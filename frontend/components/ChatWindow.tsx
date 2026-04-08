@@ -143,7 +143,7 @@ export default function ChatWindow({ sessionId, initialMessages = [] }: Props) {
             <p className="text-4xl mb-3">👨‍⚕️</p>
             <p className="text-sm">Hastaya bir şey sorun veya muayene başlatın.</p>
             <p className="text-xs mt-1 text-slate-600">
-              Örnek: "Ağrınız ne zamandan beri var?"
+              Örnek: &quot;Ağrınız ne zamandan beri var?&quot;
             </p>
           </div>
         )}

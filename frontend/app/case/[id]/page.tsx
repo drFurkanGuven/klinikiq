@@ -415,154 +415,166 @@ export default function CasePage() {
   const diff = DIFFICULTY_MAP[caseInfo?.difficulty] ?? DIFFICULTY_MAP.medium;
 
   // Sidebar içeriği
-  const SidebarContent = () => (
-    <div className="flex flex-col gap-4 h-full overflow-y-auto pb-4">
-      
-      {/* SGK Bütçe Sayacı */}
-      <div className="glass rounded-2xl p-4 border flex items-center justify-between shadow-sm transition-all" 
-        style={{ background: "var(--primary-light)", borderColor: "var(--primary-light)" }}>
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-60" style={{ color: "var(--primary)" }}>SGK BÜTÇESİ</p>
-          <p className="text-xl font-black" style={{ color: "var(--primary)" }}>{budget} ₺</p>
-        </div>
-        <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-inner" style={{ background: "white" }}>
-          <ShieldAlert className="w-5 h-5" style={{ color: "var(--primary)" }} />
-        </div>
-      </div>
+  const SidebarContent = () => {
+    const vitalsMapper: Record<string, string> = {
+      blood_pressure: "Tansiyon",
+      heart_rate: "Nabız",
+      temperature: "Ateş",
+      respiratory_rate: "Solunum",
+      spo2: "SpO2",
+      glucose: "Şeker",
+    };
 
-      {/* Hasta Bilgileri */}
-      <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-sm"
-            style={{ background: "var(--surface-2)" }}>
-            {patient?.gender === "kadın" ? "👩" : "👨"}
-          </div>
+    return (
+      <div className="flex flex-col gap-4 h-full overflow-y-auto pb-4">
+        
+        {/* SGK Bütçe Sayacı */}
+        <div className="glass rounded-2xl p-4 border flex items-center justify-between shadow-sm transition-all" 
+          style={{ background: "var(--primary-light)", borderColor: "var(--primary-light)" }}>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>Hasta</p>
-            <p className="text-base font-bold" style={{ color: "var(--text)" }}>{loading ? "Yükleniyor..." : patient?.name ?? "—"}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-60" style={{ color: "var(--primary)" }}>SGK BÜTÇESİ</p>
+            <p className="text-xl font-black" style={{ color: "var(--primary)" }}>{budget} ₺</p>
+          </div>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-inner" style={{ background: "white" }}>
+            <ShieldAlert className="w-5 h-5" style={{ color: "var(--primary)" }} />
           </div>
         </div>
-        {loading ? (
-          <div className="space-y-2"><div className="h-4 shimmer rounded" /><div className="h-4 shimmer rounded w-3/4" /></div>
-        ) : patient ? (
-          <div className="space-y-2 text-sm">
-            <InfoRow label="Yaş" value={`${patient.age} yaşında`} />
-            <InfoRow label="Cinsiyet" value={patient.gender} />
-            <div className="pt-2 border-t" style={{ borderColor: "var(--border)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-wider opacity-50 mb-1" style={{ color: "var(--text-muted)" }}>Şikayet</p>
-              <p className="text-xs leading-relaxed italic" style={{ color: "var(--text)" }}>"{patient.chief_complaint}"</p>
+
+        {/* Hasta Bilgileri */}
+        <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-sm"
+              style={{ background: "var(--surface-2)" }}>
+              {patient?.gender === "kadın" ? "👩" : "👨"}
             </div>
-            {patient.vitals && (
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>Hasta</p>
+              <p className="text-base font-black" style={{ color: "var(--text-navy)" }}>{loading ? "Yükleniyor..." : patient?.name ?? "—"}</p>
+            </div>
+          </div>
+          {loading ? (
+            <div className="space-y-2"><div className="h-4 shimmer rounded" /><div className="h-4 shimmer rounded w-3/4" /></div>
+          ) : patient ? (
+            <div className="space-y-2 text-sm">
+              <InfoRow label="Yaş" value={`${patient.age} Yaşında`} />
+              <InfoRow label="Cinsiyet" value={patient.gender} />
               <div className="pt-2 border-t" style={{ borderColor: "var(--border)" }}>
-                <p className="text-[10px] font-bold uppercase tracking-wider opacity-50 mb-1.5" style={{ color: "var(--text-muted)" }}>Vital Bulgular</p>
-                <div className="space-y-1">
-                  {Object.entries(patient.vitals).map(([k, v]) => (
-                    <div key={k} className="flex justify-between text-xs">
-                      <span className="opacity-60">{k}</span>
-                      <span className="font-mono font-bold" style={{ color: "var(--primary)" }}>{v as string}</span>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-[10px] font-black uppercase tracking-wider opacity-50 mb-1" style={{ color: "var(--text-muted)" }}>Şikayet</p>
+                <p className="text-xs leading-relaxed font-semibold italic" style={{ color: "var(--text-navy)" }}>&quot;{patient.chief_complaint}&quot;</p>
               </div>
-            )}
-          </div>
-        ) : null}
-      </div>
-
-      {/* Fizik Muayene Paneli */}
-      <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-        <div className="flex items-center gap-2 mb-3">
-          <Stethoscope className="w-4 h-4" style={{ color: "var(--primary)" }} />
-          <p className="text-sm font-bold" style={{ color: "var(--text)" }}>Fizik Muayene</p>
+              {patient.vitals && (
+                <div className="pt-2 border-t" style={{ borderColor: "var(--border)" }}>
+                  <p className="text-[10px] font-black uppercase tracking-wider opacity-50 mb-2" style={{ color: "var(--text-muted)" }}>Vital Bulgular</p>
+                  <div className="grid grid-cols-2 gap-y-1.5 gap-x-4">
+                    {Object.entries(patient.vitals).map(([k, v]) => (
+                      <div key={k} className="flex flex-col">
+                        <span className="text-[10px] font-bold opacity-60" style={{ color: "var(--text-muted)" }}>{vitalsMapper[k] || k}</span>
+                        <span className="font-mono font-black text-xs" style={{ color: "var(--primary)" }}>{v as string}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          {PHYSICAL_EXAM.map((action) => (
+
+        {/* Fizik Muayene Paneli */}
+        <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+          <div className="flex items-center gap-2 mb-3">
+            <Stethoscope className="w-4 h-4" style={{ color: "var(--primary)" }} />
+            <p className="text-sm font-black" style={{ color: "var(--text-navy)" }}>Fizik Muayene</p>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {PHYSICAL_EXAM.map((action) => (
+              <button
+                key={action.label}
+                onClick={() => sendMessage(action.message)}
+                disabled={streaming}
+                className="flex flex-col items-center justify-center gap-1.5 rounded-xl p-3 text-center transition-all disabled:opacity-40 disabled:cursor-not-allowed group border shadow-sm relative overflow-hidden"
+                style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}
+              >
+                <span className="text-xl group-hover:scale-110 transition-transform">{action.icon}</span>
+                <span className="text-[10px] font-black group-hover:scale-105 transition-all" style={{ color: "var(--text-muted)" }}>{action.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Konsültasyon Butonu */}
+        <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+          <div className="flex flex-col items-center gap-2">
             <button
-              key={action.label}
-              onClick={() => sendMessage(action.message)}
+              onClick={requestConsultation}
               disabled={streaming}
-              className="flex flex-col items-center justify-center gap-1.5 rounded-xl p-3 text-center transition-all disabled:opacity-40 disabled:cursor-not-allowed group border shadow-sm"
-              style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}
+              className="w-full flex items-center justify-center gap-2 text-white font-black py-3 rounded-xl transition-all shadow-lg hover:shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden"
+              style={{ background: "linear-gradient(135deg, #e11d48 0%, #f43f5e 100%)" }}
             >
-              <span className="text-xl group-hover:scale-110 transition-transform">{action.icon}</span>
-              <span className="text-[10px] font-bold group-hover:scale-105 transition-all" style={{ color: "var(--text-muted)" }}>{action.label}</span>
+              <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
+              {streaming ? <Loader2 className="w-5 h-5 animate-spin" /> : <Phone className="w-5 h-5 animate-pulse" />}
+              {streaming ? "İşleniyor..." : "Hocaya Danış (Konsültasyon)"}
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Konsültasyon Butonu */}
-      <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-        <div className="flex flex-col items-center gap-2">
-          <button
-            onClick={requestConsultation}
-            disabled={streaming}
-            className="w-full flex items-center justify-center gap-2 text-white font-black py-3 rounded-xl transition-all shadow-lg hover:shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden"
-            style={{ background: "linear-gradient(135deg, #e11d48 0%, #f43f5e 100%)" }}
-          >
-            <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
-            <Phone className="w-5 h-5 animate-pulse" />
-            Hocaya Danış (Konsültasyon)
-          </button>
-          <span className="text-[10px] font-black uppercase tracking-tighter opacity-70" style={{ color: "var(--danger)" }}>
-            Dikkat: Hocadan fırça yiyebilirsiniz!
-          </span>
-        </div>
-      </div>
-
-      {/* Eylemler */}
-      <div className="glass rounded-2xl p-4 border transition-all shadow-sm space-y-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-        {error && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border"
-            style={{ background: "var(--error-light)", color: "var(--error)", borderColor: "var(--error-light)" }}>
-            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-            {error}
+            <span className="text-[10px] font-black uppercase tracking-tighter" style={{ color: "var(--text-red)" }}>
+              Dikkat: Hocadan fırça yiyebilirsiniz!
+            </span>
           </div>
-        )}
-        <button
-          onClick={() => setShowDiagnosis(true)}
-          className={`w-full flex items-center gap-2 text-sm font-bold py-2.5 px-3 rounded-xl border transition-all shadow-sm ${
-            diagnosisSaved
-              ? "shadow-inner"
-              : "hover:scale-[1.02] active:scale-[0.98]"
-          }`}
-          style={diagnosisSaved 
-            ? { background: "var(--primary-light)", borderColor: "var(--primary)", color: "var(--primary)" }
-            : { background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
-        >
-          {diagnosisSaved ? <CheckCircle2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-          {diagnosisSaved ? "Tanılar Kaydedildi ✓" : "Klinik Tanı Gir"}
-        </button>
-        <button
-          onClick={handleComplete}
-          disabled={completing || !diagnosisSaved}
-          className="w-full flex items-center justify-center gap-2 text-white text-sm font-bold py-2.5 rounded-xl transition-all shadow-lg disabled:opacity-40 disabled:scale-100 hover:scale-[1.02] active:scale-[0.98]"
-          style={{ background: "var(--text)" }}
-        >
-          {completing
-            ? <><Loader2 className="w-4 h-4 animate-spin" />Raporlanıyor...</>
-            : <><Activity className="w-4 h-4" />Vakayı Bitir</>
-          }
-        </button>
+        </div>
+
+        {/* Eylemler */}
+        <div className="glass rounded-2xl p-4 border transition-all shadow-sm space-y-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+          {error && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border"
+              style={{ background: "var(--error-light)", color: "var(--danger)", borderColor: "var(--error-light)" }}>
+              <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+              {error}
+            </div>
+          )}
+          <button
+            onClick={() => setShowDiagnosis(true)}
+            className={`w-full flex items-center gap-2 text-sm font-bold py-2.5 px-3 rounded-xl border transition-all shadow-sm ${
+              diagnosisSaved
+                ? "shadow-inner"
+                : "hover:scale-[1.02] active:scale-[0.98]"
+            }`}
+            style={diagnosisSaved 
+              ? { background: "var(--primary-light)", borderColor: "var(--primary)", color: "var(--primary)" }
+              : { background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-navy)" }}
+          >
+            {diagnosisSaved ? <CheckCircle2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+            {diagnosisSaved ? "Tanılar Kaydedildi ✓" : "Klinik Tanı Gir"}
+          </button>
+          <button
+            onClick={handleComplete}
+            disabled={completing || !diagnosisSaved}
+            className="w-full flex items-center justify-center gap-2 text-white text-sm font-bold py-2.5 rounded-xl transition-all shadow-lg disabled:opacity-40 disabled:scale-100 hover:scale-[1.02] active:scale-[0.98]"
+            style={{ background: "var(--text-navy)" }}
+          >
+            {completing
+              ? <><Loader2 className="w-4 h-4 animate-spin" />Raporlanıyor...</>
+              : <><Activity className="w-4 h-4" />Vakayı Bitir</>
+            }
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="h-screen flex flex-col overflow-hidden relative transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* Navbar */}
-      <nav className="glass border-b flex-shrink-0 transition-all" style={{ borderColor: "var(--border)" }}>
+      <nav className="glass border-b flex-shrink-0 transition-all font-sans" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button onClick={() => router.push("/dashboard")} 
-              className="flex items-center gap-2 text-sm transition-all hover:scale-105 active:scale-95"
+              className="flex items-center gap-2.5 text-xs font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
               style={{ color: "var(--text-muted)" }}>
               <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Dashboard</span>
+              <span className="hidden sm:inline">KlinikIQ UI</span>
             </button>
+            <div className="w-px h-4 bg-current opacity-10 hidden sm:block mx-1" />
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="md:hidden ml-2 p-1.5 rounded-lg transition-colors shadow-sm"
+              className="md:hidden p-1.5 rounded-lg transition-colors shadow-sm"
               style={{ background: "var(--surface-2)", color: "var(--text-muted)" }}
             >
               {sidebarOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
@@ -573,14 +585,15 @@ export default function CasePage() {
             <ThemeToggle />
             <button
               onClick={() => setLabOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm hover:scale-105 active:scale-95"
-              style={{ background: "var(--primary-light)", border: "1px solid var(--primary-light)", color: "var(--primary)" }}
+              className="group flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md hover:scale-[1.05] active:scale-95 border relative overflow-hidden"
+              style={{ background: "var(--primary)", borderColor: "var(--primary-h)", color: "white" }}
             >
-              <TestTube2 className="w-3.5 h-3.5" />
-              Tetkik İste
+               <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
+              <TestTube2 className="w-3.5 h-3.5 relative z-10" />
+              <span className="relative z-10">Tetkik İste</span>
             </button>
             {caseInfo && (
-              <span className={`text-xs font-medium px-2 py-1 rounded-lg border ${diff.color} hidden sm:inline-flex`}>
+              <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border shadow-sm ${diff.color} hidden sm:inline-flex`}>
                 {diff.label}
               </span>
             )}
@@ -603,19 +616,22 @@ export default function CasePage() {
         </aside>
 
         {/* Sağ Panel: Chat */}
-        <main className="flex-1 flex flex-col overflow-hidden min-w-0 m-4 ml-0 md:ml-0 glass rounded-2xl border transition-all shadow-sm" 
+        <main className="flex-1 flex flex-col overflow-hidden min-w-0 m-4 ml-0 md:ml-0 glass rounded-2xl border transition-all shadow-xl" 
           style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-          <div className="p-3 sm:p-4 border-b flex items-center gap-3 flex-shrink-0 transition-all" 
+          <div className="p-3 sm:p-5 border-b flex items-center gap-4 flex-shrink-0 transition-all shadow-sm" 
             style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
               style={{ background: "var(--primary-light)" }}>
-              <span className="text-base">{patient?.gender === "kadın" ? "👩" : "🧑‍⚕️"}</span>
+              <span className="text-xl">{patient?.gender === "kadın" ? "👩" : "🧑‍⚕️"}</span>
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-black tracking-tight truncate" style={{ color: "var(--text-navy)" }}>
                 {patient ? `${patient.name} ile Görüşme / Muayene` : "Simülasyon"}
               </p>
-              <p className="text-xs text-slate-500 truncate">Sıradaki hamlenizi seçin.</p>
+              <div className="flex items-center gap-1.5 opacity-60">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-[10px] font-bold uppercase tracking-widest">Sıradaki hamlenizi seçin.</p>
+              </div>
             </div>
           </div>
 

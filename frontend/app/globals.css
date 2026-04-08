@@ -16,13 +16,17 @@
   --primary:     #4a7c59;
   --primary-h:   #3a6347;
   --accent:      #a8c5a0;
-  --danger:      #c0392b;
-  --success:     #2e7d52;
-  --warning:     #b7791f;
+  --danger:      #b91c1c; /* Koyu Pastel Kırmızı */
+  --success:     #15803d;
+  --warning:     #b45309;
   --primary-light: rgba(74, 124, 89, 0.1);
-  --error-light:   rgba(192, 57, 43, 0.1);
-  --success-light: rgba(46, 125, 82, 0.1);
-  --warning-light: rgba(183, 121, 31, 0.1);
+  --error-light:   rgba(185, 28, 28, 0.1);
+  --success-light: rgba(21, 128, 61, 0.1);
+  --warning-light: rgba(180, 83, 9, 0.1);
+
+  /* Modern Innovative Palette */
+  --text-navy:   #1e293b; /* Koyu Pastel Lacivert */
+  --text-red:    #991b1b; /* Koyu Pastel Kırmızı (Text) */
 }
 
 /* ── Dark Mode ────────────────────────────────────────── */
@@ -37,13 +41,17 @@ html.dark {
   --primary:     #6aac7a;
   --primary-h:   #82c494;
   --accent:      #4a7c59;
-  --danger:      #e57373;
-  --success:     #66bb6a;
-  --warning:     #ffb74d;
+  --danger:      #ef4444; 
+  --success:     #4ade80;
+  --warning:     #fbbf24;
   --primary-light: rgba(106, 172, 122, 0.15);
-  --error-light:   rgba(229, 115, 115, 0.15);
-  --success-light: rgba(102, 187, 106, 0.15);
-  --warning-light: rgba(255, 183, 77, 0.15);
+  --error-light:   rgba(239, 68, 68, 0.15);
+  --success-light: rgba(74, 222, 128, 0.15);
+  --warning-light: rgba(251, 191, 36, 0.15);
+
+  /* Modern Innovative Palette */
+  --text-navy:   #cbd5e1; /* Pastel Açık Lacivert/Mavi */
+  --text-red:    #fca5a5; /* Pastel Pembe/Kırmızı */
 }
 
 * {
