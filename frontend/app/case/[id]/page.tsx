@@ -8,6 +8,7 @@ import {
   Activity, FileText, CheckCircle2, ArrowLeft,
   Stethoscope, AlertTriangle, Send, Loader2,
   PanelLeftOpen, PanelLeftClose, Bot, Info, TestTube2, Phone, X, ShieldAlert,
+  Search, ShoppingBag, Trash, ChevronRight, Plus,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -23,56 +24,109 @@ const PHYSICAL_EXAM = [
 ];
 
 const LAB_CATEGORIES = [
-  { id: "emergency", label: "🚨 ACİL PANEL", color: "text-rose-400" },
-  { id: "routine", label: "🧪 RUTİN LABORATUVAR", color: "text-amber-400" },
-  { id: "radiology", label: "☢️ GÖRÜNTÜLEME (RADYOLOJİ)", color: "text-cyan-400" },
-  { id: "specific", label: "🔬 ÖZEL / SPESİFİK", color: "text-purple-400" },
+  { id: "lab", label: "🧪 LABORATUVAR (KAN/İDRAR)", color: "text-amber-500" },
+  { id: "radiology", label: "☢️ RADYOLOJİ VE GÖRÜNTÜLEME", color: "text-cyan-500" },
+  { id: "cardio", label: "🫀 KARDİYOLOJİK VE PULMONER", color: "text-rose-500" },
+  { id: "neuro", label: "🧠 NÖROLOJİK TESTLER", color: "text-purple-500" },
+  { id: "endo", label: "🔬 ENDOSKOPİK VE GİRİŞİMSEL", color: "text-emerald-500" },
+  { id: "nuclear", label: "☢️ NÜKLEER TIP", color: "text-orange-500" },
+  { id: "patho", label: "🧬 PATOLOJİ VE GENETİK", color: "text-indigo-500" },
 ];
 
 const LAB_TESTS = [
-  // ACİL
-  { id: "hemogram", name: "Tam Kan Sayımı (Hemogram)", price: 50, category: "emergency" },
-  { id: "ekg", name: "Elektrokardiyogram (EKG)", price: 50, category: "emergency" },
-  { id: "abg", name: "Arteriyel Kan Gazı (AKG)", price: 100, category: "emergency" },
-  { id: "kardiyak", name: "Kardiyak Panel (Troponin, CK-MB)", price: 150, category: "emergency" },
-  { id: "ddimer", name: "D-Dimer", price: 100, category: "emergency" },
-  { id: "kan_keton", name: "Kan Ketonu (Beta-hidroksibütirat)", price: 60, category: "emergency" },
-  
-  // RUTİN
-  { id: "biyokimya", name: "Rutin Biyokimya (BUN, Kre, AST, ALT, Na, K, Glukoz)", price: 100, category: "routine" },
-  { id: "genis_biyokimya", name: "Geniş Biyokimya (Ca, Mg, P, Albumin, Bilirubinler)", price: 120, category: "routine" },
-  { id: "tam_idrar", name: "Tam İdrar Tahlili (TİT)", price: 40, category: "routine" },
-  { id: "koagulasyon", name: "Koagülasyon (PT, aPTT, INR)", price: 80, category: "routine" },
-  { id: "akut_faz", name: "Akut Faz (CRP, Prokalsitonin, Sedim)", price: 150, category: "routine" },
-  { id: "lipit", name: "Lipit Profili (LDL, HDL, Trigliserid)", price: 80, category: "routine" },
-  { id: "hba1c", name: "HbA1c", price: 80, category: "routine" },
-  
-  // RADYOLOJİ
-  { id: "akciger", name: "Akciğer Grafisi (PAAC)", price: 100, category: "radiology" },
-  { id: "grafi_adbg", name: "Ayakta Direk Batın Grafisi (ADBG)", price: 100, category: "radiology" },
-  { id: "grafi_kafa", name: "Kafa Grafisi (AP-Lateral)", price: 80, category: "radiology" },
-  { id: "grafi_ekstremite", name: "Ekstremite Grafisi (Seçili Bölge)", price: 80, category: "radiology" },
-  { id: "usg_batin", name: "Tüm Batın USG", price: 300, category: "radiology" },
-  { id: "eko", name: "Ekokardiyografi (EKO)", price: 400, category: "radiology" },
-  { id: "bt_kranial", name: "Kranial BT (Kontrastsız)", price: 500, category: "radiology" },
-  { id: "bt_toraks", name: "Toraks BT (Kontrastsız)", price: 500, category: "radiology" },
-  { id: "bt_batin", name: "Tüm Batın BT (Kontrastlı)", price: 600, category: "radiology" },
-  { id: "bt_boyun", name: "Boyun BT", price: 500, category: "radiology" },
-  { id: "bt_toraks_anji", name: "Pulmoner BT Anjiyo", price: 600, category: "radiology" },
-  { id: "mr_kranial", name: "Kranial MR", price: 800, category: "radiology" },
-  { id: "mr_lomber", name: "Lomber MR", price: 800, category: "radiology" },
-  { id: "usg_doppler", name: "Venöz/Arteriyel Doppler USG", price: 350, category: "radiology" },
+  // LABORATUVAR
+  { id: "hemogram", name: "Tam Kan Sayımı (Hemogram)", price: 50, category: "lab" },
+  { id: "perf_yayma", name: "Periferik Yayma", price: 60, category: "lab" },
+  { id: "biyokimya", name: "Rutin Biyokimya Paneli", price: 120, category: "lab" },
+  { id: "koagulasyon", name: "Koagülasyon Paneli (PT, aPTT, INR)", price: 100, category: "lab" },
+  { id: "kardiyak_belirtec", name: "Kardiyak Belirteçler (Troponin, NT-proBNP)", price: 180, category: "lab" },
+  { id: "tiroid_paneli", name: "Tiroid Paneli (TSH, sT3, sT4)", price: 120, category: "lab" },
+  { id: "akg", name: "Arter Kan Gazı (AKG)", price: 110, category: "lab" },
+  { id: "tit", name: "Tam İdrar Tetkiki (TİT)", price: 40, category: "lab" },
+  { id: "hormon_paneli", name: "Hormon Paneli (FSH, LH, Kortizol vb.)", price: 200, category: "lab" },
+  { id: "tumor_belirtec", name: "Tümör Belirteçleri (PSA, CEA, CA-125)", price: 250, category: "lab" },
+  { id: "romatoloji_paneli", name: "Romatoloji Paneli (ANA, RF, Anti-CCP)", price: 220, category: "lab" },
+  { id: "vitamin_mineral", name: "Vitamin ve Mineral Paneli (B12, D Vit, Demir)", price: 150, category: "lab" },
+  { id: "seroloji_hep", name: "Seroloji ve Hepatit Paneli", price: 180, category: "lab" },
+  { id: "kulturler", name: "Kültürler (Kan, İdrar, Boğaz)", price: 160, category: "lab" },
+  { id: "ggk", name: "Gaitada Gizli Kan (GGK)", price: 50, category: "lab" },
+  { id: "bos_analizi", name: "Beyin Omurilik Sıvısı (BOS) Analizi", price: 450, category: "lab" },
+  { id: "sivi_analizi", name: "Vücut Sıvısı Analizi (Plevral/Asit)", price: 300, category: "lab" },
+  { id: "toksikoloji", name: "Toksikoloji Taraması", price: 400, category: "lab" },
 
-  // ÖZEL
-  { id: "tiroid", name: "Tiroid Paneli (TSH, sT3, sT4)", price: 120, category: "specific" },
-  { id: "demir_vit", name: "Anemi Paneli (Demir, Ferritin, B12)", price: 150, category: "specific" },
-  { id: "romatoloji", name: "Romatoloji Paneli (ANA, RF, Anti-CCP)", price: 200, category: "specific" },
-  { id: "viral_seroloji", name: "Viral Seroloji (HBsAg, HCV, HIV)", price: 150, category: "specific" },
-  { id: "otoimmun_panel", name: "Otoimmün Panel (ANCA, SMA, LKM)", price: 250, category: "specific" },
-  { id: "kultur_kan", name: "Kan Kültürü (Aerob/Anaerob)", price: 150, category: "specific" },
-  { id: "kultur_idrar", name: "İdrar Kültürü", price: 100, category: "specific" },
-  { id: "lomber_ponksiyon", name: "Lomber Ponksiyon (BOS Analizi)", price: 400, category: "specific" },
-  { id: "periferik_yayma", name: "Periferik Yayma (Manuel Değerl.)", price: 60, category: "specific" },
+  // RADYOLOJİ
+  { id: "pa_ac", name: "PA / AP Akciğer Grafisi", price: 100, category: "radiology" },
+  { id: "adbg", name: "Ayakta Direkt Batın Grafisi (ADBG)", price: 100, category: "radiology" },
+  { id: "iskelet_grafi", name: "İskelet ve Eklem Grafileri", price: 90, category: "radiology" },
+  { id: "mamografi", name: "Mamografi", price: 250, category: "radiology" },
+  { id: "dexa", name: "Kemik Dansitometrisi (DEXA)", price: 200, category: "radiology" },
+  { id: "floroskopi", name: "Floroskopi (Kontrastlı Grafiler)", price: 350, category: "radiology" },
+  { id: "usg_batin", name: "Batın Ultrasonografisi (USG)", price: 300, category: "radiology" },
+  { id: "usg_yuzeyel", name: "Yüzeyel / Tiroid / Meme USG", price: 250, category: "radiology" },
+  { id: "usg_obstetrik", name: "Renal / Pelvik / Obstetrik USG", price: 280, category: "radiology" },
+  { id: "doppler_usg", name: "Renkli Doppler USG", price: 400, category: "radiology" },
+  { id: "usg_invaziv", name: "Transvajinal / Transrektal USG", price: 350, category: "radiology" },
+  { id: "efast_pocus", name: "E-FAST / POCUS", price: 200, category: "radiology" },
+  { id: "bt_kontrastsiz", name: "Kontrastsız BT (Kranial/Batın/Toraks)", price: 500, category: "radiology" },
+  { id: "bt_kontrastli", name: "Kontrastlı BT (Tüm Batın/Toraks/Boyun)", price: 700, category: "radiology" },
+  { id: "bt_anjiyo", name: "BT Anjiyografi", price: 850, category: "radiology" },
+  { id: "bt_perfuzyon", name: "BT Perfüzyon", price: 900, category: "radiology" },
+  { id: "bt_koroner", name: "Koroner BT Anjiyografi (Sanal Anjiyo)", price: 1000, category: "radiology" },
+  { id: "mr_standart", name: "Kranial / Spinal MR", price: 850, category: "radiology" },
+  { id: "mr_tum_vucut", name: "Tüm Vücut MR", price: 2500, category: "radiology" },
+  { id: "mr_difuzyon", name: "Difüzyon MR (DWI)", price: 600, category: "radiology" },
+  { id: "mr_anji_mrcp", name: "MR Anjiyografi / MRCP", price: 950, category: "radiology" },
+  { id: "fmri", name: "Fonksiyonel MR (fMRI)", price: 1200, category: "radiology" },
+  { id: "mr_spektroskopi", name: "MR Spektroskopi", price: 1100, category: "radiology" },
+
+  // KARDİYO & PULMONER
+  { id: "ekg", name: "Elektrokardiyografi (EKG)", price: 60, category: "cardio" },
+  { id: "tte", name: "Transtorasik Ekokardiyografi (TTE)", price: 450, category: "cardio" },
+  { id: "tee", name: "Transözofageal Ekokardiyografi (TEE)", price: 800, category: "cardio" },
+  { id: "efor_testi", name: "Efor Testi (Treadmill)", price: 300, category: "cardio" },
+  { id: "holter_ritim", name: "Ritim Holter (24-72 Saat)", price: 250, category: "cardio" },
+  { id: "holter_tansiyon", name: "Tansiyon Holter", price: 200, category: "cardio" },
+  { id: "tilt_table", name: "Tilt Table Testi", price: 400, category: "cardio" },
+  { id: "koroner_anji_inv", name: "Koroner Anjiyografi (İnvaziv)", price: 3000, category: "cardio" },
+  { id: "sft", name: "Solunum Fonksiyon Testleri (SFT)", price: 150, category: "cardio" },
+  { id: "dlco", name: "Karbonmonoksit Difüzyon Kapasitesi (DLCO)", price: 250, category: "cardio" },
+  { id: "uyku_testi", name: "Uyku Apnesi Testi (Polisomnografi)", price: 1200, category: "cardio" },
+
+  // NÖROLOJİK
+  { id: "eeg", name: "Elektroensefalografi (EEG)", price: 350, category: "neuro" },
+  { id: "emg", name: "Elektromiyografi (EMG)", price: 500, category: "neuro" },
+  { id: "vep_baep_sep", name: "Uyarılmış Potansiyeller (VEP, BAEP, SEP)", price: 450, category: "neuro" },
+
+  // ENDOSKOPİK
+  { id: "ust_gis_endo", name: "Üst GİS Endoskopisi", price: 600, category: "endo" },
+  { id: "kolonoskopi", name: "Kolonoskopi / Sigmoidoskopi", price: 800, category: "endo" },
+  { id: "ercp", name: "ERCP", price: 2500, category: "endo" },
+  { id: "eus", name: "Endoskopik Ultrasonografi (EUS)", price: 1500, category: "endo" },
+  { id: "kapsul_endo", name: "Kapsül Endoskopi", price: 2000, category: "endo" },
+  { id: "bronskopi_ebus", name: "Bronkoskopi / EBUS", price: 1200, category: "endo" },
+  { id: "sistoskopi", name: "Sistoskopi", price: 700, category: "endo" },
+  { id: "laparoskopi_tanisal", name: "Laparoskopi (Tanısal)", price: 2500, category: "endo" },
+  { id: "artroskopi_tanisal", name: "Artroskopi (Tanısal)", price: 2000, category: "endo" },
+
+  // NÜKLEER TIP
+  { id: "pet_ct", name: "PET-CT", price: 3500, category: "nuclear" },
+  { id: "sint_miyokard", name: "Miyokard Perfüzyon Sintigrafisi", price: 900, category: "nuclear" },
+  { id: "sint_kemik", name: "Tüm Vücut Kemik Sintigrafisi", price: 800, category: "nuclear" },
+  { id: "sint_tiroid", name: "Tiroid / Paratiroid Sintigrafisi", price: 400, category: "nuclear" },
+  { id: "sint_renal", name: "Renal Sintigrafi (DMSA/DTPA)", price: 600, category: "nuclear" },
+  { id: "vq_sintigrafi", name: "Ventilasyon / Perfüzyon (V/Q) Sintigrafisi", price: 1000, category: "nuclear" },
+  { id: "sint_ozel", name: "Galyum / Oktreotid Sintigrafisi", price: 1500, category: "nuclear" },
+
+  // PATOLOJİ
+  { id: "iiab", name: "İnce İğne Aspirasyon Biyopsisi (İİAB)", price: 300, category: "patho" },
+  { id: "trucut", name: "Tru-cut (Kor) Biyopsi", price: 500, category: "patho" },
+  { id: "biyopsi_ozel", name: "Eksizyonel / İnsizyonel Biyopsi", price: 800, category: "patho" },
+  { id: "smear", name: "Pap Smear Testi", price: 120, category: "patho" },
+  { id: "ihk", name: "İmmünhistokimya (İHK) İncelemesi", price: 400, category: "patho" },
+  { id: "genetik_karyotip", name: "Kromozom Analizi (Karyotipleme)", price: 1500, category: "patho" },
+  { id: "pcr_testleri", name: "PCR Testleri", price: 350, category: "patho" },
+  { id: "ngs_analizi", name: "Yeni Nesil Dizileme (NGS)", price: 5000, category: "patho" },
+  { id: "fish_analizi", name: "FISH Analizi", price: 1200, category: "patho" },
 ];
 
 const SPECIALTY_LABELS: Record<string, string> = {
@@ -210,6 +264,8 @@ export default function CasePage() {
   // Custom States
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [labOpen, setLabOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("lab");
+  const [searchQuery, setSearchQuery] = useState("");
   const [budget, setBudget] = useState(1000);
   const [selectedLabs, setSelectedLabs] = useState<string[]>([]);
 
@@ -229,6 +285,16 @@ export default function CasePage() {
     try {
       const res = await sessionsApi.getSession(sessionId);
       setSessionData(res.data);
+      
+      // Mesaj geçmişini yükle
+      if (res.data.messages) {
+        setMessages(res.data.messages.map((m: any) => ({
+          role: m.role,
+          content: m.content,
+          streaming: false
+        })));
+      }
+
       const difficulty = res.data.case?.difficulty || 'medium';
       setBudget(DIFFICULTY_MAP[difficulty].initialBudget);
     } catch { setError("Oturum yüklenemedi."); }
@@ -562,17 +628,22 @@ export default function CasePage() {
                     : "rounded-tl-sm border"
                 }`} style={
                   msg.role === "user" 
-                    ? { background: "var(--primary-light)", color: "var(--primary)", border: "1px solid var(--primary-light)" }
-                    : { background: "var(--bg)", color: "var(--text)", borderColor: "var(--border)" }
+                    ? { background: "var(--primary-light)", color: "var(--primary)", borderColor: "var(--primary-light)" }
+                    : { background: "var(--surface)", color: "var(--text)", borderColor: "var(--border)" }
                 }>
+                  <div className="flex items-center gap-2 mb-1 opacity-50 text-[10px] font-bold uppercase tracking-wider">
+                    {msg.role === "user" ? "Siz" : "KlinikIQ AI"}
+                  </div>
                   {msg.role === "assistant" ? <RenderMessage content={msg.content} /> : msg.content}
                   
                   {msg.streaming && msg.content.length > 0 && (
-                    <span className="inline-block w-1 h-3.5 bg-blue-400 ml-1 animate-pulse rounded-sm align-middle" />
+                    <span className="inline-block w-1.5 h-3.5 ml-1 animate-pulse rounded-sm align-middle" style={{ background: "var(--primary)" }} />
                   )}
                   {msg.streaming && msg.content.length === 0 && (
-                    <span className="flex gap-1 items-center h-4">
-                      <Loader2 className="w-4 h-4 text-slate-500 animate-spin" />
+                    <span className="flex gap-1 items-center h-4 py-2">
+                      <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "var(--primary)" }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:0.2s]" style={{ background: "var(--primary)" }} />
+                      <span className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:0.4s]" style={{ background: "var(--primary)" }} />
                     </span>
                   )}
                 </div>
@@ -612,89 +683,176 @@ export default function CasePage() {
         </main>
       </div>
 
-      {/* Lab Request Drawer */}
+      {/* Professional Lab Request Panel (HBYS Style) */}
       {labOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setLabOpen(false)} />
-          <div className="w-full max-w-sm h-full shadow-2xl relative z-10 flex flex-col animate-in slide-in-from-right duration-300 border-l" 
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-md transition-opacity" onClick={() => setLabOpen(false)} />
+          
+          <div className="relative w-full max-w-6xl h-[85vh] shadow-2xl rounded-[2.5rem] flex flex-col overflow-hidden animate-in zoom-in-95 duration-300 border transition-all"
             style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
             
-            <div className="p-6 border-b flex justify-between items-center transition-all" 
+            {/* Header */}
+            <div className="h-20 px-8 border-b flex items-center justify-between gap-6 transition-all" 
               style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-              <div>
-                <h2 className="font-bold flex items-center gap-2" style={{ color: "var(--text)" }}>
-                  <TestTube2 className="w-5 h-5" style={{ color: "var(--primary)" }} /> Tetkik İstem Paneli
-                </h2>
-                <p className="text-xs font-bold mt-1 uppercase tracking-tight" style={{ color: "var(--success)" }}>
-                  Kalan Bütçe: {budget} ₺
-                </p>
-              </div>
-              <button onClick={() => setLabOpen(false)} 
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-90 shadow-sm border"
-                style={{ background: "var(--surface-2)", color: "var(--text-muted)", borderColor: "var(--border)" }}>
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 space-y-8">
-              {LAB_CATEGORIES.map(cat => {
-                const catTests = LAB_TESTS.filter(t => t.category === cat.id);
-                if (catTests.length === 0) return null;
-                
-                return (
-                  <div key={cat.id} className="space-y-4">
-                    <h3 className={`text-[10px] font-black tracking-widest uppercase border-b pb-1 opacity-70 ${cat.color}`} style={{ borderColor: "var(--border)" }}>
-                      {cat.label}
-                    </h3>
-                    <div className="space-y-2">
-                      {catTests.map(test => {
-                        const isSelected = selectedLabs.includes(test.id);
-                        const canAfford = budget >= test.price;
-                        return (
-                          <button
-                             key={test.id}
-                             onClick={() => toggleLab(test.id, test.price)}
-                             disabled={!isSelected && !canAfford}
-                             className={`w-full text-left p-4 rounded-2xl border transition-all flex justify-between items-center group shadow-sm ${
-                               isSelected 
-                                 ? "scale-[1.02] ring-2 ring-offset-2" 
-                                 : "hover:translate-x-1 disabled:opacity-30 disabled:cursor-not-allowed"
-                             }`}
-                             style={{ 
-                                background: isSelected ? "var(--primary-light)" : "var(--surface)", 
-                                borderColor: isSelected ? "var(--primary)" : "var(--border)",
-                                "--tw-ring-color": "var(--primary-light)"
-                             } as any}
-                           >
-                             <div className="min-w-0 flex-1 mr-3">
-                               <div className="text-sm font-bold truncate" style={{ color: "var(--text)" }}>{test.name}</div>
-                               <div className="text-[11px] font-black mt-0.5 opacity-60" style={{ color: isSelected ? "var(--primary)" : "var(--text-muted)" }}>{test.price} ₺</div>
-                             </div>
-                             {isSelected && (
-                               <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 shadow-md" style={{ background: "var(--primary)" }}>
-                                 <CheckCircle2 className="w-4 h-4 text-white" />
-                               </div>
-                             )}
-                           </button>
-                        )
-                      })}
-                    </div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm" style={{ background: "var(--primary-light)" }}>
+                  <TestTube2 className="w-6 h-6" style={{ color: "var(--primary)" }} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black tracking-tight" style={{ color: "var(--text)" }}>Laboratuvar İstem Paneli</h2>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-60" style={{ color: "var(--text-muted)" }}>KLİNİK SİSTEMİ ÇEVRİMİÇİ</p>
                   </div>
-                )
-              })}
+                </div>
+              </div>
+
+              {/* Search Bar */}
+              <div className="flex-1 max-w-md relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40 group-focus-within:opacity-100 transition-opacity" style={{ color: "var(--text)" }} />
+                <input 
+                  type="text"
+                  placeholder="Tetkik adı veya kategori ara..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-11 pl-12 pr-4 rounded-xl border text-sm transition-all outline-none focus:ring-2"
+                  style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)", "--tw-ring-color": "var(--primary-light)" } as any}
+                />
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="hidden lg:flex flex-col items-end">
+                  <p className="text-[10px] font-black uppercase tracking-tighter opacity-50" style={{ color: "var(--text-muted)" }}>KALAN BÜTÇE</p>
+                  <p className="text-lg font-black" style={{ color: "var(--primary)" }}>{budget} ₺</p>
+                </div>
+                <button onClick={() => setLabOpen(false)} 
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all hover:rotate-90 hover:scale-110 active:scale-95 border shadow-sm"
+                  style={{ background: "var(--surface-2)", color: "var(--text-muted)", borderColor: "var(--border)" }}>
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
             </div>
 
-            <div className="p-6 border-t transition-all shadow-inner" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-              <button
-                onClick={orderLabs}
-                disabled={selectedLabs.length === 0 || streaming}
-                className="w-full text-white font-black py-4 rounded-2xl shadow-xl disabled:opacity-40 transition-all flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden"
-                style={{ background: "var(--primary)" }}
-              >
-                <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
-                <TestTube2 className="w-6 h-6" />
-                <span>Tetkikleri İste ({selectedLabs.length})</span>
-              </button>
+            <div className="flex-1 flex overflow-hidden">
+              {/* Left Sidebar: Categories */}
+              <aside className="w-64 border-r overflow-y-auto p-4 space-y-2 transition-all" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-4 px-2" style={{ color: "var(--text-muted)" }}>Kategoriler</p>
+                {LAB_CATEGORIES.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all font-bold text-sm ${selectedCategory === cat.id ? "shadow-md scale-[1.02]" : "hover:bg-black/5 opacity-60 hover:opacity-100"}`}
+                    style={selectedCategory === cat.id ? { background: "var(--bg)", color: "var(--primary)", borderColor: "var(--border)", borderWidth: "1px" } : { color: "var(--text-muted)" }}
+                  >
+                    <span className="truncate">{cat.label.split(" (")[0]}</span>
+                    {selectedCategory === cat.id && <ChevronRight className="w-4 h-4" />}
+                  </button>
+                ))}
+              </aside>
+
+              {/* Main Area: Tests Grid */}
+              <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--bg)" }}>
+                <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+                  {LAB_TESTS
+                    .filter(t => (searchQuery ? t.name.toLowerCase().includes(searchQuery.toLowerCase()) : t.category === selectedCategory))
+                    .map(test => {
+                      const isSelected = selectedLabs.includes(test.id);
+                      const canAfford = budget >= test.price;
+                      return (
+                        <button
+                          key={test.id}
+                          onClick={() => toggleLab(test.id, test.price)}
+                          disabled={!isSelected && !canAfford}
+                          className={`group text-left p-5 rounded-3xl border transition-all flex flex-col justify-between h-32 relative ${
+                            isSelected ? "shadow-lg scale-[1.02]" : "hover:shadow-md hover:-translate-y-1 active:scale-95 disabled:opacity-30 disabled:grayscale"
+                          }`}
+                          style={{ 
+                            background: isSelected ? "var(--primary-light)" : "var(--surface)", 
+                            borderColor: isSelected ? "var(--primary)" : "var(--border)"
+                          }}
+                        >
+                          <div className="flex justify-between items-start">
+                            <span className="text-sm font-black leading-tight line-clamp-2 pr-6" style={{ color: isSelected ? "var(--primary)" : "var(--text)" }}>
+                              {test.name}
+                            </span>
+                            {isSelected && <CheckCircle2 className="w-5 h-5 flex-shrink-0" style={{ color: "var(--primary)" }} />}
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold opacity-60" style={{ color: isSelected ? "var(--primary)" : "var(--text-muted)" }}>{test.price} ₺</span>
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${isSelected ? "bg-white text-emerald-600 shadow-inner" : "bg-black/5"}`}>
+                              <Plus className="w-4 h-4" />
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })
+                  }
+                  {LAB_TESTS.filter(t => (searchQuery ? t.name.toLowerCase().includes(searchQuery.toLowerCase()) : t.category === selectedCategory)).length === 0 && (
+                    <div className="col-span-full py-20 text-center">
+                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Search className="w-8 h-8 opacity-20" />
+                      </div>
+                      <p className="text-sm font-bold opacity-40">Aradığınız kriterlere uygun tetkik bulunamadı.</p>
+                    </div>
+                  )}
+                </div>
+              </main>
+
+              {/* Right Sidebar: Cart */}
+              <aside className="w-80 border-l flex flex-col transition-all" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+                <div className="p-6 border-b" style={{ borderColor: "var(--border)" }}>
+                  <div className="flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4" style={{ color: "var(--primary)" }} />
+                    <h3 className="font-bold uppercase tracking-widest text-[10px]" style={{ color: "var(--text-muted)" }}>İstem Sepeti</h3>
+                  </div>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {selectedLabs.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center opacity-30 text-center p-8">
+                      <div className="w-12 h-12 border-2 border-dashed border-current rounded-2xl mb-4 flex items-center justify-center">
+                        <Plus className="w-6 h-6" />
+                      </div>
+                      <p className="text-xs font-bold">Henüz tetkik seçilmedi.</p>
+                    </div>
+                  ) : (
+                    selectedLabs.map(id => {
+                      const test = LAB_TESTS.find(t => t.id === id);
+                      if (!test) return null;
+                      return (
+                        <div key={id} className="flex items-center justify-between p-3 rounded-2xl border bg-white shadow-sm group animate-in slide-in-from-right-4 duration-300">
+                          <div className="min-w-0 pr-2">
+                            <p className="text-[11px] font-bold truncate leading-tight" style={{ color: "var(--text)" }}>{test.name}</p>
+                            <p className="text-[10px] font-black opacity-50" style={{ color: "var(--primary)" }}>{test.price} ₺</p>
+                          </div>
+                          <button onClick={() => toggleLab(test.id, test.price)} className="w-7 h-7 rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors flex items-center justify-center shrink-0 opacity-40 group-hover:opacity-100">
+                            <Trash className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                <div className="p-6 border-t space-y-4" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                  <div className="flex justify-between items-end">
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40" style={{ color: "var(--text-muted)" }}>Toplam Tutar</p>
+                    <p className="text-xl font-black" style={{ color: "var(--text)" }}>
+                      {selectedLabs.reduce((sum, id) => sum + (LAB_TESTS.find(t => t.id === id)?.price || 0), 0)} ₺
+                    </p>
+                  </div>
+                  <button
+                    onClick={orderLabs}
+                    disabled={selectedLabs.length === 0 || streaming}
+                    className="w-full text-white font-black py-4 rounded-2xl shadow-xl disabled:opacity-40 transition-all flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden"
+                    style={{ background: "var(--primary)" }}
+                  >
+                    <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
+                    <span>Tetkikleri İste ({selectedLabs.length})</span>
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </aside>
             </div>
           </div>
         </div>

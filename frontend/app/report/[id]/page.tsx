@@ -33,14 +33,14 @@ export default function ReportPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
-      <nav className="glass border-b border-slate-800 sticky top-0 z-50">
+      <nav className="glass border-b sticky top-0 z-50 transition-all" style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <button onClick={() => router.back()} className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors">
+          <button onClick={() => router.back()} className="flex items-center gap-2 text-sm font-bold transition-all hover:scale-105" style={{ color: "var(--text-muted)" }}>
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Geri</span>
           </button>
-          <h1 className="font-semibold text-white text-sm">Vaka Raporu</h1>
-          <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors">
+          <h1 className="font-bold text-sm uppercase tracking-widest" style={{ color: "var(--text)" }}>Vaka Raporu</h1>
+          <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 text-sm font-bold transition-all hover:scale-105" style={{ color: "var(--text-muted)" }}>
             <Home className="w-4 h-4" />
             <span className="hidden sm:inline">Dashboard</span>
           </button>
@@ -48,29 +48,28 @@ export default function ReportPage() {
       </nav>
 
       {/* AI Disclaimer */}
-      <div className="bg-blue-500/5 border-b border-blue-500/10 px-4 py-2 flex items-center gap-2">
-        <Bot className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-        <p className="text-xs text-slate-500">
-          <span className="text-blue-400">AI Değerlendirmesi</span>
-          {" "}— Bu rapor GPT-4o tarafından üretilmiştir. Akademik referans olarak kullanmayın.
+      <div className="px-4 py-2.5 flex items-center gap-2 justify-center border-b" style={{ background: "var(--primary-light)", borderColor: "var(--primary-light)" }}>
+        <Bot className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--primary)" }} />
+        <p className="text-[10px] font-bold uppercase tracking-tight" style={{ color: "var(--primary)" }}>
+          AI Değerlendirmesi — Bu rapor GPT-4o tarafından üretilmiştir.
         </p>
       </div>
 
-      <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8">
-        <div className="mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-white">Performans Raporu</h2>
-          <p className="text-slate-400 text-sm mt-1">AI tarafından oluşturulan detaylı klinik değerlendirme</p>
+      <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-10 transition-colors" style={{ background: "var(--bg)" }}>
+        <div className="mb-8">
+          <h2 className="text-2xl sm:text-3xl font-black" style={{ color: "var(--text)" }}>Performans Raporu</h2>
+          <p className="text-sm font-medium mt-1 opacity-60" style={{ color: "var(--text-muted)" }}>AI tarafından oluşturulan detaylı klinik değerlendirme</p>
         </div>
 
         {loading && (
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <div className="flex flex-col items-center justify-center py-32 gap-6">
             <div className="relative">
-              <div className="w-16 h-16 border-2 border-blue-500/20 rounded-full" />
-              <div className="absolute inset-0 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-16 h-16 border-4 rounded-full opacity-20" style={{ borderColor: "var(--primary)" }} />
+              <div className="absolute inset-0 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: "var(--primary)" }} />
             </div>
             <div className="text-center">
-              <p className="text-white font-medium">Rapor Hazırlanıyor</p>
-              <p className="text-slate-400 text-sm mt-1">GPT-4o analiz yapıyor, lütfen bekleyin...</p>
+              <p className="text-lg font-bold" style={{ color: "var(--text)" }}>Rapor Hazırlanıyor</p>
+              <p className="text-sm font-medium mt-1 opacity-50" style={{ color: "var(--text-muted)" }}>GPT-4o analiz yapıyor, lütfen bekleyin...</p>
             </div>
           </div>
         )}

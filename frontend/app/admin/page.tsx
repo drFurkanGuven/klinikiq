@@ -13,6 +13,7 @@ import {
   Users,
   Search,
   Save,
+  Loader2,
 } from "lucide-react";
 
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -79,56 +80,69 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen flex flex-col transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* Navbar */}
-      <nav className="glass border-b sticky top-0 z-50 transition-all" style={{ borderColor: "var(--border)" }}>
+      <nav className="glass border-b sticky top-0 z-50 transition-all font-sans" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="p-2 transition-colors mr-2 hover:scale-110 active:scale-95" style={{ color: "var(--text-muted)" }}>
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard" className="p-2.5 rounded-xl transition-all hover:bg-black/5 hover:scale-105 active:scale-90" style={{ color: "var(--text-muted)" }}>
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
-              style={{ background: "var(--error)" }}>
-              <ShieldAlert className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
+                style={{ background: "var(--error)" }}>
+                <ShieldAlert className="w-5 h-5 text-white" />
+              </div>
+              <div className="hidden sm:block">
+                <span className="font-black text-lg tracking-tight block leading-tight">Yönetim Paneli</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest opacity-40 ml-0.5">Sistem Yöneticisi</span>
+              </div>
             </div>
-            <span className="font-bold text-lg hidden sm:block">Yönetim Paneli</span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-6">
             <ThemeToggle />
+            <div className="w-px h-6 bg-current opacity-10 hidden sm:block" />
             <button
               onClick={logout}
-              className="flex items-center gap-2 text-sm transition-colors px-3 py-2 rounded-lg hover:bg-slate-500/10"
+              className="group flex items-center gap-2 text-sm font-bold transition-all px-4 py-2.5 rounded-xl hover:bg-black/5"
               style={{ color: "var(--text-muted)" }}
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
               <span className="hidden sm:inline">Çıkış</span>
             </button>
           </div>
         </div>
       </nav>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-12">
         
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
-            <div className="flex items-center gap-4">
-                <div className="p-3 rounded-2xl" style={{ background: "var(--error-light)" }}>
-                  <Users className="w-6 h-6" style={{ color: "var(--error)" }} />
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-12 gap-8">
+            <div className="space-y-4">
+                <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm"
+                  style={{ background: "var(--error-light)", color: "var(--error)", borderColor: "var(--error-light)" }}>
+                  <Users className="w-3.5 h-3.5" />
+                  Kullanıcı Yönetimi
                 </div>
                 <div>
-                  <h1 className="text-3xl font-black tracking-tight">Kullanıcı Yönetimi</h1>
-                  <p className="text-xs font-bold uppercase tracking-widest opacity-60" style={{ color: "var(--text-muted)" }}>{users.length} Kayıtlı Kullanıcı</p>
+                  <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-tight">
+                    Sistem <span style={{ color: "var(--error)" }}>Kontrolü</span>
+                  </h1>
+                  <p className="text-sm font-medium mt-2 opacity-60 max-w-md" style={{ color: "var(--text-muted)" }}>
+                    {users.length} aktif kullanıcıyı yönetin, günlük limitleri güncelleyin ve rollerini düzenleyin.
+                  </p>
                 </div>
             </div>
             
-            <div className="relative w-full md:w-80">
-                <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 opacity-40" />
+            <div className="relative w-full lg:w-96 group">
+                <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 opacity-30 group-focus-within:opacity-100 transition-opacity" style={{ color: "var(--text)" }} />
                 <input 
                     type="text" 
-                    placeholder="İsim veya e-posta ara..." 
-                    className="w-full rounded-2xl pl-11 pr-4 py-3 text-sm transition-all focus:outline-none focus:ring-2"
+                    placeholder="İsim veya e-posta ile ara..." 
+                    className="w-full rounded-[1.25rem] pl-12 pr-4 py-4 text-sm font-medium transition-all focus:outline-none focus:ring-4 shadow-sm border"
                     style={{ 
                       background: "var(--surface)", 
                       color: "var(--text)", 
-                      border: "1px solid var(--border)",
+                      borderColor: "var(--border)",
                       "--tw-ring-color": "var(--primary-light)"
                     } as any}
                     value={search}
@@ -137,49 +151,78 @@ export default function AdminDashboardPage() {
             </div>
         </div>
 
-        <div className="rounded-2xl border overflow-hidden shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+        {/* Users Table Card */}
+        <div className="glass rounded-[2rem] border shadow-xl overflow-hidden transition-all" 
+          style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
             <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                    <thead className="text-[11px] font-black uppercase tracking-widest border-b" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
-                        <tr>
-                            <th className="px-6 py-5">Kullanıcı</th>
-                            <th className="px-6 py-5">E-posta</th>
-                            <th className="px-6 py-5">Bölüm / Sınıf</th>
-                            <th className="px-6 py-5">Rol</th>
-                            <th className="px-6 py-5 text-center">Günlük Limit</th>
+                <table className="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr className="border-b transition-all" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>Kullanıcı Bilgileri</th>
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>Bölüm / Sınıf</th>
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>Yetki Grubu</th>
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-center" style={{ color: "var(--text-muted)" }}>Günlük Vaka Limiti</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
                         {loading ? (
-                            <tr><td colSpan={5} className="px-6 py-12 text-center opacity-50">Yükleniyor...</td></tr>
+                            <tr><td colSpan={4} className="px-8 py-24 text-center">
+                              <div className="flex flex-col items-center gap-4">
+                                <Loader2 className="w-8 h-8 animate-spin opacity-20" />
+                                <span className="font-bold opacity-40">Kullanıcı verileri yükleniyor...</span>
+                              </div>
+                            </td></tr>
                         ) : filteredUsers.length === 0 ? (
-                            <tr><td colSpan={5} className="px-6 py-12 text-center opacity-50">Sonuç bulunamadı.</td></tr>
+                            <tr><td colSpan={4} className="px-8 py-24 text-center">
+                              <div className="flex flex-col items-center gap-4">
+                                <Search className="w-12 h-12 opacity-10" />
+                                <span className="font-bold opacity-40">Aradığınız kriterlere uygun kullanıcı bulunamadı.</span>
+                              </div>
+                            </td></tr>
                         ) : filteredUsers.map(user => (
-                            <tr key={user.id} className="hover:bg-slate-500/5 transition-colors">
-                                <td className="px-6 py-5 font-bold" style={{ color: "var(--text)" }}>{user.name}</td>
-                                <td className="px-6 py-5 opacity-70">{user.email}</td>
-                                <td className="px-6 py-5 opacity-70">
-                                  {user.school || "Belirtilmemiş"} {user.year ? `/ ${user.year}. Sınıf` : ""}
+                            <tr key={user.id} className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group">
+                                <td className="px-8 py-6">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-black text-xs border shadow-sm transition-transform group-hover:scale-110"
+                                      style={{ background: "var(--surface-2)", color: "var(--primary)", borderColor: "var(--border)" }}>
+                                      {user.name.split(' ').map(n=>n[0]).join('')}
+                                    </div>
+                                    <div>
+                                      <p className="font-black text-base" style={{ color: "var(--text)" }}>{user.name}</p>
+                                      <p className="text-xs font-bold opacity-40" style={{ color: "var(--text-muted)" }}>{user.email}</p>
+                                    </div>
+                                  </div>
                                 </td>
-                                <td className="px-6 py-5">
+                                <td className="px-8 py-6">
+                                  <div className="flex flex-col gap-1">
+                                    <p className="font-bold text-sm" style={{ color: "var(--text)" }}>{user.school || "—"}</p>
+                                    {user.year && (
+                                      <p className="text-[10px] font-black uppercase tracking-wider opacity-40" style={{ color: "var(--text-muted)" }}>
+                                        {user.year}. Sınıf Öğrencisi
+                                      </p>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="px-8 py-6">
                                     {user.is_admin ? (
-                                        <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter border shadow-sm"
+                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border shadow-sm"
                                           style={{ background: "var(--error-light)", color: "var(--error)", borderColor: "var(--error-light)" }}>
-                                          Admin
-                                        </span>
+                                          <ShieldAlert className="w-3 h-3" />
+                                          Yönetici
+                                        </div>
                                     ) : (
-                                        <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold opacity-60 border"
+                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold opacity-60 border"
                                           style={{ background: "var(--surface-2)", color: "var(--text-muted)", borderColor: "var(--border)" }}>
                                           Standart
-                                        </span>
+                                        </div>
                                     )}
                                 </td>
-                                <td className="px-6 py-5 text-center">
+                                <td className="px-8 py-6">
                                     <div className="flex items-center justify-center gap-3">
                                         <input 
                                             type="number" 
-                                            className="w-16 rounded-xl px-2 py-1.5 text-center font-bold focus:outline-none transition-all"
-                                            style={{ background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--text)" }}
+                                            className="w-16 h-10 rounded-xl px-2 text-center font-black focus:outline-none focus:ring-2 transition-all border shadow-sm"
+                                            style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)", "--tw-ring-color": "var(--primary-light)" } as any}
                                             defaultValue={user.daily_limit}
                                             id={`limit-${user.id}`}
                                         />
@@ -188,11 +231,12 @@ export default function AdminDashboardPage() {
                                                 const el = document.getElementById(`limit-${user.id}`) as HTMLInputElement;
                                                 handleUpdateLimit(user.id, parseInt(el.value));
                                             }}
-                                            className="p-2 rounded-xl transition-all hover:scale-110 active:scale-95 shadow-sm"
+                                            className="w-10 h-10 rounded-xl transition-all hover:scale-110 active:scale-90 shadow-lg flex items-center justify-center group/btn relative overflow-hidden"
                                             style={{ background: "var(--primary)", color: "white" }}
                                             title="Kaydet"
                                         >
-                                            <Save className="w-4 h-4" />
+                                            <div className="absolute inset-0 bg-white/10 w-0 group-hover/btn:w-full transition-all duration-300" />
+                                            <Save className="w-4 h-4 relative z-10" />
                                         </button>
                                     </div>
                                 </td>

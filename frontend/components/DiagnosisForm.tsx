@@ -49,53 +49,60 @@ export default function DiagnosisForm({ onSubmit, onClose }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      <div className="relative glass rounded-2xl shadow-2xl w-full max-w-md p-6 z-10">
+      <div className="relative glass rounded-3xl shadow-2xl w-full max-w-md p-6 z-10 border transition-all" 
+        style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+        
         {/* Header */}
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold text-white">Tanıları Gir</h2>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <h2 className="text-xl font-bold" style={{ color: "var(--text)" }}>Tanıları Gir</h2>
+            <p className="text-xs font-medium mt-1 opacity-70" style={{ color: "var(--text-muted)" }}>
               En önemli tanıyı önce yaz (maks. 5)
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-90 border shadow-sm"
+            style={{ background: "var(--surface-2)", color: "var(--text-muted)", borderColor: "var(--border)" }}
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl px-4 py-3 mb-4 text-sm">
+          <div className="flex items-center gap-2 rounded-xl px-4 py-3 mb-5 text-sm font-bold border"
+            style={{ background: "var(--error-light)", color: "var(--error)", borderColor: "var(--error-light)" }}>
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {diagnoses.map((d, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
-                <span className="text-xs text-blue-400 font-bold">{i + 1}</span>
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs shadow-sm border"
+                style={{ background: "var(--primary-light)", color: "var(--primary)", borderColor: "var(--primary-light)" }}>
+                {i + 1}
               </div>
               <input
                 value={d}
                 onChange={(e) => updateDiagnosis(i, e.target.value)}
                 placeholder={
-                  i === 0 ? "Ön tanı (en olası)" : `Alternatif tanı ${i + 1}`
+                  i === 0 ? "Ön tanı (en olası)" : `Alternatif hastalık ${i + 1}`
                 }
-                className="input-focus flex-1 bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 text-sm"
+                className="input-focus flex-1 border rounded-xl px-4 py-3 text-sm transition-all"
+                style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
               />
               {diagnoses.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeDiagnosis(i)}
-                  className="w-8 h-8 rounded-lg hover:bg-red-500/10 hover:text-red-400 text-slate-500 flex items-center justify-center transition-colors"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:text-red-500 opacity-40 hover:opacity-100"
+                  style={{ color: "var(--text)" }}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -107,18 +114,20 @@ export default function DiagnosisForm({ onSubmit, onClose }: Props) {
             <button
               type="button"
               onClick={addDiagnosis}
-              className="flex items-center gap-2 text-sm text-slate-400 hover:text-blue-400 transition-colors px-2 py-1"
+              className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-all hover:translate-x-1 px-1 mt-2"
+              style={{ color: "var(--primary)" }}
             >
               <Plus className="w-4 h-4" />
               Tanı Ekle
             </button>
           )}
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:text-white text-sm transition-colors"
+              className="flex-1 py-3.5 rounded-2xl border font-bold text-sm transition-all hover:bg-black/5"
+              style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
             >
               İptal
             </button>
@@ -126,8 +135,10 @@ export default function DiagnosisForm({ onSubmit, onClose }: Props) {
               id="diagnosis-submit"
               type="submit"
               disabled={loading}
-              className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold py-2.5 rounded-xl transition-all text-sm disabled:opacity-60 flex items-center justify-center gap-2"
+              className="flex-1 text-white font-black py-3.5 rounded-2xl transition-all text-sm shadow-lg active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2 group relative overflow-hidden"
+              style={{ background: "var(--primary)" }}
             >
+              <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
