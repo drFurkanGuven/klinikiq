@@ -134,9 +134,9 @@ export function FeatureSection() {
 export function StatsSection() {
   const stats = [
     { label: "Toplam Vaka", value: "10.000+", icon: Database },
-    { label: "Aktif Kullanıcı", value: "500+", icon: Users },
     { label: "Uzmanlık Alanı", value: "30+", icon: Stethoscope },
-    { label: "Simülasyon Skoru", value: "%98", icon: ShieldCheck }
+    { label: "Soru Tipi", value: "USMLE", icon: ShieldCheck },
+    { label: "Kullanım Ücreti", value: "Ücretsiz", icon: Users }
   ];
 
   return (
