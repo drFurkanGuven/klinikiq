@@ -14,13 +14,115 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 // --- SABİTLER VE VERİLER ---
 
-const PHYSICAL_EXAM = [
-  { icon: "🫀", label: "Kardiyovasküler", message: "[FİZİK MUAYENE] Kardiyovasküler sistem muayenesi (kalp sesleri, üfürüm, nabızlar, ödem) yapar mısın?" },
-  { icon: "🫁", label: "Solunum", message: "[FİZİK MUAYENE] Solunum sistemi muayenesi (rall, ronküs, wheezing, solunum sesleri) yapar mısın?" },
-  { icon: "🩺", label: "Batın", message: "[FİZİK MUAYENE] Batın muayenesi (inspeksiyon, palpasyon, hassasiyet, rebound/defans, organomegali) yapar mısın?" },
-  { icon: "🧠", label: "Nörolojik", message: "[FİZİK MUAYENE] Nörolojik muayene (bilinç, GKS, kranial sinirler, motor/duyu defisiti, refleksler) yapar mısın?" },
-  { icon: "👁️", label: "Göz / Baş-Boyun", message: "[FİZİK MUAYENE] Baş, boyun ve göz muayenesi (pupiller, mukoza, LAP) yapar mısın?" },
-  { icon: "🦵", label: "Ekstremite / Cilt", message: "[FİZİK MUAYENE] Ekstremite, nabızlar ve cilt muayenesi (döküntü, ısı, turgor) yapar mısın?" },
+const EXAM_CATEGORIES = [
+  { id: "basic", label: "🎯 Temel Yöntemler" },
+  { id: "vitals", label: "📊 Vital & Antropometri" },
+  { id: "head_neck", label: "👤 Baş ve Boyun" },
+  { id: "respiratory", label: "🫁 Solunum Sistemi" },
+  { id: "cardio", label: "🫀 Kardiyovasküler" },
+  { id: "gastro", label: "🩺 Gastrointestinal" },
+  { id: "neuro", label: "🧠 NÖROLOJİK MUAYENE" },
+  { id: "locomotor", label: "🦴 Kas-İskelet Sistemi" },
+  { id: "urogenital", label: "🚻 Ürogenital & Rektal" },
+  { id: "derma", label: "✨ Dermatolojik" },
+];
+
+const EXAM_ITEMS = [
+  // Temel Fizik Muayene Yöntemleri
+  { id: "inspeksiyon", name: "İnspeksiyon", category: "basic", message: "[FİZİK MUAYENE] Hastaya genel bir inspeksiyon yapar mısın?" },
+  { id: "palpasyon", name: "Palpasyon", category: "basic", message: "[FİZİK MUAYENE] Palpasyon ile muayene yapar mısın?" },
+  { id: "perkusyon", name: "Perküsyon", category: "basic", message: "[FİZİK MUAYENE] Perküsyon ile muayene yapar mısın?" },
+  { id: "oskultasyon", name: "Oskültasyon", category: "basic", message: "[FİZİK MUAYENE] Oskültasyon yapar mısın?" },
+
+  // Genel Durum, Vital Bulgular ve Antropometri
+  { id: "bilinc", name: "Bilinç Durumu Değerlendirmesi", category: "vitals", message: "[FİZİK MUAYENE] Hastanın bilinç durumunu değerlendirir misin?" },
+  { id: "gks", name: "Glaskow Koma Skoru (GKS)", category: "vitals", message: "[FİZİK MUAYENE] Glaskow Koma Skoru (GKS) bakar mısın?" },
+  { id: "tansiyon", name: "Kan Basıncı (Tansiyon)", category: "vitals", message: "[FİZİK MUAYENE] Kan basıncını (tansiyon) ölçer misin?" },
+  { id: "nabiz", name: "Nabız Muayenesi (Hız/Ritim)", category: "vitals", message: "[FİZİK MUAYENE] Nabız muayenesi yapar mısın?" },
+  { id: "solunum_sayisi", name: "Solunum Sayısı Ölçümü", category: "vitals", message: "[FİZİK MUAYENE] Solunum sayısını ölçer misin?" },
+  { id: "ates", name: "Vücut Isısı (Ateş)", category: "vitals", message: "[FİZİK MUAYENE] Vücut ısısını (ateş) ölçer misin?" },
+  { id: "spo2", name: "Oksijen Satürasyonu (SpO2)", category: "vitals", message: "[FİZİK MUAYENE] Oksijen satürasyonunu (SpO2) ölçer misin?" },
+  { id: "boy_kilo", name: "Boy ve Kilo Ölçümü", category: "vitals", message: "[FİZİK MUAYENE] Boy ve kiloyu ölçer misin?" },
+  { id: "postur", name: "Postür ve Yürüyüş", category: "vitals", message: "[FİZİK MUAYENE] Postür ve yürüyüşü değerlendirir misin?" },
+
+  // Baş ve Boyun Muayenesi
+  { id: "sac_deri", name: "Saç ve Saçlı Deri", category: "head_neck", message: "[FİZİK MUAYENE] Saç ve saçlı deriyi kontrol eder misin?" },
+  { id: "kafatasi", name: "Kafatası Palpasyonu", category: "head_neck", message: "[FİZİK MUAYENE] Kafatası palpasyonu yapar mısın?" },
+  { id: "goz_insp", name: "Göz İnspeksiyonu", category: "head_neck", message: "[FİZİK MUAYENE] Göz inspeksiyonu yapar mısın?" },
+  { id: "pupilla", name: "Pupilla Işık Reaksiyonu (İRK)", category: "head_neck", message: "[FİZİK MUAYENE] Pupilla ışık reaksiyonuna (İRK) bakar mısın?" },
+  { id: "goz_hareket", name: "Göz Hareketleri Muayenesi", category: "head_neck", message: "[FİZİK MUAYENE] Göz hareketlerini değerlendirir misin?" },
+  { id: "otoskopi", name: "Otoskopik Muayene", category: "head_neck", message: "[FİZİK MUAYENE] Otoskopik muayene yapar mısın?" },
+  { id: "rinoskopi", name: "Rinoskopik Muayene", category: "head_neck", message: "[FİZİK MUAYENE] Rinoskopik muayene yapar mısın?" },
+  { id: "farenks", name: "Orofarenks ve Tonsil İnspeksiyonu", category: "head_neck", message: "[FİZİK MUAYENE] Orofarenks ve tonsilleri kontrol eder misin?" },
+  { id: "tiroid", name: "Tiroid Bezi Palpasyonu", category: "head_neck", message: "[FİZİK MUAYENE] Tiroid bezi palpasyonu yapar mısın?" },
+  { id: "jvd", name: "Boyun Venöz Dolgunluğu (JVD)", category: "head_neck", message: "[FİZİK MUAYENE] Boyun venöz dolgunluğunu (JVD) kontrol eder misin?" },
+  { id: "lap_boyun", name: "Servikal/Submandibüler LAP", category: "head_neck", message: "[FİZİK MUAYENE] Boyun lenf nodlarını palpe eder misin?" },
+  { id: "karotis", name: "Karotis Arter Muayenesi", category: "head_neck", message: "[FİZİK MUAYENE] Karotis arter muayenesi yapar mısın?" },
+
+  // Solunum Sistemi Muayenesi
+  { id: "gogus_insp", name: "Göğüs Kafesi İnspeksiyonu", category: "respiratory", message: "[FİZİK MUAYENE] Göğüs kafesi inspeksiyonu yapar mısın?" },
+  { id: "solunum_efor", name: "Solunum Eforu", category: "respiratory", message: "[FİZİK MUAYENE] Solunum eforunu değerlendirir misin?" },
+  { id: "gogus_eksp", name: "Göğüs Ekspansiyonu", category: "respiratory", message: "[FİZİK MUAYENE] Göğüs ekspansiyonuna bakar mısın?" },
+  { id: "fremitus", name: "Taktil Fremitus Palpasyonu", category: "respiratory", message: "[FİZİK MUAYENE] Taktil fremitus muayenesi yapar mısın?" },
+  { id: "akciger_perk", name: "Akciğer Perküsyonu", category: "respiratory", message: "[FİZİK MUAYENE] Akciğer perküsyonu yapar mısın?" },
+  { id: "akciger_osk", name: "Akciğer Oskültasyonu", category: "respiratory", message: "[FİZİK MUAYENE] Akciğer oskültasyonu yapar mısın? (Ral, ronküs, wheezing?)" },
+
+  // Kardiyovasküler Sistem Muayenesi
+  { id: "prekordiyal", name: "Prekordiyal İnspeksiyon", category: "cardio", message: "[FİZİK MUAYENE] Prekordiyal inspeksiyon yapar mısın?" },
+  { id: "pmi", name: "Apikal Vuru (PMI) Palpasyonu", category: "cardio", message: "[FİZİK MUAYENE] Apikal vuru (PMI) palpasyonu yapar mısın?" },
+  { id: "trill", name: "Trill Palpasyonu", category: "cardio", message: "[FİZİK MUAYENE] Kalp odaklarında trill palpasyonu yapar mısın?" },
+  { id: "kalp_osk", name: "Kalp Odakları Oskültasyonu", category: "cardio", message: "[FİZİK MUAYENE] Kalp odaklarını (Aort, Pulmoner, Triküspid, Mitral) oskülte eder misin? (Üfürüm? S1-S2?)" },
+  { id: "periferik_nabiz", name: "Periferik Nabız Palpasyonu", category: "cardio", message: "[FİZİK MUAYENE] Periferik nabızları (radyal, femoral, dorsalis pedis vb.) kontrol eder misin?" },
+  { id: "kapiller_dolum", name: "Kapiller Dolum Zamanı", category: "cardio", message: "[FİZİK MUAYENE] Kapiller dolum zamanını değerlendirir misin?" },
+  { id: "edema", name: "Pitting Ödem Muayenesi", category: "cardio", message: "[FİZİK MUAYENE] Alt ekstremitelerde ödem kontrolü yapar mısın?" },
+
+  // Gastrointestinal Sistem (Batın) Muayenesi
+  { id: "batin_insp", name: "Batın İnspeksiyonu", category: "gastro", message: "[FİZİK MUAYENE] Batın inspeksiyonu yapar mısın?" },
+  { id: "batin_osk", name: "Batın Oskültasyonu", category: "gastro", message: "[FİZİK MUAYENE] Batın oskültasyonu yapar mısın? (Bağırsak sesleri?)" },
+  { id: "batin_perk", name: "Batın Perküsyonu", category: "gastro", message: "[FİZİK MUAYENE] Batın perküsyonu yapar mısın?" },
+  { id: "karaciger_perk", name: "Karaciğer Matite Sınırı", category: "gastro", message: "[FİZİK MUAYENE] Karaciğer matite sınırını ölçer misin?" },
+  { id: "traube", name: "Traube Alanı Perküsyonu", category: "gastro", message: "[FİZİK MUAYENE] Traube alanı perküsyonu yapar mısın?" },
+  { id: "batin_palp_yuzeyel", name: "Yüzeyel Batın Palpasyonu", category: "gastro", message: "[FİZİK MUAYENE] Yüzeyel batın palpasyonu yapar mısın? (Defans? Rijidite?)" },
+  { id: "batin_palp_derin", name: "Derin Batın Palpasyonu", category: "gastro", message: "[FİZİK MUAYENE] Derin batın palpasyonu yapar mısın? (Hassasiyet? Kitle?)" },
+  { id: "kc_palp", name: "Karaciğer Palpasyonu", category: "gastro", message: "[FİZİK MUAYENE] Karaciğer palpasyonu yapar mısın?" },
+  { id: "dalak_palp", name: "Dalak Palpasyonu", category: "gastro", message: "[FİZİK MUAYENE] Dalak palpasyonu yapar mısın?" },
+  { id: "bobrek_palp", name: "Bimanuel Böbrek Palpasyonu", category: "gastro", message: "[FİZİK MUAYENE] Bimanuel böbrek palpasyonu yapar mısın?" },
+  { id: "rebound", name: "Rebound Hassasiyeti Testi", category: "gastro", message: "[FİZİK MUAYENE] Batında rebound kontrolü yapar mısın?" },
+  { id: "murphy", name: "Murphy Bulgusu Testi", category: "gastro", message: "[FİZİK MUAYENE] Murphy bulgusuna bakar mısın?" },
+  { id: "psoas_obturator", name: "Psoas/Obturator Testi", category: "gastro", message: "[FİZİK MUAYENE] Psoas ve Obturator testlerini yapar mısın? (Akut batın/apandisit?)" },
+  { id: "asit_muayenesi", name: "Asit Muayenesi (Matite/Dalga)", category: "gastro", message: "[FİZİK MUAYENE] Batında asit muayenesi yapar mısın?" },
+
+  // Nörolojik Muayene
+  { id: "mental_durum", name: "Mental Durum", category: "neuro", message: "[FİZİK MUAYENE] Mental durum değerlendirmesi yapar mısın?" },
+  { id: "kran_sinir", name: "Kraniyal Sinir (I-XII)", category: "neuro", message: "[FİZİK MUAYENE] Tüm kraniyal sinir muayenelerini yapar mısın?" },
+  { id: "kas_gucu", name: "Kas Gücü Değerlendirmesi", category: "neuro", message: "[FİZİK MUAYENE] Kas gücü değerlendirmesi yapar mısın?" },
+  { id: "kas_tonusu", name: "Kas Tonusu ve Trofisi", category: "neuro", message: "[FİZİK MUAYENE] Kas tonusu ve trofisini muayene eder misin?" },
+  { id: "duyu_yuzeyel", name: "Yüzeyel Duyu Muayenesi", category: "neuro", message: "[FİZİK MUAYENE] Yüzeyel duyu (dokunma, ağrı, ısı) kontrolü yapar mısın?" },
+  { id: "duyu_derin", name: "Derin Duyu (Propriyosepsiyon)", category: "neuro", message: "[FİZİK MUAYENE] Derin duyu (propriyosepsiyon, vibrasyon) muayenesi yapar mısın?" },
+  { id: "dtr", name: "Derin Tendon Refleksleri (DTR)", category: "neuro", message: "[FİZİK MUAYENE] Derin tendon reflekslerine (DTR) bakar mısın?" },
+  { id: "pat_refleks", name: "Babinski/Hoffman/Klonus", category: "neuro", message: "[FİZİK MUAYENE] Patolojik refleksleri (Babinski, Hoffman vb.) kontrol eder misin?" },
+  { id: "serebellar", name: "Serebellar Testler (Parmak-Burun vb.)", category: "neuro", message: "[FİZİK MUAYENE] Serebellar sistem muayenesi yapar mısın? (Parmak-burun, diz-topuk, disdiadokokinezi?)" },
+  { id: "denge_yuruyus", name: "Romberg ve Tandem Testi", category: "neuro", message: "[FİZİK MUAYENE] Romberg ve tandem yürüyüşü testi yapar mısın?" },
+  { id: "menenjismus", name: "Ense Sertliği/Kernig/Brudzinski", category: "neuro", message: "[FİZİK MUAYENE] Menenjismus bulgularına bakar mısın?" },
+
+  // Kas-İskelet Sistemi (Lokomotor) Muayenesi
+  { id: "eklem_insp_palp", name: "Eklem İnspeksiyon/Palpasyon", category: "locomotor", message: "[FİZİK MUAYENE] Eklemleri inspeksiyon ve palpasyonla değerlendirir misin?" },
+  { id: "eklem_rom", name: "Eklem ROM (Aktif/Pasif)", category: "locomotor", message: "[FİZİK MUAYENE] Eklem hareket açıklığını (ROM) kontrol eder misin?" },
+  { id: "omurga", name: "Omurga ve Skolyoz Muayenesi", category: "locomotor", message: "[FİZİK MUAYENE] Omurga ve skolyoz değerlendirmesi yapar mısın?" },
+  { id: "lasegue", name: "Düz Bacak Kaldırma (Lasegue)", category: "locomotor", message: "[FİZİK MUAYENE] Lasegue (düz bacak kaldırma) testi yapar mısın?" },
+  { id: "provokasyon", name: "Spesifik Provokasyon Testleri", category: "locomotor", message: "[FİZİK MUAYENE] Eklem bazlı provokasyon testlerini (Lachman, McMurray, Phalen vb.) yapar mısın?" },
+
+  // Ürogenital ve Anorektal Muayene
+  { id: "kvah", name: "KVAH Muayenesi", category: "urogenital", message: "[FİZİK MUAYENE] Kostovertebral açı hassasiyetine (KVAH) bakar mısın?" },
+  { id: "genital", name: "Dış Genitalya Muayenesi", category: "urogenital", message: "[FİZİK MUAYENE] Dış genitalya inspeksiyon ve palpasyonu yapar mısın?" },
+  { id: "herni", name: "İnguinal Herni Muayenesi", category: "urogenital", message: "[FİZİK MUAYENE] İnguinal herni kontrolü yapar mısın?" },
+  { id: "tuse_rektal", name: "Dijital Rektal Muayene (TR)", category: "urogenital", message: "[FİZİK MUAYENE] Dijital rektal muayene (tuşe rektal) yapar mısın?" },
+  { id: "pelvik_spekulum", name: "Pelvik ve Spekulum Muayenesi", category: "urogenital", message: "[FİZİK MUAYENE] Pelvik ve spekulum muayenesi yapar mısın?" },
+
+  // Dermatolojik Muayene
+  { id: "cilt_mukoza", name: "Cilt ve Mukoza İnspeksiyonu", category: "derma", message: "[FİZİK MUAYENE] Cilt ve mukoza inspeksiyonu yapar mısın? (Döküntü? Lezyon?)" },
+  { id: "turgor_tonus", name: "Deri Turgor ve Tonusu", category: "derma", message: "[FİZİK MUAYENE] Deri turgor ve tonusunu değerlendirir misin?" },
+  { id: "tirnak", name: "Tırnak İnspeksiyonu", category: "derma", message: "[FİZİK MUAYENE] Tırnak inspeksiyonu yapar mısın?" },
 ];
 
 const LAB_CATEGORIES = [
@@ -263,8 +365,11 @@ export default function CasePage() {
   // Custom States
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [labOpen, setLabOpen] = useState(false);
+  const [examOpen, setExamOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("lab");
+  const [selectedExamCategory, setSelectedExamCategory] = useState("basic");
   const [searchQuery, setSearchQuery] = useState("");
+  const [examSearchQuery, setExamSearchQuery] = useState("");
   const [budget, setBudget] = useState(1000);
   const [selectedLabs, setSelectedLabs] = useState<string[]>([]);
 
@@ -478,28 +583,6 @@ export default function CasePage() {
           ) : null}
         </div>
 
-        {/* Fizik Muayene Paneli */}
-        <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-          <div className="flex items-center gap-2 mb-3">
-            <Stethoscope className="w-4 h-4" style={{ color: "var(--primary)" }} />
-            <p className="text-sm font-black" style={{ color: "var(--text-navy)" }}>Fizik Muayene</p>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {PHYSICAL_EXAM.map((action) => (
-              <button
-                key={action.label}
-                onClick={() => sendMessage(action.message)}
-                disabled={streaming}
-                className="flex flex-col items-center justify-center gap-1.5 rounded-xl p-3 text-center transition-all disabled:opacity-40 disabled:cursor-not-allowed group border shadow-sm relative overflow-hidden"
-                style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform">{action.icon}</span>
-                <span className="text-[10px] font-black group-hover:scale-105 transition-all" style={{ color: "var(--text-muted)" }}>{action.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Konsültasyon Butonu */}
         <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <div className="flex flex-col items-center gap-2">
@@ -590,6 +673,15 @@ export default function CasePage() {
                <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
               <TestTube2 className="w-3.5 h-3.5 relative z-10" />
               <span className="relative z-10">Tetkik İste</span>
+            </button>
+            <button
+              onClick={() => setExamOpen(true)}
+              className="group flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md hover:scale-[1.05] active:scale-95 border relative overflow-hidden"
+              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-navy)" }}
+            >
+               <div className="absolute inset-0 bg-black/5 w-0 group-hover:w-full transition-all duration-300" />
+              <Stethoscope className="w-3.5 h-3.5 relative z-10" style={{ color: "var(--primary)" }} />
+              <span className="relative z-10">Fizik Muayene</span>
             </button>
             {caseInfo && (
               <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border shadow-sm ${diff.color} hidden sm:inline-flex`}>
@@ -868,6 +960,112 @@ export default function CasePage() {
                   </button>
                 </div>
               </aside>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Physical Exam Panel (Klinik Muayene) */}
+      {examOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-md transition-opacity" onClick={() => setExamOpen(false)} />
+          
+          <div className="relative w-full max-w-6xl h-[85vh] shadow-2xl rounded-[2.5rem] flex flex-col overflow-hidden animate-in zoom-in-95 duration-300 border transition-all"
+            style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
+            
+            {/* Header */}
+            <div className="h-20 px-8 border-b flex items-center justify-between gap-6 transition-all" 
+              style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm" style={{ background: "var(--primary-light)" }}>
+                  <Stethoscope className="w-6 h-6" style={{ color: "var(--primary)" }} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black tracking-tight" style={{ color: "var(--text)" }}>Kapsamlı Fizik Muayene Paneli</h2>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-60" style={{ color: "var(--text-muted)" }}>KLİNİK MUAYENE SİSTEMİ</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Search Bar */}
+              <div className="flex-1 max-w-md relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40 group-focus-within:opacity-100 transition-opacity" style={{ color: "var(--text)" }} />
+                <input 
+                  type="text"
+                  placeholder="Muayene yöntemi veya bölge ara..."
+                  value={examSearchQuery}
+                  onChange={(e) => setExamSearchQuery(e.target.value)}
+                  className="w-full h-11 pl-12 pr-4 rounded-xl border text-sm transition-all outline-none focus:ring-2"
+                  style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)", "--tw-ring-color": "var(--primary-light)" } as any}
+                />
+              </div>
+
+              <button onClick={() => setExamOpen(false)} 
+                className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all hover:rotate-90 hover:scale-110 active:scale-95 border shadow-sm"
+                style={{ background: "var(--surface-2)", color: "var(--text-muted)", borderColor: "var(--border)" }}>
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="flex-1 flex overflow-hidden">
+              {/* Left Sidebar: Categories */}
+              <aside className="w-64 border-r overflow-y-auto p-4 space-y-2 transition-all" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-4 px-2" style={{ color: "var(--text-muted)" }}>Muayene Odakları</p>
+                {EXAM_CATEGORIES.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedExamCategory(cat.id)}
+                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all font-bold text-sm ${selectedExamCategory === cat.id ? "shadow-md scale-[1.02]" : "hover:bg-black/5 opacity-60 hover:opacity-100"}`}
+                    style={selectedExamCategory === cat.id ? { background: "var(--bg)", color: "var(--primary)", borderColor: "var(--border)", borderWidth: "1px" } : { color: "var(--text-muted)" }}
+                  >
+                    <span className="truncate">{cat.label}</span>
+                    {selectedExamCategory === cat.id && <ChevronRight className="w-4 h-4" />}
+                  </button>
+                ))}
+              </aside>
+
+              {/* Main Area: Exams Grid */}
+              <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--bg)" }}>
+                <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+                  {EXAM_ITEMS
+                    .filter(e => (examSearchQuery ? e.name.toLowerCase().includes(examSearchQuery.toLowerCase()) : e.category === selectedExamCategory))
+                    .map(exam => {
+                      return (
+                        <button
+                          key={exam.id}
+                          onClick={() => {
+                            sendMessage(exam.message);
+                            setExamOpen(false);
+                          }}
+                          disabled={streaming}
+                          className="group text-left p-5 rounded-3xl border transition-all flex flex-col justify-between h-28 relative hover:shadow-md hover:-translate-y-1 active:scale-95 disabled:opacity-30"
+                          style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+                        >
+                          <span className="text-sm font-black leading-tight line-clamp-2 pr-6" style={{ color: "var(--text)" }}>
+                            {exam.name}
+                          </span>
+                          <div className="flex items-center justify-between bottom-4">
+                            <span className="text-[10px] font-black uppercase tracking-widest opacity-40" style={{ color: "var(--text-muted)" }}>MUAYENE ET</span>
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-all bg-black/5 group-hover:bg-primary-light group-hover:text-primary">
+                              <Plus className="w-4 h-4" />
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })
+                  }
+                  {EXAM_ITEMS.filter(e => (examSearchQuery ? e.name.toLowerCase().includes(examSearchQuery.toLowerCase()) : e.category === selectedExamCategory)).length === 0 && (
+                    <div className="col-span-full py-20 text-center">
+                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Search className="w-8 h-8 opacity-20" />
+                      </div>
+                      <p className="text-sm font-bold opacity-40">Aradığınız kriterlere uygun muayene yöntemi bulunamadı.</p>
+                    </div>
+                  )}
+                </div>
+              </main>
             </div>
           </div>
         </div>
