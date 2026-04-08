@@ -140,15 +140,16 @@ export default function DashboardPage() {
   const isLimitReached = !userProfile?.is_admin && todaySessions >= dailyLimit;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0f172a]">
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* Navbar */}
-      <nav className="glass border-b border-slate-800 sticky top-0 z-50">
+      <nav className="glass border-b sticky top-0 z-50" style={{ borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ background: "var(--primary)" }}>
               <Stethoscope className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-white text-lg">KlinikIQ</span>
+            <span className="font-bold text-lg" style={{ color: "var(--text)" }}>KlinikIQ</span>
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 sm:gap-6 mr-2 sm:mr-4">

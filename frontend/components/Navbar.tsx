@@ -13,92 +13,111 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 16);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 py-3"
-          : "bg-transparent py-5"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      style={{
+        background: isScrolled ? "rgba(var(--bg-rgb, 245, 240, 232), 0.85)" : "transparent",
+        backdropFilter: isScrolled ? "blur(14px)" : "none",
+        borderBottom: isScrolled ? "1px solid var(--border)" : "none",
+        backgroundColor: isScrolled ? "var(--bg)" : "transparent",
+        opacity: isScrolled ? 0.97 : 1,
+        padding: isScrolled ? "10px 0" : "18px 0",
+      }}
     >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
-            <Stethoscope className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm transition-transform group-hover:scale-105"
+            style={{ background: "var(--primary)" }}>
+            <Stethoscope className="w-4.5 h-4.5 text-white" />
           </div>
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300">
+          <span className="text-lg font-bold" style={{ color: "var(--text)" }}>
             KlinikIQ
           </span>
         </Link>
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-8">
-          <Link href="#features" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+        {/* Desktop links */}
+        <div className="hidden md:flex items-center gap-6">
+          <Link href="#features"
+            className="text-sm font-medium transition-colors"
+            style={{ color: "var(--text-muted)" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "var(--primary)")}
+            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}>
             Özellikler
           </Link>
-          <Link href="/leaderboard" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Liderlik Tablosu
+          <Link href="/leaderboard"
+            className="text-sm font-medium transition-colors"
+            style={{ color: "var(--text-muted)" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "var(--primary)")}
+            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}>
+            Liderlik
           </Link>
-          <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
+
+          <div className="w-px h-4" style={{ background: "var(--border)" }} />
+
           <ThemeToggle />
-          
+
           {isLoggedIn ? (
-            <Link
-              href="/dashboard"
-              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all shadow-lg shadow-blue-600/20 active:scale-95"
-            >
-              Dashboard'a Git
+            <Link href="/dashboard"
+              className="px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all"
+              style={{ background: "var(--primary)" }}>
+              Dashboard
             </Link>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              >
+              <Link href="/login"
+                className="text-sm font-semibold transition-colors"
+                style={{ color: "var(--text)" }}>
                 Giriş Yap
               </Link>
-              <Link
-                href="/register"
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all shadow-lg shadow-blue-600/20 active:scale-95"
-              >
-                Hemen Başla
+              <Link href="/register"
+                className="px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-sm"
+                style={{ background: "var(--primary)" }}>
+                Başla
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile Toggle */}
-        <div className="flex items-center gap-4 md:hidden">
+        {/* Mobile */}
+        <div className="flex items-center gap-3 md:hidden">
           <ThemeToggle />
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-slate-600 dark:text-slate-300"
-          >
-            {isMobileMenuOpen ? <X /> : <Menu />}
+            className="p-2 rounded-lg" style={{ color: "var(--text-muted)" }}>
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-4 animate-in slide-in-from-top duration-300">
-          <Link href="#features" className="text-lg font-medium text-slate-600 dark:text-slate-300">Özellikler</Link>
-          <Link href="/leaderboard" className="text-lg font-medium text-slate-600 dark:text-slate-300">Liderlik Tablosu</Link>
-          <hr className="border-slate-100 dark:border-slate-800" />
+        <div className="md:hidden absolute top-full left-0 right-0 border-b p-5 flex flex-col gap-4"
+          style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
+          <Link href="#features" className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>Özellikler</Link>
+          <Link href="/leaderboard" className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>Liderlik</Link>
+          <hr style={{ borderColor: "var(--border)" }} />
           {isLoggedIn ? (
-            <Link href="/dashboard" className="w-full py-3 text-center rounded-xl bg-blue-600 text-white font-semibold">Dashboard'a Git</Link>
+            <Link href="/dashboard" className="py-2.5 text-center rounded-xl text-sm font-semibold text-white"
+              style={{ background: "var(--primary)" }}>
+              Dashboard
+            </Link>
           ) : (
             <>
-              <Link href="/login" className="w-full py-3 text-center rounded-xl border border-slate-200 dark:border-slate-700 font-semibold">Giriş Yap</Link>
-              <Link href="/register" className="w-full py-3 text-center rounded-xl bg-blue-600 text-white font-semibold">Hemen Başla</Link>
+              <Link href="/login" className="py-2.5 text-center rounded-xl text-sm font-semibold border"
+                style={{ borderColor: "var(--border)", color: "var(--text)" }}>
+                Giriş Yap
+              </Link>
+              <Link href="/register" className="py-2.5 text-center rounded-xl text-sm font-semibold text-white"
+                style={{ background: "var(--primary)" }}>
+                Ücretsiz Başla
+              </Link>
             </>
           )}
         </div>
