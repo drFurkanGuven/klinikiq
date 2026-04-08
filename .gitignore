@@ -14,6 +14,10 @@ build/
 *.egg-info/
 postgres_data/
 redis_data/
-*.log
 .DS_Store
 *.jsonl
+*.sql
+klinikiq_db_yedek.sql
+klinikiq_db_saf_sql.sql
+cases_ready.jsonl
+medqa_finetune_train_TR.jsonl
