@@ -16,13 +16,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr" suppressHydrationWarning>
-      <body className="min-h-screen antialiased bg-background text-foreground transition-colors duration-300">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
+      <body className="min-h-screen antialiased transition-colors duration-300">
+        <ThemeProvider>
           {children}
         </ThemeProvider>
       </body>

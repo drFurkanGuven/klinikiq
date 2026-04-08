@@ -1,9 +1,40 @@
 "use client";
 
-import * as React from "react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { type ThemeProviderProps } from "next-themes";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+type Theme = "dark" | "light";
+
+const ThemeContext = createContext<{
+  theme: Theme;
+  toggleTheme: () => void;
+}>({ theme: "dark", toggleTheme: () => {} });
+
+export function useTheme() {
+  return useContext(ThemeContext);
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>("dark");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("klinikiq-theme") as Theme | null;
+    const initial = saved || "dark";
+    setTheme(initial);
+    document.documentElement.classList.toggle("dark", initial === "dark");
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      localStorage.setItem("klinikiq-theme", next);
+      document.documentElement.classList.toggle("dark", next === "dark");
+      return next;
+    });
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
