@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const SPECIALTIES = [
   { value: "cardiology", label: "Kardiyoloji" },
@@ -152,23 +153,24 @@ export default function DashboardPage() {
             <span className="font-bold text-lg tracking-tight" style={{ color: "var(--text)" }}>KlinikIQ</span>
           </Link>
 
-          <div className="flex flex-1 items-center justify-end gap-2 sm:gap-6 mr-2 sm:mr-4">
+          <div className="flex flex-1 items-center justify-end gap-2 sm:gap-4 mr-2 sm:mr-4">
+            <ThemeToggle />
             {userProfile?.is_admin && (
-                <Link href="/admin" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border"
-                  style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", borderColor: "var(--danger)", color: "var(--danger)" }}>
+                <Link href="/admin" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border shadow-sm"
+                  style={{ background: "color-mix(in srgb, var(--error) 10%, transparent)", borderColor: "var(--error)", color: "var(--error)" }}>
                     <ShieldAlert className="w-4 h-4" />
-                    <span className="hidden sm:inline">Yönetim Paneli</span>
+                    <span className="hidden sm:inline">Admin</span>
                 </Link>
             )}
-            <Link href="/study-notes" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border"
+            <Link href="/study-notes" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <BookOpen className="w-4 h-4" style={{ color: "var(--primary)" }} />
-              <span className="hidden sm:inline">Hata Defterim</span>
+              <span className="hidden sm:inline">Notlarım</span>
             </Link>
-            <Link href="/leaderboard" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border"
+            <Link href="/leaderboard" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Trophy className="w-4 h-4" style={{ color: "var(--warning)" }} />
-              <span className="hidden sm:inline">Liderlik</span>
+              <span className="hidden sm:inline">Sıralama</span>
             </Link>
           </div>
 

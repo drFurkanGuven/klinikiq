@@ -9,6 +9,7 @@ import {
   Stethoscope, AlertTriangle, Send, Loader2,
   PanelLeftOpen, PanelLeftClose, Bot, Info, TestTube2, Phone, X, ShieldAlert,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // --- SABİTLER VE VERİLER ---
 
@@ -139,14 +140,16 @@ function RenderMessage({ content }: { content: string }) {
           const rows = dataLines.slice(1).map(l => l.split('|').map(x => x.trim()).filter(x => x));
           
           return (
-            <div key={i} className="my-3 border border-slate-700 bg-slate-900 shadow-xl rounded-xl overflow-hidden font-mono text-[11px] sm:text-xs w-full">
+            <div key={i} className="my-3 border shadow-xl rounded-xl overflow-hidden font-mono text-[11px] sm:text-xs w-full transition-all" 
+              style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
               {/* LIS Header */}
-              <div className="bg-slate-800 px-3 py-2 border-b border-slate-700 flex justify-between items-center">
+              <div className="px-3 py-2 border-b flex justify-between items-center"
+                style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
                 <div className="flex items-center gap-2">
-                  <TestTube2 className="w-4 h-4 text-cyan-400" />
-                  <span className="font-bold text-slate-200">KlinikIQ Sağlık Bakanlığı Laboratuvar Bilgi Sistemi</span>
+                  <TestTube2 className="w-4 h-4" style={{ color: "var(--primary)" }} />
+                  <span className="font-bold uppercase tracking-tight" style={{ color: "var(--text)" }}>KlinikIQ LBS (Laboratuvar Bilgi Sistemi)</span>
                 </div>
-                <span className="text-slate-500 hidden sm:block">Onaylandı ✓</span>
+                <span className="text-[10px] sm:block hidden opacity-50 font-bold">✓ ONAYLANDI</span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
@@ -350,25 +353,27 @@ export default function CasePage() {
     <div className="flex flex-col gap-4 h-full overflow-y-auto pb-4">
       
       {/* SGK Bütçe Sayacı */}
-      <div className="glass rounded-2xl p-4 border border-emerald-500/20 bg-emerald-500/5 flex items-center justify-between">
+      <div className="glass rounded-2xl p-4 border flex items-center justify-between shadow-sm transition-all" 
+        style={{ background: "var(--primary-light)", borderColor: "var(--primary-light)" }}>
         <div>
-          <p className="text-xs text-emerald-400/80 font-bold uppercase tracking-wider">SGK Bütçesi</p>
-          <p className="text-xl font-black text-emerald-400">{budget} ₺</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest opacity-60" style={{ color: "var(--primary)" }}>SGK BÜTÇESİ</p>
+          <p className="text-xl font-black" style={{ color: "var(--primary)" }}>{budget} ₺</p>
         </div>
-        <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-          <ShieldAlert className="w-5 h-5 text-emerald-400" />
+        <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-inner" style={{ background: "white" }}>
+          <ShieldAlert className="w-5 h-5" style={{ color: "var(--primary)" }} />
         </div>
       </div>
 
       {/* Hasta Bilgileri */}
-      <div className="glass rounded-2xl p-4 border border-slate-800">
+      <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-xl">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-sm"
+            style={{ background: "var(--surface-2)" }}>
             {patient?.gender === "kadın" ? "👩" : "👨"}
           </div>
           <div>
-            <p className="text-xs text-slate-400">Hasta</p>
-            <p className="text-base font-bold text-white">{loading ? "Yükleniyor..." : patient?.name ?? "—"}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>Hasta</p>
+            <p className="text-base font-bold" style={{ color: "var(--text)" }}>{loading ? "Yükleniyor..." : patient?.name ?? "—"}</p>
           </div>
         </div>
         {loading ? (
@@ -377,18 +382,18 @@ export default function CasePage() {
           <div className="space-y-2 text-sm">
             <InfoRow label="Yaş" value={`${patient.age} yaşında`} />
             <InfoRow label="Cinsiyet" value={patient.gender} />
-            <div className="pt-2 border-t border-slate-800">
-              <p className="text-xs text-slate-500 mb-1">Baş Şikayet</p>
-              <p className="text-xs text-slate-300 leading-relaxed italic">"{patient.chief_complaint}"</p>
+            <div className="pt-2 border-t" style={{ borderColor: "var(--border)" }}>
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-50 mb-1" style={{ color: "var(--text-muted)" }}>Şikayet</p>
+              <p className="text-xs leading-relaxed italic" style={{ color: "var(--text)" }}>"{patient.chief_complaint}"</p>
             </div>
             {patient.vitals && (
-              <div className="pt-2 border-t border-slate-800">
-                <p className="text-xs text-slate-500 mb-1.5">Vital Bulgular</p>
+              <div className="pt-2 border-t" style={{ borderColor: "var(--border)" }}>
+                <p className="text-[10px] font-bold uppercase tracking-wider opacity-50 mb-1.5" style={{ color: "var(--text-muted)" }}>Vital Bulgular</p>
                 <div className="space-y-1">
                   {Object.entries(patient.vitals).map(([k, v]) => (
                     <div key={k} className="flex justify-between text-xs">
-                      <span className="text-slate-500">{k}</span>
-                      <span className="text-slate-300 font-mono">{v as string}</span>
+                      <span className="opacity-60">{k}</span>
+                      <span className="font-mono font-bold" style={{ color: "var(--primary)" }}>{v as string}</span>
                     </div>
                   ))}
                 </div>
@@ -399,10 +404,10 @@ export default function CasePage() {
       </div>
 
       {/* Fizik Muayene Paneli */}
-      <div className="glass rounded-2xl p-4 border border-slate-800">
+      <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
         <div className="flex items-center gap-2 mb-3">
-          <Stethoscope className="w-4 h-4 text-cyan-400" />
-          <p className="text-sm font-medium text-white">Fizik Muayene</p>
+          <Stethoscope className="w-4 h-4" style={{ color: "var(--primary)" }} />
+          <p className="text-sm font-bold" style={{ color: "var(--text)" }}>Fizik Muayene</p>
         </div>
         <div className="grid grid-cols-2 gap-2">
           {PHYSICAL_EXAM.map((action) => (
@@ -410,45 +415,51 @@ export default function CasePage() {
               key={action.label}
               onClick={() => sendMessage(action.message)}
               disabled={streaming}
-              className="flex flex-col items-center justify-center gap-1.5 bg-slate-800/50 hover:bg-slate-700/60 border border-slate-700 hover:border-cyan-500/50 rounded-xl p-3 text-center transition-all disabled:opacity-40 disabled:cursor-not-allowed group"
+              className="flex flex-col items-center justify-center gap-1.5 rounded-xl p-3 text-center transition-all disabled:opacity-40 disabled:cursor-not-allowed group border shadow-sm"
+              style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}
             >
               <span className="text-xl group-hover:scale-110 transition-transform">{action.icon}</span>
-              <span className="text-[10px] sm:text-xs font-semibold text-slate-300 group-hover:text-cyan-300">{action.label}</span>
+              <span className="text-[10px] font-bold group-hover:scale-105 transition-all" style={{ color: "var(--text-muted)" }}>{action.label}</span>
             </button>
           ))}
         </div>
       </div>
 
       {/* Konsültasyon Butonu */}
-      <div className="glass rounded-2xl p-4 border border-rose-500/20 bg-rose-500/5">
+      <div className="glass rounded-2xl p-4 border bg-rose-500/5 transition-all shadow-sm" style={{ borderColor: "var(--border)" }}>
         <div className="flex flex-col items-center gap-2">
           <button
             onClick={requestConsultation}
             disabled={streaming}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-rose-500/20 hover:shadow-rose-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg hover:shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+            style={{ background: "linear-gradient(to right, var(--error), var(--warning))" }}
           >
             <Phone className="w-4 h-4" />
             Hocayı Ara (Konsültasyon)
           </button>
-          <span className="text-[10px] text-rose-300/80 text-center">Dikkat: Fırça yiyebilirsiniz!</span>
+          <span className="text-[10px] opacity-60 text-center font-bold uppercase tracking-tighter" style={{ color: "var(--error)" }}>Dikkat: Fırça yiyebilirsiniz!</span>
         </div>
       </div>
 
       {/* Eylemler */}
-      <div className="glass rounded-2xl p-4 border border-slate-800 space-y-3">
+      <div className="glass rounded-2xl p-4 border transition-all shadow-sm space-y-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
         {error && (
-          <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl px-3 py-2 text-xs">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border"
+            style={{ background: "var(--error-light)", color: "var(--error)", borderColor: "var(--error-light)" }}>
             <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
             {error}
           </div>
         )}
         <button
           onClick={() => setShowDiagnosis(true)}
-          className={`w-full flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-xl border transition-all ${
+          className={`w-full flex items-center gap-2 text-sm font-bold py-2.5 px-3 rounded-xl border transition-all shadow-sm ${
             diagnosisSaved
-              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-              : "bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20"
+              ? "shadow-inner"
+              : "hover:scale-[1.02] active:scale-[0.98]"
           }`}
+          style={diagnosisSaved 
+            ? { background: "var(--primary-light)", borderColor: "var(--primary)", color: "var(--primary)" }
+            : { background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
         >
           {diagnosisSaved ? <CheckCircle2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
           {diagnosisSaved ? "Tanılar Kaydedildi ✓" : "Klinik Tanı Gir"}
@@ -456,7 +467,8 @@ export default function CasePage() {
         <button
           onClick={handleComplete}
           disabled={completing || !diagnosisSaved}
-          className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold py-2.5 rounded-xl transition-all disabled:opacity-40"
+          className="w-full flex items-center justify-center gap-2 text-white text-sm font-bold py-2.5 rounded-xl transition-all shadow-lg disabled:opacity-40 disabled:scale-100 hover:scale-[1.02] active:scale-[0.98]"
+          style={{ background: "var(--text)" }}
         >
           {completing
             ? <><Loader2 className="w-4 h-4 animate-spin" />Raporlanıyor...</>
@@ -468,27 +480,32 @@ export default function CasePage() {
   );
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden relative">
+    <div className="h-screen flex flex-col overflow-hidden relative transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* Navbar */}
-      <nav className="glass border-b border-slate-800 flex-shrink-0">
+      <nav className="glass border-b flex-shrink-0 transition-all" style={{ borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors">
+            <button onClick={() => router.push("/dashboard")} 
+              className="flex items-center gap-2 text-sm transition-all hover:scale-105 active:scale-95"
+              style={{ color: "var(--text-muted)" }}>
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Dashboard</span>
             </button>
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="md:hidden ml-2 p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white transition-colors"
+              className="md:hidden ml-2 p-1.5 rounded-lg transition-colors shadow-sm"
+              style={{ background: "var(--surface-2)", color: "var(--text-muted)" }}
             >
               {sidebarOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
             </button>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
+            <ThemeToggle />
             <button
               onClick={() => setLabOpen(true)}
-              className="flex items-center gap-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm hover:scale-105 active:scale-95"
+              style={{ background: "var(--primary-light)", border: "1px solid var(--primary-light)", color: "var(--primary)" }}
             >
               <TestTube2 className="w-3.5 h-3.5" />
               Tetkik İste
@@ -510,17 +527,19 @@ export default function CasePage() {
         <aside className={`
           w-72 flex-shrink-0 p-4 overflow-y-auto
           md:relative md:translate-x-0 md:block
-          fixed top-0 left-0 h-full z-30 bg-slate-900
-          transition-transform duration-300 ease-in-out
+          fixed top-0 left-0 h-full z-30 transition-transform duration-300 ease-in-out
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `} style={{ top: "auto" }}>
+        `} style={{ background: "var(--bg)", top: "auto" }}>
           <SidebarContent />
         </aside>
 
         {/* Sağ Panel: Chat */}
-        <main className="flex-1 flex flex-col overflow-hidden min-w-0 m-4 ml-0 md:ml-0 glass rounded-2xl border border-slate-800">
-          <div className="p-3 sm:p-4 border-b border-slate-800 flex items-center gap-3 flex-shrink-0 bg-slate-900/50">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
+        <main className="flex-1 flex flex-col overflow-hidden min-w-0 m-4 ml-0 md:ml-0 glass rounded-2xl border transition-all shadow-sm" 
+          style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+          <div className="p-3 sm:p-4 border-b flex items-center gap-3 flex-shrink-0 transition-all" 
+            style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ background: "var(--primary-light)" }}>
               <span className="text-base">{patient?.gender === "kadın" ? "👩" : "🧑‍⚕️"}</span>
             </div>
             <div className="min-w-0">
@@ -534,11 +553,15 @@ export default function CasePage() {
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((msg, i) => (
               <div key={i} className={`flex w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed transition-all shadow-sm ${
                   msg.role === "user"
-                    ? "bg-slate-700/80 text-white rounded-br-sm inline-block"
-                    : "bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-sm inline-block w-full"
-                }`}>
+                    ? "rounded-tr-sm"
+                    : "rounded-tl-sm border"
+                }`} style={
+                  msg.role === "user" 
+                    ? { background: "var(--primary-light)", color: "var(--primary)", border: "1px solid var(--primary-light)" }
+                    : { background: "var(--bg)", color: "var(--text)", borderColor: "var(--border)" }
+                }>
                   {msg.role === "assistant" ? <RenderMessage content={msg.content} /> : msg.content}
                   
                   {msg.streaming && msg.content.length > 0 && (
@@ -555,8 +578,9 @@ export default function CasePage() {
             <div ref={bottomRef} />
           </div>
 
-          <div className="p-3 sm:p-4 border-t border-slate-800 flex-shrink-0">
-            <div className="flex items-end gap-2 bg-slate-800/50 border border-slate-700 rounded-2xl px-3 py-2 focus-within:border-blue-500/50 transition-colors">
+          <div className="p-3 sm:p-4 border-t flex-shrink-0 transition-all" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+            <div className="flex items-end gap-2 rounded-2xl px-3 py-2 transition-all shadow-inner border group focus-within:ring-2 focus-within:ring-offset-2"
+              style={{ background: "var(--bg)", borderColor: "var(--border)", "--tw-ring-color": "var(--primary-light)" } as any}>
               <textarea
                 ref={textareaRef}
                 value={input}
@@ -569,14 +593,16 @@ export default function CasePage() {
                 placeholder="Hastaya bir soru sor..."
                 rows={1}
                 disabled={streaming}
-                className="flex-1 bg-transparent text-white placeholder-slate-500 text-sm resize-none outline-none disabled:opacity-50 mt-1"
+                className="flex-1 bg-transparent placeholder-slate-500 text-sm resize-none outline-none disabled:opacity-50 mt-1"
+                style={{ color: "var(--text)" }}
               />
               <button
                 onClick={() => sendMessage()}
                 disabled={!input.trim() || streaming}
-                className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 mb-0.5"
+                className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 mb-0.5 shadow-md"
+                style={{ background: "var(--primary)", color: "white" }}
               >
-                <Send className="w-4 h-4 text-white" />
+                <Send className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -615,21 +641,22 @@ export default function CasePage() {
                         const canAfford = budget >= test.price;
                         return (
                           <button
-                            key={test.id}
-                            onClick={() => toggleLab(test.id, test.price)}
-                            disabled={!isSelected && !canAfford}
-                            className={`w-full text-left p-3 rounded-xl border transition-all flex justify-between items-center ${
-                              isSelected 
-                                ? "bg-blue-500/10 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.1)]" 
-                                : "bg-slate-800/50 border-slate-700 hover:border-slate-500 disabled:opacity-30 disabled:cursor-not-allowed"
-                            }`}
-                          >
-                            <div>
-                              <div className={`text-xs font-bold ${isSelected ? "text-blue-400" : "text-slate-300"}`}>{test.name}</div>
-                              <div className="text-[10px] font-mono mt-0.5" style={{ color: isSelected ? 'var(--primary)' : 'var(--text-muted)' }}>{test.price} ₺</div>
-                            </div>
-                            {isSelected && <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shrink-0"><CheckCircle2 className="w-3.5 h-3.5 text-white" /></div>}
-                          </button>
+                             key={test.id}
+                             onClick={() => toggleLab(test.id, test.price)}
+                             disabled={!isSelected && !canAfford}
+                             className={`w-full text-left p-3 rounded-2xl border transition-all flex justify-between items-center group ${
+                               isSelected 
+                                 ? "shadow-md scale-[1.02]" 
+                                 : "hover:border-slate-400 disabled:opacity-30 disabled:cursor-not-allowed"
+                             }`}
+                             style={isSelected ? { background: "var(--primary-light)", borderColor: "var(--primary)" } : { background: "var(--surface-2)", borderColor: "var(--border)" }}
+                           >
+                             <div>
+                               <div className={`text-xs font-bold transition-colors ${isSelected ? "" : "opacity-80"}`} style={{ color: "var(--text)" }}>{test.name}</div>
+                               <div className="text-[10px] font-black mt-0.5 opacity-60" style={{ color: isSelected ? 'var(--primary)' : 'var(--text-muted)' }}>{test.price} ₺</div>
+                             </div>
+                             {isSelected && <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-sm" style={{ background: "var(--primary)" }}><CheckCircle2 className="w-3.5 h-3.5 text-white" /></div>}
+                           </button>
                         )
                       })}
                     </div>
@@ -637,13 +664,14 @@ export default function CasePage() {
                 )
               })}
             </div>
-            <div className="p-4 border-t border-slate-800 bg-slate-900">
+            <div className="p-4 border-t transition-all shadow-inner" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
               <button
                 onClick={orderLabs}
                 disabled={selectedLabs.length === 0 || streaming}
-                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-3 rounded-xl shadow-lg disabled:opacity-40 transition-all flex items-center justify-center gap-2"
+                className="w-full text-white font-bold py-3.5 rounded-xl shadow-lg disabled:opacity-40 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+                style={{ background: "var(--primary)" }}
               >
-                <TestTube2 className="w-4 h-4" />
+                <TestTube2 className="w-5 h-5" />
                 Seçili Tetkikleri İste ({selectedLabs.length})
               </button>
             </div>
@@ -661,8 +689,8 @@ export default function CasePage() {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between">
-      <span className="text-slate-500 text-xs">{label}</span>
-      <span className="text-slate-300 text-xs font-medium capitalize">{value}</span>
+      <span className="text-[10px] font-bold uppercase tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>{label}</span>
+      <span className="text-xs font-bold capitalize" style={{ color: "var(--text)" }}>{value}</span>
     </div>
   );
 }

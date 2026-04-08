@@ -6,6 +6,7 @@ import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import { LogOut, ArrowLeft, BookOpen, AlertCircle, Sparkles, Clock } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function StudyNotesPage() {
   const router = useRouter();
@@ -33,33 +34,39 @@ export default function StudyNotesPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0b1120]">
+    <div className="min-h-screen flex flex-col transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* Navbar */}
-      <nav className="glass border-b border-slate-800 sticky top-0 z-50">
+      <nav className="glass border-b sticky top-0 z-50 transition-all" style={{ borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="mr-2 text-slate-400 hover:text-white transition-colors">
+            <Link href="/dashboard" className="mr-2 transition-colors hover:scale-110 active:scale-95" style={{ color: "var(--text-muted)" }}>
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
+              style={{ background: "var(--primary)" }}>
               <BookOpen className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-white text-lg hidden sm:block">Cep Notlarım</span>
+            <span className="font-bold text-lg hidden sm:block" style={{ color: "var(--text)" }}>Hata Defterim</span>
           </div>
-          <button
-            onClick={logout}
-            className="flex items-center gap-2 text-slate-400 hover:text-white text-sm transition-colors px-3 py-2 rounded-lg hover:bg-slate-800"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Çıkış</span>
-          </button>
+          
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 text-sm transition-colors px-3 py-2 rounded-lg hover:bg-slate-500/10"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Çıkış</span>
+            </button>
+          </div>
         </div>
       </nav>
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
-        <div className="mb-8 text-center space-y-2 max-w-2xl mx-auto">
-          <h1 className="text-3xl font-black text-white">Hata Defterim</h1>
-          <p className="text-slate-400 text-sm">
+        <div className="mb-10 text-center space-y-3 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-black tracking-tight" style={{ color: "var(--text)" }}>Hata Defterim</h1>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
             Çözdüğün vakalarda gözden kaçırdığın tanılar ve bu vakalardan öğrenmen gereken klinik spot bilgiler. TUS tekrarı için mükemmel bir kaynak.
           </p>
         </div>
@@ -71,38 +78,40 @@ export default function StudyNotesPage() {
             ))}
           </div>
         ) : notes.length === 0 ? (
-          <div className="text-center py-20 text-slate-500">
+          <div className="text-center py-20 rounded-3xl border border-dashed" style={{ borderColor: "var(--border)" }}>
             <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-20" />
-            <p className="text-lg font-medium text-slate-300">Harika gidiyorsun!</p>
-            <p className="mt-2 text-sm">Hiç tanı kaçırmadığın için burada şu an not yok.</p>
+            <p className="text-lg font-medium opacity-60" style={{ color: "var(--text-muted)" }}>Harika gidiyorsun!</p>
+            <p className="mt-2 text-sm opacity-50">Hiç tanı kaçırmadığın için burada şu an not yok.</p>
           </div>
         ) : (
           <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
             {notes.map((note) => (
               <div
                 key={note.session_id}
-                className="break-inside-avoid relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/20 p-5 flex flex-col gap-4 hover:border-indigo-500/30 transition-colors group"
+                className="break-inside-avoid relative overflow-hidden rounded-2xl border transition-all card-hover p-6 flex flex-col gap-4 shadow-sm"
+                style={{ background: "var(--surface)", borderColor: "var(--border)" }}
               >
                 {/* Header */}
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold tracking-wider uppercase text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded pl-1.5 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-md flex items-center gap-1.5"
+                      style={{ background: "var(--primary-light)", color: "var(--primary)" }}>
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--primary)" }}></span>
                       {note.specialty}
                     </span>
-                    <span className="flex items-center gap-1 text-slate-500 text-[10px]">
+                    <span className="flex items-center gap-1 text-[10px]" style={{ color: "var(--text-muted)" }}>
                       <Clock className="w-3 h-3" />
                       {new Date(note.created_at).toLocaleDateString("tr-TR")}
                     </span>
                   </div>
-                  <h3 className="font-bold text-white text-lg leading-tight group-hover:text-indigo-300 transition-colors">
+                  <h3 className="font-bold text-xl leading-tight tracking-tight" style={{ color: "var(--text)" }}>
                     {note.case_title}
                   </h3>
                 </div>
 
                 {/* Missed Diagnoses */}
                 <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-400">
+                  <div className="flex items-center gap-1.5 text-xs font-bold" style={{ color: "var(--error)" }}>
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>Gözden Kaçanlar</span>
                   </div>
@@ -110,7 +119,8 @@ export default function StudyNotesPage() {
                     {note.missed_diagnoses.map((diag, i) => (
                       <span
                         key={i}
-                        className="text-xs bg-rose-500/10 text-rose-300 border border-rose-500/20 px-2 py-1 rounded-md"
+                        className="text-[11px] font-medium px-2 py-1 rounded-lg border"
+                        style={{ background: "var(--surface-2)", color: "var(--error)", borderColor: "var(--error-light)" }}
                       >
                         {diag}
                       </span>
@@ -120,14 +130,14 @@ export default function StudyNotesPage() {
 
                 {/* TUS Reference */}
                 {note.tus_reference && (
-                  <div className="bg-amber-500/5 rounded-xl p-3 border border-amber-500/10">
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-amber-500">
+                  <div className="rounded-xl p-4 border" style={{ background: "var(--surface-2)", borderColor: "var(--warning-light)" }}>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider" style={{ color: "var(--warning)" }}>
                         <Sparkles className="w-3.5 h-3.5" />
                         <span>TUS Spotu</span>
                       </div>
-                      <p className="text-sm text-amber-50/90 leading-relaxed font-medium">
-                        {note.tus_reference}
+                      <p className="text-sm leading-relaxed font-semibold italic" style={{ color: "var(--text)" }}>
+                        "{note.tus_reference}"
                       </p>
                     </div>
                   </div>
@@ -135,8 +145,8 @@ export default function StudyNotesPage() {
 
                 {/* Pathophysiology */}
                 {note.pathophysiology_note && (
-                  <div className="mt-2 pt-4 border-t border-slate-700/50">
-                    <p className="text-xs text-slate-400 leading-relaxed">
+                  <div className="mt-2 pt-4 border-t" style={{ borderColor: "var(--border)" }}>
+                    <p className="text-xs leading-relaxed opacity-70" style={{ color: "var(--text-muted)" }}>
                       {note.pathophysiology_note}
                     </p>
                   </div>
