@@ -21,40 +21,57 @@ const PHYSICAL_EXAM = [
   { icon: "🦵", label: "Ekstremite / Cilt", message: "[FİZİK MUAYENE] Ekstremite, nabızlar ve cilt muayenesi (döküntü, ısı, turgor) yapar mısın?" },
 ];
 
+const LAB_CATEGORIES = [
+  { id: "emergency", label: "🚨 ACİL PANEL", color: "text-rose-400" },
+  { id: "routine", label: "🧪 RUTİN LABORATUVAR", color: "text-amber-400" },
+  { id: "radiology", label: "☢️ GÖRÜNTÜLEME (RADYOLOJİ)", color: "text-cyan-400" },
+  { id: "specific", label: "🔬 ÖZEL / SPESİFİK", color: "text-purple-400" },
+];
+
 const LAB_TESTS = [
-  { id: "hemogram", name: "Tam Kan Sayımı (Hemogram)", price: 50 },
-  { id: "periferik_yayma", name: "Periferik Yayma", price: 60 },
-  { id: "biyokimya", name: "Rutin Biyokimya (BUN, Kre, AST, ALT, Na, K, Glukoz)", price: 100 },
-  { id: "genis_biyokimya", name: "Geniş Biyokimya (Ca, Mg, P, Albumin, Bilirubinler)", price: 120 },
-  { id: "lipit", name: "Lipit Profili (LDL, HDL, Trigliserid)", price: 80 },
-  { id: "tam_idrar", name: "Tam İdrar Tahlili (TİT)", price: 40 },
-  { id: "kan_keton", name: "Kan Ketonu (Beta-hidroksibütirat)", price: 60 },
-  { id: "hba1c", name: "HbA1c", price: 80 },
-  { id: "kardiyak", name: "Kardiyak Panel (Troponin, CK-MB)", price: 150 },
-  { id: "koagulasyon", name: "Koagülasyon (PT, aPTT, INR)", price: 80 },
-  { id: "ddimer", name: "D-Dimer", price: 100 },
-  { id: "abg", name: "Arteriyel Kan Gazı (AKG)", price: 100 },
-  { id: "akut_faz", name: "Akut Faz Reactant (CRP, Prokalsitonin, Sedim)", price: 150 },
-  { id: "tiroid", name: "Tiroid Paneli (TSH, sT3, sT4)", price: 120 },
-  { id: "demir_vit", name: "Anemi Paneli (Demir, TDBK, Ferritin, B12)", price: 150 },
-  { id: "romatoloji", name: "Romatoloji Paneli (ANA, RF, Anti-CCP)", price: 200 },
-  { id: "viral_seroloji", name: "Viral Seroloji (HBsAg, HCV, HIV)", price: 150 },
-  { id: "otoimmun_panel", name: "Otoimmün Panel (ANA, c-ANCA, p-ANCA, SMA)", price: 250 },
-  { id: "diyabet_otoantikor", name: "Diyabet Otoantikor (Anti-GAD, ICA, IAA)", price: 150 },
-  { id: "kultur_kan", name: "Kan Kültürü", price: 150 },
-  { id: "kultur_idrar", name: "İdrar Kültürü", price: 100 },
-  { id: "gaita_gizli_kan", name: "Gaitada Gizli Kan (GGK) / Parazit", price: 60 },
-  { id: "ekg", name: "Elektrokardiyogram (EKG)", price: 50 },
-  { id: "eko", name: "Ekokardiyografi (EKO)", price: 400 },
-  { id: "akciger", name: "Akciğer Grafisi (PAAC)", price: 100 },
-  { id: "usg_batin", name: "Tüm Batın USG", price: 300 },
-  { id: "usg_doppler", name: "Alt Ekstremite Venöz Doppler USG", price: 350 },
-  { id: "bt_toraks", name: "Toraks BT (Kontrastsız)", price: 500 },
-  { id: "bt_toraks_anji", name: "Pulmoner BT Anjiyo", price: 600 },
-  { id: "bt_batin", name: "Tüm Batın BT (Kontrastlı)", price: 600 },
-  { id: "bt_kranial", name: "Kranial BT", price: 500 },
-  { id: "mr_kranial", name: "Kranial MR", price: 800 },
-  { id: "lomber_ponksiyon", name: "Lomber Ponksiyon (BOS Analizi)", price: 400 },
+  // ACİL
+  { id: "hemogram", name: "Tam Kan Sayımı (Hemogram)", price: 50, category: "emergency" },
+  { id: "ekg", name: "Elektrokardiyogram (EKG)", price: 50, category: "emergency" },
+  { id: "abg", name: "Arteriyel Kan Gazı (AKG)", price: 100, category: "emergency" },
+  { id: "kardiyak", name: "Kardiyak Panel (Troponin, CK-MB)", price: 150, category: "emergency" },
+  { id: "ddimer", name: "D-Dimer", price: 100, category: "emergency" },
+  { id: "kan_keton", name: "Kan Ketonu (Beta-hidroksibütirat)", price: 60, category: "emergency" },
+  
+  // RUTİN
+  { id: "biyokimya", name: "Rutin Biyokimya (BUN, Kre, AST, ALT, Na, K, Glukoz)", price: 100, category: "routine" },
+  { id: "genis_biyokimya", name: "Geniş Biyokimya (Ca, Mg, P, Albumin, Bilirubinler)", price: 120, category: "routine" },
+  { id: "tam_idrar", name: "Tam İdrar Tahlili (TİT)", price: 40, category: "routine" },
+  { id: "koagulasyon", name: "Koagülasyon (PT, aPTT, INR)", price: 80, category: "routine" },
+  { id: "akut_faz", name: "Akut Faz (CRP, Prokalsitonin, Sedim)", price: 150, category: "routine" },
+  { id: "lipit", name: "Lipit Profili (LDL, HDL, Trigliserid)", price: 80, category: "routine" },
+  { id: "hba1c", name: "HbA1c", price: 80, category: "routine" },
+  
+  // RADYOLOJİ
+  { id: "akciger", name: "Akciğer Grafisi (PAAC)", price: 100, category: "radiology" },
+  { id: "grafi_adbg", name: "Ayakta Direk Batın Grafisi (ADBG)", price: 100, category: "radiology" },
+  { id: "grafi_kafa", name: "Kafa Grafisi (AP-Lateral)", price: 80, category: "radiology" },
+  { id: "grafi_ekstremite", name: "Ekstremite Grafisi (Seçili Bölge)", price: 80, category: "radiology" },
+  { id: "usg_batin", name: "Tüm Batın USG", price: 300, category: "radiology" },
+  { id: "eko", name: "Ekokardiyografi (EKO)", price: 400, category: "radiology" },
+  { id: "bt_kranial", name: "Kranial BT (Kontrastsız)", price: 500, category: "radiology" },
+  { id: "bt_toraks", name: "Toraks BT (Kontrastsız)", price: 500, category: "radiology" },
+  { id: "bt_batin", name: "Tüm Batın BT (Kontrastlı)", price: 600, category: "radiology" },
+  { id: "bt_boyun", name: "Boyun BT", price: 500, category: "radiology" },
+  { id: "bt_toraks_anji", name: "Pulmoner BT Anjiyo", price: 600, category: "radiology" },
+  { id: "mr_kranial", name: "Kranial MR", price: 800, category: "radiology" },
+  { id: "mr_lomber", name: "Lomber MR", price: 800, category: "radiology" },
+  { id: "usg_doppler", name: "Venöz/Arteriyel Doppler USG", price: 350, category: "radiology" },
+
+  // ÖZEL
+  { id: "tiroid", name: "Tiroid Paneli (TSH, sT3, sT4)", price: 120, category: "specific" },
+  { id: "demir_vit", name: "Anemi Paneli (Demir, Ferritin, B12)", price: 150, category: "specific" },
+  { id: "romatoloji", name: "Romatoloji Paneli (ANA, RF, Anti-CCP)", price: 200, category: "specific" },
+  { id: "viral_seroloji", name: "Viral Seroloji (HBsAg, HCV, HIV)", price: 150, category: "specific" },
+  { id: "otoimmun_panel", name: "Otoimmün Panel (ANCA, SMA, LKM)", price: 250, category: "specific" },
+  { id: "kultur_kan", name: "Kan Kültürü (Aerob/Anaerob)", price: 150, category: "specific" },
+  { id: "kultur_idrar", name: "İdrar Kültürü", price: 100, category: "specific" },
+  { id: "lomber_ponksiyon", name: "Lomber Ponksiyon (BOS Analizi)", price: 400, category: "specific" },
+  { id: "periferik_yayma", name: "Periferik Yayma (Manuel Değerl.)", price: 60, category: "specific" },
 ];
 
 const SPECIALTY_LABELS: Record<string, string> = {
@@ -582,27 +599,41 @@ export default function CasePage() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-2">
-              {LAB_TESTS.map(test => {
-                const isSelected = selectedLabs.includes(test.id);
-                const canAfford = budget >= test.price;
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+              {LAB_CATEGORIES.map(cat => {
+                const catTests = LAB_TESTS.filter(t => t.category === cat.id);
+                if (catTests.length === 0) return null;
+                
                 return (
-                  <button
-                    key={test.id}
-                    onClick={() => toggleLab(test.id, test.price)}
-                    disabled={!isSelected && !canAfford}
-                    className={`w-full text-left p-3 rounded-xl border transition-all flex justify-between items-center ${
-                      isSelected 
-                        ? "bg-blue-500/10 border-blue-500/50" 
-                        : "bg-slate-800/50 border-slate-700 hover:border-slate-600 disabled:opacity-30 disabled:cursor-not-allowed"
-                    }`}
-                  >
-                    <div>
-                      <div className={`text-sm font-bold ${isSelected ? "text-blue-400" : "text-slate-300"}`}>{test.name}</div>
-                      <div className="text-xs text-rose-400/80 font-mono mt-0.5">{test.price} ₺</div>
+                  <div key={cat.id} className="space-y-3">
+                    <h3 className={`text-[10px] font-black tracking-widest uppercase border-b pb-1 ${cat.color}`} style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+                      {cat.label}
+                    </h3>
+                    <div className="space-y-2">
+                      {catTests.map(test => {
+                        const isSelected = selectedLabs.includes(test.id);
+                        const canAfford = budget >= test.price;
+                        return (
+                          <button
+                            key={test.id}
+                            onClick={() => toggleLab(test.id, test.price)}
+                            disabled={!isSelected && !canAfford}
+                            className={`w-full text-left p-3 rounded-xl border transition-all flex justify-between items-center ${
+                              isSelected 
+                                ? "bg-blue-500/10 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.1)]" 
+                                : "bg-slate-800/50 border-slate-700 hover:border-slate-500 disabled:opacity-30 disabled:cursor-not-allowed"
+                            }`}
+                          >
+                            <div>
+                              <div className={`text-xs font-bold ${isSelected ? "text-blue-400" : "text-slate-300"}`}>{test.name}</div>
+                              <div className="text-[10px] font-mono mt-0.5" style={{ color: isSelected ? 'var(--primary)' : 'var(--text-muted)' }}>{test.price} ₺</div>
+                            </div>
+                            {isSelected && <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shrink-0"><CheckCircle2 className="w-3.5 h-3.5 text-white" /></div>}
+                          </button>
+                        )
+                      })}
                     </div>
-                    {isSelected && <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center"><CheckCircle2 className="w-3.5 h-3.5 text-white" /></div>}
-                  </button>
+                  </div>
                 )
               })}
             </div>

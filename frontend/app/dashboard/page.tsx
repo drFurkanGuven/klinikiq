@@ -144,13 +144,13 @@ export default function DashboardPage() {
       {/* Navbar */}
       <nav className="glass border-b sticky top-0 z-50 transition-all" style={{ borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3 group cursor-pointer transition-transform hover:scale-105">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
               style={{ background: "var(--primary)" }}>
               <Stethoscope className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-lg tracking-tight" style={{ color: "var(--text)" }}>KlinikIQ</span>
-          </div>
+          </Link>
 
           <div className="flex flex-1 items-center justify-end gap-2 sm:gap-6 mr-2 sm:mr-4">
             {userProfile?.is_admin && (
