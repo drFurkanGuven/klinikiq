@@ -51,8 +51,6 @@ services:
       - .env
     volumes:
       - ./backend:/app
-    ports:
-      - "8000:8000"
     networks:
       - klinikiq_net
     depends_on:
@@ -74,8 +72,6 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
-    ports:
-      - "3000:3000"
     networks:
       - klinikiq_net
     depends_on:
