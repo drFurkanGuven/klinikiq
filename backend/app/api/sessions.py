@@ -73,9 +73,12 @@ async def get_session(
     db: AsyncSession = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ):
-    """Session detayı — case bilgisi (hasta adı, yaş, şikayet vb.) dahil döner."""
+    """Session detayı — case bilgisi (hasta adı, yaş, şikayet vb.) ve mesaj geçmişi dahil döner."""
+    from sqlalchemy.orm import selectinload
     sess_result = await db.execute(
-        select(SimulationSession).where(
+        select(SimulationSession)
+        .options(selectinload(SimulationSession.messages))
+        .where(
             SimulationSession.id == session_id,
             SimulationSession.user_id == user_id,
         )
@@ -105,6 +108,14 @@ async def get_session(
             "patient": patient_data,
             "educational_notes": case.educational_notes,
         },
+        "messages": [
+            {
+                "id": m.id,
+                "role": m.role.value,
+                "content": m.content,
+                "created_at": m.created_at,
+            } for m in session.messages
+        ]
     }
 
 

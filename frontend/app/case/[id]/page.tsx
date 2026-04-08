@@ -194,40 +194,39 @@ function RenderMessage({ content }: { content: string }) {
           const rows = dataLines.slice(1).map(l => l.split('|').map(x => x.trim()).filter(x => x));
           
           return (
-            <div key={i} className="my-3 border shadow-xl rounded-xl overflow-hidden font-mono text-[11px] sm:text-xs w-full transition-all" 
+            <div key={i} className="my-3 border shadow-xl rounded-[1.5rem] overflow-hidden font-mono text-[11px] sm:text-xs w-full transition-all" 
               style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
               {/* LIS Header */}
-              <div className="px-3 py-2 border-b flex justify-between items-center"
+              <div className="px-4 py-3 border-b flex justify-between items-center"
                 style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
                 <div className="flex items-center gap-2">
                   <TestTube2 className="w-4 h-4" style={{ color: "var(--primary)" }} />
-                  <span className="font-bold uppercase tracking-tight" style={{ color: "var(--text)" }}>KlinikIQ LBS (Laboratuvar Bilgi Sistemi)</span>
+                  <span className="font-black uppercase tracking-tight" style={{ color: "var(--text-navy)" }}>KlinikIQ LBS (Laboratuvar Bilgi Sistemi)</span>
                 </div>
-                <span className="text-[10px] sm:block hidden opacity-50 font-bold">✓ ONAYLANDI</span>
+                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">✓ ONAYLANDI</span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-[#0b1120] text-slate-400 border-b border-slate-700/50">
+                  <thead style={{ background: "var(--text-navy)", color: "var(--bg)" }}>
                     <tr>
-                      {headers.map(h => <th key={h} className="px-3 py-2.5 font-semibold">{h}</th>)}
+                      {headers.map(h => <th key={h} className="px-4 py-3 font-bold uppercase tracking-wider">{h}</th>)}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/80 text-slate-300">
+                  <tbody className="divide-y" style={{ color: "var(--text)", borderColor: "var(--border)" }}>
                     {rows.map((row, idx) => {
                       const isHigh = row.some(cell => cell.includes('(H)') || cell.includes('Yüksek') || cell.includes('High'));
                       const isLow = row.some(cell => cell.includes('(L)') || cell.includes('Düşük') || cell.includes('Low'));
                       return (
-                        <tr key={idx} className={`${isHigh ? 'bg-rose-500/10' : isLow ? 'bg-blue-500/10' : 'hover:bg-slate-800/30'} transition-colors`}>
+                        <tr key={idx} className={`transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${isHigh ? 'bg-red-500/10' : isLow ? 'bg-blue-500/10' : ''}`}>
                           {row.map((cell, cidx) => {
                             const isValueCell = cidx === 1; // Assuming 2nd column is the Value
                             return (
-                              <td key={cidx} className={`px-3 py-2 
-                                ${isHigh && isValueCell ? 'text-rose-400 font-bold' : ''} 
-                                ${isLow && isValueCell ? 'text-blue-400 font-bold' : ''}
-                              `}>
-                                {cell.replace(/\([HL]\)/gi, '')}
-                                {isHigh && isValueCell && <span className="ml-1 text-[10px] text-rose-500">( Yüksek )</span>}
-                                {isLow && isValueCell && <span className="ml-1 text-[10px] text-blue-500">( Düşük )</span>}
+                              <td key={cidx} className="px-4 py-2.5">
+                                <span className={isValueCell && isHigh ? "text-red-600 dark:text-red-400 font-black" : isValueCell && isLow ? "text-blue-600 dark:text-blue-400 font-black" : "font-medium"}>
+                                  {cell.replace(/\([HL]\)/gi, '')}
+                                </span>
+                                {isHigh && isValueCell && <span className="ml-2 text-[9px] font-black uppercase tracking-tighter text-red-600 dark:text-red-400 opacity-80">( Yüksek )</span>}
+                                {isLow && isValueCell && <span className="ml-2 text-[9px] font-black uppercase tracking-tighter text-blue-600 dark:text-blue-400 opacity-80">( Düşük )</span>}
                               </td>
                             )
                           })}
