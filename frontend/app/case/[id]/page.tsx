@@ -426,18 +426,21 @@ export default function CasePage() {
       </div>
 
       {/* Konsültasyon Butonu */}
-      <div className="glass rounded-2xl p-4 border bg-rose-500/5 transition-all shadow-sm" style={{ borderColor: "var(--border)" }}>
+      <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
         <div className="flex flex-col items-center gap-2">
           <button
             onClick={requestConsultation}
             disabled={streaming}
-            className="w-full flex items-center justify-center gap-2 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg hover:shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
-            style={{ background: "linear-gradient(to right, var(--error), var(--warning))" }}
+            className="w-full flex items-center justify-center gap-2 text-white font-black py-3 rounded-xl transition-all shadow-lg hover:shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden"
+            style={{ background: "linear-gradient(135deg, #e11d48 0%, #f43f5e 100%)" }}
           >
-            <Phone className="w-4 h-4" />
-            Hocayı Ara (Konsültasyon)
+            <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
+            <Phone className="w-5 h-5 animate-pulse" />
+            Hocaya Danış (Konsültasyon)
           </button>
-          <span className="text-[10px] opacity-60 text-center font-bold uppercase tracking-tighter" style={{ color: "var(--error)" }}>Dikkat: Fırça yiyebilirsiniz!</span>
+          <span className="text-[10px] font-black uppercase tracking-tighter opacity-70" style={{ color: "var(--danger)" }}>
+            Dikkat: Hocadan fırça yiyebilirsiniz!
+          </span>
         </div>
       </div>
 
@@ -612,27 +615,35 @@ export default function CasePage() {
       {/* Lab Request Drawer */}
       {labOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setLabOpen(false)} />
-          <div className="w-full max-w-sm bg-slate-900 h-full shadow-2xl border-l border-slate-800 relative z-10 flex flex-col animate-in slide-in-from-right duration-300">
-            <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setLabOpen(false)} />
+          <div className="w-full max-w-sm h-full shadow-2xl relative z-10 flex flex-col animate-in slide-in-from-right duration-300 border-l" 
+            style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
+            
+            <div className="p-6 border-b flex justify-between items-center transition-all" 
+              style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
               <div>
-                <h2 className="font-bold text-white flex items-center gap-2">
-                  <TestTube2 className="w-4 h-4 text-blue-400" /> Tetkik İstem Paneli
+                <h2 className="font-bold flex items-center gap-2" style={{ color: "var(--text)" }}>
+                  <TestTube2 className="w-5 h-5" style={{ color: "var(--primary)" }} /> Tetkik İstem Paneli
                 </h2>
-                <p className="text-xs text-emerald-400 font-bold mt-1">Kalan Bütçe: {budget} ₺</p>
+                <p className="text-xs font-bold mt-1 uppercase tracking-tight" style={{ color: "var(--success)" }}>
+                  Kalan Bütçe: {budget} ₺
+                </p>
               </div>
-              <button onClick={() => setLabOpen(false)} className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 hover:text-white">
-                <X className="w-4 h-4" />
+              <button onClick={() => setLabOpen(false)} 
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-90 shadow-sm border"
+                style={{ background: "var(--surface-2)", color: "var(--text-muted)", borderColor: "var(--border)" }}>
+                <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-8">
               {LAB_CATEGORIES.map(cat => {
                 const catTests = LAB_TESTS.filter(t => t.category === cat.id);
                 if (catTests.length === 0) return null;
                 
                 return (
-                  <div key={cat.id} className="space-y-3">
-                    <h3 className={`text-[10px] font-black tracking-widest uppercase border-b pb-1 ${cat.color}`} style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+                  <div key={cat.id} className="space-y-4">
+                    <h3 className={`text-[10px] font-black tracking-widest uppercase border-b pb-1 opacity-70 ${cat.color}`} style={{ borderColor: "var(--border)" }}>
                       {cat.label}
                     </h3>
                     <div className="space-y-2">
@@ -644,18 +655,26 @@ export default function CasePage() {
                              key={test.id}
                              onClick={() => toggleLab(test.id, test.price)}
                              disabled={!isSelected && !canAfford}
-                             className={`w-full text-left p-3 rounded-2xl border transition-all flex justify-between items-center group ${
+                             className={`w-full text-left p-4 rounded-2xl border transition-all flex justify-between items-center group shadow-sm ${
                                isSelected 
-                                 ? "shadow-md scale-[1.02]" 
-                                 : "hover:border-slate-400 disabled:opacity-30 disabled:cursor-not-allowed"
+                                 ? "scale-[1.02] ring-2 ring-offset-2" 
+                                 : "hover:translate-x-1 disabled:opacity-30 disabled:cursor-not-allowed"
                              }`}
-                             style={isSelected ? { background: "var(--primary-light)", borderColor: "var(--primary)" } : { background: "var(--surface-2)", borderColor: "var(--border)" }}
+                             style={{ 
+                                background: isSelected ? "var(--primary-light)" : "var(--surface)", 
+                                borderColor: isSelected ? "var(--primary)" : "var(--border)",
+                                "--tw-ring-color": "var(--primary-light)"
+                             } as any}
                            >
-                             <div>
-                               <div className={`text-xs font-bold transition-colors ${isSelected ? "" : "opacity-80"}`} style={{ color: "var(--text)" }}>{test.name}</div>
-                               <div className="text-[10px] font-black mt-0.5 opacity-60" style={{ color: isSelected ? 'var(--primary)' : 'var(--text-muted)' }}>{test.price} ₺</div>
+                             <div className="min-w-0 flex-1 mr-3">
+                               <div className="text-sm font-bold truncate" style={{ color: "var(--text)" }}>{test.name}</div>
+                               <div className="text-[11px] font-black mt-0.5 opacity-60" style={{ color: isSelected ? "var(--primary)" : "var(--text-muted)" }}>{test.price} ₺</div>
                              </div>
-                             {isSelected && <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-sm" style={{ background: "var(--primary)" }}><CheckCircle2 className="w-3.5 h-3.5 text-white" /></div>}
+                             {isSelected && (
+                               <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 shadow-md" style={{ background: "var(--primary)" }}>
+                                 <CheckCircle2 className="w-4 h-4 text-white" />
+                               </div>
+                             )}
                            </button>
                         )
                       })}
@@ -664,15 +683,17 @@ export default function CasePage() {
                 )
               })}
             </div>
-            <div className="p-4 border-t transition-all shadow-inner" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+
+            <div className="p-6 border-t transition-all shadow-inner" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
               <button
                 onClick={orderLabs}
                 disabled={selectedLabs.length === 0 || streaming}
-                className="w-full text-white font-bold py-3.5 rounded-xl shadow-lg disabled:opacity-40 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full text-white font-black py-4 rounded-2xl shadow-xl disabled:opacity-40 transition-all flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] group relative overflow-hidden"
                 style={{ background: "var(--primary)" }}
               >
-                <TestTube2 className="w-5 h-5" />
-                Seçili Tetkikleri İste ({selectedLabs.length})
+                <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
+                <TestTube2 className="w-6 h-6" />
+                <span>Tetkikleri İste ({selectedLabs.length})</span>
               </button>
             </div>
           </div>

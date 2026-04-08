@@ -12,13 +12,17 @@
   --surface-2:   #f0ebe2;
   --border:      #d8d0c4;
   --text:        #1c2b1e;
-  --text-muted:  #5a6b5c;
+  --text-muted:  #445546;
   --primary:     #4a7c59;
   --primary-h:   #3a6347;
   --accent:      #a8c5a0;
   --danger:      #c0392b;
   --success:     #2e7d52;
   --warning:     #b7791f;
+  --primary-light: rgba(74, 124, 89, 0.1);
+  --error-light:   rgba(192, 57, 43, 0.1);
+  --success-light: rgba(46, 125, 82, 0.1);
+  --warning-light: rgba(183, 121, 31, 0.1);
 }
 
 /* ── Dark Mode ────────────────────────────────────────── */
@@ -36,6 +40,10 @@ html.dark {
   --danger:      #e57373;
   --success:     #66bb6a;
   --warning:     #ffb74d;
+  --primary-light: rgba(106, 172, 122, 0.15);
+  --error-light:   rgba(229, 115, 115, 0.15);
+  --success-light: rgba(102, 187, 106, 0.15);
+  --warning-light: rgba(255, 183, 77, 0.15);
 }
 
 * {
