@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { casesApi, usersApi, authApi, sessionsApi, type Case, type HistoryItem, type UserOut } from "@/lib/api";
 import { isAuthenticated, logout } from "@/lib/auth";
-import DonateCard from "@/components/DonateCard";
 import Footer from "@/components/Footer";
 import {
   Stethoscope,
@@ -264,8 +263,8 @@ export default function DashboardPage() {
         </div>
 
         {activeTab === "randomizer" && (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                <div className="md:col-span-8">
+            <div className="grid grid-cols-1 gap-6">
+                <div className="md:col-span-12">
                     <div className="glass rounded-2xl p-6 sm:p-8 border border-slate-700/50 shadow-2xl relative overflow-hidden">
                         {/* Decorative Background */}
                         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -362,10 +361,6 @@ export default function DashboardPage() {
                             )}
                         </button>
                     </div>
-                </div>
-                
-                <div className="md:col-span-4">
-                    <DonateCard />
                 </div>
             </div>
         )}

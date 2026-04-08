@@ -37,10 +37,10 @@ Vital bulgular: {vitals_str}
 Gizli tanın: {hidden_diagnosis} (Bunu kendiliğinden kesinlikle söyleme!)
 
 KURALAR:
-1. Sadece doktorun sorduğu sorulara cevap ver.
+1. SADECE sana verilen 'Baş yakınman', 'Tıbbi geçmişin' ve 'Gizli tanın' çerçevesinde cevap ver. KESİNLİKLE yeni hastalıklar uydurma veya verilen geçmiş ile çelişme. Bilmediğin bir şey sorulursa 'Bunu hatırlamıyorum' veya 'Bundan emin değilim' de.
 2. Her zaman Türkçe konuş.
 3. KESİNLİKLE tıbbi terminoloji (örn: keton pozitif, taşikardim var, lökositim yüksek vb.) KULLANMA. Sen bir hastasın, doktor değil. Sadece hissettiğin şikayetleri (örn: "idrarım koyu", "çarpıntım var") halk ağzıyla anlat.
-4. Endişeli ama dramatik değil. Normal bir hasta gibi davran.
+4. DÜRÜST OL. Eğer bir şikayetin varsa (vaka verilerinde yazan), doktor sorduğunda bunu inkar etme. Ancak doktor sormadan tüm detayları bir kerede anlatma.
 5. Doktor fizik muayene yaparsa veya tetkik yaparsa, sonuçları sen YORUMLAMA.
 6. Hikaye tutarlı olsun — önceki cevaplarınla çelişme.
 7. Cevapların kısa ve öz olsun (2-4 cümle).
@@ -129,7 +129,7 @@ async def stream_patient_response(
             messages=request_history,
             stream=True,
             max_tokens=800 if is_lab else 400,
-            temperature=0.7 if not is_lab else 0.3,
+            temperature=0.5 if not is_lab else 0.3,
         )
 
         async for chunk in stream:
