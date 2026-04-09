@@ -6,7 +6,7 @@ from sqlalchemy import (
     Column, String, Integer, Float, Boolean, Text, DateTime,
     ForeignKey, Enum as SAEnum, UniqueConstraint
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID, ARRAY
 from sqlalchemy.orm import relationship
 import enum
 
@@ -210,7 +210,20 @@ class CaseQuestion(Base):
     attempts = relationship("QuestionAttempt", back_populates="question")
 
 
-class QuestionAttempt(Base):
+class Annotation(Base):
+    """Annotations for high-resolution histology images."""
+    __tablename__ = "annotations"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    image_id = Column(String, nullable=False, index=True)  # Reference to the image
+    coordinates = Column(ARRAY(Float), nullable=False)  # [x, y, width, height]
+    note = Column(Text, nullable=False)  # Annotation text
+    created_at = Column(DateTime(timezone=True), default=now_utc)
+
+    __table_args__ = (
+        UniqueConstraint("image_id", "coordinates", name="uq_annotation_image_coordinates"),
+    )
+
     """Kullanıcı başına soru cevaplama geçmişi."""
     __tablename__ = "question_attempts"
 
