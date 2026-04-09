@@ -5,8 +5,9 @@ from typing import List
 
 from app.core.database import get_db
 from app.core.security import get_current_user_id
-from app.models.models import Report, SimulationSession, Case, User
-from app.schemas.schemas import ReportOut, HistoryItem
+from app.models.models import Report, SimulationSession, Case, User, Message
+from app.schemas.schemas import ReportOut, HistoryItem, ClinicalReasoningOut
+from app.services.ai_service import analyze_clinical_reasoning
 
 router = APIRouter()
 
@@ -35,6 +36,16 @@ async def get_report(
     if not report:
         raise HTTPException(status_code=404, detail="Rapor henüz oluşturulmamış")
 
+    # Klinik akıl yürütme analizi (AI yok — mesajlardan hesaplanır)
+    msgs_result = await db.execute(
+        select(Message)
+        .where(Message.session_id == session_id)
+        .order_by(Message.created_at)
+    )
+    messages = msgs_result.scalars().all()
+    reasoning_data = analyze_clinical_reasoning(messages)
+    clinical_reasoning = ClinicalReasoningOut(**reasoning_data)
+
     return ReportOut(
         id=report.id,
         session_id=report.session_id,
@@ -45,6 +56,7 @@ async def get_report(
         tus_reference=report.tus_reference,
         recommendations=report.recommendations or [],
         created_at=report.created_at,
+        clinical_reasoning=clinical_reasoning,
     )
 
 

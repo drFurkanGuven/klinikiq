@@ -217,6 +217,109 @@ async def stream_patient_response(
         await save_history(session_id, history)
 
 
+# ── Klinik Akıl Yürütme Analizi (AI yok — saf kod) ───────────────────────────
+
+def analyze_clinical_reasoning(messages: list) -> dict:
+    """DB'den gelen Message objelerinden klinik akıl yürütme skorunu hesaplar."""
+    user_msgs = [m for m in messages if m.role.value == "user"]
+
+    tetkik = [m for m in user_msgs if "[TETKİK İSTEDİ]" in m.content]
+    fizik   = [m for m in user_msgs if "[FİZİK MUAYENE]" in m.content]
+    konsult = [m for m in user_msgs if "[KONSÜLTASYON İSTEĞİ]" in m.content]
+    anamnez = [m for m in user_msgs if not any(
+        tag in m.content for tag in ["[TETKİK İSTEDİ]", "[FİZİK MUAYENE]", "[KONSÜLTASYON İSTEĞİ]"]
+    )]
+
+    # İlk klinik eylem (tetkik veya muayene) öncesi kaç anamnez sorusu soruldu?
+    ilk_eylem_idx = next(
+        (i for i, m in enumerate(user_msgs)
+         if "[TETKİK İSTEDİ]" in m.content or "[FİZİK MUAYENE]" in m.content),
+        len(user_msgs),
+    )
+
+    if ilk_eylem_idx >= 5:
+        anamnez_yorum = "Tetkik öncesi sistematik anamnez aldınız."
+    elif ilk_eylem_idx >= 3:
+        anamnez_yorum = "Anamnez yeterliydi, biraz daha derinleştirilebilirdi."
+    elif ilk_eylem_idx >= 1:
+        anamnez_yorum = "Tetkike çok erken atladınız, önce daha fazla anamnez alın."
+    else:
+        anamnez_yorum = "Hiç anamnez almadan tetkik istediniz."
+
+    fizik_yorum = (
+        f"{len(fizik)} sistem muayenesi yaptırdınız." if fizik
+        else "Fizik muayene yapmadınız — klinik değerlendirmede önemli bir adımı atladınız."
+    )
+
+    return {
+        "toplam_mesaj": len(user_msgs),
+        "anamnez_sayisi": len(anamnez),
+        "tetkik_sayisi": len(tetkik),
+        "fizik_muayene_sayisi": len(fizik),
+        "konsultasyon_sayisi": len(konsult),
+        "ilk_eylem_oncesi_anamnez": ilk_eylem_idx,
+        "anamnez_yorum": anamnez_yorum,
+        "fizik_yorum": fizik_yorum,
+    }
+
+
+# ── TUS MCQ Üretimi (gpt-4o, lazy — vaka başına tek seferlik) ────────────────
+
+async def generate_mcq(case: dict, report: dict) -> list[dict]:
+    """Vaka ve rapor verilerinden 4 TUS MCQ sorusu üretir."""
+    patient = case.get("patient_json", {})
+
+    prompt = f"""Aşağıdaki tıp vakasından TUS sınavı formatında 4 çoktan seçmeli soru üret.
+
+VAKA:
+- Branş: {case.get('specialty')}
+- Hasta: {patient.get('age')} yaşında {patient.get('gender')}, baş yakınma: {patient.get('chief_complaint')}
+- Özgeçmiş: {patient.get('history', '')}
+- Gerçek Tanı: {case.get('hidden_diagnosis')}
+- Patofizyoloji: {report.get('pathophysiology_note', '')}
+- TUS Referans: {report.get('tus_reference', '')}
+
+KURALLAR:
+1. Her soru TUS formatında — 5 şık (A-E), tek doğru cevap
+2. 4 soru farklı konuları kapsasın: tanı kriterleri, tedavi, patofizyoloji, komplikasyon/ayırıcı tanı
+3. Şıklar gerçekçi ve benzer uzunlukta olsun, "hepsi" / "hiçbiri" kullanma
+4. Türkçe yaz
+
+Sadece JSON array döndür (başka hiçbir şey ekleme):
+[
+  {{
+    "question_text": "Soru metni...",
+    "option_a": "...", "option_b": "...", "option_c": "...", "option_d": "...", "option_e": "...",
+    "correct_option": "B",
+    "explanation": "Doğru cevabın kısa açıklaması..."
+  }}
+]"""
+
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Sen TUS sınavı soru yazarısın. Klinik vakalardan yüksek kaliteli, TUS formatında MCQ soruları üretiyorsun. Sadece geçerli JSON döndür.",
+                },
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.4,
+            max_tokens=2000,
+        )
+
+        content = response.choices[0].message.content.strip()
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        return json.loads(content)
+
+    except Exception:
+        return []   # Üretim başarısız → sessizce geç, rapor etkilenmesin
+
+
 # ── Flashcard Üretimi (gpt-4o) ───────────────────────────────────────────────
 
 async def generate_flashcard(case: dict, report: dict) -> dict:

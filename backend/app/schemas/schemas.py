@@ -115,6 +115,17 @@ class SessionOut(BaseModel):
 
 # ── Reports ───────────────────────────────────────────────────────────────────
 
+class ClinicalReasoningOut(BaseModel):
+    toplam_mesaj: int
+    anamnez_sayisi: int
+    tetkik_sayisi: int
+    fizik_muayene_sayisi: int
+    konsultasyon_sayisi: int
+    ilk_eylem_oncesi_anamnez: int
+    anamnez_yorum: str
+    fizik_yorum: str
+
+
 class ReportOut(BaseModel):
     id: str
     session_id: str
@@ -125,6 +136,7 @@ class ReportOut(BaseModel):
     tus_reference: Optional[str]
     recommendations: Optional[List[str]]
     created_at: datetime
+    clinical_reasoning: Optional[ClinicalReasoningOut] = None
 
     class Config:
         from_attributes = True
@@ -169,6 +181,48 @@ class StudyNoteItem(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# ── TUS MCQ ───────────────────────────────────────────────────────────────────
+
+class QuestionOut(BaseModel):
+    id: str
+    case_id: str
+    specialty: str
+    question_text: str
+    option_a: str
+    option_b: str
+    option_c: str
+    option_d: str
+    option_e: str
+    # Doğru cevap ve açıklama sadece cevap gönderildikten sonra gelir
+    correct_option: Optional[str] = None
+    explanation: Optional[str] = None
+    created_at: datetime
+    user_answered: Optional[bool] = None       # Bu soruyu daha önce cevapladı mı?
+    user_was_correct: Optional[bool] = None    # Doğru muydu?
+
+    class Config:
+        from_attributes = True
+
+
+class QuestionAnswerSubmit(BaseModel):
+    selected_option: str   # "A" / "B" / "C" / "D" / "E"
+
+
+class QuestionAnswerResult(BaseModel):
+    is_correct: bool
+    correct_option: str
+    explanation: str
+
+
+class QuestionStatsOut(BaseModel):
+    total_questions: int
+    attempted: int
+    correct: int
+    incorrect: int
+    correct_rate: float   # 0.0 - 1.0
+    by_specialty: Dict[str, Any]
 
 
 # ── Flashcards ────────────────────────────────────────────────────────────────

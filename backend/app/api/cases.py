@@ -91,6 +91,67 @@ async def get_random_case(
     )
 
 
+@router.get("/recommended", response_model=CaseListItem)
+async def get_recommended_case(
+    db: AsyncSession = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    """En zayıf branştan çözülmemiş vaka öner. Skor geçmişi yoksa rastgele döner."""
+    from sqlalchemy import func
+    from app.models.models import SimulationSession, Report
+
+    completed_subq = select(SimulationSession.case_id).where(SimulationSession.user_id == user_id)
+
+    # Branş başına ortalama skor (en düşükten yükseğe)
+    specialty_scores = await db.execute(
+        select(Case.specialty, func.avg(Report.score).label("avg_score"))
+        .join(SimulationSession, SimulationSession.case_id == Case.id)
+        .join(Report, Report.session_id == SimulationSession.id)
+        .where(SimulationSession.user_id == user_id)
+        .group_by(Case.specialty)
+        .order_by(func.avg(Report.score).asc())
+    )
+    scores = specialty_scores.all()
+
+    # En zayıf branştan başlayarak çözülmemiş vaka ara
+    for specialty, _ in scores:
+        result = await db.execute(
+            select(Case)
+            .where(Case.is_active == True)
+            .where(Case.specialty == specialty)
+            .where(Case.id.notin_(completed_subq))
+            .order_by(func.random())
+            .limit(1)
+        )
+        c = result.scalar_one_or_none()
+        if c:
+            pj = c.patient_json or {}
+            return CaseListItem(
+                id=c.id, title=c.title, specialty=c.specialty, difficulty=c.difficulty,
+                chief_complaint=pj.get("chief_complaint"), patient_age=pj.get("age"),
+                patient_gender=pj.get("gender"), is_active=c.is_active,
+            )
+
+    # Geçmiş yoksa veya tüm zayıf branşlar tamamlandıysa rastgele döndür
+    result = await db.execute(
+        select(Case)
+        .where(Case.is_active == True)
+        .where(Case.id.notin_(completed_subq))
+        .order_by(func.random())
+        .limit(1)
+    )
+    c = result.scalar_one_or_none()
+    if not c:
+        raise HTTPException(status_code=404, detail="Çözülmemiş vaka kalmadı.")
+
+    pj = c.patient_json or {}
+    return CaseListItem(
+        id=c.id, title=c.title, specialty=c.specialty, difficulty=c.difficulty,
+        chief_complaint=pj.get("chief_complaint"), patient_age=pj.get("age"),
+        patient_gender=pj.get("gender"), is_active=c.is_active,
+    )
+
+
 @router.get("/{case_id}", response_model=CaseDetail)
 async def get_case(
     case_id: str,

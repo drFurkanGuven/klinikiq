@@ -2,8 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from datetime import datetime, timezone
 
-from app.models.models import SimulationSession, DiagnosisSubmitted, Report, SessionStatus, Case, Flashcard
-from app.services.ai_service import generate_report, generate_flashcard, load_history
+from app.models.models import SimulationSession, DiagnosisSubmitted, Report, SessionStatus, Case, Flashcard, CaseQuestion
+from app.services.ai_service import generate_report, generate_flashcard, generate_mcq, load_history
 
 
 async def create_report_for_session(session_id: str, db: AsyncSession) -> Report:
@@ -64,42 +64,41 @@ async def create_report_for_session(session_id: str, db: AsyncSession) -> Report
     await db.commit()
     await db.refresh(report)
 
-    # ── Flashcard üretimi (bu vaka için ilk kez mi tamamlanıyor?) ─────────────
+    # ── TUS MCQ üretimi (bu vaka için ilk kez mi tamamlanıyor?) ──────────────
     from app.core.database import AsyncSessionLocal
-    async with AsyncSessionLocal() as fc_db:
-        existing_fc = await fc_db.execute(
-            select(Flashcard).where(Flashcard.case_id == session.case_id)
+    async with AsyncSessionLocal() as bg_db:
+        existing_q = await bg_db.execute(
+            select(CaseQuestion).where(CaseQuestion.case_id == session.case_id).limit(1)
         )
-        if not existing_fc.scalar_one_or_none():
+        if not existing_q.scalar_one_or_none():
             try:
-                flashcard_data = await generate_flashcard(
+                questions = await generate_mcq(
                     case={
                         "specialty": case.specialty,
-                        "difficulty": case.difficulty,
                         "patient_json": case.patient_json,
                         "hidden_diagnosis": case.hidden_diagnosis,
-                        "educational_notes": case.educational_notes,
                     },
                     report={
                         "pathophysiology_note": report.pathophysiology_note,
                         "tus_reference": report.tus_reference,
-                        "missed_diagnoses": report.missed_diagnoses or [],
                     },
                 )
-                fc = Flashcard(
-                    case_id=session.case_id,
-                    specialty=case.specialty,
-                    difficulty=case.difficulty,
-                    topic=flashcard_data.get("topic", case.hidden_diagnosis),
-                    question=flashcard_data.get("question", ""),
-                    answer=flashcard_data.get("answer", ""),
-                    key_points=flashcard_data.get("key_points", []),
-                    tus_reference=flashcard_data.get("tus_reference"),
-                    source_report_id=report.id,
-                )
-                fc_db.add(fc)
-                await fc_db.commit()
+                for q in questions:
+                    bg_db.add(CaseQuestion(
+                        case_id=session.case_id,
+                        specialty=case.specialty,
+                        question_text=q.get("question_text", ""),
+                        option_a=q.get("option_a", ""),
+                        option_b=q.get("option_b", ""),
+                        option_c=q.get("option_c", ""),
+                        option_d=q.get("option_d", ""),
+                        option_e=q.get("option_e", ""),
+                        correct_option=q.get("correct_option", "A"),
+                        explanation=q.get("explanation", ""),
+                        source_report_id=report.id,
+                    ))
+                await bg_db.commit()
             except Exception:
-                pass  # Flashcard üretimi başarısız olursa rapor yine de döner
+                pass  # MCQ üretimi başarısız → rapor yine de döner
 
     return report

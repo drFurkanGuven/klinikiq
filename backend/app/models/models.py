@@ -187,3 +187,38 @@ class FlashcardProgress(Base):
     __table_args__ = (
         UniqueConstraint("user_id", "flashcard_id", name="uq_flashcard_progress"),
     )
+
+
+class CaseQuestion(Base):
+    """Vaka bazlı TUS MCQ soru bankası. İlk tamamlamada AI üretir, herkes kullanır."""
+    __tablename__ = "case_questions"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    case_id = Column(String, ForeignKey("cases.id"), nullable=False, index=True)
+    specialty = Column(String, nullable=False, index=True)
+    question_text = Column(Text, nullable=False)
+    option_a = Column(String, nullable=False)
+    option_b = Column(String, nullable=False)
+    option_c = Column(String, nullable=False)
+    option_d = Column(String, nullable=False)
+    option_e = Column(String, nullable=False)
+    correct_option = Column(String, nullable=False)   # "A" / "B" / "C" / "D" / "E"
+    explanation = Column(Text, nullable=False)
+    source_report_id = Column(String, ForeignKey("reports.id"), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
+
+    attempts = relationship("QuestionAttempt", back_populates="question")
+
+
+class QuestionAttempt(Base):
+    """Kullanıcı başına soru cevaplama geçmişi."""
+    __tablename__ = "question_attempts"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    question_id = Column(String, ForeignKey("case_questions.id"), nullable=False)
+    selected_option = Column(String, nullable=False)  # "A"-"E"
+    is_correct = Column(Boolean, nullable=False)
+    attempted_at = Column(DateTime(timezone=True), default=now_utc)
+
+    question = relationship("CaseQuestion", back_populates="attempts")
