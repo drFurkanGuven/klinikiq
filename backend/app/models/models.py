@@ -35,6 +35,12 @@ class MessageRole(str, enum.Enum):
     system = "system"
 
 
+class FlashcardStatus(str, enum.Enum):
+    new = "new"
+    learning = "learning"
+    known = "known"
+
+
 # ── Models ────────────────────────────────────────────────────────────────────
 
 class User(Base):
@@ -143,4 +149,41 @@ class TetkikResult(Base):
 
     __table_args__ = (
         UniqueConstraint("case_id", "test_key", name="uq_tetkik_case_testkey"),
+    )
+
+
+class Flashcard(Base):
+    """Vaka bazlı ortak flashcard havuzu. İlk vaka bitişinde AI üretir, herkes kullanır."""
+    __tablename__ = "flashcards"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    case_id = Column(String, ForeignKey("cases.id"), nullable=False, unique=True)
+    specialty = Column(String, nullable=False, index=True)
+    difficulty = Column(String, nullable=False, index=True)
+    topic = Column(String, nullable=False)           # AI'ın belirlediği konu adı
+    question = Column(Text, nullable=False)          # Klinik senaryo sorusu
+    answer = Column(Text, nullable=False)            # Tanı + patofizyoloji
+    key_points = Column(JSONB, nullable=False, default=list)  # 3-5 madde
+    tus_reference = Column(Text, nullable=True)
+    source_report_id = Column(String, ForeignKey("reports.id"), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
+
+    progress = relationship("FlashcardProgress", back_populates="flashcard")
+
+
+class FlashcardProgress(Base):
+    """Kullanıcı başına flashcard ilerleme takibi."""
+    __tablename__ = "flashcard_progress"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    flashcard_id = Column(String, ForeignKey("flashcards.id"), nullable=False)
+    status = Column(SAEnum(FlashcardStatus), default=FlashcardStatus.new, nullable=False)
+    times_seen = Column(Integer, default=0, nullable=False)
+    last_seen_at = Column(DateTime(timezone=True), nullable=True)
+
+    flashcard = relationship("Flashcard", back_populates="progress")
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "flashcard_id", name="uq_flashcard_progress"),
     )

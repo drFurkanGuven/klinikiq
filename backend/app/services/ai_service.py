@@ -217,6 +217,71 @@ async def stream_patient_response(
         await save_history(session_id, history)
 
 
+# ── Flashcard Üretimi (gpt-4o) ───────────────────────────────────────────────
+
+async def generate_flashcard(case: dict, report: dict) -> dict:
+    """Vaka ve rapor verilerinden TUS flashcard'ı üretir."""
+    patient = case.get("patient_json", {})
+
+    prompt = f"""Aşağıdaki tıp vakasından TUS hazırlığı için bir flashcard üret.
+
+VAKA:
+- Branş: {case.get('specialty')}
+- Zorluk: {case.get('difficulty')}
+- Hasta: {patient.get('age')} yaşında {patient.get('gender')}, baş yakınma: {patient.get('chief_complaint')}
+- Özgeçmiş: {patient.get('history', '')}
+- Gerçek Tanı: {case.get('hidden_diagnosis')}
+- Eğitim Notu: {case.get('educational_notes', '')}
+
+RAPOR:
+- Patofizyoloji: {report.get('pathophysiology_note', '')}
+- TUS Referans: {report.get('tus_reference', '')}
+- Atlanmış Tanılar: {', '.join(report.get('missed_diagnoses', []))}
+
+Aşağıdaki JSON formatında yanıt ver (başka hiçbir şey ekleme):
+{{
+  "topic": "Spesifik tıbbi konu adı (örn: Kardiyak Tamponad, Preeklampsi)",
+  "question": "Klinik senaryo özeti olarak sorulan flashcard sorusu. Tanıyı KESİNLİKLE verme. 60-80 kelime.",
+  "answer": "Tanı + kısa patofizyoloji + önemli ayırıcı tanılar. 100-150 kelime.",
+  "key_points": ["Madde 1", "Madde 2", "Madde 3", "Madde 4", "Madde 5"],
+  "tus_reference": "TUS'ta çıkmış ilgili konular ve yüksek verimli noktalar. 2-3 cümle."
+}}"""
+
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Sen TUS hazırlığında uzman bir tıp eğitimcisisin. Klinik vakalardan öğrenciler için etkili flashcard'lar üretiyorsun. Yanıtlarını her zaman geçerli JSON formatında ver."
+                },
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.4,
+            max_tokens=1000,
+        )
+
+        content = response.choices[0].message.content.strip()
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        return json.loads(content)
+
+    except Exception as e:
+        # Üretim başarısız olursa minimal fallback
+        return {
+            "topic": case.get("hidden_diagnosis", "Bilinmeyen Tanı"),
+            "question": (
+                f"{patient.get('age')} yaşında {patient.get('gender')} hasta "
+                f"{patient.get('chief_complaint')} şikayetiyle başvurdu. Tanınız nedir?"
+            ),
+            "answer": f"Tanı: {case.get('hidden_diagnosis', '')}",
+            "key_points": [],
+            "tus_reference": report.get("tus_reference", ""),
+        }
+
+
 # ── Rapor Üretimi (gpt-4o) ────────────────────────────────────────────────────
 
 async def generate_report(

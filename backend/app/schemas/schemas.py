@@ -166,6 +166,36 @@ class StudyNoteItem(BaseModel):
     pathophysiology_note: Optional[str]
     tus_reference: Optional[str]
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
+
+
+# ── Flashcards ────────────────────────────────────────────────────────────────
+
+class FlashcardOut(BaseModel):
+    id: str
+    case_id: str
+    specialty: str
+    difficulty: str
+    topic: str
+    question: str
+    answer: str
+    key_points: List[str]
+    tus_reference: Optional[str]
+    created_at: datetime
+    user_status: Optional[str] = "new"  # new / learning / known
+
+    class Config:
+        from_attributes = True
+
+
+class FlashcardProgressUpdate(BaseModel):
+    status: str  # "new" | "learning" | "known"
+
+
+class FlashcardStatsOut(BaseModel):
+    total: int
+    new: int
+    learning: int
+    known: int
