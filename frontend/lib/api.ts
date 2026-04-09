@@ -86,6 +86,17 @@ export interface MessageOut {
   created_at: string;
 }
 
+export interface ClinicalReasoning {
+  toplam_mesaj: number;
+  anamnez_sayisi: number;
+  tetkik_sayisi: number;
+  fizik_muayene_sayisi: number;
+  konsultasyon_sayisi: number;
+  ilk_eylem_oncesi_anamnez: number;
+  anamnez_yorum: string;
+  fizik_yorum: string;
+}
+
 export interface ReportOut {
   id: string;
   session_id: string;
@@ -96,6 +107,33 @@ export interface ReportOut {
   tus_reference?: string;
   recommendations?: string[];
   created_at: string;
+  clinical_reasoning?: ClinicalReasoning;
+}
+
+export interface Question {
+  id: string;
+  case_id: string;
+  specialty: string;
+  question_text: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  option_e: string;
+  correct_option?: string;
+  explanation?: string;
+  created_at: string;
+  user_answered?: boolean;
+  user_was_correct?: boolean;
+}
+
+export interface QuestionStats {
+  total_questions: number;
+  attempted: number;
+  correct: number;
+  incorrect: number;
+  correct_rate: number;
+  by_specialty: Record<string, { attempted: number; correct: number; rate: number }>;
 }
 
 export interface HistoryItem {
@@ -114,7 +152,22 @@ export const casesApi = {
     api.get<Case[]>("/cases", { params }),
   getRandom: (params?: { specialties?: string; difficulty?: string }) =>
     api.get<Case>("/cases/random", { params }),
+  getRecommended: () => api.get<Case>("/cases/recommended"),
   get: (id: string) => api.get<CaseDetail>(`/cases/${id}`),
+};
+
+export const questionsApi = {
+  list: (params?: { specialty?: string }) =>
+    api.get<Question[]>("/questions", { params }),
+  practice: (params?: { specialty?: string; limit?: number }) =>
+    api.get<Question[]>("/questions/practice", { params }),
+  stats: () => api.get<QuestionStats>("/questions/stats"),
+  get: (id: string) => api.get<Question>(`/questions/${id}`),
+  answer: (id: string, selected_option: string) =>
+    api.post<{ is_correct: boolean; correct_option: string; explanation: string }>(
+      `/questions/${id}/answer`,
+      { selected_option }
+    ),
 };
 
 export const sessionsApi = {

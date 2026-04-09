@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { casesApi, usersApi, authApi, sessionsApi, type Case, type HistoryItem, type UserOut } from "@/lib/api";
+import { casesApi, usersApi, authApi, sessionsApi, questionsApi, type Case, type HistoryItem, type UserOut, type QuestionStats } from "@/lib/api";
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
@@ -17,7 +17,9 @@ import {
   Dna,
   Play,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Sparkles,
+  GraduationCap,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -53,6 +55,8 @@ export default function DashboardPage() {
 
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"randomizer" | "history">("randomizer");
+  const [questionStats, setQuestionStats] = useState<QuestionStats | null>(null);
+  const [isRecommending, setIsRecommending] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated()) { router.replace("/login"); return; }
@@ -61,9 +65,31 @@ export default function DashboardPage() {
 
   async function fetchData() {
     setLoading(true);
-    await Promise.all([fetchHistory(), fetchMe()]);
+    await Promise.all([fetchHistory(), fetchMe(), fetchQuestionStats()]);
     setLoading(false);
   }
+
+  async function fetchQuestionStats() {
+    try {
+      const res = await questionsApi.stats();
+      setQuestionStats(res.data);
+    } catch {}
+  }
+
+  const handleRecommendedCase = async () => {
+    setIsRecommending(true);
+    setErrorMsg("");
+    try {
+      const caseRes = await casesApi.getRecommended();
+      const sessionRes = await sessionsApi.create(caseRes.data.id);
+      router.push(`/case/${sessionRes.data.id}`);
+    } catch (err: any) {
+      setIsRecommending(false);
+      if (err.response?.status === 404) setErrorMsg("Önerilebilecek yeni vaka kalmadı, tebrikler!");
+      else if (err.response?.status === 403) setErrorMsg(err.response.data.detail || "Günlük limitinize ulaştınız.");
+      else setErrorMsg("Vaka başlatılırken bir hata oluştu.");
+    }
+  };
   
   async function fetchMe() {
     try {
@@ -162,6 +188,16 @@ export default function DashboardPage() {
                     <span className="hidden sm:inline">Admin</span>
                 </Link>
             )}
+            <Link href="/questions" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border shadow-sm"
+              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
+              <GraduationCap className="w-4 h-4" style={{ color: "var(--primary)" }} />
+              <span className="hidden sm:inline">Sorular</span>
+              {questionStats && questionStats.total_questions > 0 && (
+                <span className="hidden sm:flex items-center justify-center text-[10px] font-black rounded-full w-5 h-5 text-white" style={{ background: "var(--primary)" }}>
+                  {questionStats.total_questions}
+                </span>
+              )}
+            </Link>
             <Link href="/study-notes" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <BookOpen className="w-4 h-4" style={{ color: "var(--primary)" }} />
@@ -378,34 +414,52 @@ export default function DashboardPage() {
                             </div>
                         )}
 
-                        <button 
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <button
                             onClick={handleStartRandomCase}
-                            disabled={isStarting}
-                            className={`w-full py-4.5 rounded-2xl text-white font-black text-xl flex items-center justify-center gap-3 transition-all relative overflow-hidden group shadow-lg active:scale-[0.98] ${
-                                isStarting || isLimitReached
-                                    ? "cursor-not-allowed opacity-50" 
-                                    : ""
+                            disabled={isStarting || isRecommending}
+                            className={`flex-1 py-4 rounded-2xl text-white font-black text-lg flex items-center justify-center gap-3 transition-all relative overflow-hidden group shadow-lg active:scale-[0.98] ${
+                              isStarting || isLimitReached ? "cursor-not-allowed opacity-50" : ""
                             }`}
-                            style={{ 
-                              background: isStarting || isLimitReached ? "var(--text-muted)" : "var(--primary)"
-                            }}
-                        >
+                            style={{ background: isStarting || isLimitReached ? "var(--text-muted)" : "var(--primary)" }}
+                          >
                             <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-500 ease-out" />
                             {isStarting ? (
-                                <>
-                                    <svg className="animate-spin h-6 w-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Vaka Hazırlanıyor...
-                                </>
+                              <>
+                                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                </svg>
+                                Hazırlanıyor...
+                              </>
                             ) : (
-                                <>
-                                    <Play className="w-6 h-6 fill-current" /> 
-                                    {isLimitReached ? "Günlük Limitinize Ulaştınız" : "Rastgele Vakayı Başlat"}
-                                </>
+                              <>
+                                <Play className="w-5 h-5 fill-current" />
+                                {isLimitReached ? "Günlük Limitinize Ulaştınız" : "Rastgele Vakayı Başlat"}
+                              </>
                             )}
-                        </button>
+                          </button>
+
+                          <button
+                            onClick={handleRecommendedCase}
+                            disabled={isStarting || isRecommending || isLimitReached}
+                            title="Geçmiş skorlarına göre en zayıf olduğun branştan vaka önerir"
+                            className={`sm:w-auto px-6 py-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition-all border shadow-md active:scale-[0.98] ${
+                              isRecommending || isLimitReached ? "cursor-not-allowed opacity-50" : "hover:shadow-lg"
+                            }`}
+                            style={{ background: "var(--surface)", borderColor: "var(--primary)", color: "var(--primary)" }}
+                          >
+                            {isRecommending ? (
+                              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                              </svg>
+                            ) : (
+                              <Sparkles className="w-5 h-5" />
+                            )}
+                            Önerilen Vaka
+                          </button>
+                        </div>
                     </div>
                 </div>
             </div>

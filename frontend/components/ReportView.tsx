@@ -1,6 +1,6 @@
 "use client";
 import { type ReportOut } from "@/lib/api";
-import { CheckCircle2, XCircle, BookOpen, Star, ExternalLink } from "lucide-react";
+import { CheckCircle2, XCircle, BookOpen, Star, ExternalLink, Brain, MessageSquare, FlaskConical, Stethoscope, Users } from "lucide-react";
 
 interface Props {
   report: ReportOut;
@@ -157,11 +157,7 @@ export default function ReportView({ report }: Props) {
           <h3 className="font-bold text-lg mb-6" style={{ color: "var(--text)" }}>💡 Gelişim Önerileri</h3>
           <ul className="space-y-4">
             {report.recommendations.map((r, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-3.5 text-sm font-medium"
-                style={{ color: "var(--text)" }}
-              >
+              <li key={i} className="flex items-start gap-3.5 text-sm font-medium" style={{ color: "var(--text)" }}>
                 <span className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center text-[11px] text-blue-500 font-black flex-shrink-0 mt-0.5 border border-blue-500/10">
                   {i + 1}
                 </span>
@@ -169,6 +165,58 @@ export default function ReportView({ report }: Props) {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* Klinik Akıl Yürütme */}
+      {report.clinical_reasoning && (
+        <div className="glass rounded-3xl p-8 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+          <div className="flex items-center gap-3 mb-7">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--accent) 20%, transparent)", color: "var(--primary)" }}>
+              <Brain className="w-5 h-5" />
+            </div>
+            <h3 className="font-bold text-lg" style={{ color: "var(--text)" }}>Klinik Akıl Yürütme Analizi</h3>
+          </div>
+
+          {/* İstatistik kartları */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            {[
+              { icon: MessageSquare, label: "Anamnez", value: report.clinical_reasoning.anamnez_sayisi, color: "var(--primary)" },
+              { icon: FlaskConical, label: "Tetkik", value: report.clinical_reasoning.tetkik_sayisi, color: "#8b5cf6" },
+              { icon: Stethoscope, label: "Fizik Muayene", value: report.clinical_reasoning.fizik_muayene_sayisi, color: "#0ea5e9" },
+              { icon: Users, label: "Konsültasyon", value: report.clinical_reasoning.konsultasyon_sayisi, color: "#f59e0b" },
+            ].map(({ icon: Icon, label, value, color }) => (
+              <div key={label} className="rounded-2xl p-4 border text-center" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                <Icon className="w-5 h-5 mx-auto mb-2" style={{ color }} />
+                <p className="text-2xl font-black" style={{ color: "var(--text)" }}>{value}</p>
+                <p className="text-xs font-medium mt-0.5" style={{ color: "var(--text-muted)" }}>{label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Yorumlar */}
+          <div className="space-y-3">
+            {[
+              {
+                text: report.clinical_reasoning.anamnez_yorum,
+                good: report.clinical_reasoning.ilk_eylem_oncesi_anamnez >= 4,
+              },
+              {
+                text: report.clinical_reasoning.fizik_yorum,
+                good: report.clinical_reasoning.fizik_muayene_sayisi > 0,
+              },
+            ].map(({ text, good }, i) => (
+              <div key={i} className="flex items-start gap-3 rounded-xl px-4 py-3 text-sm font-medium border"
+                style={{
+                  background: good ? "color-mix(in srgb, var(--success) 8%, transparent)" : "color-mix(in srgb, var(--warning) 8%, transparent)",
+                  borderColor: good ? "color-mix(in srgb, var(--success) 25%, transparent)" : "color-mix(in srgb, var(--warning) 25%, transparent)",
+                  color: "var(--text)",
+                }}>
+                <span className="mt-0.5 flex-shrink-0">{good ? "✅" : "⚠️"}</span>
+                {text}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
