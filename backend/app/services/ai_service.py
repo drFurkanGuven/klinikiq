@@ -1,10 +1,12 @@
 import json
 import asyncio
 from datetime import datetime, timezone
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 from openai import AsyncOpenAI
 import redis.asyncio as aioredis
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
 
 from app.core.config import settings
 
@@ -73,6 +75,48 @@ async def clear_history(session_id: str):
     await redis.aclose()
 
 
+# ── Tetkik Sonuç Cache (PostgreSQL) ──────────────────────────────────────────
+
+def _extract_test_key(message: str) -> str:
+    """[TETKİK İSTEDİ] mesajındaki '- Test Adı' satırlarını parse edip
+    küçük harf + sıralı + pipe-joined anahtar döner.
+    Örn: "crp (c-reaktif protein)|tam kan sayımı (hemogram)"
+    """
+    tests = []
+    for line in message.split('\n'):
+        line = line.strip()
+        if line.startswith('- '):
+            tests.append(line[2:].strip().lower())
+    tests.sort()
+    return '|'.join(tests)
+
+
+async def _get_cached_tetkik(case_id: str, test_key: str) -> Optional[str]:
+    from app.core.database import AsyncSessionLocal
+    from app.models.models import TetkikResult
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(
+            select(TetkikResult).where(
+                TetkikResult.case_id == case_id,
+                TetkikResult.test_key == test_key,
+            )
+        )
+        row = result.scalar_one_or_none()
+        return row.result_content if row else None
+
+
+async def _save_tetkik_result(case_id: str, test_key: str, content: str) -> None:
+    from app.core.database import AsyncSessionLocal
+    from app.models.models import TetkikResult
+    async with AsyncSessionLocal() as db:
+        try:
+            db.add(TetkikResult(case_id=case_id, test_key=test_key, result_content=content))
+            await db.commit()
+        except IntegrityError:
+            await db.rollback()
+            # Eş zamanlı istek zaten kaydetti, sorun yok
+
+
 # ── Hasta Simülasyonu (Streaming) ─────────────────────────────────────────────
 
 async def stream_patient_response(
@@ -80,6 +124,7 @@ async def stream_patient_response(
     user_message: str,
     patient_json: dict,
     hidden_diagnosis: str,
+    case_id: Optional[str] = None,
 ) -> AsyncGenerator[str, None]:
     """SSE streaming için async generator döner."""
 
@@ -93,10 +138,22 @@ async def stream_patient_response(
     is_consultation = "[KONSÜLTASYON İSTEĞİ]" in user_message
     is_lab = "[TETKİK İSTEDİ]" in user_message
     is_physical = "[FİZİK MUAYENE]" in user_message
-    
+
     is_clinical_ai = is_consultation or is_lab or is_physical
-    
+
     selected_model = "gpt-4o" if is_clinical_ai else "gpt-4o-mini"
+
+    # ── Tetkik cache kontrolü ─────────────────────────────────────────────────
+    if is_lab and case_id:
+        test_key = _extract_test_key(user_message)
+        cached_content = await _get_cached_tetkik(case_id, test_key)
+        if cached_content:
+            # Cache hit: Redis geçmişine ekleyip direkt döndür, AI çağrısı yok
+            history.append({"role": "user", "content": user_message})
+            history.append({"role": "assistant", "content": f"[SİSTEM KLİNİK RAPORU]:\n{cached_content}"})
+            await save_history(session_id, history)
+            yield cached_content
+            return
 
     # OpenAI'a gidecek istek listesini belirliyoruz
     if is_clinical_ai:
@@ -151,6 +208,9 @@ async def stream_patient_response(
         history.append({"role": "user", "content": user_message})
         history.append({"role": "assistant", "content": f"[SİSTEM KLİNİK RAPORU]:\n{full_response}"})
         await save_history(session_id, history)
+        # Tetkik sonucunu kalıcı cache'e yaz (ileride aynı vaka için tekrar sorulmayacak)
+        if is_lab and case_id and full_response:
+            await _save_tetkik_result(case_id, _extract_test_key(user_message), full_response)
     else:
         # Normal hasta diyaloğu
         history.append({"role": "assistant", "content": full_response})

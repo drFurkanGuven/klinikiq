@@ -158,6 +158,7 @@ async def send_message(
             user_message=data.content,
             patient_json=case.patient_json,
             hidden_diagnosis=case.hidden_diagnosis,
+            case_id=session.case_id,
         ):
             full_response += chunk
             yield f"data: {json.dumps({'content': chunk}, ensure_ascii=False)}\n\n"

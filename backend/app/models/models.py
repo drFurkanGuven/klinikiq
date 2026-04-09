@@ -4,7 +4,7 @@ import uuid
 
 from sqlalchemy import (
     Column, String, Integer, Float, Boolean, Text, DateTime,
-    ForeignKey, Enum as SAEnum
+    ForeignKey, Enum as SAEnum, UniqueConstraint
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
@@ -127,3 +127,20 @@ class Report(Base):
     created_at = Column(DateTime(timezone=True), default=now_utc)
 
     session = relationship("SimulationSession", back_populates="report")
+
+
+class TetkikResult(Base):
+    """Vaka bazlı tetkik sonuçları cache tablosu.
+    Aynı vaka için aynı test kombinasyonu tekrar istenirse AI'a gidilmez.
+    """
+    __tablename__ = "tetkik_results"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    case_id = Column(String, ForeignKey("cases.id"), nullable=False, index=True)
+    test_key = Column(String, nullable=False)   # sıralı, normalize test isimleri: "crp|hemogram|..."
+    result_content = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
+
+    __table_args__ = (
+        UniqueConstraint("case_id", "test_key", name="uq_tetkik_case_testkey"),
+    )
