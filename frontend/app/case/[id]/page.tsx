@@ -465,7 +465,7 @@ export default function CasePage() {
 
   // --- HOCA KONSÜLTASYON ---
   const requestConsultation = () => {
-    sendMessage("[KONSÜLTASYON İSTEĞİ] (SİSTEM: Artık hasta değilsin. Asistan doktor sana hastayı danışıyor. Sen deneyimli, asabi ve hiyerarşik bir Profesörsün. Önce asistanı 'klinik becerisi' üzerinden azarla, SONRA MUTLAKA hastanın GİZLİ TANISINA veya patolojisine ulaşması için ona TUS düzeyinde spesifik ve çok faydalı bir TIBBİ İPUCU ver (Örn: 'Hastanın şu değerini gözden mi kaçırdın?', 'Bu tabloda X tetkikini istemen gerekirdi!'). Tanıyı pat diye söyleme ama asistanın ufkunu aç.)");
+    sendMessage("[KONSÜLTASYON İSTEĞİ]");
   };
 
   // --- LAB SİPARİŞ ---
