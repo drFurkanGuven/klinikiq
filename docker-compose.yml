@@ -9,11 +9,18 @@ volumes:
   redis_data:
   frontend_next:
 
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
     image: postgres:15
     container_name: klinikiq_postgres
     restart: unless-stopped
+    logging: *default-logging
     environment:
       POSTGRES_USER: klinikiq
       POSTGRES_PASSWORD: password
@@ -32,6 +39,7 @@ services:
     image: redis:7-alpine
     container_name: klinikiq_redis
     restart: unless-stopped
+    logging: *default-logging
     volumes:
       - redis_data:/data
     networks:
@@ -48,10 +56,11 @@ services:
       dockerfile: Dockerfile
     container_name: klinikiq_backend
     restart: unless-stopped
+    logging: *default-logging
     env_file:
       - .env
     volumes:
-      - ./backend:/app
+      # Prod modunda reload'a gerek yok, sadece gerekli veriler mount edilir
       - ./tiles:/tiles
     networks:
       - klinikiq_net
@@ -60,7 +69,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
 
   frontend:
     build:
@@ -68,19 +77,15 @@ services:
       dockerfile: Dockerfile
     container_name: klinikiq_frontend
     restart: unless-stopped
+    logging: *default-logging
     env_file:
       - .env
     environment:
       - NEXT_PUBLIC_API_URL=https://klinikiq.furkanguven.space/api
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - frontend_next:/app/.next
     networks:
       - klinikiq_net
     depends_on:
       - backend
-    command: npm run dev
 
   nginx:
     build:
@@ -88,6 +93,7 @@ services:
       dockerfile: Dockerfile
     container_name: klinikiq_nginx
     restart: unless-stopped
+    logging: *default-logging
     ports:
       - "127.0.0.1:8080:80"
     volumes:
