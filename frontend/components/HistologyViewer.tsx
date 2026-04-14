@@ -40,15 +40,7 @@ const OSD_CDN =
 function resolveFullImageUrl(url: string): string {
   if (!url) return "";
   
-  // Wikimedia için en güvenli yöntem: Special:FilePath API (Redirect)
-  if (url.includes("upload.wikimedia.org") || url.includes("commons.wikimedia.org")) {
-    const filenameMatch = url.match(/\/([^\/]+)$/);
-    if (filenameMatch) {
-      const filename = decodeURIComponent(filenameMatch[1]);
-      return `https://commons.wikimedia.org/w/index.php?title=Special:FilePath&file=${filename}&width=2000`;
-    }
-  }
-
+  // Eğer link zaten bir dış URL ise (örn: Wikimedia), doğrudan onu kullan.
   if (url.startsWith("http")) return url;
   
   // Yerel dosyalar için URL temizliği

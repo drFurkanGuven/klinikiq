@@ -63,16 +63,8 @@ export default function HistologyPage() {
     const targetUrl = url || fullUrl;
     if (!targetUrl) return "";
     
-    // 1. Wikimedia Linki mi? (Otomatik Önizleme Oluştur)
-    if (targetUrl.includes("upload.wikimedia.org") || targetUrl.includes("commons.wikimedia.org")) {
-      const filenameMatch = targetUrl.match(/\/([^\/]+)$/);
-      if (filenameMatch) {
-        const filename = decodeURIComponent(filenameMatch[1]);
-        return `https://commons.wikimedia.org/w/index.php?title=Special:FilePath&file=${filename}&width=300`;
-      }
-      return targetUrl;
-    }
-
+    // Eğer link zaten bir dış URL (örn: Wikimedia) ise, olduğu gibi kullan.
+    // Yönlendirme servisi (Special:FilePath) CORS hatasına yol açabiliyor.
     if (targetUrl.startsWith("http")) return targetUrl;
     
     // 2. Yerel Dosya (Tiles) Yolu
@@ -86,7 +78,7 @@ export default function HistologyPage() {
     // Eğer yol zaten tiles/ ile başlamıyorsa, başına ekle
     const finalPath = cleanPath.startsWith("tiles/") ? `/${cleanPath}` : `/tiles/${cleanPath}`;
     
-    // Ana domain'i al ve Unicode karakterleri (böbrek -> %C3%B6) kodla
+    // Ana domain'i al ve Unicode karakterleri kodla
     const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "") || "";
     return `${baseUrl}${encodeURI(finalPath)}`;
   };
