@@ -93,19 +93,14 @@ async def get_study_notes(
     
     notes = []
     for session, case, report in rows:
-        # Pydantic JSONB olarak default list dönüyor olabilir, değilse dict'tir
-        missed = report.missed_diagnoses
-        if not missed:
-            continue
-            
         notes.append(StudyNoteItem(
             session_id=session.id,
             case_title=case.title,
             specialty=case.specialty,
-            missed_diagnoses=missed,
+            missed_diagnoses=report.missed_diagnoses or [],
             pathophysiology_note=report.pathophysiology_note,
             tus_reference=report.tus_reference,
             created_at=report.created_at,
         ))
-        
+    
     return notes
