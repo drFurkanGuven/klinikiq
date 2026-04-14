@@ -377,13 +377,18 @@ export default function CasePage() {
   const [budget, setBudget] = useState(1000);
   const [selectedLabs, setSelectedLabs] = useState<string[]>([]);
 
+  const [mounted, setMounted] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     if (!isAuthenticated()) { router.replace("/login"); return; }
     loadSession();
-  }, [sessionId]);
+  }, [sessionId, mounted]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -644,6 +649,8 @@ export default function CasePage() {
       </div>
     );
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="h-screen flex flex-col overflow-hidden relative transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>

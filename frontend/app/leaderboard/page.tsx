@@ -13,13 +13,20 @@ export default function LeaderboardPage() {
   const [data, setData] = useState<LeaderboardItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     if (!isAuthenticated()) {
       router.replace("/login");
       return;
     }
     fetchLeaderboard();
-  }, []);
+  }, [mounted]);
 
   async function fetchLeaderboard() {
     setLoading(true);
@@ -45,6 +52,8 @@ export default function LeaderboardPage() {
         return <span className="font-bold text-lg w-6 text-center" style={{ color: "var(--text-muted)" }}>{index + 1}</span>;
     }
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen flex flex-col transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>

@@ -58,17 +58,29 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"randomizer" | "history">("randomizer");
   const [questionStats, setQuestionStats] = useState<QuestionStats | null>(null);
-  const [isRecommending, setIsRecommending] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated()) { router.replace("/login"); return; }
-    fetchData();
+    setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (!isAuthenticated()) {
+      router.replace("/login");
+      return;
+    }
+    fetchData();
+  }, [mounted]);
 
   async function fetchData() {
     setLoading(true);
-    await Promise.all([fetchHistory(), fetchMe(), fetchQuestionStats()]);
-    setLoading(false);
+    try {
+      await Promise.all([fetchHistory(), fetchMe(), fetchQuestionStats()]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function fetchQuestionStats() {

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { login } from "@/lib/auth";
@@ -12,6 +12,11 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,6 +31,8 @@ export default function LoginPage() {
       setLoading(false);
     }
   }
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>

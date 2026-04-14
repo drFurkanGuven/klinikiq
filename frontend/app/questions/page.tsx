@@ -37,14 +37,22 @@ export default function QuestionsPage() {
   const [filterSpecialty, setFilterSpecialty] = useState<string>("");
   const [mode, setMode] = useState<"practice" | "all">("practice");
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    if (!isAuthenticated()) { router.replace("/login"); return; }
-    loadData();
+    setMounted(true);
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
+    if (!isAuthenticated()) { router.replace("/login"); return; }
+    loadData();
+  }, [mounted]);
+
+  useEffect(() => {
+    if (!mounted) return;
     loadQuestions();
-  }, [filterSpecialty, mode]);
+  }, [filterSpecialty, mode, mounted]);
 
   async function loadData() {
     setLoading(true);
@@ -113,6 +121,8 @@ export default function QuestionsPage() {
   }
 
   const correctRate = stats ? Math.round((stats.correct_rate || 0) * 100) : 0;
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>

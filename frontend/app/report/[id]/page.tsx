@@ -18,10 +18,17 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     if (!isAuthenticated()) { router.replace("/login"); return; }
     fetchReport();
-  }, [sessionId]);
+  }, [sessionId, mounted]);
 
   async function fetchReport() {
     try {
@@ -33,6 +40,8 @@ export default function ReportPage() {
       setLoading(false);
     }
   }
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen flex flex-col">

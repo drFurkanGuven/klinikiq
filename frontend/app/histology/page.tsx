@@ -37,14 +37,21 @@ export default function HistologyPage() {
   const [selected, setSelected] = useState<HistologyImage | null>(null);
   const [specialty, setSpecialty] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
     if (!isAuthenticated()) {
       router.replace("/login");
       return;
     }
     loadImages();
-  }, [specialty]);
+  }, [specialty, mounted, router]);
 
   const loadImages = async () => {
     setLoading(true);
@@ -82,6 +89,8 @@ export default function HistologyPage() {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "") || "";
     return `${baseUrl}${encodeURI(finalPath)}`;
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors">

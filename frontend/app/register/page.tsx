@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { register } from "@/lib/auth";
@@ -18,6 +18,11 @@ export default function RegisterPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,6 +43,8 @@ export default function RegisterPage() {
 
   const update = (field: string, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>

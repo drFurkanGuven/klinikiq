@@ -13,13 +13,20 @@ export default function StudyNotesPage() {
   const [notes, setNotes] = useState<StudyNoteItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     if (!isAuthenticated()) {
       router.replace("/login");
       return;
     }
     fetchNotes();
-  }, []);
+  }, [mounted]);
 
   async function fetchNotes() {
     setLoading(true);
@@ -32,6 +39,8 @@ export default function StudyNotesPage() {
       setLoading(false);
     }
   }
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen flex flex-col transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
