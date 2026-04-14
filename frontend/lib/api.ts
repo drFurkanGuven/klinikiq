@@ -233,6 +233,8 @@ export const adminApi = {
   getUsers: () => api.get<AdminUser[]>("/admin/users"),
   updateLimit: (userId: string, limit: number) =>
     api.put(`/admin/users/${userId}/limit`, { daily_limit: limit }),
+  deleteImage: (imageId: string) =>
+    api.delete(`/admin/images/${imageId}`),
 };
 
 // ── Histoloji ─────────────────────────────────────────────────────────────────

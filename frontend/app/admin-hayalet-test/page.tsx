@@ -51,11 +51,9 @@ export default function AdminPage() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/admin/users`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
-      });
-      const data = await res.json();
-      setUsers(data);
+      const { adminApi } = await import("@/lib/api");
+      const res = await adminApi.getUsers();
+      setUsers(res.data);
     } finally {
       setLoading(false);
     }
@@ -64,9 +62,9 @@ export default function AdminPage() {
   const fetchImages = async () => {
     setImagesLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/microscopy/images`);
-      const data = await res.json();
-      setImages(data);
+      const { microscopyApi } = await import("@/lib/api");
+      const res = await microscopyApi.listImages();
+      setImages(res.data);
     } finally {
       setImagesLoading(false);
     }
@@ -74,14 +72,8 @@ export default function AdminPage() {
 
   const handleUpdateLimit = async (userId: string, newLimit: number) => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/admin/users/${userId}/limit`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`
-        },
-        body: JSON.stringify({ daily_limit: newLimit })
-      });
+      const { adminApi } = await import("@/lib/api");
+      await adminApi.updateLimit(userId, newLimit);
       setUsers(users.map(u => u.id === userId ? { ...u, daily_limit: newLimit } : u));
     } catch (e) {
       alert("Limit güncellenemedi");
@@ -91,13 +83,12 @@ export default function AdminPage() {
   const handleDeleteImage = async (imageId: string) => {
     if (!confirm("Bu görüntüyü silmek istediğinize emin misiniz?")) return;
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/admin/images/${imageId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
-      });
+      const { adminApi } = await import("@/lib/api");
+      await adminApi.deleteImage(imageId);
       setImages(images.filter(img => img.id !== imageId));
     } catch (e) {
-      alert("Görüntü silinemedi");
+      console.error("Silme hatası:", e);
+      alert("Görüntü silinemedi. Lütfen konsol loglarını kontrol edin.");
     }
   };
 
