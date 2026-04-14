@@ -62,7 +62,9 @@ export default function HistologyViewer({ image }: Props) {
 
   const [osdReady, setOsdReady]       = useState(false);
   const [annotations, setAnnotations] = useState<AnnotationOut[]>([]);
+  const annotationsRef                = useRef<AnnotationOut[]>([]);
   const [pending, setPending]         = useState<PendingAnnotation | null>(null);
+  const pendingRef                    = useRef<PendingAnnotation | null>(null);
   const [noteText, setNoteText]       = useState("");
   const [labelText, setLabelText]     = useState("");
   const [annotateMode, setAnnotateMode] = useState(false);
@@ -80,6 +82,46 @@ export default function HistologyViewer({ image }: Props) {
       .then((res) => setAnnotations(res.data))
       .catch(() => setAnnotations([]));
   }, [image.id]);
+
+  useEffect(() => {
+    annotationsRef.current = annotations;
+    if (osdReady) updateAnnotationsOverlay();
+  }, [annotations, osdReady]);
+
+  useEffect(() => {
+    pendingRef.current = pending;
+    if (osdReady) updateAnnotationsOverlay();
+  }, [pending, osdReady]);
+
+  const updateAnnotationsOverlay = () => {
+    if (!viewerRef.current || !window.OpenSeadragon) return;
+    const v = viewerRef.current;
+    
+    // update saved
+    annotationsRef.current.forEach((a) => {
+      const el = document.getElementById(`anno-${a.id}`);
+      if (!el) return;
+      const pt1 = v.viewport.viewportToViewerElementCoordinates(new window.OpenSeadragon.Point(a.x, a.y));
+      const pt2 = v.viewport.viewportToViewerElementCoordinates(new window.OpenSeadragon.Point(a.x + a.width, a.y + a.height));
+      el.style.left = `${pt1.x}px`;
+      el.style.top = `${pt1.y}px`;
+      el.style.width = `${pt2.x - pt1.x}px`;
+      el.style.height = `${pt2.y - pt1.y}px`;
+    });
+
+    // update pending
+    if (pendingRef.current) {
+        const el = document.getElementById("anno-pending");
+        if (el) {
+          const pt1 = v.viewport.viewportToViewerElementCoordinates(new window.OpenSeadragon.Point(pendingRef.current.x, pendingRef.current.y));
+          const pt2 = v.viewport.viewportToViewerElementCoordinates(new window.OpenSeadragon.Point(pendingRef.current.x + pendingRef.current.width, pendingRef.current.y + pendingRef.current.height));
+          el.style.left = `${pt1.x}px`;
+          el.style.top = `${pt1.y}px`;
+          el.style.width = `${pt2.x - pt1.x}px`;
+          el.style.height = `${pt2.y - pt1.y}px`;
+        }
+    }
+  };
 
   // OpenSeadragon başlat
   useEffect(() => {
@@ -116,6 +158,11 @@ export default function HistologyViewer({ image }: Props) {
       setLoading(false);
       setError("Görüntü dosyasına erişilemedi. Lütfen sunucu bağlantısını ve dosya yolunu kontrol edin.");
     });
+
+    viewer.addHandler("animation", updateAnnotationsOverlay);
+    viewer.addHandler("update-viewport", updateAnnotationsOverlay);
+    viewer.addHandler("resize", updateAnnotationsOverlay);
+    viewer.addHandler("animation-finish", updateAnnotationsOverlay);
 
     viewerRef.current = viewer;
     return () => { viewer.destroy(); viewerRef.current = null; };
@@ -171,11 +218,24 @@ export default function HistologyViewer({ image }: Props) {
     const y = Math.min(drawStart.current.y, endY);
     drawStart.current = null;
 
-    setPending({
-      x: x / rect.width, y: y / rect.height,
-      width: w / rect.width, height: h / rect.height,
-      px: x, py: y, pw: w, ph: h,
-    });
+    if (viewerRef.current && window.OpenSeadragon) {
+      const ptTopLeft = viewerRef.current.viewport.viewerElementToViewportCoordinates(new window.OpenSeadragon.Point(x, y));
+      const ptBottomRight = viewerRef.current.viewport.viewerElementToViewportCoordinates(new window.OpenSeadragon.Point(x + w, y + h));
+      
+      setPending({
+        x: ptTopLeft.x, y: ptTopLeft.y,
+        width: ptBottomRight.x - ptTopLeft.x, height: ptBottomRight.y - ptTopLeft.y,
+        px: x, py: y, pw: w, ph: h,
+      });
+    } else {
+        // fallback (should not happen)
+        setPending({
+          x: x / rect.width, y: y / rect.height,
+          width: w / rect.width, height: h / rect.height,
+          px: x, py: y, pw: w, ph: h,
+        });
+    }
+
     setNoteText("");
     setLabelText("");
   };
@@ -291,12 +351,9 @@ export default function HistologyViewer({ image }: Props) {
             {/* Kaydedilmiş annotation kutuları */}
             {annotations.map((a) => (
               <div
+                id={`anno-${a.id}`}
                 key={a.id}
                 className="absolute border-2 border-yellow-400 group pointer-events-auto"
-                style={{
-                  left: `${a.x * 100}%`, top: `${a.y * 100}%`,
-                  width: `${a.width * 100}%`, height: `${a.height * 100}%`,
-                }}
               >
                 {a.label && (
                   <span className="absolute -top-5 left-0 bg-yellow-400 text-black text-xs px-1 rounded whitespace-nowrap">
@@ -318,11 +375,8 @@ export default function HistologyViewer({ image }: Props) {
             {/* Onay bekleyen (yeni çizilen) kutu */}
             {pending && (
               <div
+                id="anno-pending"
                 className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none"
-                style={{
-                  left: `${pending.x * 100}%`, top: `${pending.y * 100}%`,
-                  width: `${pending.width * 100}%`, height: `${pending.height * 100}%`,
-                }}
               />
             )}
           </div>
