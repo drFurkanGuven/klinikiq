@@ -34,13 +34,24 @@ const OSD_CDN =
  * Büyük JPEG'ler (5-15MB) tarayıcı canvas limitine takılır;
  * 2000px thumbnail (~300KB) hem kaliteli hem güvenilir yüklenir.
  */
-function resolveImageUrl(url: string): string {
-  const m = url.match(
-    /upload\.wikimedia\.org\/wikipedia\/commons\/([0-9a-f]\/[0-9a-f]{2})\/(.+)$/i
-  );
-  if (!m) return url;
-  const [, hash, filename] = m;
-  return `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${filename}/2000px-${filename}`;
+/**
+ * Görüntü URL'lerini sistem ayarlarına göre tam URL'ye dönüştürür.
+ */
+function resolveFullImageUrl(url: string): string {
+  if (!url) return "";
+  if (url.startsWith("http")) {
+    // Wikimedia için optimize et (Büyük resimler tarayıcıyı dondurmasın diye 2000px çek)
+    const m = url.match(/upload\.wikimedia\.org\/wikipedia\/commons\/([0-9a-f]\/[0-9a-f]{2})\/(.+)$/i);
+    if (m) {
+      const [, hash, filename] = m;
+      return `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${filename}/2000px-${filename}`;
+    }
+    return url;
+  }
+  
+  // Yerel dosyalar ("/tiles/..." gibi) için API URL'sini kullan
+  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/api\/?$/, "");
+  return `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
 export default function HistologyViewer({ image }: Props) {
@@ -73,28 +84,36 @@ export default function HistologyViewer({ image }: Props) {
   useEffect(() => {
     if (!osdReady || !containerRef.current || !window.OpenSeadragon) return;
 
+    const fullUrl = resolveFullImageUrl(image.image_url);
+    console.log("OSD Loading:", fullUrl);
+
     const viewer = window.OpenSeadragon({
       element: containerRef.current,
       prefixUrl: "https://cdn.jsdelivr.net/npm/openseadragon@6.0.2/build/openseadragon/images/",
-      tileSources: image.image_url.endsWith(".dzi")
-        ? image.image_url
-        : { type: "image", url: resolveImageUrl(image.image_url) },
+      tileSources: fullUrl.endsWith(".dzi")
+        ? fullUrl
+        : { type: "image", url: fullUrl },
       showNavigator: true,
       navigatorPosition: "BOTTOM_RIGHT",
       animationTime: 0.5,
       blendTime: 0.1,
       constrainDuringPan: true,
-      maxZoomPixelRatio: 4,
+      maxZoomPixelRatio: 10,  // Daha derin zoom için artırıldı
       minZoomImageRatio: 0.5,
       visibilityRatio: 0.5,
       zoomPerClick: 1,
       gestureSettingsMouse: { clickToZoom: false },
     });
 
-    viewer.addHandler("open", () => setLoading(false));
-    viewer.addHandler("open-failed", () => {
+    viewer.addHandler("open", () => {
       setLoading(false);
-      setError("Görüntü yüklenemedi.");
+      setError(null);
+    });
+    
+    viewer.addHandler("open-failed", (event) => {
+      console.error("OSD Failed to open:", event);
+      setLoading(false);
+      setError("Görüntü dosyasına erişilemedi. Lütfen sunucu bağlantısını ve dosya yolunu kontrol edin.");
     });
 
     viewerRef.current = viewer;
