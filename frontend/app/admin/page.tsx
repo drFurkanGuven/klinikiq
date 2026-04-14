@@ -11,7 +11,7 @@ import Footer from "@/components/Footer";
 
 // Client-side only components
 const HistologyUploadModal = dynamic(() => import("@/components/HistologyUploadModal"), { ssr: false });
-const ThemeToggle = dynamic(() => import("@/components/ThemeToggle"), { ssr: false });
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
