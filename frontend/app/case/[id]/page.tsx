@@ -11,6 +11,10 @@ import {
   Search, ShoppingBag, Trash, ChevronRight, Plus,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+ 
+export function generateStaticParams() {
+  return [{ id: "static" }];
+}
 
 // --- SABİTLER VE VERİLER ---
 

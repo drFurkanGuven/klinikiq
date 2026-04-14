@@ -6,6 +6,10 @@ import { isAuthenticated } from "@/lib/auth";
 import ReportView from "@/components/ReportView";
 import Footer from "@/components/Footer";
 import { ArrowLeft, Home, Bot } from "lucide-react";
+ 
+export function generateStaticParams() {
+  return [{ id: "static" }];
+}
 
 export default function ReportPage() {
   const { id: sessionId } = useParams<{ id: string }>();
