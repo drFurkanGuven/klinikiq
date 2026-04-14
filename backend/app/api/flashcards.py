@@ -60,9 +60,9 @@ async def list_flashcards(
     """Tüm flashcard havuzunu listele (isteğe bağlı branş/zorluk filtresi)."""
     query = select(Flashcard)
     if specialty:
-        query = query.where(Flashcard.specialty == specialty)
+        query = query.where(cast(Flashcard.specialty, String) == specialty)
     if difficulty:
-        query = query.where(Flashcard.difficulty == difficulty)
+        query = query.where(cast(Flashcard.difficulty, String) == difficulty)
     query = query.order_by(Flashcard.created_at.desc())
 
     result = await db.execute(query)
@@ -105,7 +105,7 @@ async def get_study_queue(
     """Çalışma kuyruğu: new → learning → known sırasında döner."""
     query = select(Flashcard)
     if specialty:
-        query = query.where(Flashcard.specialty == specialty)
+        query = query.where(cast(Flashcard.specialty, String) == specialty)
 
     result = await db.execute(query)
     flashcards = result.scalars().all()

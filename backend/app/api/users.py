@@ -28,6 +28,7 @@ def mask_name(name: str) -> str:
 async def get_leaderboard(db: AsyncSession = Depends(get_db)):
     # Aynı vakayı defalarca çözüp (farming) puan kasmayı engellemek için
     # her kullanıcının her vaka için aldığı EN YÜKSEK (MAX) puanı buluruz.
+    from sqlalchemy import cast, String
     subq = (
         select(
             SimulationSession.user_id,
@@ -35,7 +36,7 @@ async def get_leaderboard(db: AsyncSession = Depends(get_db)):
             func.max(Report.score).label("max_score")
         )
         .join(Report, Report.session_id == SimulationSession.id)
-        .where(SimulationSession.status == SessionStatus.completed)
+        .where(cast(SimulationSession.status, String) == "completed")
         .group_by(SimulationSession.user_id, SimulationSession.case_id)
         .subquery()
     )
@@ -79,12 +80,13 @@ async def get_study_notes(
     db: AsyncSession = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ):
+    from sqlalchemy import cast, String
     stmt = (
         select(SimulationSession, Case, Report)
         .join(Case, SimulationSession.case_id == Case.id)
         .join(Report, Report.session_id == SimulationSession.id)
         .where(SimulationSession.user_id == user_id)
-        .where(SimulationSession.status == "completed")
+        .where(cast(SimulationSession.status, String) == "completed")
         .order_by(Report.created_at.desc())
     )
     
@@ -93,11 +95,16 @@ async def get_study_notes(
     
     notes = []
     for session, case, report in rows:
+        # Veri tipi kontrolü (JSONB bazen string dönebilir)
+        missed = report.missed_diagnoses
+        if not isinstance(missed, list):
+            missed = []
+            
         notes.append(StudyNoteItem(
             session_id=session.id,
-            case_title=case.title,
-            specialty=case.specialty,
-            missed_diagnoses=report.missed_diagnoses or [],
+            case_title=case.title or "İsimsiz Vaka",
+            specialty=case.specialty or "Genel",
+            missed_diagnoses=missed,
             pathophysiology_note=report.pathophysiology_note,
             tus_reference=report.tus_reference,
             created_at=report.created_at,

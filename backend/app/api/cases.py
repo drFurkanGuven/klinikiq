@@ -18,11 +18,12 @@ async def list_cases(
     db: AsyncSession = Depends(get_db),
     _: str = Depends(get_current_user_id),
 ):
+    from sqlalchemy import cast, String
     query = select(Case).where(Case.is_active == True)
     if specialty:
-        query = query.where(Case.specialty == specialty)
+        query = query.where(cast(Case.specialty, String) == specialty)
     if difficulty:
-        query = query.where(Case.difficulty == difficulty)
+        query = query.where(cast(Case.difficulty, String) == difficulty)
 
     result = await db.execute(query)
     cases = result.scalars().all()
@@ -65,7 +66,7 @@ async def get_random_case(
             query = query.where(Case.specialty.in_(spec_list))
             
     if difficulty:
-        query = query.where(Case.difficulty == difficulty)
+        query = query.where(cast(Case.difficulty, String) == difficulty)
 
     query = query.order_by(func.random()).limit(1)
 
@@ -113,12 +114,13 @@ async def get_recommended_case(
     )
     scores = specialty_scores.all()
 
+    from sqlalchemy import cast, String
     # En zayıf branştan başlayarak çözülmemiş vaka ara
     for specialty, _ in scores:
         result = await db.execute(
             select(Case)
             .where(Case.is_active == True)
-            .where(Case.specialty == specialty)
+            .where(cast(Case.specialty, String) == specialty)
             .where(Case.id.notin_(completed_subq))
             .order_by(func.random())
             .limit(1)

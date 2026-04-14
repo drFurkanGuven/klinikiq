@@ -38,7 +38,7 @@ async def list_questions(
     """Tüm soru bankasını listele (cevaplar gizli)."""
     query = select(CaseQuestion)
     if specialty:
-        query = query.where(CaseQuestion.specialty == specialty)
+        query = query.where(cast(CaseQuestion.specialty, String) == specialty)
     query = query.order_by(CaseQuestion.created_at.desc())
 
     result = await db.execute(query)
@@ -108,7 +108,7 @@ async def get_practice_questions(
     """Cevaplanmamış sorular önce gelecek şekilde pratik kuyruğu döner."""
     query = select(CaseQuestion)
     if specialty:
-        query = query.where(CaseQuestion.specialty == specialty)
+        query = query.where(cast(CaseQuestion.specialty, String) == specialty)
 
     result = await db.execute(query)
     questions = result.scalars().all()

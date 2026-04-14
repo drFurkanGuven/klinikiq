@@ -99,11 +99,12 @@ async def list_images(
             import json
             return json.loads(cached)
 
+    from sqlalchemy import cast, String
     query = select(HistologyImage).order_by(HistologyImage.created_at.desc())
     if case_id:
         query = query.where(HistologyImage.case_id == case_id)
     if specialty:
-        query = query.where(HistologyImage.specialty == specialty)
+        query = query.where(cast(HistologyImage.specialty, String) == specialty)
 
     result = await db.execute(query)
     images = result.scalars().all()
