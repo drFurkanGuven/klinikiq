@@ -59,10 +59,36 @@ export default function HistologyPage() {
     }
   };
 
-  const resolveImageUrl = (url?: string | null) => {
-    if (!url) return "";
-    if (url.startsWith("http")) return url;
-    return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
+  const resolveImageUrl = (url?: string | null, fullUrl?: string | null) => {
+    const targetUrl = url || fullUrl;
+    if (!targetUrl) return "";
+    
+    // 1. Wikimedia Linki mi? (Otomatik Önizleme Oluştur)
+    if (targetUrl.includes("upload.wikimedia.org") || targetUrl.includes("commons.wikimedia.org")) {
+      const filenameMatch = targetUrl.match(/\/([^\/]+)$/);
+      if (filenameMatch) {
+        const filename = decodeURIComponent(filenameMatch[1]);
+        return `https://commons.wikimedia.org/w/index.php?title=Special:FilePath&file=${filename}&width=300`;
+      }
+      return targetUrl;
+    }
+
+    if (targetUrl.startsWith("http")) return targetUrl;
+    
+    // 2. Yerel Dosya (Tiles) Yolu
+    let cleanPath = targetUrl.replace(/^\/+/, "");
+    
+    // Eğer thumbnail istenmiş ama verilmemişse ve bu bir .dzi ise, tahmin et
+    if (!url && cleanPath.endsWith(".dzi")) {
+      cleanPath = cleanPath.replace(".dzi", "_thumb.jpg");
+    }
+
+    // Eğer yol zaten tiles/ ile başlamıyorsa, başına ekle
+    const finalPath = cleanPath.startsWith("tiles/") ? `/${cleanPath}` : `/tiles/${cleanPath}`;
+    
+    // Ana domain'i al ve Unicode karakterleri (böbrek -> %C3%B6) kodla
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "") || "";
+    return `${baseUrl}${encodeURI(finalPath)}`;
   };
 
   return (
@@ -126,9 +152,9 @@ export default function HistologyPage() {
                           : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
                       }`}
                     >
-                      {img.thumbnail_url ? (
+                      {img.thumbnail_url || img.image_url ? (
                         <img
-                          src={resolveImageUrl(img.thumbnail_url)}
+                          src={resolveImageUrl(img.thumbnail_url, img.image_url)}
                           alt=""
                           className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                         />

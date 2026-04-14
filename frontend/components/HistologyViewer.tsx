@@ -41,11 +41,9 @@ function resolveFullImageUrl(url: string): string {
   if (!url) return "";
   
   // Wikimedia için en güvenli yöntem: Special:FilePath API (Redirect)
-  // Bu API karmaşık dosya isimlerini ve thumbnail boyutlarını otomatik çözer.
   if (url.includes("upload.wikimedia.org") || url.includes("commons.wikimedia.org")) {
     const filenameMatch = url.match(/\/([^\/]+)$/);
     if (filenameMatch) {
-      // Wikimedia API, parametre olarak decoded (saf) dosya adını bekler
       const filename = decodeURIComponent(filenameMatch[1]);
       return `https://commons.wikimedia.org/w/index.php?title=Special:FilePath&file=${filename}&width=2000`;
     }
@@ -53,11 +51,16 @@ function resolveFullImageUrl(url: string): string {
 
   if (url.startsWith("http")) return url;
   
-  // Yerel dosyalar ("/tiles/..." gibi) için
+  // Yerel dosyalar için URL temizliği
+  const cleanPath = url.replace(/^\/+/, "");
+  // Eğer yol zaten tiles/ ile başlamıyorsa, başına ekle
+  const finalPath = cleanPath.startsWith("tiles/") ? `/${cleanPath}` : `/tiles/${cleanPath}`;
+  
   // Unicode karakterleri (böbrek -> b%C3%B6brek) encode etmeliyiz
-  const encodedPath = encodeURI(url);
+  const encodedPath = encodeURI(finalPath);
   const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/api\/?$/, "");
-  return `${baseUrl}${encodedPath.startsWith("/") ? "" : "/"}${encodedPath}`;
+  
+  return `${baseUrl}${encodedPath}`;
 }
 
 export default function HistologyViewer({ image }: Props) {
