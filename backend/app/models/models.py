@@ -97,7 +97,7 @@ class SimulationSession(Base):
     id = Column(String, primary_key=True, default=gen_uuid)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     case_id = Column(String, ForeignKey("cases.id"), nullable=False)
-    status = Column(String, default="active", nullable=False)
+    status = Column(SAEnum(SessionStatus), default=SessionStatus.active, nullable=False)
     started_at = Column(DateTime(timezone=True), default=now_utc)
     ended_at = Column(DateTime(timezone=True), nullable=True)
 
@@ -190,7 +190,7 @@ class FlashcardProgress(Base):
     id = Column(String, primary_key=True, default=gen_uuid)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     flashcard_id = Column(String, ForeignKey("flashcards.id"), nullable=False)
-    status = Column(String, default="new", nullable=False)
+    status = Column(SAEnum(FlashcardStatus), default=FlashcardStatus.new, nullable=False)
     times_seen = Column(Integer, default=0, nullable=False)
     last_seen_at = Column(DateTime(timezone=True), nullable=True)
 
