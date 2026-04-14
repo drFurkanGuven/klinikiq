@@ -74,16 +74,18 @@ async def get_question_stats(
     incorrect = len(attempts) - correct
 
     # Branş bazlı istatistik
-    from sqlalchemy import cast, String
+    from sqlalchemy import cast, String, Integer
     specialty_result = await db.execute(
-        select(cast(CaseQuestion.specialty, String), func.count(QuestionAttempt.id), func.sum(QuestionAttempt.is_correct.cast(func.Integer)))
+        select(cast(CaseQuestion.specialty, String), func.count(QuestionAttempt.id), func.sum(cast(QuestionAttempt.is_correct, Integer)))
         .join(QuestionAttempt, QuestionAttempt.question_id == CaseQuestion.id)
         .where(QuestionAttempt.user_id == user_id)
         .group_by(cast(CaseQuestion.specialty, String))
     )
     by_specialty = {}
     for specialty, count, correct_count in specialty_result.all():
-        by_specialty[specialty] = {
+        # Enum nesnesini JSON-sağlıklı metne (str) dönüştürüyoruz
+        spec_key = str(specialty)
+        by_specialty[spec_key] = {
             "attempted": count,
             "correct": int(correct_count or 0),
             "rate": round((correct_count or 0) / count, 2) if count else 0,

@@ -87,7 +87,10 @@ async def get_flashcard_stats(
     counts = {"new": 0, "learning": 0, "known": 0}
     seen_ids = set()
     for p in progress_list:
-        counts[p.status] += 1
+        # Statü nesnesini metne çevirerek hatayı engelliyoruz
+        status_key = str(p.status)
+        if status_key in counts:
+            counts[status_key] += 1
         seen_ids.add(p.flashcard_id)
 
     # Henüz hiç görülmemiş kartlar da "new" sayılır
