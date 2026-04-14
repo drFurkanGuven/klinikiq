@@ -3,12 +3,13 @@ import axios from "axios";
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-const api = axios.create({
+// ── API Instance ─────────────────────────────────────────────────────────────
+export const api = axios.create({
   baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// ── Request Interceptor: access token ekle ───────────────────────────────────
+// ── Interceptors ─────────────────────────────────────────────────────────────
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("access_token");
@@ -19,7 +20,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ── Response Interceptor: 401 → refresh token dene ──────────────────────────
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -46,8 +46,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-// export default api; (Moved to end)
 
 // ── Typed API calls ──────────────────────────────────────────────────────────
 

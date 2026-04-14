@@ -433,7 +433,7 @@ export default function AdminDashboardPage() {
                         {isUploading && uploadProgress >= 0 && uploadTab === "tiff" && (
                             <div className="space-y-2">
                                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest px-1">
-                                    <span className="opacity-50">{uploadProgress >= 100 ? "SİSTEM İŞLİYOR..." : "DOSYA YÜKLENİYOR..."}</span>
+                                    <span className="opacity-50">{uploadProgress >= 100 ? "İşleniyor..." : "Dosya Yükleniyor..."}</span>
                                     <span style={{ color: "var(--primary)" }}>%{uploadProgress}</span>
                                 </div>
                                 <div className="w-full bg-black/5 dark:bg-white/5 rounded-full h-4 p-1 border shadow-inner overflow-hidden relative" style={{ borderColor: "var(--border)" }}>
