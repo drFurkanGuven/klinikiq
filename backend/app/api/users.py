@@ -84,7 +84,7 @@ async def get_study_notes(
         .join(Case, SimulationSession.case_id == Case.id)
         .join(Report, Report.session_id == SimulationSession.id)
         .where(SimulationSession.user_id == user_id)
-        .where(SimulationSession.status == SessionStatus.completed)
+        .where(SimulationSession.status == "completed")
         .order_by(Report.created_at.desc())
     )
     
