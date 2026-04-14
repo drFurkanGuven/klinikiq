@@ -210,20 +210,7 @@ class CaseQuestion(Base):
     attempts = relationship("QuestionAttempt", back_populates="question")
 
 
-class Annotation(Base):
-    """Annotations for high-resolution histology images."""
-    __tablename__ = "annotations"
-
-    id = Column(String, primary_key=True, default=gen_uuid)
-    image_id = Column(String, nullable=False, index=True)  # Reference to the image
-    coordinates = Column(ARRAY(Float), nullable=False)  # [x, y, width, height]
-    note = Column(Text, nullable=False)  # Annotation text
-    created_at = Column(DateTime(timezone=True), default=now_utc)
-
-    __table_args__ = (
-        UniqueConstraint("image_id", "coordinates", name="uq_annotation_image_coordinates"),
-    )
-
+class QuestionAttempt(Base):
     """Kullanıcı başına soru cevaplama geçmişi."""
     __tablename__ = "question_attempts"
 
@@ -235,3 +222,33 @@ class Annotation(Base):
     attempted_at = Column(DateTime(timezone=True), default=now_utc)
 
     question = relationship("CaseQuestion", back_populates="attempts")
+
+
+class HistologyImage(Base):
+    """Yüksek çözünürlüklü histoloji/patoloji görüntüleri."""
+    __tablename__ = "histology_images"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    case_id = Column(String, ForeignKey("cases.id", ondelete="SET NULL"), nullable=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    image_url = Column(String, nullable=False)  # DZI dosyası veya dış URL
+    thumbnail_url = Column(String, nullable=True)
+    specialty = Column(String, nullable=True, index=True)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
+
+
+class Annotation(Base):
+    """Kullanıcıların görüntüler üzerindeki etiketleme notları."""
+    __tablename__ = "annotations"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    image_id = Column(String, ForeignKey("histology_images.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    x = Column(Float, nullable=False)
+    y = Column(Float, nullable=False)
+    width = Column(Float, nullable=False)
+    height = Column(Float, nullable=False)
+    label = Column(String, nullable=True)
+    note = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
