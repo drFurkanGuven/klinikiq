@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { adminApi, authApi, microscopyApi, type AdminUser } from "@/lib/api";
+import { adminApi, authApi, microscopyApi, type AdminUser, type HistologyImage } from "@/lib/api";
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
@@ -14,20 +14,33 @@ import {
   Search,
   Save,
   Loader2,
+  Image as ImageIcon,
+  Trash2,
+  ExternalLink,
+  Plus,
+  RefreshCcw,
 } from "lucide-react";
 
 import { ThemeToggle } from "@/components/ThemeToggle";
 import HistologyUploadModal from "@/components/HistologyUploadModal";
-import { Microscope, Plus } from "lucide-react";
+
+type Tab = "users" | "histology";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<Tab>("users");
+  
+  // Users State
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<AdminUser[]>([]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [uploadTab, setUploadTab] = useState<"url" | "tiff">("tiff");
+  const [usersLoading, setUsersLoading] = useState(true);
+  
+  // Histology State
+  const [images, setImages] = useState<HistologyImage[]>([]);
+  const [imagesLoading, setImagesLoading] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -44,19 +57,45 @@ export default function AdminDashboardPage() {
           return;
         }
         setIsAdmin(true);
-        // Yetki onaylandıktan sonra verileri çek
-        const userRes = await adminApi.getUsers();
-        setUsers(userRes.data);
+        fetchUsers();
       } catch (err) {
         console.error("Admin check failed:", err);
         router.replace("/dashboard");
-      } finally {
-        setLoading(false);
       }
     };
 
     init();
   }, [router]);
+
+  const fetchUsers = async () => {
+    setUsersLoading(true);
+    try {
+      const res = await adminApi.getUsers();
+      setUsers(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const fetchImages = async () => {
+    setImagesLoading(true);
+    try {
+      const res = await microscopyApi.listImages();
+      setImages(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setImagesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "histology") {
+      fetchImages();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     if (search) {
@@ -73,9 +112,18 @@ export default function AdminDashboardPage() {
     try {
       await adminApi.updateLimit(userId, newLimit);
       setUsers(users.map(u => u.id === userId ? { ...u, daily_limit: newLimit } : u));
-      alert("Limit başarıyla güncellendi.");
     } catch {
       alert("Hata oluştu.");
+    }
+  };
+
+  const handleDeleteImage = async (id: string) => {
+    if (!confirm("Bu görüntüyü HEM veritabanından HEM DE sunucudan kalıcı olarak silmek istediğinizden emin misiniz?")) return;
+    try {
+      await microscopyApi.deleteImage(id);
+      setImages(images.filter(img => img.id !== id));
+    } catch (err) {
+      alert("Silme hatası oluştu.");
     }
   };
 
@@ -91,8 +139,7 @@ export default function AdminDashboardPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-                style={{ background: "var(--error)" }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-danger">
                 <ShieldAlert className="w-5 h-5 text-white" />
               </div>
               <div className="hidden sm:block">
@@ -119,128 +166,170 @@ export default function AdminDashboardPage() {
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-12">
         
-        {/* Header Section */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-12 gap-8">
-            <div className="space-y-4">
-                <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm"
-                  style={{ background: "var(--error-light)", color: "var(--error)", borderColor: "var(--error-light)" }}>
-                  <Users className="w-3.5 h-3.5" />
-                  Kullanıcı Yönetimi
-                </div>
-                <div>
-                  <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-tight">
-                    Sistem <span style={{ color: "var(--error)" }}>Kontrolü</span>
-                  </h1>
-                  <p className="text-sm font-medium mt-2 opacity-60 max-w-md" style={{ color: "var(--text-muted)" }}>
-                    {users.length} aktif kullanıcıyı yönetin, günlük limitleri güncelleyin ve rollerini düzenleyin.
-                  </p>
-                </div>
-            </div>
-            
-            <div className="relative w-full lg:w-96 group">
-                <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 opacity-30 group-focus-within:opacity-100 transition-opacity" style={{ color: "var(--text)" }} />
-                <input 
-                    type="text" 
-                    placeholder="İsim veya e-posta ile ara..." 
-                    className="w-full rounded-[1.25rem] pl-12 pr-4 py-4 text-sm font-medium transition-all focus:outline-none focus:ring-4 shadow-sm border"
-                    style={{ 
-                      background: "var(--surface)", 
-                      color: "var(--text)", 
-                      borderColor: "var(--border)",
-                      "--tw-ring-color": "var(--primary-light)"
-                    } as any}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-            </div>
+        {/* Tab Selection */}
+        <div className="flex p-1.5 rounded-2xl bg-black/5 dark:bg-white/5 border border-border w-fit mb-12">
+            <button
+                onClick={() => setActiveTab("users")}
+                className={`flex items-center gap-2 px-8 py-3 text-xs font-black uppercase tracking-widest transition-all rounded-xl ${
+                    activeTab === "users" ? "bg-white dark:bg-zinc-800 shadow-xl text-primary" : "opacity-40 hover:opacity-100"
+                }`}
+            >
+                <Users className="w-4 h-4" />
+                Kullanıcı Yönetimi
+            </button>
+            <button
+                onClick={() => setActiveTab("histology")}
+                className={`flex items-center gap-2 px-8 py-3 text-xs font-black uppercase tracking-widest transition-all rounded-xl ${
+                    activeTab === "histology" ? "bg-white dark:bg-zinc-800 shadow-xl text-primary" : "opacity-40 hover:opacity-100"
+                }`}
+            >
+                <ImageIcon className="w-4 h-4" />
+                Histoloji Arşivi
+            </button>
         </div>
 
-        {/* Users Table Card */}
-        <div className="glass rounded-[2rem] border shadow-xl overflow-hidden transition-all" 
-          style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-            <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm border-collapse">
+        {activeTab === "users" ? (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-8">
+                <div>
+                  <h1 className="text-4xl font-black tracking-tight leading-tight">Kullanıcı <span className="text-primary">Kontrolü</span></h1>
+                  <p className="text-sm font-medium mt-2 opacity-60">Sistemdeki kullanıcıların yetki ve limitlerini düzenleyin.</p>
+                </div>
+                <div className="relative w-full lg:w-96">
+                    <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 opacity-30" />
+                    <input 
+                        type="text" 
+                        placeholder="İsim veya e-posta ile ara..." 
+                        className="w-full rounded-2xl pl-12 pr-4 py-4 text-sm font-bold transition-all border bg-surface outline-none focus:ring-4 focus:ring-primary/10"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </div>
+            </div>
+
+            <div className="glass rounded-[2rem] border shadow-xl overflow-hidden">
+                <table className="w-full text-left text-sm whitespace-nowrap">
                     <thead>
-                        <tr className="border-b transition-all" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>Kullanıcı Bilgileri</th>
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>Bölüm / Sınıf</th>
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>Yetki Grubu</th>
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-center" style={{ color: "var(--text-muted)" }}>Günlük Vaka Limiti</th>
+                        <tr className="bg-black/5 dark:bg-white/5 border-b border-border">
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40">Kullanıcı</th>
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40">Okul / Bölüm</th>
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40">Limit</th>
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40">İşlem</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
-                        {loading ? (
-                            <tr><td colSpan={4} className="px-8 py-24 text-center">
-                              <div className="flex flex-col items-center gap-4">
-                                <Loader2 className="w-8 h-8 animate-spin opacity-20" />
-                                <span className="font-bold opacity-40">Kullanıcı verileri yükleniyor...</span>
-                              </div>
-                            </td></tr>
-                        ) : filteredUsers.length === 0 ? (
-                            <tr><td colSpan={4} className="px-8 py-24 text-center">
-                              <div className="flex flex-col items-center gap-4">
-                                <Search className="w-12 h-12 opacity-10" />
-                                <span className="font-bold opacity-40">Aradığınız kriterlere uygun kullanıcı bulunamadı.</span>
-                              </div>
-                            </td></tr>
+                    <tbody className="divide-y divide-border">
+                        {usersLoading ? (
+                             <tr><td colSpan={4} className="px-8 py-24 text-center opacity-40 font-bold italic">Yükleniyor...</td></tr>
                         ) : filteredUsers.map(user => (
-                            <tr key={user.id} className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group">
+                            <tr key={user.id} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors group">
                                 <td className="px-8 py-6">
-                                  <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-black text-xs border shadow-sm transition-transform group-hover:scale-110"
-                                      style={{ background: "var(--surface-2)", color: "var(--primary)", borderColor: "var(--border)" }}>
-                                      {user.name.split(' ').map(n=>n[0]).join('')}
-                                    </div>
-                                    <div>
-                                      <p className="font-black text-base" style={{ color: "var(--text)" }}>{user.name}</p>
-                                      <p className="text-xs font-bold opacity-40" style={{ color: "var(--text-muted)" }}>{user.email}</p>
-                                    </div>
-                                  </div>
+                                    <p className="font-black text-base">{user.name}</p>
+                                    <p className="text-xs font-bold opacity-40">{user.email}</p>
+                                </td>
+                                <td className="px-8 py-6 font-bold">{user.school || "—"}</td>
+                                <td className="px-8 py-6">
+                                    <input 
+                                        type="number" 
+                                        id={`limit-${user.id}`}
+                                        defaultValue={user.daily_limit}
+                                        className="w-16 bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1 text-center font-black border border-border"
+                                    />
                                 </td>
                                 <td className="px-8 py-6">
-                                  <div className="flex flex-col gap-1">
-                                    <p className="font-bold text-sm" style={{ color: "var(--text)" }}>{user.school || "—"}</p>
-                                    {user.year && (
-                                      <p className="text-[10px] font-black uppercase tracking-wider opacity-40" style={{ color: "var(--text-muted)" }}>
-                                        {user.year}. Sınıf Öğrencisi
-                                      </p>
-                                    )}
-                                  </div>
+                                    <button 
+                                        onClick={() => {
+                                            const val = (document.getElementById(`limit-${user.id}`) as HTMLInputElement).value;
+                                            handleUpdateLimit(user.id, parseInt(val));
+                                        }}
+                                        className="p-2.5 rounded-xl bg-primary text-white shadow-lg hover:scale-110 active:scale-95 transition-all"
+                                    >
+                                        <Save className="w-4 h-4" />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+          </div>
+        ) : (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-8">
+                <div>
+                  <h1 className="text-4xl font-black tracking-tight leading-tight">Histoloji <span className="text-primary">Arşivi</span></h1>
+                  <p className="text-sm font-medium mt-2 opacity-60">Sistemdeki dijital slaytları yönetin ve yenilerini ekleyin.</p>
+                </div>
+                <div className="flex gap-4 w-full lg:w-fit">
+                    <button 
+                        onClick={fetchImages}
+                        className="p-4 rounded-2xl border border-border bg-surface hover:bg-black/5 transition-all"
+                    >
+                        <RefreshCcw className={`w-5 h-5 ${imagesLoading ? 'animate-spin' : ''}`} />
+                    </button>
+                    <button 
+                         onClick={() => setIsUploadModalOpen(true)}
+                         className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest text-white bg-primary shadow-xl hover:scale-[1.05] active:scale-95 transition-all"
+                    >
+                        <Plus className="w-5 h-5" />
+                        YENİ EKLE
+                    </button>
+                </div>
+            </div>
+
+            <div className="glass rounded-[2rem] border shadow-xl overflow-hidden">
+                <table className="w-full text-left text-sm">
+                    <thead>
+                        <tr className="bg-black/5 dark:bg-white/5 border-b border-border">
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40">Önizleme</th>
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40">Başlık / Branş</th>
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40">URL / Yol</th>
+                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40 text-right">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                        {imagesLoading ? (
+                             <tr><td colSpan={4} className="px-8 py-24 text-center opacity-40 font-bold italic">Yükleniyor...</td></tr>
+                        ) : images.length === 0 ? (
+                            <tr><td colSpan={4} className="px-8 py-24 text-center opacity-40 font-bold">Arşivde henüz görüntü bulunmuyor.</td></tr>
+                        ) : images.map(img => (
+                            <tr key={img.id} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors group">
+                                <td className="px-8 py-4">
+                                     <div className="w-16 h-16 rounded-xl overflow-hidden border border-border bg-black/5">
+                                         {img.thumbnail_url && (
+                                            <img 
+                                                src={`${(process.env.NEXT_PUBLIC_API_URL || "").replace("/api", "")}${img.thumbnail_url}`} 
+                                                className="w-full h-full object-cover" 
+                                                alt="" 
+                                                onError={(e) => (e.currentTarget.style.display = 'none')}
+                                            />
+                                         )}
+                                     </div>
                                 </td>
                                 <td className="px-8 py-6">
-                                    {user.is_admin ? (
-                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border shadow-sm"
-                                          style={{ background: "var(--error-light)", color: "var(--error)", borderColor: "var(--error-light)" }}>
-                                          <ShieldAlert className="w-3 h-3" />
-                                          Yönetici
-                                        </div>
-                                    ) : (
-                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold opacity-60 border"
-                                          style={{ background: "var(--surface-2)", color: "var(--text-muted)", borderColor: "var(--border)" }}>
-                                          Standart
-                                        </div>
-                                    )}
+                                    <p className="font-black text-base">{img.title}</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">{img.specialty}</p>
                                 </td>
                                 <td className="px-8 py-6">
-                                    <div className="flex items-center justify-center gap-3">
-                                        <input 
-                                            type="number" 
-                                            className="w-16 h-10 rounded-xl px-2 text-center font-black focus:outline-none focus:ring-2 transition-all border shadow-sm"
-                                            style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)", "--tw-ring-color": "var(--primary-light)" } as any}
-                                            defaultValue={user.daily_limit}
-                                            id={`limit-${user.id}`}
-                                        />
-                                        <button 
-                                            onClick={() => {
-                                                const el = document.getElementById(`limit-${user.id}`) as HTMLInputElement;
-                                                handleUpdateLimit(user.id, parseInt(el.value));
-                                            }}
-                                            className="w-10 h-10 rounded-xl transition-all hover:scale-110 active:scale-90 shadow-lg flex items-center justify-center group/btn relative overflow-hidden"
-                                            style={{ background: "var(--primary)", color: "white" }}
-                                            title="Kaydet"
+                                    <code className="text-xs bg-black/5 dark:bg-white/5 px-3 py-1.5 rounded-lg opacity-60">
+                                        {img.image_url.length > 30 ? img.image_url.substring(0, 30) + "..." : img.image_url}
+                                    </code>
+                                </td>
+                                <td className="px-8 py-6">
+                                    <div className="flex items-center justify-end gap-3">
+                                        <Link 
+                                            href={`/histology?image=${img.id}`}
+                                            className="p-2.5 rounded-xl bg-surface border border-border hover:border-primary hover:text-primary transition-all"
+                                            title="Görüntüle"
+                                            target="_blank"
                                         >
-                                            <div className="absolute inset-0 bg-white/10 w-0 group-hover/btn:w-full transition-all duration-300" />
-                                            <Save className="w-4 h-4 relative z-10" />
+                                            <ExternalLink className="w-4 h-4" />
+                                        </Link>
+                                        <button 
+                                            onClick={() => handleDeleteImage(img.id)}
+                                            className="p-2.5 rounded-xl bg-danger/10 text-danger hover:bg-danger hover:text-white transition-all"
+                                            title="Sunucudan Sil"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </td>
@@ -249,41 +338,21 @@ export default function AdminDashboardPage() {
                     </tbody>
                 </table>
             </div>
-        </div>
+          </div>
+        )}
 
-        {/* Histology Image Management Section - Simplified */}
-        <div id="image-management" className="glass rounded-[2rem] border shadow-xl p-8 mt-12 transition-all relative overflow-hidden" 
-             style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-            
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-transform hover:rotate-12" 
-                         style={{ background: "var(--primary)", color: "white" }}>
-                       <Microscope className="w-6 h-6" />
-                    </div>
-                    <div>
-                       <h2 className="text-2xl font-black tracking-tight">Görüntü Arşivi Yönetimi</h2>
-                       <p className="text-sm font-medium opacity-60" style={{ color: "var(--text-muted)" }}>Mikroskop ve Histoloji sistemi için yeni vakalar ekleyin.</p>
-                    </div>
-                </div>
-                
-                <button 
-                  onClick={() => setIsUploadModalOpen(true)}
-                  className="flex items-center gap-2 px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] text-white bg-primary shadow-xl hover:shadow-primary/20 hover:scale-[1.05] active:scale-95 transition-all"
-                >
-                  <Plus className="w-5 h-5" />
-                  YENİ GÖRÜNTÜ YÜKLE
-                </button>
-            </div>
-        </div>
+      </main>
 
-        {/* Upload Modal */}
-        <HistologyUploadModal 
-          isOpen={isUploadModalOpen} 
-          onClose={() => setIsUploadModalOpen(false)}
-          onSuccess={() => {
-            // İsterseniz burada görüntü listesini yenileyebilirsiniz
-            alert("Görüntü başarıyla arşive eklendi!");
+      <HistologyUploadModal 
+        isOpen={isUploadModalOpen} 
+        onClose={() => setIsUploadModalOpen(false)}
+        onSuccess={fetchImages}
+      />
+
+      <Footer />
+    </div>
+  );
+}
           }}
         />
 

@@ -240,6 +240,23 @@ async def delete_image(
     if not image:
         raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
 
+    # Fiziksel dosyaları sil
+    if image.image_url and image.image_url.startswith("/tiles/"):
+        filename = os.path.basename(image.image_url)
+        name = os.path.splitext(filename)[0]
+        
+        # Dosya yolları
+        dzi_path = os.path.join(settings.TILES_DIR, filename)
+        files_path = os.path.join(settings.TILES_DIR, f"{name}_files")
+        thumb_path = os.path.join(settings.TILES_DIR, f"{name}_thumb.jpg")
+        
+        try:
+            if os.path.exists(dzi_path): os.remove(dzi_path)
+            if os.path.exists(files_path): shutil.rmtree(files_path)
+            if os.path.exists(thumb_path): os.remove(thumb_path)
+        except Exception as e:
+            print(f"Dosya silme hatası: {e}")
+
     await db.delete(image)
     await db.commit()
 
