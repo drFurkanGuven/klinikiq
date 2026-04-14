@@ -143,7 +143,7 @@ html.dark .border-metallic {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 10px rgba(var(--primary), 0.3));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary), transparent 70%));
 }
 
 /* ── Premium Buttons ────────────────────────────────────── */
@@ -158,7 +158,8 @@ html.dark .border-metallic {
 }
 
 html.dark .btn-premium {
-    box-shadow: 0 0 20px rgba(var(--primary), 0.3), 0 0 40px rgba(var(--primary), 0.1);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--primary), transparent 70%), 
+                0 0 40px color-mix(in srgb, var(--primary), transparent 90%);
     border-color: rgba(255, 255, 255, 0.2);
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-h) 100%);
 }
