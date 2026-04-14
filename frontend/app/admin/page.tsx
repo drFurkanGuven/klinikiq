@@ -353,11 +353,3 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-          }}
-        />
-
-      </main>
-      <Footer />
-    </div>
-  );
-}

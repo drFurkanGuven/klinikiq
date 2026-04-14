@@ -45,8 +45,8 @@ function resolveFullImageUrl(url: string): string {
   if (url.includes("upload.wikimedia.org") || url.includes("commons.wikimedia.org")) {
     const filenameMatch = url.match(/\/([^\/]+)$/);
     if (filenameMatch) {
-      const filename = filenameMatch[1];
-      // Special:FilePath API'si her zaman doğru thumbnail'i döndürür
+      // Wikimedia API, parametre olarak decoded (saf) dosya adını bekler
+      const filename = decodeURIComponent(filenameMatch[1]);
       return `https://commons.wikimedia.org/w/index.php?title=Special:FilePath&file=${filename}&width=2000`;
     }
   }
