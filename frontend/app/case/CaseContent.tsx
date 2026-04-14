@@ -539,33 +539,36 @@ export default function CasePageContent() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setLabOpen(false)} />
           <div className="relative w-full max-w-6xl h-[85vh] shadow-2xl rounded-[2.5rem] flex flex-col overflow-hidden border" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
-            <div className="h-20 px-8 border-b flex items-center justify-between gap-6" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-              <div className="flex items-center gap-4"><h2 className="text-xl font-black tracking-tight">Laboratuvar Paneli</h2></div>
-              <input type="text" placeholder="Tetkik ara..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="flex-1 max-w-md h-11 px-4 rounded-xl border text-sm outline-none" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }} />
-              <button onClick={() => setLabOpen(false)} className="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all hover:bg-black/5" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}><X className="w-6 h-6" /></button>
+            <div className="flex-col md:flex-row h-auto md:h-20 p-4 md:px-8 border-b flex md:items-center justify-between gap-4" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg md:text-xl font-black tracking-tight">Laboratuvar Paneli</h2>
+                <button onClick={() => setLabOpen(false)} className="w-10 h-10 md:hidden rounded-xl border flex items-center justify-center transition-all hover:bg-black/5" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}><X className="w-5 h-5" /></button>
+              </div>
+              <input type="text" placeholder="Tetkik ara..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full md:flex-1 md:max-w-md h-11 px-4 rounded-xl border text-sm outline-none" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }} />
+              <button onClick={() => setLabOpen(false)} className="hidden md:flex w-12 h-12 rounded-2xl border items-center justify-center transition-all hover:bg-black/5" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}><X className="w-6 h-6" /></button>
             </div>
-            <div className="flex-1 flex overflow-hidden">
-              <aside className="w-64 border-r overflow-y-auto p-4" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+              <aside className="w-full md:w-56 lg:w-64 border-b md:border-b-0 md:border-r overflow-x-auto md:overflow-y-auto p-2 md:p-4 flex flex-row md:flex-col gap-2 md:gap-1 flex-shrink-0" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
                 {LAB_CATEGORIES.map(cat => (
-                  <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={`w-full text-left px-4 py-3.5 rounded-2xl font-bold text-sm ${selectedCategory === cat.id ? "shadow-md" : "opacity-60"}`} style={{ background: selectedCategory === cat.id ? "var(--surface)" : "transparent", color: selectedCategory === cat.id ? "var(--primary)" : "var(--text)" }}>{cat.label}</button>
+                  <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={`w-auto md:w-full flex-shrink-0 text-left px-4 py-2.5 md:py-3.5 rounded-full md:rounded-2xl font-bold text-xs md:text-sm whitespace-nowrap md:whitespace-normal transition-all ${selectedCategory === cat.id ? "shadow-md" : "opacity-60"}`} style={{ background: selectedCategory === cat.id ? "var(--surface)" : "transparent", color: selectedCategory === cat.id ? "var(--primary)" : "var(--text)" }}>{cat.label}</button>
                 ))}
               </aside>
-              <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--surface)" }}>
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+              <main className="flex-1 overflow-y-auto p-4 md:p-8" style={{ background: "var(--surface)" }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
                   {LAB_TESTS.filter(t => (searchQuery ? t.name.toLowerCase().includes(searchQuery.toLowerCase()) : t.category === selectedCategory)).map(test => {
                     const isSelected = selectedLabs.includes(test.id);
                     return (
-                      <button key={test.id} onClick={() => toggleLab(test.id, test.price)} className={`p-4 rounded-3xl border transition-all text-left h-28 flex flex-col justify-between hover:scale-105 active:scale-95 shadow-sm`} style={{ background: isSelected ? "var(--primary-light)" : "var(--surface)", borderColor: isSelected ? "var(--primary)" : "var(--border)", color: "var(--text)" }}>
-                        <span className="text-sm font-black">{test.name}</span>
-                        <span className="text-xs font-bold opacity-80" style={{ color: "var(--primary)" }}>{test.price} ₺</span>
+                      <button key={test.id} onClick={() => toggleLab(test.id, test.price)} className={`p-4 rounded-2xl md:rounded-3xl border transition-all text-left h-24 md:h-28 flex flex-col justify-between hover:scale-105 active:scale-95 shadow-sm`} style={{ background: isSelected ? "var(--primary-light)" : "var(--surface)", borderColor: isSelected ? "var(--primary)" : "var(--border)", color: "var(--text)" }}>
+                        <span className="text-xs md:text-sm font-black line-clamp-2 leading-tight pr-2">{test.name}</span>
+                        <span className="text-[10px] md:text-xs font-bold opacity-80" style={{ color: "var(--primary)" }}>{test.price} ₺</span>
                       </button>
                     );
                   })}
                 </div>
               </main>
-              <aside className="w-80 border-l flex flex-col" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
-                <div className="p-6 border-b font-black text-xs uppercase tracking-widest" style={{ borderColor: "var(--border)" }}>Sepet ({selectedLabs.length})</div>
-                <div className="flex-1 overflow-y-auto p-4 space-y-2">
+              <aside className="w-full md:w-72 lg:w-80 h-40 md:h-auto flex-shrink-0 border-t md:border-t-0 md:border-l flex flex-col" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                <div className="p-4 md:p-6 border-b font-black text-xs uppercase tracking-widest" style={{ borderColor: "var(--border)" }}>Sepet ({selectedLabs.length})</div>
+                <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-2">
                   {selectedLabs.map(id => (
                     <div key={id} className="p-3 rounded-xl border flex justify-between items-center text-xs font-bold shadow-sm transition-all" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
                       <span className="truncate pr-2">{LAB_TESTS.find(t => t.id === id)?.name}</span>
@@ -573,8 +576,8 @@ export default function CasePageContent() {
                     </div>
                   ))}
                 </div>
-                <div className="p-6 border-t" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-                   <button onClick={orderLabs} disabled={selectedLabs.length === 0} className="w-full text-white font-black py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 flex justify-center items-center gap-2 group relative overflow-hidden" style={{ background: "var(--primary)" }}>
+                <div className="p-4 md:p-6 border-t" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+                   <button onClick={orderLabs} disabled={selectedLabs.length === 0} className="w-full text-white font-black py-3 md:py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 flex justify-center items-center gap-2 group relative overflow-hidden" style={{ background: "var(--primary)" }}>
                         <div className="absolute inset-0 bg-white/20 w-0 group-hover:w-full transition-all duration-300" />
                         Tetkikleri İste
                    </button>
@@ -589,21 +592,21 @@ export default function CasePageContent() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setExamOpen(false)} />
           <div className="relative w-full max-w-6xl h-[85vh] shadow-2xl rounded-[2.5rem] flex flex-col overflow-hidden border" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
-            <div className="h-20 px-8 border-b flex items-center justify-between" style={{ background: "var(--surface)" }}>
-              <h2 className="text-xl font-black">Fizik Muayene</h2>
-              <button onClick={() => setExamOpen(false)} className="w-12 h-12 rounded-2xl border flex items-center justify-center"><X className="w-6 h-6" /></button>
+            <div className="h-16 md:h-20 px-4 md:px-8 border-b flex items-center justify-between" style={{ background: "var(--surface)" }}>
+              <h2 className="text-lg md:text-xl font-black">Fizik Muayene</h2>
+              <button onClick={() => setExamOpen(false)} className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl border flex items-center justify-center transition-all hover:bg-black/5" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}><X className="w-5 h-5 md:w-6 md:h-6" /></button>
             </div>
-            <div className="flex-1 flex overflow-hidden">
-              <aside className="w-64 border-r overflow-y-auto p-4" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+              <aside className="w-full md:w-56 lg:w-64 border-b md:border-b-0 md:border-r overflow-x-auto md:overflow-y-auto p-2 md:p-4 flex flex-row md:flex-col gap-2 md:gap-1 flex-shrink-0" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
                 {EXAM_CATEGORIES.map(cat => (
-                  <button key={cat.id} onClick={() => setSelectedExamCategory(cat.id)} className={`w-full text-left px-4 py-3 rounded-2xl font-bold text-sm ${selectedExamCategory === cat.id ? "shadow-md" : "opacity-60"}`} style={{ background: selectedExamCategory === cat.id ? "var(--surface)" : "transparent", color: selectedExamCategory === cat.id ? "var(--primary)" : "var(--text)" }}>{cat.label}</button>
+                  <button key={cat.id} onClick={() => setSelectedExamCategory(cat.id)} className={`w-auto md:w-full flex-shrink-0 text-left px-4 py-2.5 md:py-3 rounded-full md:rounded-2xl font-bold text-xs md:text-sm whitespace-nowrap md:whitespace-normal transition-all ${selectedExamCategory === cat.id ? "shadow-md" : "opacity-60"}`} style={{ background: selectedExamCategory === cat.id ? "var(--surface)" : "transparent", color: selectedExamCategory === cat.id ? "var(--primary)" : "var(--text)" }}>{cat.label}</button>
                 ))}
               </aside>
-              <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--surface)" }}>
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+              <main className="flex-1 overflow-y-auto p-4 md:p-8" style={{ background: "var(--surface)" }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
                   {EXAM_ITEMS.filter(e => e.category === selectedExamCategory).map(exam => (
-                    <button key={exam.id} onClick={() => { sendMessage(exam.message); setExamOpen(false); }} className="p-4 rounded-3xl border hover:-translate-y-1 transition-all text-left h-24 flex flex-col justify-between" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}>
-                      <span className="text-sm font-black">{exam.name}</span>
+                    <button key={exam.id} onClick={() => { sendMessage(exam.message); setExamOpen(false); }} className="p-4 rounded-2xl md:rounded-3xl border hover:-translate-y-1 transition-all text-left h-20 md:h-24 flex flex-col justify-between" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}>
+                      <span className="text-xs md:text-sm font-black line-clamp-2 leading-tight pr-2">{exam.name}</span>
                       <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--primary)" }}>Uygula</span>
                     </button>
                   ))}
