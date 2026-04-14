@@ -74,13 +74,12 @@ async def get_history(
     )
 
     items = []
-    for session, case, report in result.all():
         items.append(HistoryItem(
             session_id=session.id,
             case_title=case.title,
             specialty=case.specialty,
             difficulty=case.difficulty,
-            status=session.status.value,
+            status=session.status,
             started_at=session.started_at,
             ended_at=session.ended_at,
             score=report.score if report else None,

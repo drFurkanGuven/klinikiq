@@ -30,7 +30,7 @@ async def _attach_user_status(
             FlashcardProgress.flashcard_id.in_(fc_ids),
         )
     )
-    progress_map = {p.flashcard_id: p.status.value for p in prog_result.scalars().all()}
+    progress_map = {p.flashcard_id: p.status for p in prog_result.scalars().all()}
 
     return [
         FlashcardOut(
@@ -87,7 +87,7 @@ async def get_flashcard_stats(
     counts = {"new": 0, "learning": 0, "known": 0}
     seen_ids = set()
     for p in progress_list:
-        counts[p.status.value] += 1
+        counts[p.status] += 1
         seen_ids.add(p.flashcard_id)
 
     # Henüz hiç görülmemiş kartlar da "new" sayılır
@@ -146,7 +146,7 @@ async def get_flashcard(
         key_points=fc.key_points or [],
         tus_reference=fc.tus_reference,
         created_at=fc.created_at,
-        user_status=prog.status.value if prog else "new",
+        user_status=prog.status if prog else "new",
     )
 
 

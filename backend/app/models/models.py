@@ -76,7 +76,7 @@ class Case(Base):
 
     id = Column(String, primary_key=True, default=gen_uuid)
     title = Column(String, nullable=False)
-    specialty = Column(SAEnum(Specialty), nullable=False, index=True)  # cardiology, nephrology...
+    specialty = Column(String, nullable=False, index=True)  # cardiology, nephrology...
     difficulty = Column(String, nullable=False, index=True)  # easy, medium, hard
     patient_json = Column(JSONB, nullable=False)
     # patient_json örnek: {name, age, gender, chief_complaint, history, vitals}
@@ -97,7 +97,7 @@ class SimulationSession(Base):
     id = Column(String, primary_key=True, default=gen_uuid)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     case_id = Column(String, ForeignKey("cases.id"), nullable=False)
-    status = Column(SAEnum(SessionStatus), default=SessionStatus.active, nullable=False)
+    status = Column(String, default="active", nullable=False)
     started_at = Column(DateTime(timezone=True), default=now_utc)
     ended_at = Column(DateTime(timezone=True), nullable=True)
 
@@ -170,7 +170,7 @@ class Flashcard(Base):
 
     id = Column(String, primary_key=True, default=gen_uuid)
     case_id = Column(String, ForeignKey("cases.id"), nullable=False, unique=True)
-    specialty = Column(SAEnum(Specialty), nullable=False, index=True)
+    specialty = Column(String, nullable=False, index=True)
     difficulty = Column(String, nullable=False, index=True)
     topic = Column(String, nullable=False)           # AI'ın belirlediği konu adı
     question = Column(Text, nullable=False)          # Klinik senaryo sorusu
@@ -190,7 +190,7 @@ class FlashcardProgress(Base):
     id = Column(String, primary_key=True, default=gen_uuid)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     flashcard_id = Column(String, ForeignKey("flashcards.id"), nullable=False)
-    status = Column(SAEnum(FlashcardStatus), default=FlashcardStatus.new, nullable=False)
+    status = Column(String, default="new", nullable=False)
     times_seen = Column(Integer, default=0, nullable=False)
     last_seen_at = Column(DateTime(timezone=True), nullable=True)
 
@@ -246,7 +246,7 @@ class HistologyImage(Base):
     description = Column(Text, nullable=True)
     image_url = Column(String, nullable=False)  # DZI dosyası veya dış URL
     thumbnail_url = Column(String, nullable=True)
-    specialty = Column(SAEnum(Specialty), nullable=True, index=True)
+    specialty = Column(String, nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), default=now_utc)
 
 

@@ -61,7 +61,7 @@ async def create_session(
     return SessionOut(
         id=session.id,
         case_id=session.case_id,
-        status=session.status.value,
+        status=session.status,
         started_at=session.started_at,
         messages=[],
     )
@@ -97,7 +97,7 @@ async def get_session(
 
     return {
         "session_id": session.id,
-        "status": session.status.value,
+        "status": session.status,
         "started_at": session.started_at,
         "ended_at": session.ended_at,
         "case": {
@@ -136,7 +136,7 @@ async def send_message(
     session = sess_result.scalar_one_or_none()
     if not session:
         raise HTTPException(status_code=404, detail="Oturum bulunamadı")
-    if session.status != SessionStatus.active:
+    if session.status != "active":
         raise HTTPException(status_code=400, detail="Bu oturum aktif değil")
 
     case_result = await db.execute(select(Case).where(Case.id == session.case_id))
@@ -202,7 +202,7 @@ async def submit_diagnoses(
     session = sess_result.scalar_one_or_none()
     if not session:
         raise HTTPException(status_code=404, detail="Oturum bulunamadı")
-    if session.status != SessionStatus.active:
+    if session.status != "active":
         raise HTTPException(status_code=400, detail="Bu oturum aktif değil")
 
     # Önceki tanıları temizle
@@ -239,7 +239,7 @@ async def complete_session(
     session = sess_result.scalar_one_or_none()
     if not session:
         raise HTTPException(status_code=404, detail="Oturum bulunamadı")
-    if session.status != SessionStatus.active:
+    if session.status != "active":
         raise HTTPException(status_code=400, detail="Bu oturum zaten tamamlanmış")
 
     # Tanı var mı kontrol et
