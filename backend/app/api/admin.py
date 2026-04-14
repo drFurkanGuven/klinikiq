@@ -76,3 +76,40 @@ async def update_user_limit(
     await db.commit()
     
     return {"message": "Limit başarıyla güncellendi", "new_limit": target_user.daily_limit}
+
+@router.delete("/images/{image_id}", status_code=204)
+async def admin_delete_image(
+    image_id: str,
+    admin: User = Depends(get_current_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Admin panelinden histoloji görüntüsünü sil."""
+    from app.models.models import HistologyImage
+    import os, shutil
+    from app.core.config import settings
+
+    result = await db.execute(select(HistologyImage).where(HistologyImage.id == image_id))
+    image = result.scalar_one_or_none()
+    
+    if not image:
+        raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
+
+    # Fiziksel dosyaları sil (yerel ise)
+    if image.image_url and image.image_url.startswith("/tiles/"):
+        filename = os.path.basename(image.image_url)
+        name = os.path.splitext(filename)[0]
+        
+        dzi_path = os.path.join(settings.TILES_DIR, filename)
+        files_path = os.path.join(settings.TILES_DIR, f"{name}_files")
+        thumb_path = os.path.join(settings.TILES_DIR, f"{name}_thumb.jpg")
+        
+        try:
+            if os.path.exists(dzi_path): os.remove(dzi_path)
+            if os.path.exists(files_path): shutil.rmtree(files_path)
+            if os.path.exists(thumb_path): os.remove(thumb_path)
+        except Exception as e:
+            print(f"Admin silme işlemi sırasında dosya silme hatası: {e}")
+
+    await db.delete(image)
+    await db.commit()
+    return None
