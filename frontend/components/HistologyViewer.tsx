@@ -43,8 +43,11 @@ function resolveFullImageUrl(url: string): string {
     // Wikimedia için optimize et (Büyük resimler tarayıcıyı dondurmasın diye 2000px çek)
     const m = url.match(/upload\.wikimedia\.org\/wikipedia\/commons\/([0-9a-f]\/[0-9a-f]{2})\/(.+)$/i);
     if (m) {
-      const [, hash, filename] = m;
-      return `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${filename}/2000px-${filename}`;
+      const [, hash, filenameRaw] = m;
+      // Filename kısmını normalize et (Hem encoded hem unencoded halleri kapsayacak şekilde)
+      const filename = decodeURIComponent(filenameRaw);
+      const encodedFilename = encodeURIComponent(filename).replace(/%20/g, "_"); // Wikimedia boşlukları _ tercih eder
+      return `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${encodedFilename}/2000px-${encodedFilename}`;
     }
     return url;
   }

@@ -1,5 +1,7 @@
 import React from 'react';
-import MicroscopeViewer from '../components/MicroscopeViewer';
+import dynamic from 'next/dynamic';
+
+const MicroscopeViewer = dynamic(() => import('../components/MicroscopeViewer'), { ssr: false });
 
 const MicroscopeTest: React.FC = () => {
     return (
