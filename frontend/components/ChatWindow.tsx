@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { API_URL } from "@/lib/api";
 
 interface Message {
   role: "user" | "assistant";
@@ -12,7 +13,7 @@ interface Props {
   initialMessages?: Message[];
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+// API_URL merkezden alınıyor
 
 export default function ChatWindow({ sessionId, initialMessages = [] }: Props) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);

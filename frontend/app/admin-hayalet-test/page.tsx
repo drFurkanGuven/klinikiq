@@ -6,7 +6,7 @@ import {
   Trash2, ShieldCheck, Database, LayoutDashboard, Plus, ExternalLink
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import Link from "lucide-react";
+import Link from "next/link";
 import Footer from "@/components/Footer";
 
 // Client-side only components

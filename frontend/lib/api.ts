@@ -1,16 +1,35 @@
 import axios from "axios";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+export const getBaseUrl = () => {
+  // 1. Önce her zaman çevre değişkenine bak (Canlı deployment için en güvenli yol)
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  
+  // 2. Eğer değişken yoksa ve Android emülatördeysek yerel tünele git
+  if (typeof window !== "undefined") {
+    const isAndroid = (window as any).Capacitor?.getPlatform() === 'android';
+    const isCapacitorOrigin = window.location.protocol === 'capacitor:';
+    
+    if (isAndroid || isCapacitorOrigin) {
+      return "http://10.0.2.2:8000/api";
+    }
+  }
+  
+  // 3. Fallback: Yerel geliştirme
+  return "http://localhost:8000/api";
+};
+
+// İlk yüklemede bir varsayılan belirle ama dinamik kalmasını sağla
+export const API_URL = getBaseUrl();
 
 // ── API Instance ─────────────────────────────────────────────────────────────
 export const api = axios.create({
-  baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// ── Interceptors ─────────────────────────────────────────────────────────────
+// Dinamik Base URL Interceptor
 api.interceptors.request.use((config) => {
+  config.baseURL = getBaseUrl();
+  
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("access_token");
     if (token) {

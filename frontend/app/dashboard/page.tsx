@@ -53,6 +53,7 @@ export default function DashboardPage() {
   const [selectedSpecs, setSelectedSpecs] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState("");
   const [isStarting, setIsStarting] = useState(false);
+  const [isRecommending, setIsRecommending] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   const [loading, setLoading] = useState(true);

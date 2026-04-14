@@ -53,21 +53,21 @@ export default function LoginPage() {
         </div>
 
         {/* Kart */}
-        <div className="glass rounded-3xl p-8 shadow-2xl border transition-all" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-          <h2 className="text-xl font-bold mb-6" style={{ color: "var(--text)" }}>Giriş Yap</h2>
+        <div className="glass-card p-8 transition-all" style={{ background: "var(--surface)" }}>
+          <h2 className="text-2xl font-black mb-6 tracking-tight" style={{ color: "var(--text-navy)" }}>Giriş Yap</h2>
 
           {error && (
-            <div className="flex items-center gap-2 rounded-xl px-4 py-3 mb-5 text-sm font-bold border"
-              style={{ background: "var(--error-light)", color: "var(--error)", borderColor: "var(--error-light)" }}>
+            <div className="flex items-center gap-2 rounded-2xl px-4 py-3 mb-5 text-sm font-bold border animate-fade-in-up"
+              style={{ background: "var(--error-light)", color: "var(--danger)", borderColor: "var(--error-light)" }}>
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 px-1 opacity-60" style={{ color: "var(--text-muted)" }}>
-                E-posta
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>
+                E-posta Adresi
               </label>
               <input
                 id="login-email"
@@ -76,13 +76,13 @@ export default function LoginPage() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="ornek@email.com"
-                className="input-focus w-full border rounded-xl px-4 py-3 transition-all text-sm"
+                className="input-focus w-full border rounded-2xl px-5 py-4 transition-all text-sm font-medium shadow-sm"
                 style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 px-1 opacity-60" style={{ color: "var(--text-muted)" }}>
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>
                 Şifre
               </label>
               <div className="relative">
@@ -95,13 +95,13 @@ export default function LoginPage() {
                     setForm({ ...form, password: e.target.value })
                   }
                   placeholder="••••••••"
-                  className="input-focus w-full border rounded-xl px-4 py-3 pr-11 transition-all text-sm"
+                  className="input-focus w-full border rounded-2xl px-5 py-4 pr-12 transition-all text-sm font-medium shadow-sm"
                   style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 opacity-40 hover:opacity-100 transition-opacity"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 hover:opacity-100 transition-opacity p-1"
                   style={{ color: "var(--text)" }}
                 >
                   {showPass ? (
@@ -117,13 +117,11 @@ export default function LoginPage() {
               id="login-submit"
               type="submit"
               disabled={loading}
-              className="w-full text-white font-black py-4 rounded-2xl transition-all shadow-lg active:scale-[0.98] disabled:opacity-60 mt-2 flex items-center justify-center gap-2 group relative overflow-hidden"
-              style={{ background: "var(--primary)" }}
+              className="btn-premium w-full py-4.5 mt-2"
             >
-              <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
               {loading ? (
                 <>
-                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   Giriş yapılıyor...
                 </>
               ) : (
@@ -132,14 +130,13 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm mt-6 font-medium" style={{ color: "var(--text-muted)" }}>
+          <p className="text-center text-sm mt-8 font-medium opacity-60">
             Hesabın yok mu?{" "}
             <Link
               href="/register"
-              className="font-bold transition-all hover:opacity-80"
-              style={{ color: "var(--primary)" }}
+              className="font-black text-primary hover:underline transition-all underline-offset-4"
             >
-              Kayıt Ol
+              Hemen Kayıt Ol
             </Link>
           </p>
         </div>

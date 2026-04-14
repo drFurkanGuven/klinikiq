@@ -140,6 +140,57 @@ html.dark .glass {
 /* ── Score ring ────────────────────────────────────────── */
 .score-ring { transition: stroke-dashoffset 1s ease-in-out; }
 
+/* ── Premium Buttons ────────────────────────────────────── */
+.btn-premium {
+  @apply relative overflow-hidden transition-all duration-300 active:scale-95 hover:scale-[1.02] flex items-center justify-center gap-2;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  box-shadow: 0 4px 15px rgba(74, 124, 89, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  color: white;
+  font-weight: 800;
+}
+
+.btn-premium:hover {
+  box-shadow: 0 8px 25px rgba(74, 124, 89, 0.4);
+  filter: brightness(1.1);
+}
+
+.btn-premium::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.btn-premium:hover::before {
+  left: 100%;
+}
+
+/* ── Glass Card ─────────────────────────────────────────── */
+.glass-card {
+  @apply glass rounded-[2.5rem] shadow-2xl;
+  border-color: rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+html.dark .glass-card {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.glass-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
 /* ── Fade in animation ─────────────────────────────────── */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(16px); }

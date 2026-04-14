@@ -63,12 +63,12 @@ export default function RegisterPage() {
           <p className="text-sm mt-1 opacity-60 font-medium" style={{ color: "var(--text-muted)" }}>TUS Hazırlık Platformu</p>
         </div>
 
-        <div className="glass rounded-3xl p-8 shadow-2xl border transition-all" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-          <h2 className="text-xl font-bold mb-6" style={{ color: "var(--text)" }}>Hesap Oluştur</h2>
+        <div className="glass-card p-8 transition-all" style={{ background: "var(--surface)" }}>
+          <h2 className="text-2xl font-black mb-6 tracking-tight" style={{ color: "var(--text-navy)" }}>Hesap Oluştur</h2>
 
           {error && (
-            <div className="flex items-center gap-2 rounded-xl px-4 py-3 mb-5 text-sm font-bold border" 
-              style={{ background: "var(--error-light)", color: "var(--error)", borderColor: "var(--error-light)" }}>
+            <div className="flex items-center gap-2 rounded-2xl px-4 py-3 mb-5 text-sm font-bold border animate-fade-in-up" 
+              style={{ background: "var(--error-light)", color: "var(--danger)", borderColor: "var(--error-light)" }}>
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {error}
             </div>
@@ -76,20 +76,20 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 px-1 opacity-60" style={{ color: "var(--text-muted)" }}>Ad Soyad</label>
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>Ad Soyad</label>
               <input
                 id="reg-name"
                 required
                 value={form.name}
                 onChange={(e) => update("name", e.target.value)}
                 placeholder="Ahmet Yılmaz"
-                className="input-focus w-full border rounded-xl px-4 py-3 transition-all text-sm"
+                className="input-focus w-full border rounded-2xl px-5 py-3.5 transition-all text-sm font-medium shadow-sm"
                 style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 px-1 opacity-60" style={{ color: "var(--text-muted)" }}>E-posta</label>
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>E-posta</label>
               <input
                 id="reg-email"
                 type="email"
@@ -97,14 +97,14 @@ export default function RegisterPage() {
                 value={form.email}
                 onChange={(e) => update("email", e.target.value)}
                 placeholder="ornek@email.com"
-                className="input-focus w-full border rounded-xl px-4 py-3 transition-all text-sm"
+                className="input-focus w-full border rounded-2xl px-5 py-3.5 transition-all text-sm font-medium shadow-sm"
                 style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 px-1 opacity-60" style={{ color: "var(--text-muted)" }}>
-                Şifre <span className="text-[10px] lowercase font-medium opacity-50">(min 6 karakter)</span>
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>
+                Şifre <span className="text-[9px] lowercase opacity-50 font-medium">(min 6 karakter)</span>
               </label>
               <input
                 id="reg-password"
@@ -114,31 +114,31 @@ export default function RegisterPage() {
                 value={form.password}
                 onChange={(e) => update("password", e.target.value)}
                 placeholder="••••••••"
-                className="input-focus w-full border rounded-xl px-4 py-3 transition-all text-sm"
+                className="input-focus w-full border rounded-2xl px-5 py-3.5 transition-all text-sm font-medium shadow-sm"
                 style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 px-1 opacity-60" style={{ color: "var(--text-muted)" }}>Üniversite</label>
+                <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>Üniversite</label>
                 <input
                   id="reg-school"
                   value={form.school}
                   onChange={(e) => update("school", e.target.value)}
                   placeholder="Hacettepe Tıp"
-                  className="input-focus w-full border rounded-xl px-4 py-3 transition-all text-sm"
+                  className="input-focus w-full border rounded-2xl px-5 py-3.5 transition-all text-sm font-medium shadow-sm"
                   style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 px-1 opacity-60" style={{ color: "var(--text-muted)" }}>Sınıf</label>
+                <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>Sınıf</label>
                 <div className="relative">
                   <select
                     id="reg-year"
                     value={form.year}
                     onChange={(e) => update("year", e.target.value)}
-                    className="input-focus w-full border rounded-xl px-4 py-3 transition-all text-sm appearance-none"
+                    className="input-focus w-full border rounded-2xl px-5 py-3.5 transition-all text-sm appearance-none font-medium shadow-sm cursor-pointer"
                     style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
                   >
                     <option value="">Seç</option>
@@ -146,7 +146,7 @@ export default function RegisterPage() {
                       <option key={y} value={y}>{y}. Sınıf</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-40 pointer-events-none" style={{ color: "var(--text)" }} />
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30 pointer-events-none" style={{ color: "var(--text)" }} />
                 </div>
               </div>
             </div>
@@ -155,24 +155,22 @@ export default function RegisterPage() {
               id="reg-submit"
               type="submit"
               disabled={loading}
-              className="w-full text-white font-black py-4 rounded-2xl transition-all shadow-lg active:scale-[0.98] disabled:opacity-60 mt-4 flex items-center justify-center gap-2 group relative overflow-hidden"
-              style={{ background: "var(--primary)" }}
+              className="btn-premium w-full py-4 mt-4"
             >
-              <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
               {loading ? (
                 <>
                   <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Hazırlanıyor...
+                  Kaydediliyor...
                 </>
               ) : (
-                "Kayıt Ol"
+                "Kayıt Ol ve Başla"
               )}
             </button>
           </form>
 
-          <p className="text-center text-sm mt-6 font-medium" style={{ color: "var(--text-muted)" }}>
+          <p className="text-center text-sm mt-8 font-medium opacity-60">
             Zaten hesabın var mı?{" "}
-            <Link href="/login" className="font-bold transition-all hover:opacity-80" style={{ color: "var(--primary)" }}>
+            <Link href="/login" className="font-black text-primary hover:underline transition-all underline-offset-4">
               Giriş Yap
             </Link>
           </p>

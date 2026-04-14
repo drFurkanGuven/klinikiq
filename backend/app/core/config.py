@@ -25,7 +25,13 @@ class Settings(BaseSettings):
 
     # App
     ENVIRONMENT: str = "development"
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost"]
+    BACKEND_CORS_ORIGINS: List[str] = [
+        "http://localhost:3000", 
+        "http://localhost", 
+        "https://localhost",
+        "capacitor://localhost", 
+        "http://localhost:8000"
+    ]
 
     class Config:
         env_file = ".env"
