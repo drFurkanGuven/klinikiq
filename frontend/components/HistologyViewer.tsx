@@ -39,22 +39,25 @@ const OSD_CDN =
  */
 function resolveFullImageUrl(url: string): string {
   if (!url) return "";
-  if (url.startsWith("http")) {
-    // Wikimedia için optimize et (Büyük resimler tarayıcıyı dondurmasın diye 2000px çek)
-    const m = url.match(/upload\.wikimedia\.org\/wikipedia\/commons\/([0-9a-f]\/[0-9a-f]{2})\/(.+)$/i);
-    if (m) {
-      const [, hash, filenameRaw] = m;
-      // Filename kısmını normalize et (Hem encoded hem unencoded halleri kapsayacak şekilde)
-      const filename = decodeURIComponent(filenameRaw);
-      const encodedFilename = encodeURIComponent(filename).replace(/%20/g, "_"); // Wikimedia boşlukları _ tercih eder
-      return `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${encodedFilename}/2000px-${encodedFilename}`;
-    }
-    return url;
-  }
   
-  // Yerel dosyalar ("/tiles/..." gibi) için API URL'sini kullan
+  // Wikimedia için en güvenli yöntem: Special:FilePath API (Redirect)
+  // Bu API karmaşık dosya isimlerini ve thumbnail boyutlarını otomatik çözer.
+  if (url.includes("upload.wikimedia.org") || url.includes("commons.wikimedia.org")) {
+    const filenameMatch = url.match(/\/([^\/]+)$/);
+    if (filenameMatch) {
+      const filename = filenameMatch[1];
+      // Special:FilePath API'si her zaman doğru thumbnail'i döndürür
+      return `https://commons.wikimedia.org/w/index.php?title=Special:FilePath&file=${filename}&width=2000`;
+    }
+  }
+
+  if (url.startsWith("http")) return url;
+  
+  // Yerel dosyalar ("/tiles/..." gibi) için
+  // Unicode karakterleri (böbrek -> b%C3%B6brek) encode etmeliyiz
+  const encodedPath = encodeURI(url);
   const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/api\/?$/, "");
-  return `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+  return `${baseUrl}${encodedPath.startsWith("/") ? "" : "/"}${encodedPath}`;
 }
 
 export default function HistologyViewer({ image }: Props) {
@@ -265,8 +268,20 @@ export default function HistologyViewer({ image }: Props) {
             </div>
           )}
 
-          {/* OpenSeadragon kapsayıcı */}
-          <div ref={containerRef} className="w-full h-[520px]" />
+          {/* OpenSeadragon Container - Key ekleyerek her resim değişiminde temiz mount sağlıyoruz */}
+          <div 
+            key={image.id}
+            ref={(el) => {
+              if (el) {
+                // WebGL sızıntısını önlemek için içeriği zorla temizle
+                if (containerRef.current !== el) {
+                  el.innerHTML = "";
+                  containerRef.current = el;
+                }
+              }
+            }}
+            className="w-full h-[520px]" 
+          />
 
           {/* Annotation çizim overlay'i — sadece annotation modunda aktif */}
           <div

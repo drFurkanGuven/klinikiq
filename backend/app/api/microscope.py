@@ -33,6 +33,9 @@ CACHE_TTL = 3600  # 1 hour
 
 
 def _slugify(text: str) -> str:
+    """Türkçe karakterleri ASCII'ye dönüştüren güvenli dosya ismi oluşturucu."""
+    tr_map = str.maketrans("çğıöşüÇĞİÖŞÜ ", "cgiosuCGIOSU_")
+    text = text.translate(tr_map)
     text = text.lower()
     text = re.sub(r"[^\w\s-]", "", text)
     text = re.sub(r"[\s_-]+", "_", text).strip("_")
