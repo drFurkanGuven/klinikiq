@@ -7,7 +7,7 @@ import { isAuthenticated } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Stethoscope, ArrowLeft, GraduationCap, CheckCircle2, XCircle,
-  ChevronRight, BarChart3, Flame, Target, RefreshCw,
+  ChevronRight, BarChart3, Flame, Target, RefreshCw, AlertCircle,
 } from "lucide-react";
 
 const OPTION_KEYS = ["a", "b", "c", "d", "e"] as const;
@@ -34,6 +34,7 @@ export default function QuestionsPage() {
   const [result, setResult] = useState<{ is_correct: boolean; correct_option: string; explanation: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const [filterSpecialty, setFilterSpecialty] = useState<string>("");
   const [mode, setMode] = useState<"practice" | "all">("practice");
 
@@ -77,7 +78,12 @@ export default function QuestionsPage() {
       setIdx(0);
       setSelectedOption(null);
       setResult(null);
-    } catch {}
+      setErrorMsg("");
+    } catch (err) {
+      console.error("Soru yükleme hatası:", err);
+      setErrorMsg("Sorular yüklenirken bir sorun oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.");
+      setQuestions([]);
+    }
   }
 
   const currentQ = questions[idx];
@@ -90,7 +96,11 @@ export default function QuestionsPage() {
       const res = await questionsApi.answer(currentQ.id, option);
       setResult(res.data);
       await loadStats();
-    } catch {}
+      setErrorMsg("");
+    } catch (err) {
+      console.error("Cevap gönderme hatası:", err);
+      setErrorMsg("Cevap iletilemedi. Lütfen tekrar deneyin.");
+    }
     setSubmitting(false);
   }
 
@@ -205,6 +215,15 @@ export default function QuestionsPage() {
               style={{ background: "var(--primary)" }}>
               <ArrowLeft className="w-4 h-4" /> Vaka Çözmeye Git
             </Link>
+          </div>
+        )}
+        
+        {/* Hata Mesajı */}
+        {errorMsg && (
+          <div className="p-4 rounded-2xl flex items-center gap-3 text-sm font-bold border animate-pulse"
+            style={{ background: "var(--error-light)", borderColor: "var(--error-light)", color: "var(--danger)" }}>
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            {errorMsg}
           </div>
         )}
 

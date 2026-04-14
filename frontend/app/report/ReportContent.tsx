@@ -1,14 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { sessionsApi, type ReportOut } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
 import ReportView from "@/components/ReportView";
 import Footer from "@/components/Footer";
-import { ArrowLeft, Home, Bot } from "lucide-react";
+import { ArrowLeft, Home, Bot, Share2 } from "lucide-react";
+import { nativeClient } from "@/lib/native";
 
 export default function ReportPageContent() {
-  const { id: sessionId } = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get("id") || "";
   const router = useRouter();
   const [report, setReport] = useState<ReportOut | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,6 +39,19 @@ export default function ReportPageContent() {
     }
   }
 
+  const handleShare = async () => {
+    nativeClient.impact();
+    if (!report) return;
+    const score = report.score || 0;
+    const caseTitle = report.case?.title || "Vaka";
+    await nativeClient.share({
+      title: "KlinikIQ Başarı Raporu",
+      text: `🦾 KlinikIQ'da bir vakayı daha başarıyla tamamladım!\n🎯 Vaka: ${caseTitle}\n📊 Başarı Skoru: %${score}\n🩺 Sen de hasta simülasyonu ile TUS'a hazırlan!`,
+      url: window.location.href,
+      dialogTitle: "Başarı Raporunu Paylaş"
+    });
+  };
+
   if (!mounted) return null;
 
   return (
@@ -44,15 +59,21 @@ export default function ReportPageContent() {
       {/* Navbar */}
       <nav className="glass border-b sticky top-0 z-50 transition-all" style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <button onClick={() => router.back()} className="flex items-center gap-2 text-sm font-bold transition-all hover:scale-105" style={{ color: "var(--text-muted)" }}>
+          <button onClick={() => router.back()} className="flex items-center gap-2 text-sm font-bold transition-all hover:scale-105 px-4 py-2 rounded-2xl" style={{ color: "var(--text-muted)" }}>
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Geri</span>
           </button>
           <h1 className="font-bold text-sm uppercase tracking-widest" style={{ color: "var(--text)" }}>Vaka Raporu</h1>
-          <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 text-sm font-bold transition-all hover:scale-105" style={{ color: "var(--text-muted)" }}>
-            <Home className="w-4 h-4" />
-            <span className="hidden sm:inline">Dashboard</span>
-          </button>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button onClick={handleShare} className="flex items-center gap-2 text-primary font-bold transition-all hover:scale-110 p-2 rounded-2xl bg-primary-light border border-primary-light">
+              <Share2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Paylaş</span>
+            </button>
+            <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 text-sm font-bold transition-all hover:scale-105 px-4 py-2 rounded-2xl" style={{ color: "var(--text-muted)" }}>
+              <Home className="w-4 h-4" />
+              <span className="hidden sm:inline">Dashboard</span>
+            </button>
+          </div>
         </div>
       </nav>
 

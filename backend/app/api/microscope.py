@@ -290,9 +290,9 @@ async def delete_image(
 async def list_annotations(
     image_id: str,
     db: AsyncSession = Depends(get_db),
-    _: str = Depends(get_current_user_id),
+    user_id: str = Depends(get_current_user_id),
 ):
-    """Bir görüntüdeki tüm annotationları getir."""
+    """Bir görüntüdeki sadece kendi annotationlarını getir."""
     image_result = await db.execute(
         select(HistologyImage).where(HistologyImage.id == image_id)
     )
@@ -301,7 +301,10 @@ async def list_annotations(
 
     result = await db.execute(
         select(Annotation)
-        .where(Annotation.image_id == image_id)
+        .where(
+            Annotation.image_id == image_id,
+            Annotation.user_id == user_id
+        )
         .order_by(Annotation.created_at.asc())
     )
     return result.scalars().all()

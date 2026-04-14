@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { microscopyApi, type HistologyImage } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import dynamic from "next/dynamic";
 import { Microscope, ArrowLeft, ImageOff, ChevronRight } from "lucide-react";
 
@@ -111,11 +110,10 @@ export default function HistologyPage() {
               Histoloji Görüntüleri
             </div>
           </div>
-          <ThemeToggle />
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col-reverse lg:flex-row gap-6">
         {/* Sol panel: görüntü listesi */}
         <aside className="lg:w-72 flex-shrink-0">
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">

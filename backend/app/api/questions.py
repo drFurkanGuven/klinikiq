@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, cast, String, Integer
 
 from app.core.database import get_db
 from app.core.security import get_current_user_id
@@ -74,7 +74,6 @@ async def get_question_stats(
     incorrect = len(attempts) - correct
 
     # Branş bazlı istatistik
-    from sqlalchemy import cast, String, Integer
     specialty_result = await db.execute(
         select(cast(CaseQuestion.specialty, String), func.count(QuestionAttempt.id), func.sum(cast(QuestionAttempt.is_correct, Integer)))
         .join(QuestionAttempt, QuestionAttempt.question_id == CaseQuestion.id)

@@ -1,29 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { casesApi, usersApi, authApi, sessionsApi, questionsApi, type Case, type HistoryItem, type UserOut, type QuestionStats } from "@/lib/api";
+import { casesApi, usersApi, authApi, sessionsApi, questionsApi, type HistoryItem, type UserOut, type QuestionStats } from "@/lib/api";
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
-  Stethoscope,
-  LogOut,
-  BookOpen,
-  Trophy,
-  BarChart3,
-  Clock,
-  Bot,
-  ShieldAlert,
-  Dna,
-  Play,
-  CheckCircle2,
-  AlertCircle,
-  Sparkles,
-  GraduationCap,
-  Microscope,
-  Brain,
+  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon
 } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { nativeClient } from "@/lib/native";
+import { biometricsClient } from "@/lib/biometrics";
+import { useTheme, type Palette } from "@/components/ThemeProvider";
+import PremiumAlert from "@/components/PremiumAlert";
 
 const SPECIALTIES = [
   { value: "cardiology", label: "Kardiyoloji" },
@@ -48,18 +36,23 @@ export default function DashboardPage() {
   const router = useRouter();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [userProfile, setUserProfile] = useState<UserOut | null>(null);
-  
-  // Randomizer State
   const [selectedSpecs, setSelectedSpecs] = useState<string[]>([]);
   const [difficulty, setDifficulty] = useState("");
   const [isStarting, setIsStarting] = useState(false);
   const [isRecommending, setIsRecommending] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"randomizer" | "history">("randomizer");
   const [questionStats, setQuestionStats] = useState<QuestionStats | null>(null);
   const [mounted, setMounted] = useState(false);
+
+  // Premium Features States
+  const [showSettings, setShowSettings] = useState(false);
+  const [biometricsAvailable, setBiometricsAvailable] = useState(false);
+  const [isBiometricsEnabled, setIsBiometricsEnabled ] = useState(false);
+  const [showBioInfo, setShowBioInfo] = useState(false);
+
+  const { theme, toggleTheme, palette, setPalette } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -67,7 +60,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!mounted) return;
-
     if (!isAuthenticated()) {
       router.replace("/login");
       return;
@@ -78,9 +70,26 @@ export default function DashboardPage() {
   async function fetchData() {
     setLoading(true);
     try {
-      await Promise.all([fetchHistory(), fetchMe(), fetchQuestionStats()]);
+      await Promise.all([fetchHistory(), fetchMe(), fetchQuestionStats(), checkBiometrics()]);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function checkBiometrics() {
+    const available = await biometricsClient.checkAvailability();
+    setBiometricsAvailable(available);
+    setIsBiometricsEnabled(biometricsClient.isEnabled());
+  }
+
+  async function toggleBiometrics() {
+    nativeClient.impact();
+    if (isBiometricsEnabled) {
+        await biometricsClient.disable();
+        setIsBiometricsEnabled(false);
+    } else {
+        setShowBioInfo(true);
+        setIsBiometricsEnabled(true);
     }
   }
 
@@ -92,12 +101,13 @@ export default function DashboardPage() {
   }
 
   const handleRecommendedCase = async () => {
+    nativeClient.impact();
     setIsRecommending(true);
     setErrorMsg("");
     try {
       const caseRes = await casesApi.getRecommended();
       const sessionRes = await sessionsApi.create(caseRes.data.id);
-      router.push(`/case/${sessionRes.data.id}`);
+      router.push(`/case?id=${sessionRes.data.id}`);
     } catch (err: any) {
       setIsRecommending(false);
       if (err.response?.status === 404) setErrorMsg("Önerilebilecek yeni vaka kalmadı, tebrikler!");
@@ -129,6 +139,7 @@ export default function DashboardPage() {
   };
 
   const handleStartRandomCase = async () => {
+    nativeClient.impact();
     setIsStarting(true);
     setErrorMsg("");
     try {
@@ -139,7 +150,7 @@ export default function DashboardPage() {
         
         // 2. Start session
         const sessionRes = await sessionsApi.create(caseId);
-        router.push(`/case/${sessionRes.data.id}`);
+        router.push(`/case?id=${sessionRes.data.id}`);
         
     } catch (err: any) {
         setIsStarting(false);
@@ -195,7 +206,6 @@ export default function DashboardPage() {
           </Link>
 
           <div className="flex flex-1 items-center justify-end gap-1 sm:gap-4 mr-1 sm:mr-4 overflow-x-auto no-scrollbar">
-            <ThemeToggle />
             {userProfile?.is_admin && (
                 <Link href="/admin" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
                   style={{ background: "color-mix(in srgb, var(--error) 10%, transparent)", borderColor: "var(--error)", color: "var(--error)" }}>
@@ -223,6 +233,14 @@ export default function DashboardPage() {
               <Trophy className="w-3.5 h-3.5" style={{ color: "var(--warning)" }} />
               <span className="hidden lg:inline">Sıralama</span>
             </Link>
+            <button
+                onClick={() => { nativeClient.impact(); setShowSettings(true); }}
+                className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+                style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}
+            >
+                <Settings className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
+                <span className="hidden lg:inline">Ayarlar</span>
+            </button>
           </div>
 
           <button
@@ -424,7 +442,7 @@ export default function DashboardPage() {
                           <button
                             onClick={handleStartRandomCase}
                             disabled={isStarting || isRecommending || isLimitReached}
-                            className={`btn-premium flex-1 py-4 text-base active:scale-95 ${
+                            className={`btn-premium flex-1 py-4 text-base rounded-2xl active:scale-95 ${
                               isStarting || isLimitReached ? "opacity-50 grayscale cursor-not-allowed" : ""
                             }`}
                           >
@@ -434,7 +452,7 @@ export default function DashboardPage() {
                           <button
                             onClick={handleRecommendedCase}
                             disabled={isStarting || isRecommending || isLimitReached}
-                            className={`btn-premium px-6 py-4 text-base active:scale-95 flex items-center justify-center gap-2 ${
+                            className={`btn-premium px-6 py-4 text-base rounded-2xl active:scale-95 flex items-center justify-center gap-2 ${
                               isRecommending || isLimitReached ? "opacity-50 grayscale cursor-not-allowed" : ""
                             }`}
                             style={{ background: "transparent", border: "2px solid var(--primary)", color: "var(--primary)" }}
@@ -481,7 +499,7 @@ export default function DashboardPage() {
                     )}
                     {item.status === "completed" && (
                       <button
-                        onClick={() => router.push(`/report/${item.session_id}`)}
+                        onClick={() => router.push(`/report?id=${item.session_id}`)}
                         className="btn-premium px-5 py-2.5 text-xs active:scale-95"
                         style={{ background: "transparent", border: "2px solid var(--primary)", color: "var(--primary)" }}
                       >
@@ -497,6 +515,84 @@ export default function DashboardPage() {
       </main>
 
       <Footer />
+        {/* Settings Modal */}
+        {showSettings && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSettings(false)} />
+                <div className="relative w-full max-w-sm glass-card p-8 animate-fade-in-up" style={{ background: "var(--surface)" }}>
+                    <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-xl font-black tracking-tight">Ayarlar</h3>
+                        <button onClick={() => setShowSettings(false)} className="opacity-40 hover:opacity-100 p-1"><X className="w-6 h-6" /></button>
+                    </div>
+
+                    <div className="space-y-8">
+                        {/* Palette Selector */}
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 opacity-40">Renk Paleti</p>
+                            <div className="flex justify-between gap-2">
+                                {(["emerald", "midnight", "violet", "rose"] as Palette[]).map((p) => (
+                                    <button
+                                        key={p}
+                                        onClick={() => { nativeClient.impact(); setPalette(p); }}
+                                        className={`w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-lg border-2 ${palette === p ? "border-primary scale-110" : "border-transparent opacity-60"}`}
+                                        style={{ background: p === "emerald" ? "#4a7c59" : p === "midnight" ? "#334155" : p === "violet" ? "#7c3aed" : "#be123c" }}
+                                    >
+                                        {palette === p && <Check className="w-5 h-5 text-white" />}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Biometric Toggle */}
+                        {biometricsAvailable && (
+                            <div className="flex items-center justify-between p-4 rounded-2xl border bg-surface-2" style={{ borderColor: "var(--border)" }}>
+                                <div className="flex items-center gap-3">
+                                    <Fingerprint className="w-5 h-5 text-primary" />
+                                    <div>
+                                        <p className="text-xs font-black">Parmak İzi</p>
+                                        <p className="text-[10px] opacity-50">Hızlı Giriş</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={toggleBiometrics}
+                                    className={`w-12 h-6 rounded-full transition-all relative ${isBiometricsEnabled ? "bg-primary" : "bg-slate-300"}`}
+                                >
+                                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isBiometricsEnabled ? "left-7" : "left-1"}`} />
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Theme Toggle Button */}
+                        <button
+                            onClick={() => { nativeClient.impact(); toggleTheme(); }}
+                            className="w-full flex items-center justify-between p-4 rounded-2xl border bg-surface-2"
+                            style={{ borderColor: "var(--border)" }}
+                        >
+                            <div className="flex items-center gap-3">
+                                {theme === "dark" ? <Sun className="w-5 h-5 text-warning" /> : <Moon className="w-5 h-5 text-primary" />}
+                                <p className="text-xs font-black">{theme === "dark" ? "Gündüz Modu" : "Gece Modu"}</p>
+                            </div>
+                            <span className="text-[10px] font-bold opacity-40 uppercase">Değiştir</span>
+                        </button>
+                    </div>
+
+                    <div className="mt-10 pt-6 border-t" style={{ borderColor: "var(--border)" }}>
+                        <button onClick={logout} className="w-full py-4 text-xs font-black uppercase tracking-widest text-danger flex items-center justify-center gap-2">
+                            <LogOut className="w-4 h-4" /> Oturumu Kapat
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        <PremiumAlert 
+            isOpen={showBioInfo}
+            onClose={() => setShowBioInfo(false)}
+            title="Sistem Hazır"
+            message="Biyometrik giriş altyapısı hazırlandı. Tam aktif olması için bir sonraki girişinizde size sorulduğunda 'Evet' demeniz yeterlidir."
+            confirmText="Anladım"
+            type="success"
+        />
     </div>
   );
 }
