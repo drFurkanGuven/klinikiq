@@ -286,40 +286,59 @@ export default function DashboardPage() {
             )}
         </div>
 
-        {/* Stats Banner */}
-        <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div className="glass-card p-4 sm:p-5 border shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-            <div className="flex items-center gap-3 mb-2 sm:mb-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)" }}>
-                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: "var(--primary)" }} />
+        {/* Stats Section */}
+        <div className="flex justify-center mb-6 sm:mb-10">
+          <div className="grid grid-cols-3 gap-2 sm:gap-6 w-full max-w-4xl">
+            {/* Vakalar */}
+            <div className="glass-card p-3 sm:p-5 border relative overflow-hidden group" 
+                 style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 mb-1 sm:mb-2">
+                <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner"
+                  style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}>
+                  <BookOpen className="w-3.5 h-3.5 sm:w-5 sm:h-5" style={{ color: "var(--primary)" }} />
+                </div>
+                <div className="flex flex-col items-center sm:items-start">
+                    <span className="text-[8px] sm:text-xs font-black uppercase tracking-tighter sm:tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>Vakalar</span>
+                    <p className="text-lg sm:text-3xl font-black mt-[-2px] sm:mt-0" style={{ color: "var(--text-navy)" }}>{uniqueTotalCount}</p>
+                </div>
               </div>
-              <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider opacity-60" style={{ color: "var(--text-muted)" }}>Vakalar</span>
             </div>
-            <p className="text-2xl sm:text-3xl font-black" style={{ color: "var(--text-navy)" }}>{uniqueTotalCount}</p>
-          </div>
-          <div className="glass-card p-4 sm:p-5 border shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-            <div className="flex items-center gap-3 mb-2 sm:mb-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "color-mix(in srgb, var(--success) 10%, transparent)" }}>
-                <Trophy className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: "var(--success)" }} />
+
+            {/* Ort. Skor */}
+            <div className="glass-card p-3 sm:p-5 border relative overflow-hidden group border-t-2" 
+                 style={{ background: "var(--surface)", borderColor: "var(--border)", borderTopColor: "var(--success)" }}>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 mb-1 sm:mb-2">
+                <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner"
+                  style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)" }}>
+                  <Trophy className="w-3.5 h-3.5 sm:w-5 sm:h-5" style={{ color: "var(--success)" }} />
+                </div>
+                <div className="flex flex-col items-center sm:items-start">
+                    <span className="text-[8px] sm:text-xs font-black uppercase tracking-tighter sm:tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>Ort. Skor</span>
+                    <div className="flex items-baseline gap-0.5">
+                        <p className="text-lg sm:text-3xl font-black mt-[-2px] sm:mt-0" style={{ color: "var(--text-navy)" }}>{avgScore != null ? avgScore : "—"}</p>
+                        {avgScore != null && <span className="text-[8px] sm:text-xs font-bold opacity-30">/100</span>}
+                    </div>
+                </div>
               </div>
-              <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider opacity-60" style={{ color: "var(--text-muted)" }}>Ort. Skor</span>
             </div>
-            <p className="text-2xl sm:text-3xl font-black" style={{ color: "var(--text-navy)" }}>
-              {avgScore != null ? avgScore : "—"}
-              {avgScore != null && <span className="text-sm font-bold opacity-30 ml-1">/100</span>}
-            </p>
-          </div>
-          <div className="glass-card p-4 sm:p-5 border shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-            <div className="flex items-center gap-3 mb-2 sm:mb-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "color-mix(in srgb, var(--accent) 15%, transparent)" }}>
-                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: "var(--accent)" }} />
+
+            {/* Tamamlanan */}
+            <div className="glass-card p-3 sm:p-5 border relative overflow-hidden group" 
+                 style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 mb-1 sm:mb-2">
+                <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner"
+                  style={{ background: "color-mix(in srgb, var(--accent) 20%, transparent)" }}>
+                  <BarChart3 className="w-3.5 h-3.5 sm:w-5 sm:h-5" style={{ color: "var(--accent)" }} />
+                </div>
+                <div className="flex flex-col items-center sm:items-start">
+                    <span className="text-[8px] sm:text-xs font-black uppercase tracking-tighter sm:tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>Biten</span>
+                    <p className="text-lg sm:text-3xl font-black mt-[-2px] sm:mt-0" style={{ color: "var(--text-navy)" }}>{uniqueCompletedCount}</p>
+                </div>
               </div>
-              <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider opacity-60" style={{ color: "var(--text-muted)" }}>Tamamlanan</span>
             </div>
-            <p className="text-2xl sm:text-3xl font-black" style={{ color: "var(--text-navy)" }}>{uniqueCompletedCount}</p>
           </div>
         </div>
 
