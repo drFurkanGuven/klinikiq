@@ -58,6 +58,13 @@ def _run_vips_dzsave(tiff_path: str, output_base: str) -> None:
         check=True,
     )
     
+    # Nginx'in okuyabilmesi için izinleri ayarla
+    try:
+        subprocess.run(["chmod", "-R", "755", f"{output_base}.dzi"], check=False)
+        subprocess.run(["chmod", "-R", "755", f"{output_base}_files"], check=False)
+    except Exception:
+        pass
+    
     # Opsiyonel: Thumbnail Üretimi (FE listesi için)
     try:
         thumb_path = f"{output_base}_thumb.jpg"
