@@ -20,6 +20,8 @@ import {
   AlertCircle,
   Sparkles,
   GraduationCap,
+  Microscope,
+  Brain,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -188,6 +190,16 @@ export default function DashboardPage() {
                     <span className="hidden sm:inline">Admin</span>
                 </Link>
             )}
+            <Link href="/histology" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border shadow-sm"
+              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
+              <Microscope className="w-4 h-4" style={{ color: "var(--primary)" }} />
+              <span className="hidden sm:inline">Histoloji</span>
+            </Link>
+            <Link href="/sinir-lezyon" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border shadow-sm"
+              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
+              <Brain className="w-4 h-4" style={{ color: "var(--primary)" }} />
+              <span className="hidden sm:inline">Nöroloji</span>
+            </Link>
             <Link href="/questions" className="flex items-center gap-1.5 transition-all text-sm font-medium px-3 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <GraduationCap className="w-4 h-4" style={{ color: "var(--primary)" }} />
