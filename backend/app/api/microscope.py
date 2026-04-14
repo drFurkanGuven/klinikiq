@@ -33,12 +33,16 @@ CACHE_TTL = 3600  # 1 hour
 
 
 def _slugify(text: str) -> str:
-    """Türkçe karakterleri ASCII'ye dönüştüren güvenli dosya ismi oluşturucu."""
+    """Türkçe karakterleri ASCII'ye dönüştüren ve path traversal'ı engelleyen güvenli dosya ismi oluşturucu."""
     tr_map = str.maketrans("çğıöşüÇĞİÖŞÜ ", "cgiosuCGIOSU_")
     text = text.translate(tr_map)
     text = text.lower()
+    # Sadece alfanümerik ve alt çizgi/tire
     text = re.sub(r"[^\w\s-]", "", text)
+    # Boşlukları ve tekrarlayan işaretleri temizle
     text = re.sub(r"[\s_-]+", "_", text).strip("_")
+    # Path traversal engelleme: Sadece dosya adı döner, dizin geçişi içermez
+    text = os.path.basename(text)
     return text[:60]
 
 
@@ -47,7 +51,7 @@ def _run_vips_dzsave(tiff_path: str, output_base: str) -> None:
     if not shutil.which("vips"):
         raise RuntimeError("vips bulunamadı. Lütfen 'apt-get install libvips-tools' ile kurun.")
     
-    # DZI Dönüştürme (Orijinal Script Ayarları)
+    # DZI Dönüştürme (Orijinal Script Ayarları) - 5 Dakika Sınırı (300s)
     subprocess.run(
         [
             "vips", "dzsave", tiff_path, output_base,
@@ -56,6 +60,7 @@ def _run_vips_dzsave(tiff_path: str, output_base: str) -> None:
             "--suffix", ".jpg[Q=85]",
         ],
         check=True,
+        timeout=300,
     )
     
     # Nginx'in okuyabilmesi için izinleri ayarla
@@ -71,9 +76,10 @@ def _run_vips_dzsave(tiff_path: str, output_base: str) -> None:
         subprocess.run(
             ["vips", "thumbnail", tiff_path, thumb_path, "400"],
             check=True,
+            timeout=60,
         )
-    except Exception:
-        pass # Thumbnail kritik değil, DZI oluştuysa devam et
+    except Exception as e:
+        print(f"Thumbnail uretimi basarisiz (kritik degil): {e}")
 
 router = APIRouter()
 
@@ -210,6 +216,7 @@ async def upload_tiff_image(
     if redis_client:
         await redis_client.delete(CACHE_KEY_LIST)
 
+    # 3. Veritabanına Kayıt (Hata durumunda dosya temizliği)
     image = HistologyImage(
         title=title.strip(),
         description=description.strip() or None,
@@ -217,10 +224,27 @@ async def upload_tiff_image(
         thumbnail_url=thumb_url,
         specialty=specialty or None,
     )
-    db.add(image)
-    await db.commit()
-    await db.refresh(image)
-    return image
+    
+    try:
+        db.add(image)
+        await db.commit()
+        await db.refresh(image)
+        return image
+    except Exception as e:
+        # DB kaydi basarisiz ise uretilen dosyalari temizle
+        print(f"DB Kayit Hatasi (Dosyalar temizleniyor): {e}")
+        try:
+            filename = f"{name}.dzi"
+            files_dir = f"{name}_files"
+            thumb_file = f"{name}_thumb.jpg"
+            
+            for path in [os.path.join(settings.TILES_DIR, f) for f in [filename, files_dir, thumb_file]]:
+                if os.path.exists(path):
+                    if os.path.isdir(path): shutil.rmtree(path)
+                    else: os.remove(path)
+        except Exception:
+            pass
+        raise HTTPException(status_code=500, detail="Görüntü veritabanına kaydedilirken hata oluştu.")
 
 
 @router.delete("/images/{image_id}", status_code=204)

@@ -64,6 +64,14 @@ async def update_user_limit(
     if not target_user:
         raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
         
+    # [AİDER] Input validation: Limit negatif olamaz ve makul bir SINIRDA olmalı
+    if req.daily_limit < 0 or req.daily_limit > 1000:
+        raise HTTPException(status_code=400, detail="Geçersiz limit değeri (0-1000 arası olmalı)")
+
+    # [AİDER] Audit Logging: Admin işlemini logla
+    from datetime import datetime
+    print(f"[AUDIT] {datetime.now()}: Admin {admin.email} (ID: {admin.id}) changed limit for {target_user.email} from {target_user.daily_limit} to {req.daily_limit}")
+
     target_user.daily_limit = req.daily_limit
     await db.commit()
     

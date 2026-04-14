@@ -197,9 +197,14 @@ export default function HistologyUploadModal({ isOpen, onClose, onSuccess }: Pro
                       className="w-full rounded-2xl px-5 py-4 text-sm font-bold border border-border bg-black/5 dark:bg-white/5 focus:ring-4 focus:ring-primary/20 outline-none transition-all disabled:opacity-50 cursor-pointer appearance-none"
                     >
                       <option value="pathology">Genel Patoloji</option>
-                      <option value="nephrology">Böbrek (Nefroloji)</option>
-                      <option value="pulmonology">Akciğer (Gözül)</option>
+                      <option value="nephrology">Nefroloji (Böbrek)</option>
+                      <option value="pulmonology">Göğüs Hastalıkları</option>
                       <option value="neurology">Nöroloji</option>
+                      <option value="cardiology">Kardiyoloji</option>
+                      <option value="hematology">Hematoloji</option>
+                      <option value="gastroenterology">Gastroenteroloji</option>
+                      <option value="dermatology">Dermatoloji</option>
+                      <option value="other">Diğer</option>
                     </select>
                   </div>
 

@@ -41,6 +41,18 @@ class FlashcardStatus(str, enum.Enum):
     known = "known"
 
 
+class Specialty(str, enum.Enum):
+    pathology = "pathology"
+    nephrology = "nephrology"
+    pulmonology = "pulmonology"
+    neurology = "neurology"
+    cardiology = "cardiology"
+    hematology = "hematology"
+    gastroenterology = "gastroenterology"
+    dermatology = "dermatology"
+    other = "other"
+
+
 # ── Models ────────────────────────────────────────────────────────────────────
 
 class User(Base):
@@ -64,7 +76,7 @@ class Case(Base):
 
     id = Column(String, primary_key=True, default=gen_uuid)
     title = Column(String, nullable=False)
-    specialty = Column(String, nullable=False, index=True)  # cardiology, endocrinology...
+    specialty = Column(SAEnum(Specialty), nullable=False, index=True)  # cardiology, nephrology...
     difficulty = Column(String, nullable=False, index=True)  # easy, medium, hard
     patient_json = Column(JSONB, nullable=False)
     # patient_json örnek: {name, age, gender, chief_complaint, history, vitals}
@@ -158,7 +170,7 @@ class Flashcard(Base):
 
     id = Column(String, primary_key=True, default=gen_uuid)
     case_id = Column(String, ForeignKey("cases.id"), nullable=False, unique=True)
-    specialty = Column(String, nullable=False, index=True)
+    specialty = Column(SAEnum(Specialty), nullable=False, index=True)
     difficulty = Column(String, nullable=False, index=True)
     topic = Column(String, nullable=False)           # AI'ın belirlediği konu adı
     question = Column(Text, nullable=False)          # Klinik senaryo sorusu
@@ -234,7 +246,7 @@ class HistologyImage(Base):
     description = Column(Text, nullable=True)
     image_url = Column(String, nullable=False)  # DZI dosyası veya dış URL
     thumbnail_url = Column(String, nullable=True)
-    specialty = Column(String, nullable=True, index=True)
+    specialty = Column(SAEnum(Specialty), nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), default=now_utc)
 
 
