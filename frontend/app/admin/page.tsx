@@ -31,7 +31,7 @@ export default function AdminPage() {
       }
 
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/auth/me`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || ""}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();

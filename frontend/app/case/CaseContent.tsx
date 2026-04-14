@@ -11,6 +11,7 @@ import {
   Search, ShoppingBag, Trash, ChevronRight, Plus,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { nativeClient } from "@/lib/native";
 
 // --- SABİTLER VE VERİLER ---
 
@@ -319,6 +320,7 @@ export default function CasePageContent() {
   const [streaming, setStreaming] = useState(false);
   const [showDiagnosis, setShowDiagnosis] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const [savedDiagnoses, setSavedDiagnoses] = useState<string[]>([""]);
   const [diagnosisSaved, setDiagnosisSaved] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -418,7 +420,9 @@ export default function CasePageContent() {
 
   async function handleDiagnosisSubmit(diagnoses: string[]) {
     await sessionsApi.diagnose(sessionId, diagnoses);
-    setDiagnosisSaved(true); setShowDiagnosis(false);
+    setSavedDiagnoses(diagnoses);
+    setDiagnosisSaved(true); 
+    setShowDiagnosis(false);
   }
 
   async function handleComplete() {
@@ -523,9 +527,9 @@ export default function CasePageContent() {
             <div ref={bottomRef} />
           </div>
           <div className="p-3 sm:p-4 border-t" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
-            <div className="flex items-end gap-2 rounded-2xl px-3 py-2 transition-all shadow-inner border bg-white" style={{ borderColor: "var(--border)" }}>
-              <textarea ref={textareaRef} value={input} onChange={(e) => { setInput(e.target.value); if (textareaRef.current) { textareaRef.current.style.height = "auto"; textareaRef.current.style.height = textareaRef.current.scrollHeight + "px"; } }} placeholder="Sorunuzu yazın..." rows={1} disabled={streaming} className="flex-1 bg-transparent text-sm resize-none outline-none" />
-              <button onClick={() => sendMessage()} disabled={!input.trim() || streaming} className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary text-white shadow-md"><Send className="w-4 h-4" /></button>
+            <div className="flex items-end gap-2 rounded-2xl px-3 py-2 transition-all shadow-inner border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+              <textarea ref={textareaRef} value={input} onChange={(e) => { setInput(e.target.value); if (textareaRef.current) { textareaRef.current.style.height = "auto"; textareaRef.current.style.height = textareaRef.current.scrollHeight + "px"; } }} placeholder="Sorunuzu yazın..." rows={1} disabled={streaming} className="flex-1 bg-transparent text-sm resize-none outline-none" style={{ color: "var(--text)" }} />
+              <button onClick={() => sendMessage()} disabled={!input.trim() || streaming} className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md transition-all active:scale-95 disabled:opacity-50" style={{ background: "var(--primary)" }}><Send className="w-4 h-4" /></button>
             </div>
           </div>
         </main>
@@ -534,19 +538,19 @@ export default function CasePageContent() {
       {labOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setLabOpen(false)} />
-          <div className="relative w-full max-w-6xl h-[85vh] shadow-2xl rounded-[2.5rem] flex flex-col overflow-hidden border bg-white" style={{ borderColor: "var(--border)" }}>
+          <div className="relative w-full max-w-6xl h-[85vh] shadow-2xl rounded-[2.5rem] flex flex-col overflow-hidden border" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
             <div className="h-20 px-8 border-b flex items-center justify-between gap-6" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
               <div className="flex items-center gap-4"><h2 className="text-xl font-black tracking-tight">Laboratuvar Paneli</h2></div>
-              <input type="text" placeholder="Tetkik ara..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="flex-1 max-w-md h-11 px-4 rounded-xl border text-sm" />
-              <button onClick={() => setLabOpen(false)} className="w-12 h-12 rounded-2xl border flex items-center justify-center"><X className="w-6 h-6" /></button>
+              <input type="text" placeholder="Tetkik ara..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="flex-1 max-w-md h-11 px-4 rounded-xl border text-sm outline-none" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }} />
+              <button onClick={() => setLabOpen(false)} className="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all hover:bg-black/5" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}><X className="w-6 h-6" /></button>
             </div>
             <div className="flex-1 flex overflow-hidden">
               <aside className="w-64 border-r overflow-y-auto p-4" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
                 {LAB_CATEGORIES.map(cat => (
-                  <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={`w-full text-left px-4 py-3.5 rounded-2xl font-bold text-sm ${selectedCategory === cat.id ? "bg-white text-primary shadow-md" : "opacity-60"}`}>{cat.label}</button>
+                  <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={`w-full text-left px-4 py-3.5 rounded-2xl font-bold text-sm ${selectedCategory === cat.id ? "shadow-md" : "opacity-60"}`} style={{ background: selectedCategory === cat.id ? "var(--surface)" : "transparent", color: selectedCategory === cat.id ? "var(--primary)" : "var(--text)" }}>{cat.label}</button>
                 ))}
               </aside>
-              <main className="flex-1 overflow-y-auto p-8 bg-white">
+              <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--surface)" }}>
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
                   {LAB_TESTS.filter(t => (searchQuery ? t.name.toLowerCase().includes(searchQuery.toLowerCase()) : t.category === selectedCategory)).map(test => {
                     const isSelected = selectedLabs.includes(test.id);
@@ -581,23 +585,23 @@ export default function CasePageContent() {
       {examOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setExamOpen(false)} />
-          <div className="relative w-full max-w-6xl h-[85vh] shadow-2xl rounded-[2.5rem] flex flex-col overflow-hidden border bg-white" style={{ borderColor: "var(--border)" }}>
+          <div className="relative w-full max-w-6xl h-[85vh] shadow-2xl rounded-[2.5rem] flex flex-col overflow-hidden border" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
             <div className="h-20 px-8 border-b flex items-center justify-between" style={{ background: "var(--surface)" }}>
               <h2 className="text-xl font-black">Fizik Muayene</h2>
               <button onClick={() => setExamOpen(false)} className="w-12 h-12 rounded-2xl border flex items-center justify-center"><X className="w-6 h-6" /></button>
             </div>
             <div className="flex-1 flex overflow-hidden">
-              <aside className="w-64 border-r overflow-y-auto p-4 bg-surface-2 border-border">
+              <aside className="w-64 border-r overflow-y-auto p-4" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
                 {EXAM_CATEGORIES.map(cat => (
-                  <button key={cat.id} onClick={() => setSelectedExamCategory(cat.id)} className={`w-full text-left px-4 py-3 rounded-2xl font-bold text-sm ${selectedExamCategory === cat.id ? "bg-white text-primary" : "opacity-60"}`}>{cat.label}</button>
+                  <button key={cat.id} onClick={() => setSelectedExamCategory(cat.id)} className={`w-full text-left px-4 py-3 rounded-2xl font-bold text-sm ${selectedExamCategory === cat.id ? "shadow-md" : "opacity-60"}`} style={{ background: selectedExamCategory === cat.id ? "var(--surface)" : "transparent", color: selectedExamCategory === cat.id ? "var(--primary)" : "var(--text)" }}>{cat.label}</button>
                 ))}
               </aside>
-              <main className="flex-1 overflow-y-auto p-8 bg-white">
+              <main className="flex-1 overflow-y-auto p-8" style={{ background: "var(--surface)" }}>
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
                   {EXAM_ITEMS.filter(e => e.category === selectedExamCategory).map(exam => (
-                    <button key={exam.id} onClick={() => { sendMessage(exam.message); setExamOpen(false); }} className="p-4 rounded-3xl border bg-surface hover:shadow-md transition-all text-left h-24 flex flex-col justify-between">
+                    <button key={exam.id} onClick={() => { sendMessage(exam.message); setExamOpen(false); }} className="p-4 rounded-3xl border hover:-translate-y-1 transition-all text-left h-24 flex flex-col justify-between" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}>
                       <span className="text-sm font-black">{exam.name}</span>
-                      <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Uygula</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--primary)" }}>Uygula</span>
                     </button>
                   ))}
                 </div>
@@ -607,7 +611,7 @@ export default function CasePageContent() {
         </div>
       )}
 
-      {showDiagnosis && <DiagnosisForm onSubmit={handleDiagnosisSubmit} onClose={() => setShowDiagnosis(false)} />}
+      {showDiagnosis && <DiagnosisForm initialDiagnoses={savedDiagnoses} onSubmit={handleDiagnosisSubmit} onClose={() => setShowDiagnosis(false)} />}
     </div>
   );
 }

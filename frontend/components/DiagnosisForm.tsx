@@ -3,12 +3,13 @@ import { useState } from "react";
 import { X, Plus, Trash2, Loader2, AlertTriangle } from "lucide-react";
 
 interface Props {
+  initialDiagnoses?: string[];
   onSubmit: (diagnoses: string[]) => Promise<void>;
   onClose: () => void;
 }
 
-export default function DiagnosisForm({ onSubmit, onClose }: Props) {
-  const [diagnoses, setDiagnoses] = useState<string[]>([""]);
+export default function DiagnosisForm({ initialDiagnoses, onSubmit, onClose }: Props) {
+  const [diagnoses, setDiagnoses] = useState<string[]>(initialDiagnoses && initialDiagnoses.length > 0 && initialDiagnoses[0] !== "" ? initialDiagnoses : [""]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
