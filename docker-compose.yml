@@ -7,6 +7,7 @@ networks:
 volumes:
   postgres_data:
   redis_data:
+  frontend_next:
 
 services:
   postgres:
@@ -69,10 +70,12 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      - NEXT_PUBLIC_API_URL=https://klinikiq.furkanguven.space/api
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - /app/.next
+      - frontend_next:/app/.next
     networks:
       - klinikiq_net
     depends_on:
