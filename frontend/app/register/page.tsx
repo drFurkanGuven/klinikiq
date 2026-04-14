@@ -47,20 +47,20 @@ export default function RegisterPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
+    <div className="min-h-screen flex flex-col items-center justify-start sm:justify-center px-4 py-8 sm:py-12 relative overflow-y-auto transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* Arka plan efektleri */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--primary)_0%,_transparent_60%)] opacity-10" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-10" style={{ background: "var(--accent)" }} />
-
-      <div className="relative w-full max-w-md">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--primary)_0%,_transparent_60%)] opacity-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--accent)_0%,_transparent_60%)] opacity-10 pointer-events-none" />
+      
+      <div className="relative w-full max-w-md z-10">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg transition-transform hover:scale-105" 
+        <div className="text-center mb-6 sm:mb-8">
+          <Link href="/" className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl mb-3 sm:mb-4 shadow-lg transition-transform hover:scale-105"
             style={{ background: "var(--primary)" }}>
-            <Stethoscope className="w-8 h-8 text-white" />
+            <Stethoscope className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
           </Link>
-          <h1 className="text-3xl font-bold gradient-text">KlinikIQ</h1>
-          <p className="text-sm mt-1 opacity-60 font-medium" style={{ color: "var(--text-muted)" }}>TUS Hazırlık Platformu</p>
+          <h1 className="text-2xl sm:text-3xl font-black gradient-text tracking-tight">KlinikIQ</h1>
+          <p className="text-[10px] sm:text-xs mt-1 opacity-50 font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>Yeni Hesap Oluştur</p>
         </div>
 
         <div className="glass-card p-8 transition-all" style={{ background: "var(--surface)" }}>

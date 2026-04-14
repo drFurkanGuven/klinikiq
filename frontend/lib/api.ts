@@ -18,8 +18,11 @@ export const getBaseUrl = () => {
   return "http://localhost:8000/api";
 };
 
-// İlk yüklemede bir varsayılan belirle ama dinamik kalmasını sağla
+// İlk yüklemede ve her çözümlemede logla
 export const API_URL = getBaseUrl();
+if (typeof window !== "undefined") {
+  console.log("🔍 [KlinikIQ] Resolved API_URL:", API_URL);
+}
 
 // ── API Instance ─────────────────────────────────────────────────────────────
 export const api = axios.create({
