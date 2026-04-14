@@ -51,6 +51,7 @@ services:
       - .env
     volumes:
       - ./backend:/app
+      - ./tiles:/tiles
     networks:
       - klinikiq_net
     depends_on:
@@ -86,6 +87,8 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:80"
+    volumes:
+      - ./tiles:/tiles:ro
     networks:
       - klinikiq_net
     depends_on:

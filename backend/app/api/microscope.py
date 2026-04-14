@@ -40,11 +40,11 @@ def _slugify(text: str) -> str:
 
 
 def _run_vips_dzsave(tiff_path: str, output_base: str) -> None:
-    """Synchronous vips call — runs in thread pool."""
+    """Synchronous vips call — matches convert_to_dzi.py logic."""
     if not shutil.which("vips"):
-        raise RuntimeError("vips bulunamadı")
+        raise RuntimeError("vips bulunamadı. Lütfen 'apt-get install libvips-tools' ile kurun.")
     
-    # 1. DZI Dönüştürme
+    # DZI Dönüştürme (Orijinal Script Ayarları)
     subprocess.run(
         [
             "vips", "dzsave", tiff_path, output_base,
@@ -55,12 +55,15 @@ def _run_vips_dzsave(tiff_path: str, output_base: str) -> None:
         check=True,
     )
     
-    # 2. Thumbnail Üretimi (400px width)
-    thumb_path = f"{output_base}_thumb.jpg"
-    subprocess.run(
-        ["vips", "thumbnail", tiff_path, thumb_path, "400"],
-        check=True,
-    )
+    # Opsiyonel: Thumbnail Üretimi (FE listesi için)
+    try:
+        thumb_path = f"{output_base}_thumb.jpg"
+        subprocess.run(
+            ["vips", "thumbnail", tiff_path, thumb_path, "400"],
+            check=True,
+        )
+    except Exception:
+        pass # Thumbnail kritik değil, DZI oluştuysa devam et
 
 router = APIRouter()
 
