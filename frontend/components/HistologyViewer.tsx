@@ -1,0 +1,367 @@
+"use client";
+import { useEffect, useRef, useState } from "react";
+import Script from "next/script";
+import { microscopyApi, AnnotationOut, AnnotationCreate, HistologyImage } from "@/lib/api";
+import { ZoomIn, ZoomOut, Maximize2, StickyNote, X, Trash2 } from "lucide-react";
+
+declare global {
+  interface Window {
+    OpenSeadragon: (options: Record<string, unknown>) => OSDViewer;
+  }
+}
+
+interface OSDViewer {
+  viewport: { zoomBy: (f: number) => void; goHome: () => void };
+  addHandler: (event: string, cb: () => void) => void;
+  destroy: () => void;
+}
+
+interface Props {
+  image: HistologyImage;
+}
+
+interface PendingAnnotation {
+  x: number; y: number; width: number; height: number;
+  // piksel koordinatları (overlay çizimi için)
+  px: number; py: number; pw: number; ph: number;
+}
+
+const OSD_CDN =
+  "https://cdn.jsdelivr.net/npm/openseadragon@6.0.2/build/openseadragon/openseadragon.min.js";
+
+/**
+ * Wikimedia Commons URL'lerini thumbnail servisine yönlendirir.
+ * Büyük JPEG'ler (5-15MB) tarayıcı canvas limitine takılır;
+ * 2000px thumbnail (~300KB) hem kaliteli hem güvenilir yüklenir.
+ */
+function resolveImageUrl(url: string): string {
+  const m = url.match(
+    /upload\.wikimedia\.org\/wikipedia\/commons\/([0-9a-f]\/[0-9a-f]{2})\/(.+)$/i
+  );
+  if (!m) return url;
+  const [, hash, filename] = m;
+  return `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${filename}/2000px-${filename}`;
+}
+
+export default function HistologyViewer({ image }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const overlayRef   = useRef<HTMLDivElement>(null);
+  const viewerRef    = useRef<OSDViewer | null>(null);
+
+  const [osdReady, setOsdReady]       = useState(false);
+  const [annotations, setAnnotations] = useState<AnnotationOut[]>([]);
+  const [pending, setPending]         = useState<PendingAnnotation | null>(null);
+  const [noteText, setNoteText]       = useState("");
+  const [labelText, setLabelText]     = useState("");
+  const [annotateMode, setAnnotateMode] = useState(false);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState<string | null>(null);
+
+  // Çizim state'i — ref ile sakla, re-render gerektirmiyor
+  const drawStart = useRef<{ x: number; y: number } | null>(null);
+  const selBox    = useRef<HTMLDivElement | null>(null);
+
+  // Annotationları yükle
+  useEffect(() => {
+    microscopyApi
+      .listAnnotations(image.id)
+      .then((res) => setAnnotations(res.data))
+      .catch(() => setAnnotations([]));
+  }, [image.id]);
+
+  // OpenSeadragon başlat
+  useEffect(() => {
+    if (!osdReady || !containerRef.current || !window.OpenSeadragon) return;
+
+    const viewer = window.OpenSeadragon({
+      element: containerRef.current,
+      prefixUrl: "https://cdn.jsdelivr.net/npm/openseadragon@6.0.2/build/openseadragon/images/",
+      tileSources: image.image_url.endsWith(".dzi")
+        ? image.image_url
+        : { type: "image", url: resolveImageUrl(image.image_url) },
+      showNavigator: true,
+      navigatorPosition: "BOTTOM_RIGHT",
+      animationTime: 0.5,
+      blendTime: 0.1,
+      constrainDuringPan: true,
+      maxZoomPixelRatio: 4,
+      minZoomImageRatio: 0.5,
+      visibilityRatio: 0.5,
+      zoomPerClick: 1,
+      gestureSettingsMouse: { clickToZoom: false },
+    });
+
+    viewer.addHandler("open", () => setLoading(false));
+    viewer.addHandler("open-failed", () => {
+      setLoading(false);
+      setError("Görüntü yüklenemedi.");
+    });
+
+    viewerRef.current = viewer;
+    return () => { viewer.destroy(); viewerRef.current = null; };
+  }, [osdReady, image.image_url]);
+
+  // ── Annotation overlay mouse handler'ları ─────────────────────────────
+  // Overlay, OSD'nin tam üstünde yer alır; annotation modunda pointer-events açık
+  const onOverlayMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (!overlayRef.current) return;
+    const rect = overlayRef.current.getBoundingClientRect();
+    drawStart.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+
+    // Canlı seçim kutusu oluştur
+    const box = document.createElement("div");
+    box.style.cssText = `
+      position:absolute; border:2px dashed #3b82f6; background:rgba(59,130,246,0.08);
+      pointer-events:none; z-index:30;
+    `;
+    overlayRef.current.appendChild(box);
+    selBox.current = box;
+  };
+
+  const onOverlayMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!drawStart.current || !selBox.current || !overlayRef.current) return;
+    const rect = overlayRef.current.getBoundingClientRect();
+    const curX = e.clientX - rect.left;
+    const curY = e.clientY - rect.top;
+    const x = Math.min(drawStart.current.x, curX);
+    const y = Math.min(drawStart.current.y, curY);
+    const w = Math.abs(curX - drawStart.current.x);
+    const h = Math.abs(curY - drawStart.current.y);
+    selBox.current.style.left   = `${x}px`;
+    selBox.current.style.top    = `${y}px`;
+    selBox.current.style.width  = `${w}px`;
+    selBox.current.style.height = `${h}px`;
+  };
+
+  const onOverlayMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!drawStart.current || !overlayRef.current) return;
+    const rect = overlayRef.current.getBoundingClientRect();
+    const endX = e.clientX - rect.left;
+    const endY = e.clientY - rect.top;
+    const w = Math.abs(endX - drawStart.current.x);
+    const h = Math.abs(endY - drawStart.current.y);
+
+    // Canlı kutuyu temizle
+    if (selBox.current) { selBox.current.remove(); selBox.current = null; }
+
+    if (w < 12 || h < 12) { drawStart.current = null; return; }
+
+    const x = Math.min(drawStart.current.x, endX);
+    const y = Math.min(drawStart.current.y, endY);
+    drawStart.current = null;
+
+    setPending({
+      x: x / rect.width, y: y / rect.height,
+      width: w / rect.width, height: h / rect.height,
+      px: x, py: y, pw: w, ph: h,
+    });
+    setNoteText("");
+    setLabelText("");
+  };
+
+  const saveAnnotation = async () => {
+    if (!pending || !noteText.trim()) return;
+    const payload: AnnotationCreate = {
+      x: pending.x, y: pending.y, width: pending.width, height: pending.height,
+      label: labelText.trim() || undefined,
+      note: noteText.trim(),
+    };
+    try {
+      const res = await microscopyApi.addAnnotation(image.id, payload);
+      setAnnotations((prev) => [...prev, res.data]);
+      setPending(null);
+      setAnnotateMode(false);
+    } catch { /* sessiz */ }
+  };
+
+  const deleteAnnotation = async (id: string) => {
+    await microscopyApi.deleteAnnotation(image.id, id);
+    setAnnotations((prev) => prev.filter((a) => a.id !== id));
+  };
+
+  return (
+    <>
+      <Script src={OSD_CDN} onLoad={() => setOsdReady(true)} strategy="afterInteractive" />
+
+      <div className="flex flex-col gap-4">
+        {/* Araç çubuğu */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => viewerRef.current?.viewport.zoomBy(1.5)}
+            disabled={annotateMode}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm transition-colors disabled:opacity-40"
+          >
+            <ZoomIn size={15} /> Yaklaştır
+          </button>
+          <button
+            onClick={() => viewerRef.current?.viewport.zoomBy(0.67)}
+            disabled={annotateMode}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm transition-colors disabled:opacity-40"
+          >
+            <ZoomOut size={15} /> Uzaklaştır
+          </button>
+          <button
+            onClick={() => viewerRef.current?.viewport.goHome()}
+            disabled={annotateMode}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm transition-colors disabled:opacity-40"
+          >
+            <Maximize2 size={15} /> Sıfırla
+          </button>
+
+          <button
+            onClick={() => { setAnnotateMode((v) => !v); setPending(null); }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              annotateMode
+                ? "bg-blue-600 text-white ring-2 ring-blue-400"
+                : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+            }`}
+          >
+            <StickyNote size={15} />
+            {annotateMode ? "Çizim modu — Kare çiz" : "Annotation ekle"}
+          </button>
+
+          {annotateMode && (
+            <span className="text-xs text-blue-500 font-medium animate-pulse">
+              Görüntü üzerinde sürükle → kare çiz
+            </span>
+          )}
+        </div>
+
+        {/* Görüntüleyici + overlay katmanı */}
+        <div className="relative rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-black select-none">
+          {(loading || !osdReady) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/80 z-10">
+              <span className="text-white text-sm">
+                {!osdReady ? "Görüntüleyici hazırlanıyor..." : "Görüntü yükleniyor..."}
+              </span>
+            </div>
+          )}
+          {error && (
+            <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/80 z-10">
+              <span className="text-red-400 text-sm">{error}</span>
+            </div>
+          )}
+
+          {/* OpenSeadragon kapsayıcı */}
+          <div ref={containerRef} className="w-full h-[520px]" />
+
+          {/* Annotation çizim overlay'i — sadece annotation modunda aktif */}
+          <div
+            ref={overlayRef}
+            className={`absolute inset-0 z-20 ${
+              annotateMode ? "cursor-crosshair" : "pointer-events-none"
+            }`}
+            onMouseDown={annotateMode ? onOverlayMouseDown : undefined}
+            onMouseMove={annotateMode ? onOverlayMouseMove : undefined}
+            onMouseUp={annotateMode ? onOverlayMouseUp : undefined}
+          >
+            {/* Kaydedilmiş annotation kutuları */}
+            {annotations.map((a) => (
+              <div
+                key={a.id}
+                className="absolute border-2 border-yellow-400 group pointer-events-auto"
+                style={{
+                  left: `${a.x * 100}%`, top: `${a.y * 100}%`,
+                  width: `${a.width * 100}%`, height: `${a.height * 100}%`,
+                }}
+              >
+                {a.label && (
+                  <span className="absolute -top-5 left-0 bg-yellow-400 text-black text-xs px-1 rounded whitespace-nowrap">
+                    {a.label}
+                  </span>
+                )}
+                <div className="hidden group-hover:flex absolute top-full left-0 mt-1 bg-zinc-900 text-white text-xs p-2 rounded-lg shadow-lg max-w-[220px] z-30 whitespace-pre-wrap flex-col gap-1">
+                  <span>{a.note}</span>
+                  <button
+                    onClick={() => deleteAnnotation(a.id)}
+                    className="text-red-400 hover:text-red-300 flex items-center gap-0.5 self-start"
+                  >
+                    <Trash2 size={11} /> sil
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Onay bekleyen (yeni çizilen) kutu */}
+            {pending && (
+              <div
+                className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none"
+                style={{
+                  left: `${pending.x * 100}%`, top: `${pending.y * 100}%`,
+                  width: `${pending.width * 100}%`, height: `${pending.height * 100}%`,
+                }}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Not formu — kare çizildikten sonra açılır */}
+        {pending && (
+          <div className="rounded-xl border-2 border-blue-500 bg-white dark:bg-zinc-900 p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-sm text-blue-600 dark:text-blue-400">
+                Seçili alan için not ekle
+              </span>
+              <button onClick={() => setPending(null)}>
+                <X size={16} className="text-zinc-400 hover:text-zinc-600" />
+              </button>
+            </div>
+            <input
+              autoFocus
+              className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Kısa etiket (örn: Granülom, Glomerül)"
+              value={labelText}
+              onChange={(e) => setLabelText(e.target.value)}
+            />
+            <textarea
+              className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Eğitim notu, patolojik bulgu açıklaması..."
+              rows={3}
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setPending(null)}
+                className="px-4 py-1.5 rounded-lg text-sm border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              >
+                İptal
+              </button>
+              <button
+                onClick={saveAnnotation}
+                disabled={!noteText.trim()}
+                className="px-4 py-1.5 rounded-lg text-sm bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Kaydet
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Annotation listesi */}
+        {annotations.length > 0 && (
+          <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4">
+            <p className="text-sm font-medium mb-3">Notlar ({annotations.length})</p>
+            <ul className="flex flex-col gap-2">
+              {annotations.map((a) => (
+                <li key={a.id} className="flex items-start gap-2 text-sm border-b border-zinc-100 dark:border-zinc-800 pb-2 last:border-0 last:pb-0">
+                  <span className="mt-0.5 w-2 h-2 rounded-full bg-yellow-400 flex-shrink-0" />
+                  <div className="flex-1">
+                    {a.label && (
+                      <span className="font-medium text-yellow-600 dark:text-yellow-400 mr-1">{a.label}:</span>
+                    )}
+                    {a.note}
+                  </div>
+                  <button onClick={() => deleteAnnotation(a.id)} className="text-zinc-400 hover:text-red-400 flex-shrink-0">
+                    <Trash2 size={13} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

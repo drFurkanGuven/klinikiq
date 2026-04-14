@@ -1,0 +1,257 @@
+import asyncio
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from typing import Optional
+
+from app.core.database import get_db
+from app.core.security import get_current_user_id
+from app.models.models import HistologyImage, Annotation, User
+from app.schemas.schemas import (
+    HistologyImageOut,
+    HistologyImageCreate,
+    AnnotationCreate,
+    AnnotationOut,
+)
+
+TILES_DIR = "/tiles"
+
+
+def _slugify(text: str) -> str:
+    text = text.lower()
+    text = re.sub(r"[^\w\s-]", "", text)
+    text = re.sub(r"[\s_-]+", "_", text).strip("_")
+    return text[:60]
+
+
+def _run_vips_dzsave(tiff_path: str, output_base: str) -> None:
+    """Synchronous vips call — runs in thread pool."""
+    if not shutil.which("vips"):
+        raise RuntimeError("vips bulunamadı")
+    result = subprocess.run(
+        [
+            "vips", "dzsave", tiff_path, output_base,
+            "--tile-size", "256",
+            "--overlap", "1",
+            "--suffix", ".jpg[Q=85]",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"vips dzsave başarısız: {result.stderr[:500]}")
+
+router = APIRouter()
+
+
+@router.get("/images", response_model=list[HistologyImageOut])
+async def list_images(
+    case_id: Optional[str] = None,
+    specialty: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(get_current_user_id),
+):
+    """Histolojik görüntü listesi. Vaka veya branşa göre filtrelenebilir."""
+    query = select(HistologyImage).order_by(HistologyImage.created_at.desc())
+    if case_id:
+        query = query.where(HistologyImage.case_id == case_id)
+    if specialty:
+        query = query.where(HistologyImage.specialty == specialty)
+
+    result = await db.execute(query)
+    return result.scalars().all()
+
+
+@router.get("/images/{image_id}", response_model=HistologyImageOut)
+async def get_image(
+    image_id: str,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(get_current_user_id),
+):
+    result = await db.execute(
+        select(HistologyImage).where(HistologyImage.id == image_id)
+    )
+    image = result.scalar_one_or_none()
+    if not image:
+        raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
+    return image
+
+
+@router.post("/images", response_model=HistologyImageOut, status_code=201)
+async def create_image(
+    data: HistologyImageCreate,
+    db: AsyncSession = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    """Yeni histolojik görüntü ekle (sadece admin)."""
+    user_result = await db.execute(select(User).where(User.id == user_id))
+    user = user_result.scalar_one_or_none()
+    if not user or not user.is_admin:
+        raise HTTPException(status_code=403, detail="Yetki gerekli")
+
+    image = HistologyImage(**data.model_dump())
+    db.add(image)
+    await db.commit()
+    await db.refresh(image)
+    return image
+
+
+@router.post("/images/upload", response_model=HistologyImageOut, status_code=201)
+async def upload_tiff_image(
+    file: UploadFile = File(...),
+    title: str = Form(...),
+    description: str = Form(""),
+    specialty: str = Form(""),
+    db: AsyncSession = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    """TIFF dosyasını yükle, DZI'ye dönüştür ve veritabanına ekle (sadece admin)."""
+    user_result = await db.execute(select(User).where(User.id == user_id))
+    user = user_result.scalar_one_or_none()
+    if not user or not user.is_admin:
+        raise HTTPException(status_code=403, detail="Yetki gerekli")
+
+    # Sadece TIFF / genel image formatlarına izin ver
+    allowed = {"image/tiff", "image/tif", "application/octet-stream", "image/jpeg", "image/png"}
+    content_type = file.content_type or ""
+    filename_lower = (file.filename or "").lower()
+    is_tiff = filename_lower.endswith((".tiff", ".tif", ".svs", ".ndpi"))
+    if content_type not in allowed and not is_tiff:
+        raise HTTPException(status_code=400, detail="Desteklenmeyen dosya tipi. TIFF/TIF yükleyin.")
+
+    os.makedirs(TILES_DIR, exist_ok=True)
+    slug = _slugify(title) or "image"
+
+    # Çakışma kontrolü
+    counter = 0
+    while True:
+        name = slug if counter == 0 else f"{slug}_{counter}"
+        dzi_path = os.path.join(TILES_DIR, f"{name}.dzi")
+        if not os.path.exists(dzi_path):
+            break
+        counter += 1
+
+    # Geçici dosyaya kaydet
+    suffix = os.path.splitext(file.filename or "upload.tiff")[1] or ".tiff"
+    tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    try:
+        content = await file.read()
+        tmp_file.write(content)
+        tmp_file.close()
+
+        output_base = os.path.join(TILES_DIR, name)
+
+        # vips'i thread pool'da çalıştır (blocking)
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, _run_vips_dzsave, tmp_file.name, output_base)
+
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    finally:
+        os.unlink(tmp_file.name)
+
+    dzi_url = f"/tiles/{name}.dzi"
+
+    image = HistologyImage(
+        title=title.strip(),
+        description=description.strip() or None,
+        image_url=dzi_url,
+        specialty=specialty or None,
+    )
+    db.add(image)
+    await db.commit()
+    await db.refresh(image)
+    return image
+
+
+@router.delete("/images/{image_id}", status_code=204)
+async def delete_image(
+    image_id: str,
+    db: AsyncSession = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    """Histolojik görüntüyü sil (sadece admin)."""
+    user_result = await db.execute(select(User).where(User.id == user_id))
+    user = user_result.scalar_one_or_none()
+    if not user or not user.is_admin:
+        raise HTTPException(status_code=403, detail="Yetki gerekli")
+
+    result = await db.execute(select(HistologyImage).where(HistologyImage.id == image_id))
+    image = result.scalar_one_or_none()
+    if not image:
+        raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
+
+    await db.delete(image)
+    await db.commit()
+
+
+@router.get("/images/{image_id}/annotations", response_model=list[AnnotationOut])
+async def list_annotations(
+    image_id: str,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(get_current_user_id),
+):
+    """Bir görüntüdeki tüm annotationları getir."""
+    image_result = await db.execute(
+        select(HistologyImage).where(HistologyImage.id == image_id)
+    )
+    if not image_result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
+
+    result = await db.execute(
+        select(Annotation)
+        .where(Annotation.image_id == image_id)
+        .order_by(Annotation.created_at.asc())
+    )
+    return result.scalars().all()
+
+
+@router.post("/images/{image_id}/annotations", response_model=AnnotationOut, status_code=201)
+async def add_annotation(
+    image_id: str,
+    data: AnnotationCreate,
+    db: AsyncSession = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    """Görüntüye annotation ekle."""
+    image_result = await db.execute(
+        select(HistologyImage).where(HistologyImage.id == image_id)
+    )
+    if not image_result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
+
+    annotation = Annotation(image_id=image_id, user_id=user_id, **data.model_dump())
+    db.add(annotation)
+    await db.commit()
+    await db.refresh(annotation)
+    return annotation
+
+
+@router.delete("/images/{image_id}/annotations/{annotation_id}", status_code=204)
+async def delete_annotation(
+    image_id: str,
+    annotation_id: str,
+    db: AsyncSession = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    """Kendi annotationını sil."""
+    result = await db.execute(
+        select(Annotation).where(
+            Annotation.id == annotation_id,
+            Annotation.image_id == image_id,
+        )
+    )
+    annotation = result.scalar_one_or_none()
+    if not annotation:
+        raise HTTPException(status_code=404, detail="Annotation bulunamadı")
+    if annotation.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Sadece kendi annotationını silebilirsin")
+
+    await db.delete(annotation)
+    await db.commit()
