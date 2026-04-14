@@ -45,3 +45,10 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# 🛡️ BULLETPROOF CORS: Sunucudaki .env dosyası listeyi ezse bile, 
+# Android için gereken izinleri zorla ekleyelim.
+required_origins = ["capacitor://localhost", "http://localhost", "https://localhost"]
+for origin in required_origins:
+    if origin not in settings.BACKEND_CORS_ORIGINS:
+        settings.BACKEND_CORS_ORIGINS.append(origin)
