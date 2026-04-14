@@ -74,11 +74,12 @@ async def get_question_stats(
     incorrect = len(attempts) - correct
 
     # Branş bazlı istatistik
+    from sqlalchemy import cast, String
     specialty_result = await db.execute(
-        select(CaseQuestion.specialty, func.count(QuestionAttempt.id), func.sum(QuestionAttempt.is_correct.cast(func.Integer)))
+        select(cast(CaseQuestion.specialty, String), func.count(QuestionAttempt.id), func.sum(QuestionAttempt.is_correct.cast(func.Integer)))
         .join(QuestionAttempt, QuestionAttempt.question_id == CaseQuestion.id)
         .where(QuestionAttempt.user_id == user_id)
-        .group_by(CaseQuestion.specialty)
+        .group_by(cast(CaseQuestion.specialty, String))
     )
     by_specialty = {}
     for specialty, count, correct_count in specialty_result.all():

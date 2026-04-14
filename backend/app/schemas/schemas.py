@@ -172,12 +172,12 @@ class LeaderboardItem(BaseModel):
 
 class StudyNoteItem(BaseModel):
     session_id: str
-    case_title: str
-    specialty: str
-    missed_diagnoses: List[str]
-    pathophysiology_note: Optional[str]
-    tus_reference: Optional[str]
-    created_at: datetime
+    case_title: Optional[str] = "İsimsiz Vaka"
+    specialty: Optional[str] = "Genel"
+    missed_diagnoses: List[str] = []
+    pathophysiology_note: Optional[str] = None
+    tus_reference: Optional[str] = None
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

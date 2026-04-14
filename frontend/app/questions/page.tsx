@@ -325,7 +325,7 @@ export default function QuestionsPage() {
                       style={{
                         width: `${Math.round(data.rate * 100)}%`,
                         background: data.rate >= 0.7 ? "var(--success)" : data.rate >= 0.5 ? "var(--warning)" : "var(--danger)",
-                      }} />
+                      }}></div>
                   </div>
                 </div>
               ))}
