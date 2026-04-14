@@ -74,6 +74,7 @@ async def get_history(
     )
 
     items = []
+    for session, case, report in result.all():
         items.append(HistoryItem(
             session_id=session.id,
             case_title=case.title,
