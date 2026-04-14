@@ -168,13 +168,14 @@ export default function HistologyViewer({ image }: Props) {
     return () => { viewer.destroy(); viewerRef.current = null; };
   }, [osdReady, image.image_url]);
 
-  // ── Annotation overlay mouse handler'ları ─────────────────────────────
-  // Overlay, OSD'nin tam üstünde yer alır; annotation modunda pointer-events açık
-  const onOverlayMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  // ── Annotation overlay mouse/touch handler'ları ─────────────────────────────
+  const onOverlayDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (!overlayRef.current) return;
+    if ("touches" in e && e.touches.length > 1) return;
+    const pos = "touches" in e ? e.touches[0] : e;
+    
     const rect = overlayRef.current.getBoundingClientRect();
-    drawStart.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    drawStart.current = { x: pos.clientX - rect.left, y: pos.clientY - rect.top };
 
     // Canlı seçim kutusu oluştur
     const box = document.createElement("div");
@@ -186,11 +187,13 @@ export default function HistologyViewer({ image }: Props) {
     selBox.current = box;
   };
 
-  const onOverlayMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onOverlayMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!drawStart.current || !selBox.current || !overlayRef.current) return;
+    const pos = "touches" in e ? e.touches[0] : e;
+    
     const rect = overlayRef.current.getBoundingClientRect();
-    const curX = e.clientX - rect.left;
-    const curY = e.clientY - rect.top;
+    const curX = pos.clientX - rect.left;
+    const curY = pos.clientY - rect.top;
     const x = Math.min(drawStart.current.x, curX);
     const y = Math.min(drawStart.current.y, curY);
     const w = Math.abs(curX - drawStart.current.x);
@@ -201,11 +204,12 @@ export default function HistologyViewer({ image }: Props) {
     selBox.current.style.height = `${h}px`;
   };
 
-  const onOverlayMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onOverlayUp = (e: React.MouseEvent | React.TouchEvent) => {
     if (!drawStart.current || !overlayRef.current) return;
+    const pos = "changedTouches" in e ? e.changedTouches[0] : (e as React.MouseEvent);
     const rect = overlayRef.current.getBoundingClientRect();
-    const endX = e.clientX - rect.left;
-    const endY = e.clientY - rect.top;
+    const endX = pos.clientX - rect.left;
+    const endY = pos.clientY - rect.top;
     const w = Math.abs(endX - drawStart.current.x);
     const h = Math.abs(endY - drawStart.current.y);
 
@@ -228,7 +232,6 @@ export default function HistologyViewer({ image }: Props) {
         px: x, py: y, pw: w, ph: h,
       });
     } else {
-        // fallback (should not happen)
         setPending({
           x: x / rect.width, y: y / rect.height,
           width: w / rect.width, height: h / rect.height,
@@ -338,16 +341,19 @@ export default function HistologyViewer({ image }: Props) {
             className="w-full h-[520px]" 
           />
 
-          {/* Annotation çizim overlay'i — sadece annotation modunda aktif */}
-          <div
-            ref={overlayRef}
-            className={`absolute inset-0 z-20 ${
-              annotateMode ? "cursor-crosshair" : "pointer-events-none"
-            }`}
-            onMouseDown={annotateMode ? onOverlayMouseDown : undefined}
-            onMouseMove={annotateMode ? onOverlayMouseMove : undefined}
-            onMouseUp={annotateMode ? onOverlayMouseUp : undefined}
-          >
+            <div
+              ref={overlayRef}
+              className={`absolute inset-0 z-20 ${
+                annotateMode ? "cursor-crosshair" : "pointer-events-none"
+              }`}
+              onMouseDown={annotateMode ? onOverlayDown : undefined}
+              onMouseMove={annotateMode ? onOverlayMove : undefined}
+              onMouseUp={annotateMode ? onOverlayUp : undefined}
+              onTouchStart={annotateMode ? onOverlayDown : undefined}
+              onTouchMove={annotateMode ? onOverlayMove : undefined}
+              onTouchEnd={annotateMode ? onOverlayUp : undefined}
+              style={{ touchAction: annotateMode ? "none" : "auto" }}
+            >
             {/* Kaydedilmiş annotation kutuları */}
             {annotations.map((a) => (
               <div
