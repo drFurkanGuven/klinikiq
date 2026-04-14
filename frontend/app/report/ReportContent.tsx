@@ -65,9 +65,10 @@ export default function ReportPageContent() {
           </button>
           <h1 className="font-bold text-sm uppercase tracking-widest" style={{ color: "var(--text)" }}>Vaka Raporu</h1>
           <div className="flex items-center gap-2 sm:gap-4">
-            <button onClick={handleShare} className="flex items-center gap-2 text-primary font-bold transition-all hover:scale-110 p-2 rounded-2xl bg-primary-light border border-primary-light">
-              <Share2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Paylaş</span>
+            <button onClick={handleShare} className="flex items-center gap-2 text-white font-black transition-all shadow-lg hover:shadow-primary/50 hover:scale-105 active:scale-95 px-4 py-2 rounded-2xl relative overflow-hidden group" style={{ background: "var(--primary)" }}>
+                <div className="absolute inset-0 bg-white/20 w-0 group-hover:w-full transition-all duration-300" />
+              <Share2 className="w-4 h-4 relative z-10" />
+              <span className="hidden sm:inline relative z-10">Raporu Paylaş</span>
             </button>
             <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 text-sm font-bold transition-all hover:scale-105 px-4 py-2 rounded-2xl" style={{ color: "var(--text-muted)" }}>
               <Home className="w-4 h-4" />

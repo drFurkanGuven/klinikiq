@@ -555,26 +555,29 @@ export default function CasePageContent() {
                   {LAB_TESTS.filter(t => (searchQuery ? t.name.toLowerCase().includes(searchQuery.toLowerCase()) : t.category === selectedCategory)).map(test => {
                     const isSelected = selectedLabs.includes(test.id);
                     return (
-                      <button key={test.id} onClick={() => toggleLab(test.id, test.price)} className={`p-4 rounded-3xl border transition-all text-left h-28 flex flex-col justify-between ${isSelected ? "bg-primary-light border-primary" : "bg-surface"}`}>
+                      <button key={test.id} onClick={() => toggleLab(test.id, test.price)} className={`p-4 rounded-3xl border transition-all text-left h-28 flex flex-col justify-between hover:scale-105 active:scale-95 shadow-sm`} style={{ background: isSelected ? "var(--primary-light)" : "var(--surface)", borderColor: isSelected ? "var(--primary)" : "var(--border)", color: "var(--text)" }}>
                         <span className="text-sm font-black">{test.name}</span>
-                        <span className="text-xs font-bold opacity-60">{test.price} ₺</span>
+                        <span className="text-xs font-bold opacity-80" style={{ color: "var(--primary)" }}>{test.price} ₺</span>
                       </button>
                     );
                   })}
                 </div>
               </main>
-              <aside className="w-80 border-l flex flex-col bg-surface-2">
-                <div className="p-6 border-b font-black text-xs uppercase tracking-widest">Sepet ({selectedLabs.length})</div>
+              <aside className="w-80 border-l flex flex-col" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                <div className="p-6 border-b font-black text-xs uppercase tracking-widest" style={{ borderColor: "var(--border)" }}>Sepet ({selectedLabs.length})</div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-2">
                   {selectedLabs.map(id => (
-                    <div key={id} className="p-3 bg-white rounded-xl border flex justify-between items-center text-xs font-bold">
+                    <div key={id} className="p-3 rounded-xl border flex justify-between items-center text-xs font-bold shadow-sm transition-all" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
                       <span className="truncate pr-2">{LAB_TESTS.find(t => t.id === id)?.name}</span>
-                      <button onClick={() => toggleLab(id, 0)} className="text-red-500"><Trash className="w-4 h-4" /></button>
+                      <button onClick={() => toggleLab(id, 0)} className="text-danger hover:scale-110 active:scale-95 transition-transform"><Trash className="w-4 h-4" /></button>
                     </div>
                   ))}
                 </div>
-                <div className="p-6 border-t bg-white">
-                   <button onClick={orderLabs} disabled={selectedLabs.length === 0} className="w-full bg-primary text-white font-black py-4 rounded-2xl shadow-xl">Tetkikleri İste</button>
+                <div className="p-6 border-t" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+                   <button onClick={orderLabs} disabled={selectedLabs.length === 0} className="w-full text-white font-black py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 flex justify-center items-center gap-2 group relative overflow-hidden" style={{ background: "var(--primary)" }}>
+                        <div className="absolute inset-0 bg-white/20 w-0 group-hover:w-full transition-all duration-300" />
+                        Tetkikleri İste
+                   </button>
                 </div>
               </aside>
             </div>
