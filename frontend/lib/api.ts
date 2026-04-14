@@ -47,7 +47,7 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+// export default api; (Moved to end)
 
 // ── Typed API calls ──────────────────────────────────────────────────────────
 
@@ -236,3 +236,76 @@ export const adminApi = {
   updateLimit: (userId: string, limit: number) =>
     api.put(`/admin/users/${userId}/limit`, { daily_limit: limit }),
 };
+
+// ── Histoloji ─────────────────────────────────────────────────────────────────
+
+export interface HistologyImage {
+  id: string;
+  case_id?: string;
+  title: string;
+  description?: string;
+  image_url: string;
+  thumbnail_url?: string;
+  specialty?: string;
+  created_at: string;
+}
+
+export interface AnnotationOut {
+  id: string;
+  image_id: string;
+  user_id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  label?: string;
+  note: string;
+  created_at: string;
+}
+
+export interface AnnotationCreate {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  label?: string;
+  note: string;
+}
+
+export const microscopyApi = {
+  listImages: (params?: { case_id?: string; specialty?: string }) =>
+    api.get<HistologyImage[]>("/microscope/images", { params }),
+  getImage: (id: string) =>
+    api.get<HistologyImage>(`/microscope/images/${id}`),
+  createImage: (data: Omit<HistologyImage, "id" | "created_at">) =>
+    api.post<HistologyImage>("/microscope/images", data),
+  uploadTiff: (
+    file: File,
+    meta: { title: string; description?: string; specialty?: string },
+    onProgress?: (pct: number) => void,
+  ) => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("title", meta.title);
+    form.append("description", meta.description ?? "");
+    form.append("specialty", meta.specialty ?? "");
+    return api.post<HistologyImage>("/microscope/images/upload", form, {
+      headers: { "Content-Type": undefined }, // axios FormData boundary'i otomatik ekler
+      onUploadProgress: (e) => {
+        if (onProgress && e.total) onProgress(Math.round((e.loaded / e.total) * 100));
+      },
+      timeout: 600_000, // 10 dk — büyük dosya + dönüşüm
+    });
+  },
+  listAnnotations: (image_id: string) =>
+    api.get<AnnotationOut[]>(`/microscope/images/${image_id}/annotations`),
+  addAnnotation: (image_id: string, data: AnnotationCreate) =>
+    api.post<AnnotationOut>(`/microscope/images/${image_id}/annotations`, data),
+  deleteAnnotation: (image_id: string, annotation_id: string) =>
+    api.delete(`/microscope/images/${image_id}/annotations/${annotation_id}`),
+  deleteImage: (image_id: string) =>
+    api.delete(`/microscope/images/${image_id}`),
+};
+
+// ── Default Export ───────────────────────────────────────────────────────────
+export default api;

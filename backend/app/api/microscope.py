@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import Optional
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_current_user_id
 from app.models.models import HistologyImage, Annotation, User
@@ -20,7 +21,15 @@ from app.schemas.schemas import (
     AnnotationOut,
 )
 
-TILES_DIR = "/tiles"
+# Redis client placeholder
+try:
+    import redis.asyncio as redis
+    redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+except ImportError:
+    redis_client = None
+
+CACHE_KEY_LIST = "microscope:images:list"
+CACHE_TTL = 3600  # 1 hour
 
 
 def _slugify(text: str) -> str:
@@ -34,18 +43,24 @@ def _run_vips_dzsave(tiff_path: str, output_base: str) -> None:
     """Synchronous vips call — runs in thread pool."""
     if not shutil.which("vips"):
         raise RuntimeError("vips bulunamadı")
-    result = subprocess.run(
+    
+    # 1. DZI Dönüştürme
+    subprocess.run(
         [
             "vips", "dzsave", tiff_path, output_base,
             "--tile-size", "256",
             "--overlap", "1",
             "--suffix", ".jpg[Q=85]",
         ],
-        capture_output=True,
-        text=True,
+        check=True,
     )
-    if result.returncode != 0:
-        raise RuntimeError(f"vips dzsave başarısız: {result.stderr[:500]}")
+    
+    # 2. Thumbnail Üretimi (400px width)
+    thumb_path = f"{output_base}_thumb.jpg"
+    subprocess.run(
+        ["vips", "thumbnail", tiff_path, thumb_path, "400"],
+        check=True,
+    )
 
 router = APIRouter()
 
@@ -58,6 +73,13 @@ async def list_images(
     _: str = Depends(get_current_user_id),
 ):
     """Histolojik görüntü listesi. Vaka veya branşa göre filtrelenebilir."""
+    # Cache kontrolü
+    if redis_client and not case_id and not specialty:
+        cached = await redis_client.get(CACHE_KEY_LIST)
+        if cached:
+            import json
+            return json.loads(cached)
+
     query = select(HistologyImage).order_by(HistologyImage.created_at.desc())
     if case_id:
         query = query.where(HistologyImage.case_id == case_id)
@@ -65,7 +87,19 @@ async def list_images(
         query = query.where(HistologyImage.specialty == specialty)
 
     result = await db.execute(query)
-    return result.scalars().all()
+    images = result.scalars().all()
+    
+    # Cache kayıt
+    if redis_client and not case_id and not specialty:
+        import json
+        from fastapi.encoders import jsonable_encoder
+        await redis_client.setex(
+            CACHE_KEY_LIST, 
+            CACHE_TTL, 
+            json.dumps(jsonable_encoder(images))
+        )
+    
+    return images
 
 
 @router.get("/images/{image_id}", response_model=HistologyImageOut)
@@ -125,14 +159,14 @@ async def upload_tiff_image(
     if content_type not in allowed and not is_tiff:
         raise HTTPException(status_code=400, detail="Desteklenmeyen dosya tipi. TIFF/TIF yükleyin.")
 
-    os.makedirs(TILES_DIR, exist_ok=True)
+    os.makedirs(settings.TILES_DIR, exist_ok=True)
     slug = _slugify(title) or "image"
 
     # Çakışma kontrolü
     counter = 0
     while True:
         name = slug if counter == 0 else f"{slug}_{counter}"
-        dzi_path = os.path.join(TILES_DIR, f"{name}.dzi")
+        dzi_path = os.path.join(settings.TILES_DIR, f"{name}.dzi")
         if not os.path.exists(dzi_path):
             break
         counter += 1
@@ -145,7 +179,7 @@ async def upload_tiff_image(
         tmp_file.write(content)
         tmp_file.close()
 
-        output_base = os.path.join(TILES_DIR, name)
+        output_base = os.path.join(settings.TILES_DIR, name)
 
         # vips'i thread pool'da çalıştır (blocking)
         loop = asyncio.get_event_loop()
@@ -157,11 +191,17 @@ async def upload_tiff_image(
         os.unlink(tmp_file.name)
 
     dzi_url = f"/tiles/{name}.dzi"
+    thumb_url = f"/tiles/{name}_thumb.jpg"
+
+    # Cache geçersiz kılma
+    if redis_client:
+        await redis_client.delete(CACHE_KEY_LIST)
 
     image = HistologyImage(
         title=title.strip(),
         description=description.strip() or None,
         image_url=dzi_url,
+        thumbnail_url=thumb_url,
         specialty=specialty or None,
     )
     db.add(image)

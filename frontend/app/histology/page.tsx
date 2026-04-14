@@ -59,6 +59,12 @@ export default function HistologyPage() {
     }
   };
 
+  const resolveImageUrl = (url?: string | null) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors">
       {/* Navbar */}
@@ -122,7 +128,7 @@ export default function HistologyPage() {
                     >
                       {img.thumbnail_url ? (
                         <img
-                          src={img.thumbnail_url}
+                          src={resolveImageUrl(img.thumbnail_url)}
                           alt=""
                           className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                         />

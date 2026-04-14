@@ -251,21 +251,51 @@ export default function AdminDashboardPage() {
             </div>
         </div>
 
-        {/* Histoloji Image Upload Section */}
-        <div className="glass rounded-[2rem] border shadow-xl p-8 mt-12 transition-all" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
-                       <span style={{ fontSize: "1.2rem" }}>🔬</span>
+        {/* Histology Image Management Section */}
+        <div id="image-management" className="glass rounded-[2rem] border shadow-xl p-8 mt-12 transition-all relative overflow-hidden" 
+             style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+            
+            {/* Background Decorative Element */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8 relative z-10">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-transform hover:rotate-12" 
+                         style={{ background: "var(--primary)", color: "white" }}>
+                       <Microscope className="w-6 h-6" />
                     </div>
                     <div>
-                       <h2 className="text-xl font-black">Histoloji Görüntüsü Yükle</h2>
-                       <p className="text-sm font-medium opacity-60" style={{ color: "var(--text-muted)" }}>Mikroskop arayüzü için yeni doku örnekleri ekleyin.</p>
+                       <h2 className="text-2xl font-black tracking-tight">Görüntü Arşivi Yönetimi</h2>
+                       <p className="text-sm font-medium opacity-60" style={{ color: "var(--text-muted)" }}>Mikroskop ve Histoloji sistemi için yeni vakalar ekleyin.</p>
                     </div>
                 </div>
-                <div className="flex gap-2 p-1.5 rounded-2xl border shadow-inner w-fit" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
-                    <button onClick={() => setUploadTab("tiff")} className={`px-5 py-2 text-sm font-bold transition-all rounded-xl ${uploadTab === "tiff" ? "shadow-md" : "opacity-60"}`} style={{ background: uploadTab === "tiff" ? "var(--surface)" : "transparent", color: uploadTab === "tiff" ? "var(--primary)" : "var(--text)", borderColor: uploadTab === "tiff" ? "var(--border)" : "transparent", borderWidth: 1 }}>TIFF Yükle</button>
-                    <button onClick={() => setUploadTab("url")} className={`px-5 py-2 text-sm font-bold transition-all rounded-xl ${uploadTab === "url" ? "shadow-md" : "opacity-60"}`} style={{ background: uploadTab === "url" ? "var(--surface)" : "transparent", color: uploadTab === "url" ? "var(--primary)" : "var(--text)", borderColor: uploadTab === "url" ? "var(--border)" : "transparent", borderWidth: 1 }}>URL İle Ekle</button>
+                
+                <div className="flex p-1.5 rounded-2xl border shadow-inner w-fit" 
+                     style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                    <button 
+                        onClick={() => setUploadTab("tiff")} 
+                        className={`flex items-center gap-2 px-6 py-2.5 text-sm font-black transition-all rounded-xl ${uploadTab === "tiff" ? "shadow-md scale-105" : "opacity-40 hover:opacity-100"}`} 
+                        style={{ 
+                            background: uploadTab === "tiff" ? "var(--surface)" : "transparent", 
+                            color: uploadTab === "tiff" ? "var(--primary)" : "var(--text)",
+                            borderColor: uploadTab === "tiff" ? "var(--border)" : "transparent",
+                            borderWidth: 1 
+                        }}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${uploadTab === "tiff" ? "bg-primary animate-pulse" : "bg-current"}`} />
+                        TIFF Yükle
+                    </button>
+                    <button 
+                        onClick={() => setUploadTab("url")} 
+                        className={`flex items-center gap-2 px-6 py-2.5 text-sm font-black transition-all rounded-xl ${uploadTab === "url" ? "shadow-md scale-105" : "opacity-40 hover:opacity-100"}`} 
+                        style={{ 
+                            background: uploadTab === "url" ? "var(--surface)" : "transparent", 
+                            color: uploadTab === "url" ? "var(--primary)" : "var(--text)",
+                            borderColor: uploadTab === "url" ? "var(--border)" : "transparent",
+                            borderWidth: 1 
+                        }}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${uploadTab === "url" ? "bg-primary animate-pulse" : "bg-current"}`} />
+                        URL İle Ekle
+                    </button>
                 </div>
             </div>
             
@@ -282,86 +312,160 @@ export default function AdminDashboardPage() {
                     const description = (form.description as HTMLInputElement).value;
                     const specialty = (form.specialty as HTMLSelectElement).value;
                     
+                    // Önce bir yetki tazelemesi yapalım (401 hatasını önlemek için)
+                    try { await authApi.me(); } catch (e) { console.warn("Token refresh failed, re-login might be needed."); }
+
                     if (uploadTab === "tiff") {
                         const fileInput = form.file as HTMLInputElement;
                         const file = fileInput.files?.[0];
-                        if (!file) { alert("Lütfen bir dosya seçin."); setIsUploading(false); return; }
+                        if (!file) throw new Error("Lütfen bir dosya seçin.");
                         
+                        // microscopyApi kullanılarak standart api interceptor'ları devreye girer
                         await microscopyApi.uploadTiff(file, { title, description, specialty }, (pct) => setUploadProgress(pct));
                     } else {
                         const imageUrl = (form.image_url as HTMLInputElement).value;
-                        if (!imageUrl) { alert("Lütfen URL girin."); setIsUploading(false); return; }
+                        if (!imageUrl) throw new Error("Lütfen URL girin.");
                         await microscopyApi.createImage({ title, description, specialty, image_url: imageUrl });
                         setUploadProgress(100);
                     }
                     
                     setTimeout(() => {
-                        alert("Görüntü başarıyla eklendi / işlendi!");
+                        alert("Görüntü başarıyla sisteme eklendi!");
                         form.reset();
                         setIsUploading(false);
                         setUploadProgress(-1);
-                    }, 500);
+                    }, 800);
                 } catch (err: any) {
                     setIsUploading(false);
                     setUploadProgress(-1);
-                    console.error(err);
-                    alert("Yükleme başarısız: " + (err.response?.data?.detail || err.message));
+                    console.error("Upload Error:", err);
+                    const errorMsg = err.response?.data?.detail || err.message || "Bilinmeyen bir hata oluştu.";
+                    alert("⚠️ İşlem Başarısız: " + errorMsg);
                 }
-            }} className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+            }} className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
                 
-                <div className="space-y-4">
-                    {uploadTab === "tiff" ? (
-                        <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Görüntü Dosyası (.tiff, .svs)</label>
-                            <input name="file" type="file" accept=".tiff,.tif,.svs,.jpg,.png" required={uploadTab === "tiff"} disabled={isUploading} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 outline-none transition-all font-medium disabled:opacity-50" />
-                            <p className="mt-2 text-xs opacity-50 font-medium">* Dosya boyutu büyük olabilir, yükleme ve DZI dönüştürme işlemi 1-2 dakika sürebilir.</p>
+                <div className="space-y-6">
+                    <div className="space-y-4">
+                        {uploadTab === "tiff" ? (
+                            <div className="group transition-all">
+                                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50 group-focus-within:opacity-100 group-focus-within:text-primary transition-all">
+                                    Histoloji Dosyası (.tiff, .svs)
+                                </label>
+                                <div className="relative group/input">
+                                    <input 
+                                        name="file" 
+                                        type="file" 
+                                        accept=".tiff,.tif,.svs,.jpg,.png" 
+                                        required={uploadTab === "tiff"} 
+                                        disabled={isUploading} 
+                                        className="w-full text-xs file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:tracking-widest file:bg-primary file:text-white hover:file:opacity-90 file:cursor-pointer outline-none transition-all font-bold disabled:opacity-50 p-1 rounded-2xl border-2 border-dashed border-border hover:border-primary-light" 
+                                    />
+                                </div>
+                                <p className="mt-3 text-[10px] opacity-40 leading-relaxed font-bold">
+                                    * TIFF/SVS dosyaları sunucu tarafında DZI formatına dönüştürülür. Bu işlem dosya boyutuna bağlı olarak 1-5 dakika sürebilir.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="group transition-all">
+                                <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50 group-focus-within:opacity-100 group-focus-within:text-primary transition-all">
+                                    Doğrudan Görüntü / DZI URL
+                                </label>
+                                <input 
+                                    name="image_url" 
+                                    type="url" 
+                                    required={uploadTab === "url"} 
+                                    disabled={isUploading} 
+                                    className="w-full rounded-2xl px-5 py-4 text-sm font-bold border focus:ring-4 transition-all outline-none disabled:opacity-50 shadow-sm" 
+                                    style={{ background: "var(--bg)", borderColor: "var(--border)", "--tw-ring-color": "var(--primary-light)" } as any} 
+                                    placeholder="https://example.com/histology.jpg" 
+                                />
+                            </div>
+                        )}
+                        
+                        <div className="group transition-all">
+                            <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50 group-focus-within:opacity-100 group-focus-within:text-primary transition-all">
+                                Görüntü Başlığı (Vaka İsmi)
+                            </label>
+                            <input 
+                                name="title_input" 
+                                type="text" 
+                                required 
+                                disabled={isUploading} 
+                                className="w-full rounded-2xl px-5 py-4 text-sm font-bold border focus:ring-4 transition-all outline-none disabled:opacity-50 shadow-sm" 
+                                style={{ background: "var(--bg)", borderColor: "var(--border)", "--tw-ring-color": "var(--primary-light)" } as any} 
+                                placeholder="Örn: Akut Glomerülonefrit" 
+                            />
                         </div>
-                    ) : (
-                        <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Görüntü URL (veya .dzi Linki)</label>
-                            <input name="image_url" type="url" required={uploadTab === "url"} disabled={isUploading} className="w-full rounded-xl px-4 py-3 text-sm border focus:ring-2 transition-all outline-none disabled:opacity-50" style={{ background: "var(--bg)", borderColor: "var(--border)" }} placeholder="Örn: https://upload.wikimedia..." />
-                        </div>
-                    )}
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Görüntü Başlığı</label>
-                        <input name="title_input" type="text" required disabled={isUploading} className="w-full rounded-xl px-4 py-3 text-sm border focus:ring-2 transition-all outline-none disabled:opacity-50" style={{ background: "var(--bg)", borderColor: "var(--border)" }} placeholder="Örn: Renal Hücreli Karsinom" />
                     </div>
                 </div>
 
-                <div className="space-y-4 flex flex-col justify-between">
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Branş</label>
-                        <select name="specialty" disabled={isUploading} className="w-full rounded-xl px-4 py-3 text-sm border outline-none disabled:opacity-50" style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
-                            <option value="pathology">Genel Patoloji</option>
-                            <option value="nephrology">Nefroloji</option>
-                            <option value="pulmonology">Pulmonoloji</option>
-                            <option value="neurology">Nöroloji</option>
-                            <option value="endocrinology">Endokrinoloji</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Açıklama (Opsiyonel)</label>
-                        <textarea name="description" rows={2} disabled={isUploading} className="w-full rounded-xl px-4 py-3 text-sm border outline-none resize-none disabled:opacity-50" style={{ background: "var(--bg)", borderColor: "var(--border)" }} placeholder="Görüntü detayları veya vaka ipuçları..."></textarea>
-                    </div>
-                    
-                    {isUploading && uploadProgress >= 0 && uploadTab === "tiff" && (
-                        <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-3 mb-2 overflow-hidden relative">
-                            <div className="h-full rounded-full transition-all duration-300 relative flex items-center justify-end pr-2 overflow-hidden" 
-                                style={{ width: `${uploadProgress}%`, background: "var(--primary)" }}>
-                                <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                            </div>
-                            <span className="absolute inset-0 flex items-center justify-center text-[9px] font-black mix-blend-difference text-white">{uploadProgress}%</span>
+                <div className="space-y-6 flex flex-col justify-between">
+                    <div className="space-y-6">
+                        <div className="group transition-all">
+                            <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50">Tıbbi Branş</label>
+                            <select 
+                                name="specialty" 
+                                disabled={isUploading} 
+                                className="w-full rounded-2xl px-5 py-4 text-sm font-bold border outline-none disabled:opacity-50 appearance-none shadow-sm cursor-pointer" 
+                                style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
+                                <option value="pathology">Genel Patoloji</option>
+                                <option value="nephrology">Nefroloji / Böbrek</option>
+                                <option value="pulmonology">Pulmonoloji / Akciğer</option>
+                                <option value="neurology">Nöroloji / Beyin</option>
+                                <option value="endocrinology">Endokrinoloji</option>
+                                <option value="cardiology">Kardiyoloji</option>
+                            </select>
                         </div>
-                    )}
+                        
+                        <div className="group transition-all">
+                            <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50">Öğrenci İçin Açıklama</label>
+                            <textarea 
+                                name="description" 
+                                rows={2} 
+                                disabled={isUploading} 
+                                className="w-full rounded-2xl px-5 py-4 text-sm font-bold border outline-none resize-none disabled:opacity-50 shadow-sm" 
+                                style={{ background: "var(--bg)", borderColor: "var(--border)" }} 
+                                placeholder="Vaka hakkında kısa bir klinik bilgi veya preparat notu..."></textarea>
+                        </div>
+                    </div>
                     
-                    <button type="submit" disabled={isUploading} className={`w-full py-3.5 rounded-xl text-sm font-black text-white transition-all outline-none flex items-center justify-center gap-2 ${isUploading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02] active:scale-95 shadow-md hover:shadow-lg"}`} style={{ background: "var(--primary)" }}>
-                        {isUploading ? (
-                           <>
-                             <Loader2 className="w-4 h-4 animate-spin" />
-                             {uploadTab === "tiff" ? (uploadProgress >= 100 ? "İşleniyor..." : "Yükleniyor...") : "Kaydediliyor..."}
-                           </>
-                        ) : uploadTab === "tiff" ? "TIFF Yükle ve Dönüştür" : "URL ile Ekle"}
-                    </button>
+                    <div className="space-y-4">
+                        {isUploading && uploadProgress >= 0 && uploadTab === "tiff" && (
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest px-1">
+                                    <span className="opacity-50">{uploadProgress >= 100 ? "SİSTEM İŞLİYOR..." : "DOSYA YÜKLENİYOR..."}</span>
+                                    <span style={{ color: "var(--primary)" }}>%{uploadProgress}</span>
+                                </div>
+                                <div className="w-full bg-black/5 dark:bg-white/5 rounded-full h-4 p-1 border shadow-inner overflow-hidden relative" style={{ borderColor: "var(--border)" }}>
+                                    <div className="h-full rounded-full transition-all duration-500 relative flex items-center justify-end pr-2 overflow-hidden shadow-lg" 
+                                        style={{ width: `${uploadProgress}%`, background: "var(--primary)" }}>
+                                        <div className="absolute inset-0 bg-white/25 animate-pulse" />
+                                        <div className="absolute inset-0 translate-x-[-100%] animate-[shimmer_2s_infinite]" 
+                                             style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)" }} />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        
+                        <button 
+                            type="submit" 
+                            disabled={isUploading} 
+                            className={`w-full py-5 rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] text-white transition-all outline-none flex items-center justify-center gap-3 relative overflow-hidden group/btn ${isUploading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02] active:scale-95 shadow-xl hover:shadow-primary/20"}`} 
+                            style={{ background: "var(--primary)" }}>
+                            <div className="absolute inset-0 bg-white/10 w-0 group-hover/btn:w-full transition-all duration-300 pointer-events-none" />
+                            {isUploading ? (
+                               <>
+                                 <Loader2 className="w-5 h-5 animate-spin" />
+                                 <span>{uploadTab === "tiff" ? (uploadProgress >= 100 ? "DÖNÜŞTÜRÜLÜYOR" : "YÜKLENİYOR") : "KAYDEDİLİYOR"}</span>
+                               </>
+                            ) : (
+                                <>
+                                    <Save className="w-4 h-4" />
+                                    <span>{uploadTab === "tiff" ? "TIFF VERİSİNİ İŞLE" : "URL İLE ARŞİVE EKLE"}</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

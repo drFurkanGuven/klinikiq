@@ -1,6 +1,10 @@
-FROM python:3.11-slim
-
-WORKDIR /app
+# Sistem bağımlılıkları (libvips için)
+RUN apt-get update && apt-get install -y \
+    libvips-dev \
+    libvips \
+    gcc \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Bağımlılıklar önce (cache optimizasyonu)
 COPY requirements.txt .

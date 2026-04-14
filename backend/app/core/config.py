@@ -5,7 +5,11 @@ import json
 
 class Settings(BaseSettings):
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://klinikiq:password@postgres:5432/klinikiq"
+    # Database
+    DATABASE_URL: str
+
+    # Paths
+    TILES_DIR: str = "/tiles"
 
     # Redis
     REDIS_URL: str = "redis://redis:6379/0"

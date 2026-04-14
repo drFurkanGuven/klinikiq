@@ -32,6 +32,8 @@ app.add_middleware(
 )
 
 # Rotalar
+from fastapi.staticfiles import StaticFiles
+
 app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(cases.router, prefix="/api/cases", tags=["Cases"])
 app.include_router(sessions.router, prefix="/api/sessions", tags=["Sessions"])
@@ -41,6 +43,12 @@ app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(flashcards.router, prefix="/api/flashcards", tags=["Flashcards"])
 app.include_router(questions.router, prefix="/api/questions", tags=["Questions"])
 app.include_router(microscope.router, prefix="/api/microscope", tags=["Microscope"])
+
+# Statik dosyalar (tiles ve önizlemeler)
+if not os.path.exists(settings.TILES_DIR):
+    os.makedirs(settings.TILES_DIR, exist_ok=True)
+
+app.mount("/tiles", StaticFiles(directory=settings.TILES_DIR), name="tiles")
 
 
 @app.get("/health", tags=["Health"])

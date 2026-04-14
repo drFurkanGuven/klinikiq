@@ -14,10 +14,25 @@ build/
 *.egg-info/
 postgres_data/
 redis_data/
+# Local Storage
+tiles/
+uploads/
+
+# AI Tools
+.aider*
+.claude/
+.gemini/
+
+# OS
 .DS_Store
-*.jsonl
+
+# Mobile
+frontend/android/
+frontend/ios/
+frontend/capacitor.config.ts
+
+# SQL & Data
 *.sql
-klinikiq_db_yedek.sql
-klinikiq_db_saf_sql.sql
-cases_ready.jsonl
-medqa_finetune_train_TR.jsonl
+*.jsonl
+postgres_data/
+redis_data/
