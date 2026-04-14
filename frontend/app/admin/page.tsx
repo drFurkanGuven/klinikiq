@@ -247,6 +247,89 @@ export default function AdminDashboardPage() {
             </div>
         </div>
 
+        {/* TIFF Upload Section */}
+        <div className="glass rounded-[2rem] border shadow-xl p-8 mt-12 transition-all" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+            <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                   <span style={{ fontSize: "1.2rem" }}>🔬</span>
+                </div>
+                <div>
+                   <h2 className="text-xl font-black">Histoloji Görüntüsü Yükle (TIFF)</h2>
+                   <p className="text-sm font-medium opacity-60" style={{ color: "var(--text-muted)" }}>Yüksek çözünürlüklü .tiff dosyalarınızı yükleyerek mikroskop arayüzüne ekleyin.</p>
+                </div>
+            </div>
+            
+            <form onSubmit={async (e) => {
+                e.preventDefault();
+                const form = e.target as HTMLFormElement;
+                const fileInput = form.file as HTMLInputElement;
+                const file = fileInput.files?.[0];
+                if (!file) return alert("Lütfen bir dosya seçin.");
+                
+                try {
+                    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+                    const originalText = btn.innerText;
+                    btn.innerText = "Yükleniyor ve Dönüştürülüyor... Lütfen bekleyin";
+                    btn.disabled = true;
+                    
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    formData.append("title", (form.title_input as HTMLInputElement).value);
+                    formData.append("description", (form.description as HTMLInputElement).value);
+                    formData.append("specialty", (form.specialty as HTMLSelectElement).value);
+                    
+                    const token = localStorage.getItem("access_token");
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/microscope/images/upload`, {
+                        method: "POST",
+                        headers: { "Authorization": `Bearer ${token}` },
+                        body: formData
+                    });
+                    
+                    if (!res.ok) throw new Error(await res.text());
+                    
+                    alert("Resim başarıyla yüklendi ve işlendi!");
+                    form.reset();
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                } catch (err: any) {
+                    alert("Yükleme başarısız: " + err.message);
+                    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+                    btn.innerText = "Yükle";
+                    btn.disabled = false;
+                }
+            }} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Görüntü Dosyası (.tiff)</label>
+                        <input name="file" type="file" accept=".tiff,.tif,.svs,.jpg,.png" required className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 transition-all font-medium" />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Görüntü Başlığı</label>
+                        <input name="title_input" type="text" required className="w-full rounded-xl px-4 py-3 text-sm border focus:ring-2 transition-all outline-none" style={{ background: "var(--bg)", borderColor: "var(--border)" }} placeholder="Örn: Renal Hücreli Karsinom" />
+                    </div>
+                </div>
+                <div className="space-y-4 flex flex-col justify-between">
+                    <div className="flex gap-4">
+                        <div className="flex-1">
+                            <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Branş</label>
+                            <select name="specialty" className="w-full rounded-xl px-4 py-3 text-sm border outline-none" style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
+                                <option value="pathology">Genel Patoloji</option>
+                                <option value="nephrology">Nefroloji</option>
+                                <option value="pulmonology">Pulmonoloji</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Açıklama (Opsiyonel)</label>
+                        <textarea name="description" rows={2} className="w-full rounded-xl px-4 py-3 text-sm border outline-none resize-none" style={{ background: "var(--bg)", borderColor: "var(--border)" }} placeholder="Görüntü detayları..."></textarea>
+                    </div>
+                    <button type="submit" className="w-full py-3.5 rounded-xl text-sm font-black text-white hover:opacity-90 active:scale-95 transition-all outline-none" style={{ background: "var(--primary)" }}>
+                        Görüntüyü Yükle ve Dönüştür
+                    </button>
+                </div>
+            </form>
+        </div>
+
       </main>
       <Footer />
     </div>
