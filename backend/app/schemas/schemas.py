@@ -253,3 +253,52 @@ class FlashcardStatsOut(BaseModel):
     new: int
     learning: int
     known: int
+
+
+# ── Histology & Microscope ───────────────────────────────────────────────────
+
+class HistologyImageCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    image_url: str
+    thumbnail_url: Optional[str] = None
+    specialty: Optional[str] = None
+
+
+class HistologyImageOut(BaseModel):
+    id: str
+    case_id: Optional[str] = None
+    title: str
+    description: Optional[str] = None
+    image_url: str
+    thumbnail_url: Optional[str] = None
+    specialty: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class AnnotationCreate(BaseModel):
+    x: float
+    y: float
+    width: float
+    height: float
+    label: Optional[str] = None
+    note: str
+
+
+class AnnotationOut(BaseModel):
+    id: str
+    image_id: str
+    user_id: str
+    x: float
+    y: float
+    width: float
+    height: float
+    label: Optional[str] = None
+    note: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
