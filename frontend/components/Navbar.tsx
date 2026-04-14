@@ -58,6 +58,20 @@ export default function Navbar() {
             onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}>
             Liderlik
           </Link>
+          <Link href="/histology"
+            className="text-sm font-medium transition-colors"
+            style={{ color: "var(--text-muted)" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "var(--primary)")}
+            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}>
+            Histoloji
+          </Link>
+          <Link href="/sinir-lezyon"
+            className="text-sm font-medium transition-colors"
+            style={{ color: "var(--text-muted)" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "var(--primary)")}
+            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}>
+            Nöroloji
+          </Link>
 
           <div className="w-px h-4" style={{ background: "var(--border)" }} />
 
@@ -102,6 +116,8 @@ export default function Navbar() {
           style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
           <Link href="#features" className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>Özellikler</Link>
           <Link href="/leaderboard" className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>Liderlik</Link>
+          <Link href="/histology" className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>Histoloji</Link>
+          <Link href="/sinir-lezyon" className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>Nöroloji</Link>
           <hr style={{ borderColor: "var(--border)" }} />
           {isLoggedIn ? (
             <Link href="/dashboard" className="py-2.5 text-center rounded-xl text-sm font-semibold text-white"
