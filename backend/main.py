@@ -13,11 +13,13 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     
-    # DIAGNOSTIC: Log allowed origins to verify if .env overrides them
-    print("\n" + "="*50)
-    print(f"🚀 KLINIKIQ BACKEND STARTING")
-    print(f"📡 ALLOWED CORS ORIGINS: {settings.BACKEND_CORS_ORIGINS}")
-    print("="*50 + "\n")
+    # DIAGNOSTIC: Logging (Using standard logger to ensure it shows in Docker)
+    import logging
+    logger = logging.getLogger("uvicorn")
+    logger.info("="*50)
+    logger.info("🚀 KLINIKIQ BACKEND STARTING")
+    logger.info(f"📡 ALLOWED CORS ORIGINS: {settings.BACKEND_CORS_ORIGINS}")
+    logger.info("="*50)
     
     yield
     # Shutdown
