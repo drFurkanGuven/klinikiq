@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { adminApi, authApi, type AdminUser } from "@/lib/api";
+import { adminApi, authApi, microscopyApi, type AdminUser } from "@/lib/api";
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
@@ -25,6 +25,10 @@ export default function AdminDashboardPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  
+  const [uploadTab, setUploadTab] = useState<"url" | "tiff">("tiff");
+  const [uploadProgress, setUploadProgress] = useState(-1);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated()) { router.replace("/login"); return; }
@@ -247,84 +251,116 @@ export default function AdminDashboardPage() {
             </div>
         </div>
 
-        {/* TIFF Upload Section */}
+        {/* Histoloji Image Upload Section */}
         <div className="glass rounded-[2rem] border shadow-xl p-8 mt-12 transition-all" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-            <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
-                   <span style={{ fontSize: "1.2rem" }}>🔬</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                       <span style={{ fontSize: "1.2rem" }}>🔬</span>
+                    </div>
+                    <div>
+                       <h2 className="text-xl font-black">Histoloji Görüntüsü Yükle</h2>
+                       <p className="text-sm font-medium opacity-60" style={{ color: "var(--text-muted)" }}>Mikroskop arayüzü için yeni doku örnekleri ekleyin.</p>
+                    </div>
                 </div>
-                <div>
-                   <h2 className="text-xl font-black">Histoloji Görüntüsü Yükle (TIFF)</h2>
-                   <p className="text-sm font-medium opacity-60" style={{ color: "var(--text-muted)" }}>Yüksek çözünürlüklü .tiff dosyalarınızı yükleyerek mikroskop arayüzüne ekleyin.</p>
+                <div className="flex gap-2 p-1.5 rounded-2xl border shadow-inner w-fit" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                    <button onClick={() => setUploadTab("tiff")} className={`px-5 py-2 text-sm font-bold transition-all rounded-xl ${uploadTab === "tiff" ? "shadow-md" : "opacity-60"}`} style={{ background: uploadTab === "tiff" ? "var(--surface)" : "transparent", color: uploadTab === "tiff" ? "var(--primary)" : "var(--text)", borderColor: uploadTab === "tiff" ? "var(--border)" : "transparent", borderWidth: 1 }}>TIFF Yükle</button>
+                    <button onClick={() => setUploadTab("url")} className={`px-5 py-2 text-sm font-bold transition-all rounded-xl ${uploadTab === "url" ? "shadow-md" : "opacity-60"}`} style={{ background: uploadTab === "url" ? "var(--surface)" : "transparent", color: uploadTab === "url" ? "var(--primary)" : "var(--text)", borderColor: uploadTab === "url" ? "var(--border)" : "transparent", borderWidth: 1 }}>URL İle Ekle</button>
                 </div>
             </div>
             
             <form onSubmit={async (e) => {
                 e.preventDefault();
                 const form = e.target as HTMLFormElement;
-                const fileInput = form.file as HTMLInputElement;
-                const file = fileInput.files?.[0];
-                if (!file) return alert("Lütfen bir dosya seçin.");
+                if (isUploading) return;
                 
                 try {
-                    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-                    const originalText = btn.innerText;
-                    btn.innerText = "Yükleniyor ve Dönüştürülüyor... Lütfen bekleyin";
-                    btn.disabled = true;
+                    setIsUploading(true);
+                    setUploadProgress(0);
                     
-                    const formData = new FormData();
-                    formData.append("file", file);
-                    formData.append("title", (form.title_input as HTMLInputElement).value);
-                    formData.append("description", (form.description as HTMLInputElement).value);
-                    formData.append("specialty", (form.specialty as HTMLSelectElement).value);
+                    const title = (form.title_input as HTMLInputElement).value;
+                    const description = (form.description as HTMLInputElement).value;
+                    const specialty = (form.specialty as HTMLSelectElement).value;
                     
-                    const token = localStorage.getItem("access_token");
-                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/microscope/images/upload`, {
-                        method: "POST",
-                        headers: { "Authorization": `Bearer ${token}` },
-                        body: formData
-                    });
+                    if (uploadTab === "tiff") {
+                        const fileInput = form.file as HTMLInputElement;
+                        const file = fileInput.files?.[0];
+                        if (!file) { alert("Lütfen bir dosya seçin."); setIsUploading(false); return; }
+                        
+                        await microscopyApi.uploadTiff(file, { title, description, specialty }, (pct) => setUploadProgress(pct));
+                    } else {
+                        const imageUrl = (form.image_url as HTMLInputElement).value;
+                        if (!imageUrl) { alert("Lütfen URL girin."); setIsUploading(false); return; }
+                        await microscopyApi.createImage({ title, description, specialty, image_url: imageUrl });
+                        setUploadProgress(100);
+                    }
                     
-                    if (!res.ok) throw new Error(await res.text());
-                    
-                    alert("Resim başarıyla yüklendi ve işlendi!");
-                    form.reset();
-                    btn.innerText = originalText;
-                    btn.disabled = false;
+                    setTimeout(() => {
+                        alert("Görüntü başarıyla eklendi / işlendi!");
+                        form.reset();
+                        setIsUploading(false);
+                        setUploadProgress(-1);
+                    }, 500);
                 } catch (err: any) {
-                    alert("Yükleme başarısız: " + err.message);
-                    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-                    btn.innerText = "Yükle";
-                    btn.disabled = false;
+                    setIsUploading(false);
+                    setUploadProgress(-1);
+                    console.error(err);
+                    alert("Yükleme başarısız: " + (err.response?.data?.detail || err.message));
                 }
-            }} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            }} className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+                
                 <div className="space-y-4">
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Görüntü Dosyası (.tiff)</label>
-                        <input name="file" type="file" accept=".tiff,.tif,.svs,.jpg,.png" required className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 transition-all font-medium" />
-                    </div>
+                    {uploadTab === "tiff" ? (
+                        <div>
+                            <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Görüntü Dosyası (.tiff, .svs)</label>
+                            <input name="file" type="file" accept=".tiff,.tif,.svs,.jpg,.png" required={uploadTab === "tiff"} disabled={isUploading} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 outline-none transition-all font-medium disabled:opacity-50" />
+                            <p className="mt-2 text-xs opacity-50 font-medium">* Dosya boyutu büyük olabilir, yükleme ve DZI dönüştürme işlemi 1-2 dakika sürebilir.</p>
+                        </div>
+                    ) : (
+                        <div>
+                            <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Görüntü URL (veya .dzi Linki)</label>
+                            <input name="image_url" type="url" required={uploadTab === "url"} disabled={isUploading} className="w-full rounded-xl px-4 py-3 text-sm border focus:ring-2 transition-all outline-none disabled:opacity-50" style={{ background: "var(--bg)", borderColor: "var(--border)" }} placeholder="Örn: https://upload.wikimedia..." />
+                        </div>
+                    )}
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Görüntü Başlığı</label>
-                        <input name="title_input" type="text" required className="w-full rounded-xl px-4 py-3 text-sm border focus:ring-2 transition-all outline-none" style={{ background: "var(--bg)", borderColor: "var(--border)" }} placeholder="Örn: Renal Hücreli Karsinom" />
+                        <input name="title_input" type="text" required disabled={isUploading} className="w-full rounded-xl px-4 py-3 text-sm border focus:ring-2 transition-all outline-none disabled:opacity-50" style={{ background: "var(--bg)", borderColor: "var(--border)" }} placeholder="Örn: Renal Hücreli Karsinom" />
                     </div>
                 </div>
+
                 <div className="space-y-4 flex flex-col justify-between">
-                    <div className="flex gap-4">
-                        <div className="flex-1">
-                            <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Branş</label>
-                            <select name="specialty" className="w-full rounded-xl px-4 py-3 text-sm border outline-none" style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
-                                <option value="pathology">Genel Patoloji</option>
-                                <option value="nephrology">Nefroloji</option>
-                                <option value="pulmonology">Pulmonoloji</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Branş</label>
+                        <select name="specialty" disabled={isUploading} className="w-full rounded-xl px-4 py-3 text-sm border outline-none disabled:opacity-50" style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
+                            <option value="pathology">Genel Patoloji</option>
+                            <option value="nephrology">Nefroloji</option>
+                            <option value="pulmonology">Pulmonoloji</option>
+                            <option value="neurology">Nöroloji</option>
+                            <option value="endocrinology">Endokrinoloji</option>
+                        </select>
                     </div>
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-60">Açıklama (Opsiyonel)</label>
-                        <textarea name="description" rows={2} className="w-full rounded-xl px-4 py-3 text-sm border outline-none resize-none" style={{ background: "var(--bg)", borderColor: "var(--border)" }} placeholder="Görüntü detayları..."></textarea>
+                        <textarea name="description" rows={2} disabled={isUploading} className="w-full rounded-xl px-4 py-3 text-sm border outline-none resize-none disabled:opacity-50" style={{ background: "var(--bg)", borderColor: "var(--border)" }} placeholder="Görüntü detayları veya vaka ipuçları..."></textarea>
                     </div>
-                    <button type="submit" className="w-full py-3.5 rounded-xl text-sm font-black text-white hover:opacity-90 active:scale-95 transition-all outline-none" style={{ background: "var(--primary)" }}>
-                        Görüntüyü Yükle ve Dönüştür
+                    
+                    {isUploading && uploadProgress >= 0 && uploadTab === "tiff" && (
+                        <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-3 mb-2 overflow-hidden relative">
+                            <div className="h-full rounded-full transition-all duration-300 relative flex items-center justify-end pr-2 overflow-hidden" 
+                                style={{ width: `${uploadProgress}%`, background: "var(--primary)" }}>
+                                <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                            </div>
+                            <span className="absolute inset-0 flex items-center justify-center text-[9px] font-black mix-blend-difference text-white">{uploadProgress}%</span>
+                        </div>
+                    )}
+                    
+                    <button type="submit" disabled={isUploading} className={`w-full py-3.5 rounded-xl text-sm font-black text-white transition-all outline-none flex items-center justify-center gap-2 ${isUploading ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02] active:scale-95 shadow-md hover:shadow-lg"}`} style={{ background: "var(--primary)" }}>
+                        {isUploading ? (
+                           <>
+                             <Loader2 className="w-4 h-4 animate-spin" />
+                             {uploadTab === "tiff" ? (uploadProgress >= 100 ? "İşleniyor..." : "Yükleniyor...") : "Kaydediliyor..."}
+                           </>
+                        ) : uploadTab === "tiff" ? "TIFF Yükle ve Dönüştür" : "URL ile Ekle"}
                     </button>
                 </div>
             </form>
