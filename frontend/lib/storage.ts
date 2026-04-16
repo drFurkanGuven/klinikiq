@@ -1,26 +1,21 @@
 /**
  * storage.ts — Platform-aware secure storage
  *
- * Native (iOS/Android): @capacitor/preferences
- *   - iOS: NSUserDefaults (uygulama izole, sistem şifreli)
- *   - Android: SharedPreferences (uygulama izole)
+ * Native: @capacitor/preferences (SharedPreferences/NSUserDefaults)
+ * Web: localStorage
  *
- * Web: localStorage (geliştirme için)
- *
- * Kullanım:
- *   await storage.setItem("key", "value")
- *   storage.getItem("key")   ← sync, memory cache'den okur
- *   await storage.removeItem("key")
+ * KRİTİK TASARIM KURALLARI:
+ * - init() ASLA throw etmez — hata olursa localStorage'a fallback yapar
+ * - waitForInit() ASLA hang etmez — 5s timeout sonra devam eder
+ * - getItem() ASLA block etmez — sync, cache'den okur
  */
 
 import { Capacitor } from "@capacitor/core";
 
-// Uygulama başlangıcında yüklenen tokenlar için bellek içi önbellek
 const cache: Record<string, string | null> = {};
 let initialized = false;
 let _initPromise: Promise<void> | null = null;
 
-// Hangi key'ler uygulama açılışında yüklenmeli
 const PRELOAD_KEYS = ["access_token", "refresh_token", "biometrics_enabled"] as const;
 
 async function getPreferences() {
@@ -30,26 +25,45 @@ async function getPreferences() {
 
 export const storage = {
   /**
-   * Uygulama açılışında çağrılır (AppInit component'ı yapar).
-   * Native platformda Preferences'dan cache'e yükler.
-   * Promise kaydedilir — birden fazla çağrı sadece bir kez çalışır.
+   * Uygulama açılışında çağrılır (AppInit).
+   * Hata olsa bile initialized=true set edilir (localStorage fallback ile).
+   * Promise kaydedilir — birden fazla çağrı tek bir init çalıştırır.
    */
   async init(): Promise<void> {
     if (initialized) return;
     if (!_initPromise) {
       _initPromise = (async () => {
-        if (Capacitor.isNativePlatform()) {
-          const Preferences = await getPreferences();
-          for (const key of PRELOAD_KEYS) {
-            const { value } = await Preferences.get({ key });
-            cache[key] = value;
+        try {
+          if (Capacitor.isNativePlatform()) {
+            const Preferences = await getPreferences();
+            for (const key of PRELOAD_KEYS) {
+              try {
+                const { value } = await Preferences.get({ key });
+                cache[key] = value;
+              } catch {
+                // Preferences hatası → localStorage fallback
+                cache[key] = typeof window !== "undefined"
+                  ? localStorage.getItem(key)
+                  : null;
+              }
+            }
+          } else {
+            for (const key of PRELOAD_KEYS) {
+              cache[key] = typeof window !== "undefined"
+                ? localStorage.getItem(key)
+                : null;
+            }
           }
-        } else {
-          for (const key of PRELOAD_KEYS) {
-            cache[key] = localStorage.getItem(key);
+        } catch {
+          // Tüm init başarısız → localStorage fallback (web güvenliği)
+          if (typeof window !== "undefined") {
+            for (const key of PRELOAD_KEYS) {
+              cache[key] = localStorage.getItem(key);
+            }
           }
+        } finally {
+          initialized = true;
         }
-        initialized = true;
       })();
     }
     return _initPromise;
@@ -57,47 +71,62 @@ export const storage = {
 
   /**
    * Init tamamlanana kadar bekler.
-   * API interceptor'da kullanılır — her istek öncesi storage garantili hazır olur.
+   * 5 saniye içinde bitmezse devam eder (asla sonsuz blok olmaz).
+   * Hata olsa bile resolve eder (hiçbir zaman reject etmez).
    */
   waitForInit(): Promise<void> {
     if (initialized) return Promise.resolve();
-    if (_initPromise) return _initPromise;
-    return storage.init(); // henüz başlamadıysa başlat
+    const target = _initPromise ?? storage.init();
+    return Promise.race([
+      target,
+      new Promise<void>((resolve) => setTimeout(resolve, 5000)),
+    ]).catch(() => {
+      initialized = true; // fallback: bozuk state'i düzelt
+    });
   },
 
   /** Token kaydeder — hem cache hem kalıcı depolama */
   async setItem(key: string, value: string): Promise<void> {
-    cache[key] = value;
-    if (Capacitor.isNativePlatform()) {
-      const Preferences = await getPreferences();
-      await Preferences.set({ key, value });
-    } else {
-      localStorage.setItem(key, value);
+    cache[key] = value; // önce cache — sync erişim hemen çalışsın
+    try {
+      if (Capacitor.isNativePlatform()) {
+        const Preferences = await getPreferences();
+        await Preferences.set({ key, value });
+      } else {
+        localStorage.setItem(key, value);
+      }
+    } catch {
+      // Kalıcı kayıt başarısız olsa da cache'de var, oturum sürer
+      localStorage.setItem(key, value); // son çare localStorage
     }
   },
 
   /** Token siler */
   async removeItem(key: string): Promise<void> {
     cache[key] = null;
-    if (Capacitor.isNativePlatform()) {
-      const Preferences = await getPreferences();
-      await Preferences.remove({ key });
-    } else {
+    try {
+      if (Capacitor.isNativePlatform()) {
+        const Preferences = await getPreferences();
+        await Preferences.remove({ key });
+      } else {
+        localStorage.removeItem(key);
+      }
+    } catch {
       localStorage.removeItem(key);
     }
   },
 
   /**
-   * Senkron okuma — init() sonrası cache'den döner.
-   * init() çağrılmadan önce web'de localStorage'a fallback yapar,
-   * native'de null döner (waitForInit() garanti eder ki bu olmaz).
+   * Senkron okuma — cache'den.
+   * Init bitmemişse web'de localStorage fallback, native'de null.
+   * (Native'de waitForInit() garanti eder ki bu null dönmez.)
    */
   getItem(key: string): string | null {
     if (initialized) return cache[key] ?? null;
-    // Native'de init bitmeden token yok — waitForInit() bunu önler
-    if (Capacitor.isNativePlatform()) return null;
-    // Web'de localStorage'a fallback (sadece geliştirme/SSR)
-    if (typeof window !== "undefined") return localStorage.getItem(key);
+    // Init bitmemiş — sadece web'de localStorage fallback güvenlidir
+    if (!Capacitor.isNativePlatform() && typeof window !== "undefined") {
+      return localStorage.getItem(key);
+    }
     return null;
   },
 };

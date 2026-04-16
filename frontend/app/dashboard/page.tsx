@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { nativeClient } from "@/lib/native";
 import { biometricsClient } from "@/lib/biometrics";
+import { storage } from "@/lib/storage";
 import { useTheme, type Palette } from "@/components/ThemeProvider";
 import PremiumAlert from "@/components/PremiumAlert";
 
@@ -68,11 +69,15 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!mounted) return;
-    if (!isAuthenticated()) {
-      router.replace("/login");
-      return;
-    }
-    fetchData();
+    // Storage init tamamlanana kadar bekle — native'de token cache hazır olmadan
+    // isAuthenticated() false dönebilir ve yanlışlıkla login'e redirect olunur
+    storage.waitForInit().then(() => {
+      if (!isAuthenticated()) {
+        router.replace("/login");
+        return;
+      }
+      fetchData();
+    });
   }, [mounted]);
 
   async function fetchData() {

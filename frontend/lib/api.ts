@@ -22,9 +22,12 @@ export const api = axios.create({
 });
 
 // Dinamik Base URL + Token Interceptor
-// async interceptor: storage init tamamlanana kadar bekler (native race condition fix)
 api.interceptors.request.use(async (config) => {
-  await storage.waitForInit();
+  try {
+    await storage.waitForInit(); // max 5s bekler, hata olsa da devam eder
+  } catch {
+    // waitForInit hiçbir zaman throw etmemeli, ama yine de koruma
+  }
   config.baseURL = getBaseUrl();
   const token = storage.getItem("access_token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
