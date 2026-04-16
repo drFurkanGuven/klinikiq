@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowLeft, Stethoscope, Trash2, Mail, Clock, Database, ShieldCheck } from 'lucide-react';
+
 import Footer from '@/components/Footer';
 
 export default function DeleteAccount() {
@@ -88,22 +89,13 @@ export default function DeleteAccount() {
         <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 mb-6">
           <h2 className="text-lg font-black text-white mb-4 flex items-center gap-2">
             <Clock className="w-5 h-5 text-yellow-400" />
-            Veri Saklama Süresi
+            Veri Saklama Politikası
           </h2>
-          <ul className="text-sm text-slate-400 space-y-3">
-            <li className="flex items-start gap-3">
-              <span className="text-yellow-400 font-bold shrink-0">7 gün</span>
-              <span>Talep alındıktan sonra hesap ve tüm veriler kalıcı olarak silinir.</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-yellow-400 font-bold shrink-0">30 gün</span>
-              <span>Yedek sistemlerden tam temizleme tamamlanır.</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-slate-500 font-bold shrink-0">İstisna</span>
-              <span className="text-slate-500">Yasal zorunluluk gerektiren durumlarda bazı veriler mevzuat gereği daha uzun süre saklanabilir.</span>
-            </li>
-          </ul>
+          <p className="text-sm text-slate-400 leading-relaxed">
+            KlinikIQ, kullanıcı verilerini yalnızca hesap aktif olduğu sürece saklar.
+            Hesap silme talebi onaylandıktan sonra tüm veriler kalıcı olarak silinir.
+            Aktif hesaplara ait veriler, hizmet kalitesini korumak amacıyla saklanmaya devam eder.
+          </p>
         </div>
 
         {/* Alternatif: Uygulama İçinden */}
