@@ -6,9 +6,33 @@ from typing import List
 from app.core.database import get_db
 from app.core.security import get_current_user_id
 from app.models.models import User, SimulationSession, Report, Case, SessionStatus
-from app.schemas.schemas import LeaderboardItem, StudyNoteItem
+from app.schemas.schemas import LeaderboardItem, StudyNoteItem, UpdateProfile, UserOut
 
 router = APIRouter()
+
+
+@router.patch("/me", response_model=UserOut)
+async def update_profile(
+    data: UpdateProfile,
+    db: AsyncSession = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+
+    if data.name is not None:
+        user.name = data.name
+    if data.school is not None:
+        user.school = data.school
+    if data.year is not None:
+        user.year = data.year
+
+    await db.commit()
+    await db.refresh(user)
+    return user
 
 
 def mask_name(name: str) -> str:

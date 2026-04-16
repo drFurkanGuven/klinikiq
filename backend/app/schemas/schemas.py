@@ -48,6 +48,12 @@ class UserOut(BaseModel):
         from_attributes = True
 
 
+class UpdateProfile(BaseModel):
+    name: Optional[str] = None
+    school: Optional[str] = None
+    year: Optional[int] = None
+
+
 # ── Cases ─────────────────────────────────────────────────────────────────────
 
 class CaseListItem(BaseModel):

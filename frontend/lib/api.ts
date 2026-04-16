@@ -1,44 +1,31 @@
 import axios from "axios";
+import { storage } from "./storage";
 
 export const getBaseUrl = () => {
-  // 1. Önce her zaman çevre değişkenine bak (Canlı deployment için en güvenli yol)
   if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-  
-  // 2. Eğer değişken yoksa ve Android emülatördeysek yerel tünele git
+
   if (typeof window !== "undefined") {
-    const isAndroid = (window as any).Capacitor?.getPlatform() === 'android';
-    const isCapacitorOrigin = window.location.protocol === 'capacitor:';
-    
-    if (isAndroid || isCapacitorOrigin) {
-      return "http://10.0.2.2:8000/api";
-    }
+    const isAndroid = (window as any).Capacitor?.getPlatform() === "android";
+    const isCapacitorOrigin = window.location.protocol === "capacitor:";
+    if (isAndroid || isCapacitorOrigin) return "http://10.0.2.2:8000/api";
   }
-  
-  // 3. Fallback: Yerel geliştirme
+
   return "http://localhost:8000/api";
 };
 
-// İlk yüklemede ve her çözümlemede logla
 export const API_URL = getBaseUrl();
-if (typeof window !== "undefined") {
-  console.log("🔍 [KlinikIQ] Resolved API_URL:", API_URL);
-}
 
 // ── API Instance ─────────────────────────────────────────────────────────────
 export const api = axios.create({
   headers: { "Content-Type": "application/json" },
+  timeout: 30000, // 30s — ağır SSE dışı tüm istekler için güvenlik ağı
 });
 
-// Dinamik Base URL Interceptor
+// Dinamik Base URL + Token Interceptor
 api.interceptors.request.use((config) => {
   config.baseURL = getBaseUrl();
-  
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
+  const token = storage.getItem("access_token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
@@ -49,19 +36,19 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
       try {
-        const refreshToken = localStorage.getItem("refresh_token");
+        const refreshToken = storage.getItem("refresh_token");
         if (!refreshToken) throw new Error("No refresh token");
 
         const res = await axios.post(`${API_URL}/auth/refresh`, {
           refresh_token: refreshToken,
         });
         const newAccessToken = res.data.access_token;
-        localStorage.setItem("access_token", newAccessToken);
+        await storage.setItem("access_token", newAccessToken);
         original.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(original);
       } catch {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
+        await storage.removeItem("access_token");
+        await storage.removeItem("refresh_token");
         window.location.href = "/login";
       }
     }
@@ -225,6 +212,8 @@ export const usersApi = {
   history: () => api.get<HistoryItem[]>("/users/me/history"),
   getLeaderboard: () => api.get<LeaderboardItem[]>("/users/leaderboard"),
   getStudyNotes: () => api.get<StudyNoteItem[]>("/users/study-notes"),
+  updateProfile: (data: { name?: string; school?: string; year?: number }) =>
+    api.patch<UserOut>("/users/me", data),
 };
 
 export interface UserOut {

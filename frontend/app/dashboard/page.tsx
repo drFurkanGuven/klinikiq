@@ -6,7 +6,7 @@ import { casesApi, usersApi, authApi, sessionsApi, questionsApi, type HistoryIte
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
-  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon
+  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2
 } from "lucide-react";
 import { nativeClient } from "@/lib/native";
 import { biometricsClient } from "@/lib/biometrics";
@@ -51,6 +51,14 @@ export default function DashboardPage() {
   const [biometricsAvailable, setBiometricsAvailable] = useState(false);
   const [isBiometricsEnabled, setIsBiometricsEnabled ] = useState(false);
   const [showBioInfo, setShowBioInfo] = useState(false);
+
+  // Profile edit states
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileName, setProfileName] = useState("");
+  const [profileSchool, setProfileSchool] = useState("");
+  const [profileYear, setProfileYear] = useState("");
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSaveMsg, setProfileSaveMsg] = useState<"ok" | "err" | null>(null);
 
   const { theme, toggleTheme, palette, setPalette } = useTheme();
 
@@ -120,7 +128,31 @@ export default function DashboardPage() {
     try {
       const res = await authApi.me();
       setUserProfile(res.data);
+      setProfileName(res.data.name || "");
+      setProfileSchool(res.data.school || "");
+      setProfileYear(res.data.year ? String(res.data.year) : "");
     } catch {}
+  }
+
+  async function saveProfile() {
+    setProfileSaving(true);
+    setProfileSaveMsg(null);
+    try {
+      const res = await usersApi.updateProfile({
+        name: profileName.trim() || undefined,
+        school: profileSchool.trim() || undefined,
+        year: profileYear ? parseInt(profileYear) : undefined,
+      });
+      setUserProfile(res.data);
+      setIsEditingProfile(false);
+      setProfileSaveMsg("ok");
+      setTimeout(() => setProfileSaveMsg(null), 2500);
+    } catch {
+      setProfileSaveMsg("err");
+      setTimeout(() => setProfileSaveMsg(null), 2500);
+    } finally {
+      setProfileSaving(false);
+    }
   }
 
   async function fetchHistory() {
@@ -147,20 +179,23 @@ export default function DashboardPage() {
         // 1. Get a random case
         const randomRes = await casesApi.getRandom({ specialties: specsParam, difficulty: difficulty || undefined });
         const caseId = randomRes.data.id;
-        
+
         // 2. Start session
         const sessionRes = await sessionsApi.create(caseId);
         router.push(`/case?id=${sessionRes.data.id}`);
-        
+
     } catch (err: any) {
-        setIsStarting(false);
         if (err.response?.status === 404) {
             setErrorMsg("Seçtiğiniz kriterlerde yeni/çözülmemiş vaka bulunamadı!");
         } else if (err.response?.status === 403) {
             setErrorMsg(err.response.data.detail || "Günlük limitinize ulaştınız.");
+        } else if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+            setErrorMsg("Sunucu yanıt vermedi. Lütfen tekrar deneyin.");
         } else {
             setErrorMsg("Vaka başlatılırken bir hata oluştu.");
         }
+    } finally {
+        setIsStarting(false);
     }
   };
 
@@ -537,14 +572,133 @@ export default function DashboardPage() {
         {/* Settings Modal */}
         {showSettings && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSettings(false)} />
-                <div className="relative w-full max-w-sm glass-card p-8 animate-fade-in-up" style={{ background: "var(--surface)" }}>
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowSettings(false); setIsEditingProfile(false); setProfileSaveMsg(null); }} />
+                <div className="relative w-full max-w-md glass-card p-6 sm:p-8 animate-fade-in-up max-h-[90vh] overflow-y-auto" style={{ background: "var(--surface)" }}>
                     <div className="flex items-center justify-between mb-8">
                         <h3 className="text-xl font-black tracking-tight">Ayarlar</h3>
-                        <button onClick={() => setShowSettings(false)} className="opacity-40 hover:opacity-100 p-1"><X className="w-6 h-6" /></button>
+                        <button onClick={() => { setShowSettings(false); setIsEditingProfile(false); setProfileSaveMsg(null); }} className="opacity-40 hover:opacity-100 p-1"><X className="w-6 h-6" /></button>
                     </div>
 
                     <div className="space-y-8">
+                        {/* Profile Section */}
+                        <div>
+                            <div className="flex items-center justify-between mb-4">
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Profil Bilgileri</p>
+                                {!isEditingProfile ? (
+                                    <button
+                                        onClick={() => { nativeClient.impact(); setIsEditingProfile(true); setProfileSaveMsg(null); }}
+                                        className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl border transition-all"
+                                        style={{ borderColor: "var(--primary)", color: "var(--primary)", background: "color-mix(in srgb, var(--primary) 8%, transparent)" }}
+                                    >
+                                        <Edit2 className="w-3 h-3" /> Düzenle
+                                    </button>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => { setIsEditingProfile(false); setProfileName(userProfile?.name || ""); setProfileSchool(userProfile?.school || ""); setProfileYear(userProfile?.year ? String(userProfile.year) : ""); }}
+                                            className="text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl border transition-all"
+                                            style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+                                        >
+                                            İptal
+                                        </button>
+                                        <button
+                                            onClick={saveProfile}
+                                            disabled={profileSaving}
+                                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl transition-all text-white"
+                                            style={{ background: "var(--primary)" }}
+                                        >
+                                            {profileSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                                            Kaydet
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {profileSaveMsg === "ok" && (
+                                <div className="mb-3 px-3 py-2 rounded-xl text-[11px] font-bold flex items-center gap-2"
+                                    style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)", color: "var(--success)" }}>
+                                    <Check className="w-3.5 h-3.5" /> Profil başarıyla güncellendi
+                                </div>
+                            )}
+                            {profileSaveMsg === "err" && (
+                                <div className="mb-3 px-3 py-2 rounded-xl text-[11px] font-bold"
+                                    style={{ background: "color-mix(in srgb, var(--danger) 15%, transparent)", color: "var(--danger)" }}>
+                                    Kayıt sırasında bir hata oluştu.
+                                </div>
+                            )}
+
+                            <div className="rounded-2xl border p-4 space-y-3" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+                                {/* Email — sadece göster */}
+                                <div className="flex items-center gap-3">
+                                    <User className="w-4 h-4 shrink-0 opacity-40" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-0.5">E-posta</p>
+                                        <p className="text-xs font-bold truncate" style={{ color: "var(--text-muted)" }}>{userProfile?.email}</p>
+                                    </div>
+                                </div>
+
+                                {/* Ad Soyad */}
+                                <div className="flex items-center gap-3">
+                                    <div className="w-4 h-4 shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-0.5">Ad Soyad</p>
+                                        {isEditingProfile ? (
+                                            <input
+                                                value={profileName}
+                                                onChange={(e) => setProfileName(e.target.value)}
+                                                className="w-full bg-transparent text-xs font-bold outline-none border-b pb-0.5 transition-colors"
+                                                style={{ borderColor: "var(--primary)", color: "var(--text)" }}
+                                                placeholder="Adınız Soyadınız"
+                                            />
+                                        ) : (
+                                            <p className="text-xs font-bold" style={{ color: "var(--text)" }}>{userProfile?.name || "—"}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Okul */}
+                                <div className="flex items-center gap-3">
+                                    <div className="w-4 h-4 shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-0.5">Okul</p>
+                                        {isEditingProfile ? (
+                                            <input
+                                                value={profileSchool}
+                                                onChange={(e) => setProfileSchool(e.target.value)}
+                                                className="w-full bg-transparent text-xs font-bold outline-none border-b pb-0.5 transition-colors"
+                                                style={{ borderColor: "var(--primary)", color: "var(--text)" }}
+                                                placeholder="Tıp Fakültesi"
+                                            />
+                                        ) : (
+                                            <p className="text-xs font-bold" style={{ color: "var(--text)" }}>{userProfile?.school || "—"}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Sınıf */}
+                                <div className="flex items-center gap-3">
+                                    <div className="w-4 h-4 shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-0.5">Sınıf</p>
+                                        {isEditingProfile ? (
+                                            <input
+                                                type="number"
+                                                min={1}
+                                                max={6}
+                                                value={profileYear}
+                                                onChange={(e) => setProfileYear(e.target.value)}
+                                                className="w-full bg-transparent text-xs font-bold outline-none border-b pb-0.5 transition-colors"
+                                                style={{ borderColor: "var(--primary)", color: "var(--text)" }}
+                                                placeholder="1–6"
+                                            />
+                                        ) : (
+                                            <p className="text-xs font-bold" style={{ color: "var(--text)" }}>{userProfile?.year ? `${userProfile.year}. Sınıf` : "—"}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Palette Selector */}
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 opacity-40">Renk Paleti</p>

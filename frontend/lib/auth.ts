@@ -1,4 +1,5 @@
 import api from "./api";
+import { storage } from "./storage";
 
 export interface AuthUser {
   id: string;
@@ -8,13 +9,10 @@ export interface AuthUser {
   year?: number;
 }
 
-export async function login(
-  email: string,
-  password: string
-): Promise<void> {
+export async function login(email: string, password: string): Promise<void> {
   const res = await api.post("/auth/login", { email, password });
-  localStorage.setItem("access_token", res.data.access_token);
-  localStorage.setItem("refresh_token", res.data.refresh_token);
+  await storage.setItem("access_token", res.data.access_token);
+  await storage.setItem("refresh_token", res.data.refresh_token);
 }
 
 export async function register(data: {
@@ -25,17 +23,17 @@ export async function register(data: {
   year?: number;
 }): Promise<void> {
   const res = await api.post("/auth/register", data);
-  localStorage.setItem("access_token", res.data.access_token);
-  localStorage.setItem("refresh_token", res.data.refresh_token);
+  await storage.setItem("access_token", res.data.access_token);
+  await storage.setItem("refresh_token", res.data.refresh_token);
 }
 
-export function logout(): void {
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
+export async function logout(): Promise<void> {
+  await storage.removeItem("access_token");
+  await storage.removeItem("refresh_token");
   window.location.href = "/login";
 }
 
 export function isAuthenticated(): boolean {
   if (typeof window === "undefined") return false;
-  return !!localStorage.getItem("access_token");
+  return !!storage.getItem("access_token");
 }

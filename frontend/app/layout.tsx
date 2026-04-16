@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AppInit } from "@/components/AppInit";
 
 export const metadata: Metadata = {
   title: "KlinikIQ — TUS Hazırlık Platformu",
@@ -26,6 +27,7 @@ export default function RootLayout({
     <html lang="tr" suppressHydrationWarning>
       <body className="min-h-screen antialiased transition-colors duration-300">
         <ThemeProvider>
+          <AppInit />
           {children}
         </ThemeProvider>
       </body>
