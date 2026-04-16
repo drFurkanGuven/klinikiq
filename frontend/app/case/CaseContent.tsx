@@ -8,7 +8,7 @@ import {
   Activity, FileText, CheckCircle2, ArrowLeft,
   Stethoscope, AlertTriangle, Send, Loader2,
   PanelLeftOpen, PanelLeftClose, Bot, Info, TestTube2, Phone, X, ShieldAlert,
-  Search, ShoppingBag, Trash, ChevronRight, Plus,
+  Search, ShoppingBag, Trash, ChevronRight, Plus, RefreshCw,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { nativeClient } from "@/lib/native";
@@ -211,7 +211,7 @@ const DIFFICULTY_MAP: Record<string, { label: string; color: string; initialBudg
   hard: { label: "Zor", color: "text-red-400 bg-red-500/10 border-red-500/20", initialBudget: 2500 },
 };
 
-interface Message { role: "user" | "assistant"; content: string; streaming?: boolean; }
+interface Message { role: "user" | "assistant"; content: string; streaming?: boolean; isError?: boolean; }
 
 function parseContent(content: string) {
   const lines = content.split('\n');
@@ -333,6 +333,7 @@ export default function CasePageContent() {
   const [examSearchQuery, setExamSearchQuery] = useState("");
   const [budget, setBudget] = useState(1000);
   const [selectedLabs, setSelectedLabs] = useState<string[]>([]);
+  const [lastRawMessage, setLastRawMessage] = useState<string>("");
   const [mounted, setMounted] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -358,28 +359,38 @@ export default function CasePageContent() {
     finally { setLoading(false); }
   }
 
-  const sendMessage = useCallback(async (text?: string, displayOverride?: string) => {
+  const sendMessage = useCallback(async (text?: string, displayOverride?: string, skipUserBubble?: boolean) => {
     const rawMsg = (text ?? input).trim();
     if (!rawMsg || streaming) return;
     setInput("");
     setSidebarOpen(false);
-    let displayMsg = displayOverride || rawMsg;
-    if (!displayOverride) {
-      if (rawMsg.startsWith("[KONSÜLTASYON İSTEĞİ]")) displayMsg = "📞 Uzmana Danış (Konsültasyon İstendi)";
-      else if (rawMsg.startsWith("[FİZİK MUAYENE]")) displayMsg = rawMsg.replace("[FİZİK MUAYENE] ", "").split("(")[0] + " Muayenesi Yapıldı";
-      else if (rawMsg.startsWith("[TETKİK İSTEDİ]")) displayMsg = "🧪 Laboratuvar/Görüntüleme İsteği Gönderildi";
+
+    if (!skipUserBubble) {
+      let displayMsg = displayOverride || rawMsg;
+      if (!displayOverride) {
+        if (rawMsg.startsWith("[KONSÜLTASYON İSTEĞİ]")) displayMsg = "📞 Uzmana Danış (Konsültasyon İstendi)";
+        else if (rawMsg.startsWith("[FİZİK MUAYENE]")) displayMsg = rawMsg.replace("[FİZİK MUAYENE] ", "").split("(")[0] + " Muayenesi Yapıldı";
+        else if (rawMsg.startsWith("[TETKİK İSTEDİ]")) displayMsg = "🧪 Laboratuvar/Görüntüleme İsteği Gönderildi";
+      }
+      setMessages((prev) => [...prev, { role: "user", content: displayMsg }]);
+      setLastRawMessage(rawMsg);
     }
-    setMessages((prev) => [...prev, { role: "user", content: displayMsg }]);
+
     setMessages((prev) => [...prev, { role: "assistant", content: "", streaming: true }]);
     setStreaming(true);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90000); // 90s timeout
+
     try {
       const token = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}/sessions/${sessionId}/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ content: rawMsg }),
+        signal: controller.signal,
       });
-      if (!response.ok || !response.body) throw new Error();
+      if (!response.ok || !response.body) throw new Error("sunucu hatası");
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let accumulated = "";
@@ -400,10 +411,20 @@ export default function CasePageContent() {
         }
       }
       setMessages((prev) => { const u = [...prev]; u[u.length - 1] = { role: "assistant", content: accumulated, streaming: false }; return u; });
-    } catch {
-      setMessages((prev) => { const u = [...prev]; u[u.length - 1] = { role: "assistant", content: "Bağlantı hatası. Tekrar deneyin.", streaming: false }; return u; });
-    } finally { setStreaming(false); }
+    } catch (e: any) {
+      const msg = e?.name === "AbortError" ? "Bağlantı zaman aşımına uğradı." : "Bağlantı hatası.";
+      setMessages((prev) => { const u = [...prev]; u[u.length - 1] = { role: "assistant", content: msg, streaming: false, isError: true }; return u; });
+    } finally {
+      clearTimeout(timeoutId);
+      setStreaming(false);
+    }
   }, [input, streaming, sessionId]);
+
+  const retryLastMessage = useCallback(() => {
+    if (!lastRawMessage || streaming) return;
+    setMessages((prev) => prev.slice(0, -1));
+    sendMessage(lastRawMessage, undefined, true);
+  }, [lastRawMessage, streaming, sendMessage]);
 
   const toggleLab = (id: string, price: number) => {
     if (selectedLabs.includes(id)) { setSelectedLabs(prev => prev.filter(l => l !== id)); setBudget(prev => prev + price); }
@@ -492,6 +513,19 @@ export default function CasePageContent() {
                      <p className="text-[10px] font-black uppercase tracking-wider opacity-50 mb-1" style={{ color: "var(--text-muted)" }}>Şikayet</p>
                      <p className="text-xs leading-relaxed font-semibold italic" style={{ color: "var(--text-navy)" }}>&quot;{patient.chief_complaint}&quot;</p>
                    </div>
+                   {patient.vitals && Object.keys(patient.vitals).length > 0 && (
+                     <div className="pt-2 border-t" style={{ borderColor: "var(--border)" }}>
+                       <p className="text-[10px] font-black uppercase tracking-wider opacity-50 mb-2" style={{ color: "var(--text-muted)" }}>Vital Bulgular</p>
+                       <div className="grid grid-cols-2 gap-1.5">
+                         {Object.entries(patient.vitals as Record<string, string>).map(([key, val]) => (
+                           <div key={key} className="rounded-xl p-2 text-center" style={{ background: "var(--surface-2)" }}>
+                             <p className="text-[9px] font-black uppercase tracking-wider opacity-50 truncate">{key}</p>
+                             <p className="text-[11px] font-black truncate" style={{ color: "var(--text-navy)" }}>{val}</p>
+                           </div>
+                         ))}
+                       </div>
+                     </div>
+                   )}
                  </div>
                ) : null}
              </div>
@@ -521,6 +555,16 @@ export default function CasePageContent() {
                 <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed transition-all shadow-sm ${msg.role === "user" ? "rounded-tr-sm bg-primary-light text-primary" : "rounded-tl-sm border bg-surface text-text border-border"}`}>
                   <div className="flex items-center gap-2 mb-1 opacity-50 text-[10px] font-bold uppercase tracking-wider">{msg.role === "user" ? "Siz" : "KlinikIQ AI"}</div>
                   {msg.role === "assistant" ? <RenderMessage content={msg.content} /> : msg.content}
+                  {msg.isError && (
+                    <button
+                      onClick={retryLastMessage}
+                      disabled={streaming}
+                      className="mt-2 flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all active:scale-95 disabled:opacity-50"
+                      style={{ background: "var(--primary-light)", color: "var(--primary)" }}
+                    >
+                      <RefreshCw className="w-3 h-3" /> Yeniden Bağlan
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
