@@ -8,8 +8,14 @@ export const biometricsClient = {
   async checkAvailability() {
     if (!Capacitor.isNativePlatform()) return false;
     try {
-      const result = await NativeBiometric.isAvailable();
-      return !!(result.isAvailable && result.biometryType);
+      // 3 saniye içinde yanıt gelmezse false dön — login akışını bloklama
+      const result = await Promise.race([
+        NativeBiometric.isAvailable(),
+        new Promise<{ isAvailable: false }>((resolve) =>
+          setTimeout(() => resolve({ isAvailable: false }), 3000)
+        ),
+      ]);
+      return !!(result.isAvailable && (result as any).biometryType);
     } catch {
       return false;
     }

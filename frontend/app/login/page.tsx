@@ -56,14 +56,18 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(form.email, form.password);
-      // Başarılı girişte biyometrik teklifi - Gerçek uygunluğu kontrol et
-      if (!biometricsClient.isEnabled() && (window as any).Capacitor?.isNativePlatform()) {
+      // Başarılı girişte biyometrik teklifi — login akışını ASLA bloklamaz
+      try {
+        if (!biometricsClient.isEnabled() && (window as any).Capacitor?.isNativePlatform()) {
           const available = await biometricsClient.checkAvailability();
           if (available) {
-              setPendingCreds({ email: form.email, pass: form.password });
-              setShowBiometricEnroll(true);
-              return; // Router push modal kapanınca olacak
+            setPendingCreds({ email: form.email, pass: form.password });
+            setShowBiometricEnroll(true);
+            return; // Router push modal kapanınca olacak
           }
+        }
+      } catch {
+        // Biyometrik kontrol başarısız → görmezden gel, dashboard'a geç
       }
       router.push("/dashboard");
     } catch (err: any) {
