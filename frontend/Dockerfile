@@ -18,7 +18,7 @@ RUN echo 'server { \
     listen 80; \
     location / { \
         root /usr/share/nginx/html; \
-        try_files $uri $uri.html $uri/ /index.html; \
+        try_files $uri $uri/ $uri.html /index.html; \
     } \
 }' > /etc/nginx/conf.d/default.conf
 
