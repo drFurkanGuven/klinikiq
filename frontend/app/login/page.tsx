@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { login } from "@/lib/auth";
-import { Eye, EyeOff, Stethoscope, AlertCircle, Fingerprint, Loader2, Sparkles, Check } from "lucide-react";
+import { Eye, EyeOff, Stethoscope, AlertCircle, Fingerprint, Loader2, Sparkles, Check, ShieldCheck } from "lucide-react";
 import Footer from "@/components/Footer";
 import { useTheme, type Palette } from "@/components/ThemeProvider";
 import { biometricsClient } from "@/lib/biometrics";
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [mounted, setMounted] = React.useState(false);
   const [showBiometricEnroll, setShowBiometricEnroll] = useState(false);
   const [pendingCreds, setPendingCreds] = useState<{email:string, pass:string} | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
 
   React.useEffect(() => {
     setMounted(true);
@@ -28,6 +29,12 @@ export default function LoginPage() {
 
   React.useEffect(() => {
     setMounted(true);
+    // Kaydedilmiş email varsa doldur
+    const savedEmail = localStorage.getItem("remembered_email");
+    if (savedEmail) {
+      setForm((f) => ({ ...f, email: savedEmail }));
+      setRememberMe(true);
+    }
     // Biyometrik login kontrolü
     if (biometricsClient.isEnabled()) {
         handleBiometricLogin();
@@ -56,6 +63,12 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(form.email, form.password);
+      // Beni hatırla
+      if (rememberMe) {
+        localStorage.setItem("remembered_email", form.email);
+      } else {
+        localStorage.removeItem("remembered_email");
+      }
       // Başarılı girişte biyometrik teklifi — login akışını ASLA bloklamaz
       try {
         if (!biometricsClient.isEnabled() && (window as any).Capacitor?.isNativePlatform()) {
@@ -156,6 +169,21 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+
+            {/* Beni Hatırla */}
+            <button
+              type="button"
+              onClick={() => { nativeClient.impact(); setRememberMe(!rememberMe); }}
+              className="flex items-center gap-3 w-full px-1 py-1 group"
+            >
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all flex-shrink-0 ${rememberMe ? "border-primary" : "border-border opacity-40"}`}
+                style={{ background: rememberMe ? "var(--primary)" : "transparent", borderColor: rememberMe ? "var(--primary)" : undefined }}>
+                {rememberMe && <Check className="w-3 h-3 text-white" />}
+              </div>
+              <span className="text-xs font-bold opacity-60 group-hover:opacity-100 transition-opacity" style={{ color: "var(--text-muted)" }}>
+                Beni hatırla
+              </span>
+            </button>
 
             <button
               id="login-submit"
