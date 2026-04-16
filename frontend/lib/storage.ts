@@ -18,6 +18,7 @@ import { Capacitor } from "@capacitor/core";
 // Uygulama başlangıcında yüklenen tokenlar için bellek içi önbellek
 const cache: Record<string, string | null> = {};
 let initialized = false;
+let _initPromise: Promise<void> | null = null;
 
 // Hangi key'ler uygulama açılışında yüklenmeli
 const PRELOAD_KEYS = ["access_token", "refresh_token", "biometrics_enabled"] as const;
@@ -31,21 +32,37 @@ export const storage = {
   /**
    * Uygulama açılışında çağrılır (AppInit component'ı yapar).
    * Native platformda Preferences'dan cache'e yükler.
+   * Promise kaydedilir — birden fazla çağrı sadece bir kez çalışır.
    */
-  async init() {
+  async init(): Promise<void> {
     if (initialized) return;
-    if (Capacitor.isNativePlatform()) {
-      const Preferences = await getPreferences();
-      for (const key of PRELOAD_KEYS) {
-        const { value } = await Preferences.get({ key });
-        cache[key] = value;
-      }
-    } else {
-      for (const key of PRELOAD_KEYS) {
-        cache[key] = localStorage.getItem(key);
-      }
+    if (!_initPromise) {
+      _initPromise = (async () => {
+        if (Capacitor.isNativePlatform()) {
+          const Preferences = await getPreferences();
+          for (const key of PRELOAD_KEYS) {
+            const { value } = await Preferences.get({ key });
+            cache[key] = value;
+          }
+        } else {
+          for (const key of PRELOAD_KEYS) {
+            cache[key] = localStorage.getItem(key);
+          }
+        }
+        initialized = true;
+      })();
     }
-    initialized = true;
+    return _initPromise;
+  },
+
+  /**
+   * Init tamamlanana kadar bekler.
+   * API interceptor'da kullanılır — her istek öncesi storage garantili hazır olur.
+   */
+  waitForInit(): Promise<void> {
+    if (initialized) return Promise.resolve();
+    if (_initPromise) return _initPromise;
+    return storage.init(); // henüz başlamadıysa başlat
   },
 
   /** Token kaydeder — hem cache hem kalıcı depolama */
@@ -72,11 +89,14 @@ export const storage = {
 
   /**
    * Senkron okuma — init() sonrası cache'den döner.
-   * init() çağrılmadan önce web'de localStorage'a fallback yapar.
+   * init() çağrılmadan önce web'de localStorage'a fallback yapar,
+   * native'de null döner (waitForInit() garanti eder ki bu olmaz).
    */
   getItem(key: string): string | null {
     if (initialized) return cache[key] ?? null;
-    // init() henüz bitmemişse (web'de) localStorage'a fallback
+    // Native'de init bitmeden token yok — waitForInit() bunu önler
+    if (Capacitor.isNativePlatform()) return null;
+    // Web'de localStorage'a fallback (sadece geliştirme/SSR)
     if (typeof window !== "undefined") return localStorage.getItem(key);
     return null;
   },
