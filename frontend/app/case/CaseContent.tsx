@@ -27,6 +27,9 @@ const EXAM_CATEGORIES = [
   { id: "neuro", label: "🧠 NÖROLOJİK MUAYENE" },
   { id: "locomotor", label: "🦴 Kas-İskelet Sistemi" },
   { id: "urogenital", label: "🚻 Ürogenital & Rektal" },
+  { id: "peds", label: "👶 Pediatri" },
+  { id: "obgyn", label: "🤰 Kadın Doğum" },
+  { id: "ortho", label: "🦿 Ortopedi & Eklem" },
   { id: "derma", label: "✨ Dermatolojik" },
 ];
 
@@ -124,6 +127,50 @@ const EXAM_ITEMS = [
   { id: "cilt_mukoza", name: "Cilt ve Mukoza İnspeksiyonu", category: "derma", message: "[FİZİK MUAYENE] Cilt ve mukoza inspeksiyonu yapar mısın? (Döküntü? Lezyon?)" },
   { id: "turgor_tonus", name: "Deri Turgor ve Tonusu", category: "derma", message: "[FİZİK MUAYENE] Deri turgor ve tonusunu değerlendirir misin?" },
   { id: "tirnak", name: "Tırnak İnspeksiyonu", category: "derma", message: "[FİZİK MUAYENE] Tırnak inspeksiyonu yapar mısın?" },
+
+  // ── Pediatri ─────────────────────────────────────────────────────────────
+  { id: "peds_vital_yas", name: "Yaşa Göre Vital Bulgular (Nabız/Solunum)", category: "peds", message: "[FİZİK MUAYENE] Yaşa uygun nabız ve solunum sayısını değerlendirir misin? (Pediatrik referans aralığı.)" },
+  { id: "peds_persentil", name: "Boy / Kilo Persentil veya SDS", category: "peds", message: "[FİZİK MUAYENE] Boy ve kilo için persentil eğrisi veya SDS ile büyüme değerlendirmesi yapar mısın?" },
+  { id: "peds_fontanel", name: "Fontanel ve Kafatası (Bebek)", category: "peds", message: "[FİZİK MUAYENE] Fontanel genişliği ve kafatası suturlarını değerlendirir misin?" },
+  { id: "peds_primitif", name: "Primitif Refleksler (Moro, Emme, Yakalama)", category: "peds", message: "[FİZİK MUAYENE] Yenidoğan/bebekte primitif refleksleri kontrol eder misin?" },
+  { id: "peds_ortolani", name: "Kalça Çıkığı Tarama (Ortolani-Barlow)", category: "peds", message: "[FİZİK MUAYENE] Ortolani ve Barlow manevraları ile gelişimsel kalça displazisi taraması yapar mısın?" },
+  { id: "peds_hidrasyon", name: "Hidrasyon (Mukoza, Fontanel, Turgor)", category: "peds", message: "[FİZİK MUAYENE] Çocukta hidrasyonu (mukoza, fontanel, deri turgoru, idrar çıkışı) değerlendirir misin?" },
+  { id: "peds_gelisim", name: "Gelişimsel Mileston / Tarama", category: "peds", message: "[FİZİK MUAYENE] Yaşa uygun gelişimsel milestonları (göz teması, baş kontrolü, oturma, yürüme vb.) sorar ve gözlemler misin?" },
+  { id: "peds_stridor", name: "Stridor / Krup Klinik Değerlendirme", category: "peds", message: "[FİZİK MUAYENE] İnspiratuvar stridor ve üst hava yolu obstrüksiyonu için klinik değerlendirme yapar mısın?" },
+  { id: "peds_batin", name: "Çocuk Batın Muayenesi", category: "peds", message: "[FİZİK MUAYENE] Çocuk batın inspeksiyon ve palpasyonu (Rosenberg, kitle, distansiyon) yapar mısın?" },
+  { id: "peds_inguinal", name: "Çocuk İnguinal / Skrotum (Fıtık, Testis)", category: "peds", message: "[FİZİK MUAYENE] İnguinal kanal ve skrotumu çocukta muayene eder misin? (İnguinal fıtık, hidrosel, testis torsiyonu düşüncesi.)" },
+  { id: "peds_capiller", name: "Kapiller Dolgu (Pediatrik Şok İzlemi)", category: "peds", message: "[FİZİK MUAYENE] Çocukta kapiller dolgu süresi ve periferik perfüzyonu değerlendirir misin?" },
+  { id: "peds_airway", name: "Pediatrik Hava Yolu ve Dispne Skoru", category: "peds", message: "[FİZİK MUAYENE] Pediatrik solunum sıkıntısını (çekilmeler, siyanoz, işe solunum) klinik olarak tarar mısın?" },
+
+  // ── Kadın doğum ─────────────────────────────────────────────────────────
+  { id: "ob_leopold", name: "Leopold Manevraları (Fetal Prezentasyon)", category: "obgyn", message: "[FİZİK MUAYENE] Gebelikte Leopold manevraları ile fetal prezentasyon ve pozisyonu değerlendirir misin?" },
+  { id: "ob_fundus", name: "Uterus Fundus Yüksekliği (cm)", category: "obgyn", message: "[FİZİK MUAYENE] Gebelik haftasına uygun uterus fundus yüksekliğini ölçer ve kaydeder misin?" },
+  { id: "ob_fetal_kalp", name: "Fetal Kalp Sesleri (FKS)", category: "obgyn", message: "[FİZİK MUAYENE] Doppler veya fetoskop ile fetal kalp seslerini dinler misin?" },
+  { id: "ob_bimanuel", name: "Bimanuel Pelvik Muayene", category: "obgyn", message: "[FİZİK MUAYENE] Bimanuel pelvik muayene ile uterus ve adneksleri değerlendirir misin?" },
+  { id: "ob_spekulum", name: "Spekulum ile Serviks ve Vajen Görüntüleme", category: "obgyn", message: "[FİZİK MUAYENE] Spekulum ile serviks ve vajen mukozasını inspeksiyon eder misin?" },
+  { id: "ob_vulva", name: "Vulva ve Bartholin Muayenesi", category: "obgyn", message: "[FİZİK MUAYENE] Vulva, vestibulum ve Bartholin bölgesini inspeksiyon/palpasyonla değerlendirir misin?" },
+  { id: "ob_gebelik_meme", name: "Gebelikte Meme Muayenesi", category: "obgyn", message: "[FİZİK MUAYENE] Gebelikte meme inspeksiyon ve palpasyonu (emzirme planı, mastit riski) yapar mısın?" },
+  { id: "ob_lohusa_uterus", name: "Lohusal Uterus İnvülasyon (Fundus)", category: "obgyn", message: "[FİZİK MUAYENE] Lohusal dönemde uterus fundus yüksekliği ve kontraksiyonu palpe eder misin?" },
+  { id: "ob_gebelik_ta", name: "Gebelikte TA ve Ödem", category: "obgyn", message: "[FİZİK MUAYENE] Gebelikte kan basıncı ve periferik ödemi preeklampsi açısından değerlendirir misin?" },
+  { id: "ob_kontraksiyon", name: "Uterus Kontraksiyon Takibi (Doğum Eylemi)", category: "obgyn", message: "[FİZİK MUAYENE] Doğum eyleminde uterus kontraksiyon sıklığı ve şiddetini palpasyonla izler misin?" },
+
+  // ── Ortopedi (spesifik provokasyon testleri) ─────────────────────────────
+  { id: "ortho_lachman", name: "Lachman Testi (Ön Çapraz Bağ)", category: "ortho", message: "[FİZİK MUAYENE] Dizde Lachman testi ile ön çapraz bağ bütünlüğünü değerlendirir misin?" },
+  { id: "ortho_drawer", name: "Ön/Arka Çekmece Testi (Diz)", category: "ortho", message: "[FİZİK MUAYENE] Dizde anterior ve posterior drawer testlerini yapar mısın?" },
+  { id: "ortho_mcmurray", name: "McMurray Testi (Menisküs)", category: "ortho", message: "[FİZİK MUAYENE] McMurray testi ile medial/lateral menisküs patolojisini değerlendirir misin?" },
+  { id: "ortho_pivot", name: "Pivot Shift Testi (Diz)", category: "ortho", message: "[FİZİK MUAYENE] Pivot shift testi ile ACL instabilitesini değerlendirir misin?" },
+  { id: "ortho_varus_valgus", name: "Varus / Valgus Stres (Diz)", category: "ortho", message: "[FİZİK MUAYENE] Dizde varus ve valgus stres testlerini uygular mısın?" },
+  { id: "ortho_apprehension", name: "Apprehension Testi (Omuz)", category: "ortho", message: "[FİZİK MUAYENE] Omuzda apprehension ve relocation testlerini yapar mısın?" },
+  { id: "ortho_hawkins", name: "Hawkins-Kennedy (Omuz Impingement)", category: "ortho", message: "[FİZİK MUAYENE] Hawkins-Kennedy testi ile subakromial sıkışmayı değerlendirir misin?" },
+  { id: "ortho_empty_can", name: "Empty Can / Jobe (Supraspinatus)", category: "ortho", message: "[FİZİK MUAYENE] Empty can (Jobe) testi ile supraspinatus patolojisini tarar mısın?" },
+  { id: "ortho_yergason", name: "Yergason Testi (Biseps)", category: "ortho", message: "[FİZİK MUAYENE] Yergason testi ile biseps tendon patolojisini değerlendirir misin?" },
+  { id: "ortho_finkelstein", name: "Finkelstein Testi (De Quervain)", category: "ortho", message: "[FİZİK MUAYENE] Finkelstein testi ile 1. ekstansör kompartman tenosinovitini tarar mısın?" },
+  { id: "ortho_phalen_tinel", name: "Phalen ve Tinel (Median Sinir)", category: "ortho", message: "[FİZİK MUAYENE] Karpal tünel için Phalen ve Tinel testlerini uygular mısın?" },
+  { id: "ortho_thomas", name: "Thomas Testi (Kalça Fleksiyon Kontraktürü)", category: "ortho", message: "[FİZİK MUAYENE] Thomas testi ile kalça fleksiyon kontraktürünü değerlendirir misin?" },
+  { id: "ortho_ober", name: "Ober Testi (İT Bant)", category: "ortho", message: "[FİZİK MUAYENE] Ober testi ile iliotibial bant gerginliğini değerlendirir misin?" },
+  { id: "ortho_slr_cross", name: "Çapraz SLR (İskias)", category: "ortho", message: "[FİZİK MUAYENE] Çapraz düz bacak kaldırma testi ile kök irritasyonunu tarar mısın?" },
+  { id: "ortho_ankle_drawer", name: "Ayak Bileği Ön Çekmece (YÇB)", category: "ortho", message: "[FİZİK MUAYENE] Ayak bileğinde anterior drawer ile lateral bağ yaralanmasını değerlendirir misin?" },
+  { id: "ortho_adams", name: "Adams Eğilme Testi (Skolyoz Tarama)", category: "ortho", message: "[FİZİK MUAYENE] Adams eğilme testi ile skolyoz ve kosta kamburluğunu tarar mısın?" },
 ];
 
 const LAB_CATEGORIES = [
