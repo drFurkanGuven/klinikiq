@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { sessionsApi, api, API_URL } from "@/lib/api";
+import { sessionsApi, api, getBaseUrl } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
 import DiagnosisForm from "@/components/DiagnosisForm";
 import {
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { nativeClient } from "@/lib/native";
+import { storage } from "@/lib/storage";
 
 // --- SABİTLER VE VERİLER ---
 
@@ -383,8 +384,9 @@ export default function CasePageContent() {
     const timeoutId = setTimeout(() => controller.abort(), 90000); // 90s timeout
 
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${API_URL}/sessions/${sessionId}/message`, {
+      await storage.waitForInit();
+      const token = storage.getItem("access_token");
+      const response = await fetch(`${getBaseUrl()}/sessions/${sessionId}/message`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ content: rawMsg }),

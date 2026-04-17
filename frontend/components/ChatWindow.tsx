@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { API_URL } from "@/lib/api";
+import { getBaseUrl } from "@/lib/api";
+import { storage } from "@/lib/storage";
 
 interface Message {
   role: "user" | "assistant";
@@ -42,9 +43,10 @@ export default function ChatWindow({ sessionId, initialMessages = [] }: Props) {
     setStreaming(true);
 
     try {
-      const token = localStorage.getItem("access_token");
+      await storage.waitForInit();
+      const token = storage.getItem("access_token");
       const response = await fetch(
-        `${API_URL}/sessions/${sessionId}/message`,
+        `${getBaseUrl()}/sessions/${sessionId}/message`,
         {
           method: "POST",
           headers: {

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, cast, String
 from typing import Optional, List
 
 from app.core.database import get_db
@@ -18,7 +18,6 @@ async def list_cases(
     db: AsyncSession = Depends(get_db),
     _: str = Depends(get_current_user_id),
 ):
-    from sqlalchemy import cast, String
     query = select(Case).where(Case.is_active == True)
     if specialty:
         query = query.where(cast(Case.specialty, String) == specialty)
