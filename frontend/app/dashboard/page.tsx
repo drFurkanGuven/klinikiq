@@ -6,8 +6,21 @@ import { casesApi, usersApi, authApi, sessionsApi, questionsApi, type HistoryIte
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
-  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound
+  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound, RefreshCw, Filter
 } from "lucide-react";
+
+function timeAgo(dateStr: string | undefined): string {
+  if (!dateStr) return "";
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "az önce";
+  if (m < 60) return `${m} dk önce`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} saat önce`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `${d} gün önce`;
+  return `${Math.floor(d / 30)} ay önce`;
+}
 import { nativeClient } from "@/lib/native";
 import { biometricsClient } from "@/lib/biometrics";
 import { storage } from "@/lib/storage";
@@ -46,6 +59,8 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<"randomizer" | "history">("randomizer");
   const [questionStats, setQuestionStats] = useState<QuestionStats | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [restartingSessionId, setRestartingSessionId] = useState<string | null>(null);
+  const [filterSuggestion, setFilterSuggestion] = useState<{ label: string; specs: string[]; difficulty: string } | null>(null);
 
   // Premium Features States
   const [showSettings, setShowSettings] = useState(false);
@@ -134,6 +149,22 @@ export default function DashboardPage() {
     }
   };
   
+  async function handleRestartCase(sessionId: string) {
+    nativeClient.impact();
+    setRestartingSessionId(sessionId);
+    try {
+      const sessionRes = await sessionsApi.getSession(sessionId);
+      const caseId = sessionRes.data.case_id;
+      const newSession = await sessionsApi.create(caseId);
+      router.push(`/case?id=${newSession.data.id}`);
+    } catch (err: any) {
+      setActiveTab("randomizer");
+      setErrorMsg(err.response?.data?.detail || "Vaka yeniden başlatılamadı, lütfen tekrar deneyin.");
+    } finally {
+      setRestartingSessionId(null);
+    }
+  }
+
   async function fetchMe() {
     try {
       const res = await authApi.me();
@@ -218,6 +249,7 @@ export default function DashboardPage() {
     nativeClient.impact();
     setIsStarting(true);
     setErrorMsg("");
+    setFilterSuggestion(null);
     try {
         const specsParam = selectedSpecs.length > 0 ? selectedSpecs.join(",") : undefined;
         // 1. Get a random case
@@ -230,13 +262,26 @@ export default function DashboardPage() {
 
     } catch (err: any) {
         if (err.response?.status === 404) {
-            setErrorMsg("Seçtiğiniz kriterlerde yeni/çözülmemiş vaka bulunamadı!");
+            setErrorMsg("Bu kriterlerde çözülmemiş yeni vaka bulunamadı.");
+            // Filtre genişletme önerisi hesapla
+            const diffOrder = ["", "easy", "medium", "hard"];
+            const currentDiffIdx = diffOrder.indexOf(difficulty);
+            if (currentDiffIdx > 1) {
+              // hard→medium veya medium→easy
+              const lowerDiff = diffOrder[currentDiffIdx - 1];
+              const lowerLabel = DIFFICULTIES.find(d => d.value === lowerDiff)?.label ?? lowerDiff;
+              setFilterSuggestion({ label: `Zorluğu "${lowerLabel}" olarak dene`, specs: selectedSpecs, difficulty: lowerDiff });
+            } else if (selectedSpecs.length > 0) {
+              setFilterSuggestion({ label: "Tüm branşlara genişlet", specs: [], difficulty });
+            } else {
+              setFilterSuggestion({ label: "Tüm filtreleri temizle ve dene", specs: [], difficulty: "" });
+            }
         } else if (err.response?.status === 403) {
             setErrorMsg(err.response.data.detail || "Günlük limitinize ulaştınız.");
-        } else if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
-            setErrorMsg("Sunucu yanıt vermedi. Lütfen tekrar deneyin.");
+        } else if (err.code === "ECONNABORTED" || err.message?.includes("timeout") || !navigator.onLine) {
+            setErrorMsg("Sunucu yanıt vermedi. Bağlantınızı kontrol edip tekrar deneyin.");
         } else {
-            setErrorMsg("Vaka başlatılırken bir hata oluştu.");
+            setErrorMsg("Geçici bir sorun oluştu. Lütfen tekrar deneyin.");
         }
     } finally {
         setIsStarting(false);
@@ -274,7 +319,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* Navbar */}
-      <nav className="glass border-b sticky top-0 z-50 transition-all" style={{ borderColor: "var(--border)" }}>
+      <nav className="glass border-b sticky top-0 z-[100] transition-all" style={{ borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group cursor-pointer transition-transform hover:scale-105">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
@@ -284,56 +329,55 @@ export default function DashboardPage() {
             <span className="font-bold text-lg tracking-tight" style={{ color: "var(--text)" }}>KlinikIQ</span>
           </Link>
 
-          <div className="flex flex-1 items-center justify-end gap-1 sm:gap-4 mr-1 sm:mr-4 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1 sm:gap-2">
             {userProfile?.is_admin && (
-                <Link href="/admin" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+                <Link href="/admin" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
                   style={{ background: "color-mix(in srgb, var(--error) 10%, transparent)", borderColor: "var(--error)", color: "var(--error)" }}>
                     <ShieldAlert className="w-3.5 h-3.5" />
                     <span className="hidden md:inline">Admin</span>
                 </Link>
             )}
-            <Link href="/histology" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+            <Link href="/histology" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Microscope className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
               <span className="hidden lg:inline">Histoloji</span>
             </Link>
-            <Link href="/sinir-lezyon" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+            <Link href="/sinir-lezyon" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Brain className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
               <span className="hidden lg:inline">Nöroloji</span>
             </Link>
-            <Link href="/questions" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+            <Link href="/questions" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <GraduationCap className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
               <span className="hidden lg:inline">Sorular</span>
             </Link>
-            <Link href="/leaderboard" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+            <Link href="/leaderboard" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Trophy className="w-3.5 h-3.5" style={{ color: "var(--warning)" }} />
               <span className="hidden lg:inline">Sıralama</span>
             </Link>
             <button
                 onClick={() => { nativeClient.impact(); setShowSettings(true); }}
-                className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+                className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
                 style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}
             >
                 <Settings className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
                 <span className="hidden lg:inline">Ayarlar</span>
             </button>
+            <button
+              onClick={logout}
+              className="flex items-center gap-1 text-[10px] sm:text-sm transition-colors px-2 py-2 rounded-lg hover:bg-slate-500/10"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Çıkış</span>
+            </button>
           </div>
-
-          <button
-            onClick={logout}
-            className="flex items-center gap-1 text-[10px] sm:text-sm transition-colors px-2 py-2 rounded-lg hover:bg-slate-500/10 shrink-0"
-            style={{ color: "var(--text-muted)" }}
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Çıkış</span>
-          </button>
         </div>
       </nav>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8">
+      <main className="relative z-0 flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8">
         {/* AI Disclaimer & Limit Banner */}
         <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6">
             <div className="flex-1 flex items-center gap-2.5 border rounded-2xl px-4 py-3 text-[10px] sm:text-xs shadow-sm"
@@ -421,26 +465,72 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Tab navigasyon */}
-        <div className="flex gap-1 p-1 rounded-xl w-fit mb-6 border shadow-inner" 
-          style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
-          {(["randomizer", "history"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 sm:px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm ${
-                activeTab === tab
-                  ? "text-white"
-                  : ""
-              }`}
-              style={{ 
-                background: activeTab === tab ? "var(--primary)" : "transparent",
-                color: activeTab === tab ? "#fff" : "var(--text-muted)"
+        {/* Aktif oturum kart */}
+        {(() => {
+          const activeSession = history.find(h => h.status === "active");
+          if (!activeSession) return null;
+          return (
+            <div
+              className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl px-5 py-4 border shadow-md animate-fade-in-up"
+              style={{
+                background: "color-mix(in srgb, var(--primary) 8%, var(--surface))",
+                borderColor: "var(--primary)",
               }}
             >
-              {tab === "randomizer" ? "Yepyeni Vaka Çöz" : "Geçmişim"}
-            </button>
-          ))}
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+                  style={{ background: "var(--primary)" }}>
+                  <Play className="w-4 h-4 text-white" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-black uppercase tracking-widest mb-0.5" style={{ color: "var(--primary)" }}>
+                    Devam eden vakan var
+                  </p>
+                  <p className="text-sm font-bold truncate" style={{ color: "var(--text)" }}>
+                    {activeSession.case_title}
+                  </p>
+                  <p className="text-[10px] font-medium opacity-60 mt-0.5" style={{ color: "var(--text-muted)" }}>
+                    {activeSession.specialty} · {activeSession.difficulty} · {timeAgo(activeSession.started_at)}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => { nativeClient.impact(); router.push(`/case?id=${activeSession.session_id}`); }}
+                className="btn-premium shrink-0 px-5 py-2.5 text-sm rounded-xl active:scale-95 w-full sm:w-auto"
+              >
+                Devam Et →
+              </button>
+            </div>
+          );
+        })()}
+
+        {/* Tab navigasyon */}
+        <div className="flex gap-1 p-1 rounded-xl w-fit mb-6 border shadow-inner"
+          style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+          {(["randomizer", "history"] as const).map((tab) => {
+            const incompleteCount = history.filter(h => h.status === "active" || h.status === "abandoned").length;
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`relative px-4 sm:px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm ${
+                  activeTab === tab ? "text-white" : ""
+                }`}
+                style={{
+                  background: activeTab === tab ? "var(--primary)" : "transparent",
+                  color: activeTab === tab ? "#fff" : "var(--text-muted)"
+                }}
+              >
+                {tab === "randomizer" ? "Yepyeni Vaka Çöz" : "Geçmişim"}
+                {tab === "history" && incompleteCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center text-white"
+                    style={{ background: "var(--warning)" }}>
+                    {incompleteCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {activeTab === "randomizer" && (
@@ -529,10 +619,28 @@ export default function DashboardPage() {
                         </div>
 
                         {errorMsg && (
-                            <div className="mb-6 p-4 rounded-2xl flex items-center gap-3 text-xs font-bold border"
-                              style={{ background: "var(--error-light)", borderColor: "var(--error-light)", color: "var(--danger)" }}>
-                                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                {errorMsg}
+                            <div className="mb-4 space-y-2">
+                              <div className="p-4 rounded-2xl flex items-center gap-3 text-xs font-bold border"
+                                style={{ background: "var(--error-light)", borderColor: "var(--error-light)", color: "var(--danger)" }}>
+                                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                  {errorMsg}
+                              </div>
+                              {filterSuggestion && (
+                                <button
+                                  onClick={() => {
+                                    nativeClient.impact();
+                                    setSelectedSpecs(filterSuggestion.specs);
+                                    setDifficulty(filterSuggestion.difficulty);
+                                    setFilterSuggestion(null);
+                                    setErrorMsg("");
+                                  }}
+                                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all hover:opacity-80 active:scale-95"
+                                  style={{ borderColor: "var(--primary)", color: "var(--primary)", background: "var(--primary-light)" }}
+                                >
+                                  <Filter className="w-3.5 h-3.5" />
+                                  {filterSuggestion.label}
+                                </button>
+                              )}
                             </div>
                         )}
 
@@ -559,6 +667,20 @@ export default function DashboardPage() {
                             <span>Önerilen</span>
                           </button>
                         </div>
+
+                        {history.some(h => h.status === "active" || h.status === "abandoned") && (
+                          <p className="mt-6 text-center text-[11px] font-medium opacity-40" style={{ color: "var(--text-muted)" }}>
+                            Yarım kalan vakalarına{" "}
+                            <button
+                              onClick={() => setActiveTab("history")}
+                              className="underline underline-offset-2 opacity-100 transition-opacity hover:opacity-70"
+                              style={{ color: "var(--primary)" }}
+                            >
+                              Geçmişim
+                            </button>
+                            {" "}sekmesinden devam edebilirsin.
+                          </p>
+                        )}
                     </div>
                 </div>
             </div>
@@ -605,7 +727,9 @@ export default function DashboardPage() {
                             ? "Yarım Kaldı"
                             : "Tamamlandı"}
                       </span>
-                      <span className="opacity-60">{new Date(item.started_at).toLocaleDateString("tr-TR")}</span>
+                      <span className="opacity-60">
+                        {timeAgo(item.status === "active" ? item.started_at : (item.ended_at || item.started_at))}
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-4 sm:pl-4 transition-all" style={{ borderColor: "var(--border)" }}>
@@ -631,6 +755,21 @@ export default function DashboardPage() {
                         className="btn-premium px-5 py-2.5 text-xs active:scale-95"
                       >
                         Devam Et
+                      </button>
+                    )}
+                    {item.status === "abandoned" && (
+                      <button
+                        onClick={() => handleRestartCase(item.session_id)}
+                        disabled={restartingSessionId === item.session_id}
+                        className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-2xl border transition-all active:scale-95 disabled:opacity-50"
+                        style={{ borderColor: "var(--primary)", color: "var(--primary)", background: "var(--primary-light)" }}
+                      >
+                        {restartingSessionId === item.session_id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <RefreshCw className="w-3.5 h-3.5" />
+                        )}
+                        Yeniden Başlat
                       </button>
                     )}
                   </div>

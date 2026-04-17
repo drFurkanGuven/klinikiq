@@ -93,7 +93,7 @@ export default function LoginPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start sm:justify-center px-4 py-8 sm:py-12 relative overflow-y-auto transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
+    <div className="min-h-screen flex flex-col items-center justify-start sm:justify-center px-4 py-8 sm:py-12 relative overflow-y-auto transition-colors" style={{ background: "var(--bg)", color: "var(--text)", paddingTop: "max(2rem, calc(var(--safe-top) + 2rem))" }}>
       {/* Arka plan efektleri */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--primary)_0%,_transparent_60%)] opacity-10 pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--accent)_0%,_transparent_60%)] opacity-10 pointer-events-none" />
