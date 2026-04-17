@@ -127,7 +127,7 @@ const LAB_TESTS = [
   { id: "tiroid_paneli", name: "Tiroid Paneli (TSH, sT3, sT4)", price: 120, category: "lab" },
   { id: "akg", name: "Arter Kan Gazı (AKG)", price: 110, category: "lab" },
   { id: "tit", name: "Tam İdrar Tetkiki (TİT)", price: 40, category: "lab" },
-  { id: "hormon_paneli", name: "Hormon Paneli (FSH, LH, Kortizol vb.)", price: 200, category: "lab" },
+  { id: "hormon_paneli", name: "Hormon Paneli (FSH, LH, Kortizol, Prolaktin vb.)", price: 200, category: "lab" },
   { id: "tumor_belirtec", name: "Tümör Belirteçleri (PSA, CEA, CA-125)", price: 250, category: "lab" },
   { id: "romatoloji_paneli", name: "Romatoloji Paneli (ANA, RF, Anti-CCP)", price: 220, category: "lab" },
   { id: "vitamin_mineral", name: "Vitamin ve Mineral Paneli (B12, D Vit, Demir)", price: 150, category: "lab" },
@@ -137,6 +137,116 @@ const LAB_TESTS = [
   { id: "bos_analizi", name: "Beyin Omurilik Sıvısı (BOS) Analizi", price: 450, category: "lab" },
   { id: "sivi_analizi", name: "Vücut Sıvısı Analizi (Plevral/Asit)", price: 300, category: "lab" },
   { id: "toksikoloji", name: "Toksikoloji Taraması", price: 400, category: "lab" },
+  // ── Hormonlar & nöroendokrin (tekil ve özel) ─────────────────────────────
+  { id: "serum_oksitosin", name: "Serum Oksitosin", price: 320, category: "lab" },
+  { id: "serum_vazopressin", name: "Serum ADH (Vazopressin)", price: 340, category: "lab" },
+  { id: "prolaktin_tek", name: "Prolaktin (tekil)", price: 110, category: "lab" },
+  { id: "gh_igf_panel", name: "GH + IGF-1 Paneli", price: 380, category: "lab" },
+  { id: "acth_kortizol", name: "ACTH + Serum Kortizol (eş zamanlı)", price: 220, category: "lab" },
+  { id: "salivary_kortizol", name: "Tükürük Kortizol (gece)", price: 260, category: "lab" },
+  { id: "renin_aldosteron", name: "Renin + Aldosteron (PRA)", price: 280, category: "lab" },
+  { id: "andr_steroid", name: "Androjen / Steroid Paneli (DHEA-S, Androstenedion, 17-OHP)", price: 300, category: "lab" },
+  { id: "testosteron_free", name: "Testosteron (Total + Free) + SHBG", price: 200, category: "lab" },
+  { id: "estro_prog_panel", name: "Estradiol + Progesteron Paneli", price: 180, category: "lab" },
+  { id: "fsh_lh_tek", name: "FSH + LH (tekil)", price: 160, category: "lab" },
+  { id: "amh", name: "Anti-Müllerian Hormon (AMH)", price: 350, category: "lab" },
+  { id: "inhibin_b", name: "İnhibin B", price: 400, category: "lab" },
+  { id: "beta_hcg_kant", name: "Beta-hCG (Kantitatif)", price: 130, category: "lab" },
+  { id: "parathormon", name: "Parathormon (PTH)", price: 150, category: "lab" },
+  { id: "kalsitonin", name: "Serum Kalsitonin", price: 200, category: "lab" },
+  { id: "tiroid_antikor", name: "Tiroid Otoantikor Paneli (Anti-TPO, Anti-Tg, TRAb)", price: 240, category: "lab" },
+  { id: "metanefrin_plazma", name: "Plazma Metanefrin / Normetanefrin", price: 450, category: "lab" },
+  { id: "metanefrin_idrar24", name: "24 Saat İdrar Metanefrinler", price: 420, category: "lab" },
+  { id: "vma_hma", name: "24 Saat İdrar VMA / HMA", price: 280, category: "lab" },
+  { id: "hi_aa_idrar", name: "24 Saat İdrar 5-HIAA (Serotonin metaboliti)", price: 300, category: "lab" },
+  { id: "insulin_cpep", name: "Açlık İnsülin + C-Peptid", price: 170, category: "lab" },
+  { id: "ogtt", name: "Oral Glukoz Tolerans Testi (OGTT, 75 g)", price: 140, category: "lab" },
+  { id: "fruktosamin", name: "Fruktozamin", price: 90, category: "lab" },
+  { id: "hba1c", name: "HbA1c", price: 85, category: "lab" },
+  // ── Biyokimya alt paneller ───────────────────────────────────────────────
+  { id: "lft", name: "Karaciğer Fonksiyon Paneli (ALT, AST, GGT, ALP, Bilirubin)", price: 130, category: "lab" },
+  { id: "rft", name: "Böbrek Fonksiyon Paneli (Üre, Kreatinin, eGFR, Asit-Baz)", price: 120, category: "lab" },
+  { id: "lipid_profil", name: "Lipid Profili (Kol, HDL, LDL, TG)", price: 100, category: "lab" },
+  { id: "lipoprotein_a", name: "Lipoprotein (a)", price: 180, category: "lab" },
+  { id: "apo_apob", name: "ApoA1 + ApoB", price: 160, category: "lab" },
+  { id: "elektrolit_genis", name: "Elektrolit Paneli (Na, K, Cl, osmolalite)", price: 95, category: "lab" },
+  { id: "ca_mg_p", name: "Kalsiyum + Fosfor + Mg (serum)", price: 90, category: "lab" },
+  { id: "demir_profili", name: "Demir Profili (Demir, TDBK, Ferritin, Satürasyon)", price: 140, category: "lab" },
+  { id: "laktat", name: "Kan Laktat", price: 110, category: "lab" },
+  { id: "amonyak", name: "Kan Amonyağı", price: 130, category: "lab" },
+  { id: "ck_ckmb", name: "CK + CK-MB + Miyoglobin", price: 170, category: "lab" },
+  { id: "homosistein", name: "Homosistein", price: 150, category: "lab" },
+  { id: "urik_asit", name: "Ürik Asit", price: 70, category: "lab" },
+  { id: "bilirubin_ayrim", name: "Direkt / İndirekt Bilirubin Ayrımı", price: 80, category: "lab" },
+  // ── Hematoloji & koagülasyon genişletilmiş ───────────────────────────────
+  { id: "retikulosit", name: "Retikülosit Sayımı", price: 55, category: "lab" },
+  { id: "esr", name: "Sedimantasyon (ESR)", price: 45, category: "lab" },
+  { id: "crp", name: "C-Reaktif Protein (CRP)", price: 70, category: "lab" },
+  { id: "hs_crp", name: "Yüksek Duyarlılık CRP (hs-CRP)", price: 90, category: "lab" },
+  { id: "pct", name: "Prokalsitonin (PCT)", price: 220, category: "lab" },
+  { id: "ddimer", name: "D-Dimer", price: 180, category: "lab" },
+  { id: "fibrinojen", name: "Fibrinojen", price: 95, category: "lab" },
+  { id: "kan_grubu", name: "Kan Grubu + Rh + Antikor Tarama", price: 80, category: "lab" },
+  { id: "cross_match", name: "Cross-Match (Uygunluk)", price: 120, category: "lab" },
+  { id: "direct_coombs", name: "Direkt Coombs", price: 90, category: "lab" },
+  { id: "antitrombin", name: "Anti-Trombin III", price: 200, category: "lab" },
+  { id: "protein_c_s", name: "Protein C + Protein S Aktivitesi", price: 280, category: "lab" },
+  { id: "lupus_antikoag", name: "Lupus Antikoagülan + Kardiyolipin IgG/IgM", price: 350, category: "lab" },
+  { id: "hb_elektro", name: "Hemoglobin Elektroforezi", price: 180, category: "lab" },
+  // ── İmmünoloji & seroloji ────────────────────────────────────────────────
+  { id: "ana_ena", name: "ANA + ENA Paneli", price: 320, category: "lab" },
+  { id: "anca", name: "ANCA (p/c-ANCA)", price: 260, category: "lab" },
+  { id: "anti_dsdna", name: "Anti-dsDNA", price: 200, category: "lab" },
+  { id: "kompleman", name: "Kompleman C3 + C4", price: 140, category: "lab" },
+  { id: "ig_panel", name: "İmmünoglobulin Paneli (IgG, IgA, IgM, IgE)", price: 220, category: "lab" },
+  { id: "hla_b27", name: "HLA-B27", price: 350, category: "lab" },
+  { id: "aso", name: "ASO Titresi", price: 70, category: "lab" },
+  { id: "torch", name: "TORCH Serolojisi", price: 380, category: "lab" },
+  { id: "hiv_combo", name: "HIV Ag/Ab Kombine", price: 160, category: "lab" },
+  { id: "hbsag_anti_hcv", name: "HBsAg + Anti-HCV", price: 140, category: "lab" },
+  { id: "cmv_pcr", name: "CMV DNA (PCR, kan)", price: 400, category: "lab" },
+  { id: "ebv_seroloji", name: "EBV Serolojisi (VCA, EBNA)", price: 240, category: "lab" },
+  // ── Mikrobiyoloji ─────────────────────────────────────────────────────────
+  { id: "kan_kultur", name: "Kan Kültürü (Aerob + Anaerob)", price: 180, category: "lab" },
+  { id: "idrar_kultur", name: "İdrar Kültürü + Antibiyogram", price: 120, category: "lab" },
+  { id: "bogaz_kultur", name: "Boğaz / Sürüntü Kültürü", price: 100, category: "lab" },
+  { id: "mrsa", name: "MRSA Burun Sürüntüsü Taraması", price: 130, category: "lab" },
+  { id: "c_diff", name: "Clostridioides difficile Toksin A/B", price: 220, category: "lab" },
+  { id: "legionella_ua", name: "Legionella Üriner Antijen", price: 280, category: "lab" },
+  { id: "strepa_hizli", name: "Streptokok Grup A Hızlı Test", price: 60, category: "lab" },
+  { id: "mantoux", name: "Mantoux (PPD) Testi", price: 80, category: "lab" },
+  // ── İdrar & gaita ───────────────────────────────────────────────────────
+  { id: "mikroalbuminuri", name: "İdrar Mikroalbuminürisi", price: 90, category: "lab" },
+  { id: "idrar24_protein", name: "24 Saat İdrar Protein", price: 100, category: "lab" },
+  { id: "osmolalite_serum_idrar", name: "Serum + İdrar Osmolalitesi", price: 130, category: "lab" },
+  { id: "gaita_kalprotektin", name: "Gaita Kalprotektini", price: 350, category: "lab" },
+  { id: "gaita_parazit", name: "Gaita Parazit Taraması", price: 90, category: "lab" },
+  { id: "gaita_elastaz", name: "Gaita Pankreas Elastaz-1", price: 280, category: "lab" },
+  { id: "helicobacter_stool", name: "Helicobacter pylori Gaita Antijeni", price: 200, category: "lab" },
+  // ── İlaç düzeyleri ───────────────────────────────────────────────────────
+  { id: "dijitalis", name: "Digoksin Düzeyi", price: 150, category: "lab" },
+  { id: "valproat", name: "Valproik Asit Düzeyi", price: 160, category: "lab" },
+  { id: "fenitoin", name: "Fenitoin Düzeyi", price: 150, category: "lab" },
+  { id: "karbamazepin", name: "Karbamazepin Düzeyi", price: 150, category: "lab" },
+  { id: "litium", name: "Lityum Düzeyi", price: 120, category: "lab" },
+  { id: "teofilin", name: "Teofilin Düzeyi", price: 140, category: "lab" },
+  { id: "vankomisin", name: "Vankomisin Düzeyi (trough)", price: 180, category: "lab" },
+  { id: "amikasin", name: "Amikasin Düzeyi", price: 180, category: "lab" },
+  { id: "siklosporin", name: "Siklosporin Düzeyi", price: 200, category: "lab" },
+  { id: "takrolimus", name: "Takrolimus Düzeyi", price: 200, category: "lab" },
+  // ── Diğer ────────────────────────────────────────────────────────────────
+  { id: "il6", name: "İnterlökin-6 (IL-6)", price: 280, category: "lab" },
+  { id: "ferritin_tek", name: "Ferritin (tekil)", price: 85, category: "lab" },
+  { id: "g6pd", name: "G6PD Enzim Aktivitesi", price: 200, category: "lab" },
+  { id: "ldh", name: "LDH", price: 75, category: "lab" },
+  { id: "b12_folat", name: "B12 + Folat (serum)", price: 140, category: "lab" },
+  { id: "vit_d25", name: "Vitamin D (25-OH)", price: 180, category: "lab" },
+  { id: "demir_baglanma", name: "Demir Bağlama Kapasitesi (TDBK)", price: 70, category: "lab" },
+  { id: "porfirin", name: "İdrar / Kan Porfirin Paneli", price: 450, category: "lab" },
+  { id: "asit_sivi_ada", name: "Asit / Plevra Sıvısı ADA", price: 220, category: "lab" },
+  { id: "ter_testi", name: "Ter Testi (Klor / iletkenlik, CF)", price: 600, category: "lab" },
+  { id: "kan_gazi_venoz", name: "Venöz Kan Gazı", price: 100, category: "lab" },
+  { id: "laktat_arteriyel", name: "Arteriyel Laktat (Şok takibi)", price: 120, category: "lab" },
   { id: "pa_ac", name: "PA / AP Akciğer Grafisi", price: 100, category: "radiology" },
   { id: "adbg", name: "Ayakta Direkt Batın Grafisi (ADBG)", price: 100, category: "radiology" },
   { id: "iskelet_grafi", name: "İskelet ve Eklem Grafileri", price: 90, category: "radiology" },
@@ -160,6 +270,16 @@ const LAB_TESTS = [
   { id: "mr_anji_mrcp", name: "MR Anjiyografi / MRCP", price: 950, category: "radiology" },
   { id: "fmri", name: "Fonksiyonel MR (fMRI)", price: 1200, category: "radiology" },
   { id: "mr_spektroskopi", name: "MR Spektroskopi", price: 1100, category: "radiology" },
+  { id: "mr_mamografi", name: "MR Mamografi", price: 950, category: "radiology" },
+  { id: "mr_enterografi", name: "MR Enterografi (kontrastlı)", price: 1100, category: "radiology" },
+  { id: "bt_kolonografi", name: "Virtual Kolonografi (BT)", price: 750, category: "radiology" },
+  { id: "urografi_iv", name: "İntravenöz Ürografi (İVÜ)", price: 450, category: "radiology" },
+  { id: "sialografi", name: "Sialografi", price: 400, category: "radiology" },
+  { id: "usg_elastografi", name: "USG Elastografi (Karaciğer / Tiroid)", price: 320, category: "radiology" },
+  { id: "karotis_duplex", name: "Karotis Duplex USG", price: 350, category: "radiology" },
+  { id: "venoz_doppler_ekst", name: "Venöz Doppler (Alt Ekstremite)", price: 380, category: "radiology" },
+  { id: "periferik_anjio_bt", name: "Periferik Anjiyografi (BT)", price: 900, category: "radiology" },
+  { id: "toraks_bt_yuksek", name: "Toraks BT (Yüksek Çözünürlük)", price: 550, category: "radiology" },
   { id: "ekg", name: "Elektrokardiyografi (EKG)", price: 60, category: "cardio" },
   { id: "tte", name: "Transtorasik Ekokardiyografi (TTE)", price: 450, category: "cardio" },
   { id: "tee", name: "Transözofageal Ekokardiyografi (TEE)", price: 800, category: "cardio" },
@@ -171,9 +291,16 @@ const LAB_TESTS = [
   { id: "sft", name: "Solunum Fonksiyon Testleri (SFT)", price: 150, category: "cardio" },
   { id: "dlco", name: "Karbonmonoksit Difüzyon Kapasitesi (DLCO)", price: 250, category: "cardio" },
   { id: "uyku_testi", name: "Uyku Apnesi Testi (Polisomnografi)", price: 1200, category: "cardio" },
+  { id: "event_recorder", name: "Event Recorder (Belirtilmeli Ritim Kaydı)", price: 400, category: "cardio" },
+  { id: "imp_ekg", name: "İmplante Edilebilir Loop Recorder (ILR)", price: 4500, category: "cardio" },
+  { id: "six_walk", name: "6 Dakika Yürüme Testi", price: 80, category: "cardio" },
+  { id: "muga", name: "MUGA (Radyonüklid Ventrikülografi)", price: 850, category: "cardio" },
   { id: "eeg", name: "Elektroensefalografi (EEG)", price: 350, category: "neuro" },
   { id: "emg", name: "Elektromiyografi (EMG)", price: 500, category: "neuro" },
   { id: "vep_baep_sep", name: "Uyarılmış Potansiyeller (VEP, BAEP, SEP)", price: 450, category: "neuro" },
+  { id: "ncs_emg", name: "Sinir İletim Çalışması (NCS) + EMG", price: 550, category: "neuro" },
+  { id: "baep_yenidogan", name: "İşitme Tarama (OAE / BERA)", price: 300, category: "neuro" },
+  { id: "botoks_emg", name: "EMG Rehberli Botulinum Enjeksiyonu", price: 1200, category: "neuro" },
   { id: "ust_gis_endo", name: "Üst GİS Endoskopisi", price: 600, category: "endo" },
   { id: "kolonoskopi", name: "Kolonoskopi / Sigmoidoskopi", price: 800, category: "endo" },
   { id: "ercp", name: "ERCP", price: 2500, category: "endo" },
@@ -183,6 +310,9 @@ const LAB_TESTS = [
   { id: "sistoskopi", name: "Sistoskopi", price: 700, category: "endo" },
   { id: "laparoskopi_tanisal", name: "Laparoskopi (Tanısal)", price: 2500, category: "endo" },
   { id: "artroskopi_tanisal", name: "Artroskopi (Tanısal)", price: 2000, category: "endo" },
+  { id: "gastro_biyopsi", name: "Gastroskopi + Biyopsi", price: 750, category: "endo" },
+  { id: "kolon_biyopsi", name: "Kolonoskopi + Polipektomi / Biyopsi", price: 950, category: "endo" },
+  { id: "sigmoidoskopi_flek", name: "Esnek Sigmoidoskopi", price: 550, category: "endo" },
   { id: "pet_ct", name: "PET-CT", price: 3500, category: "nuclear" },
   { id: "sint_miyokard", name: "Miyokard Perfüzyon Sintigrafisi", price: 900, category: "nuclear" },
   { id: "sint_kemik", name: "Tüm Vücut Kemik Sintigrafisi", price: 800, category: "nuclear" },
@@ -190,6 +320,8 @@ const LAB_TESTS = [
   { id: "sint_renal", name: "Renal Sintigrafi (DMSA/DTPA)", price: 600, category: "nuclear" },
   { id: "vq_sintigrafi", name: "Ventilasyon / Perfüzyon (V/Q) Sintigrafisi", price: 1000, category: "nuclear" },
   { id: "sint_ozel", name: "Galyum / Oktreotid Sintigrafisi", price: 1500, category: "nuclear" },
+  { id: "pet_psma", name: "PSMA PET-CT", price: 4200, category: "nuclear" },
+  { id: "datscan", name: "DaTSCAN (Dopamin Transportör Sintigrafisi)", price: 2800, category: "nuclear" },
   { id: "iiab", name: "İnce İğne Aspirasyon Biyopsisi (İİAB)", price: 300, category: "patho" },
   { id: "trucut", name: "Tru-cut (Kor) Biyopsi", price: 500, category: "patho" },
   { id: "biyopsi_ozel", name: "Eksizyonel / İnsizyonel Biyopsi", price: 800, category: "patho" },
@@ -199,6 +331,11 @@ const LAB_TESTS = [
   { id: "pcr_testleri", name: "PCR Testleri", price: 350, category: "patho" },
   { id: "ngs_analizi", name: "Yeni Nesil Dizileme (NGS)", price: 5000, category: "patho" },
   { id: "fish_analizi", name: "FISH Analizi", price: 1200, category: "patho" },
+  { id: "kemik_iligi_asp", name: "Kemik İliği Aspirasyonu + Biyopsi", price: 650, category: "patho" },
+  { id: "flow_sitometri", name: "Flow Sitometri (Kan / Kemik İliği)", price: 900, category: "patho" },
+  { id: "sitoloji_bos", name: "Sitoloji (BOS / İdrar / Balgam)", price: 220, category: "patho" },
+  { id: "frozen", name: "Frozen Section (Peroperatuvar Patoloji)", price: 500, category: "patho" },
+  { id: "exom", name: "Ekzom Dizileme (Exome Sequencing)", price: 6500, category: "patho" },
 ];
 
 const SPECIALTY_LABELS: Record<string, string> = {
@@ -207,9 +344,10 @@ const SPECIALTY_LABELS: Record<string, string> = {
 };
 
 const DIFFICULTY_MAP: Record<string, { label: string; color: string; initialBudget: number }> = {
-  easy: { label: "Kolay", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20", initialBudget: 1000 },
-  medium: { label: "Orta", color: "text-amber-400 bg-amber-500/10 border-amber-500/20", initialBudget: 1500 },
-  hard: { label: "Zor", color: "text-red-400 bg-red-500/10 border-red-500/20", initialBudget: 2500 },
+  // Geniş tetkik menüsü (PET, MR, NGS vb.) ile uyumlu — kullanıcı şikayeti: bütçe yetmiyordu
+  easy: { label: "Kolay", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20", initialBudget: 4500 },
+  medium: { label: "Orta", color: "text-amber-400 bg-amber-500/10 border-amber-500/20", initialBudget: 9500 },
+  hard: { label: "Zor", color: "text-red-400 bg-red-500/10 border-red-500/20", initialBudget: 22000 },
 };
 
 interface Message { role: "user" | "assistant"; content: string; streaming?: boolean; isError?: boolean; }
@@ -332,7 +470,7 @@ export default function CasePageContent() {
   const [selectedExamCategory, setSelectedExamCategory] = useState("basic");
   const [searchQuery, setSearchQuery] = useState("");
   const [examSearchQuery, setExamSearchQuery] = useState("");
-  const [budget, setBudget] = useState(1000);
+  const [budget, setBudget] = useState(DIFFICULTY_MAP.medium.initialBudget);
   const [selectedLabs, setSelectedLabs] = useState<string[]>([]);
   const [lastRawMessage, setLastRawMessage] = useState<string>("");
   const [mounted, setMounted] = useState(false);
@@ -354,8 +492,9 @@ export default function CasePageContent() {
       if (res.data.messages) {
         setMessages(res.data.messages.map((m: any) => ({ role: m.role, content: m.content, streaming: false })));
       }
-      const difficulty = res.data.case?.difficulty || 'medium';
-      setBudget(DIFFICULTY_MAP[difficulty].initialBudget);
+      const difficulty = res.data.case?.difficulty || "medium";
+      const tier = DIFFICULTY_MAP[difficulty] ? difficulty : "medium";
+      setBudget(DIFFICULTY_MAP[tier].initialBudget);
     } catch { setError("Oturum yüklenemedi."); }
     finally { setLoading(false); }
   }
@@ -604,8 +743,8 @@ export default function CasePageContent() {
                   {LAB_TESTS.filter(t => (searchQuery ? t.name.toLowerCase().includes(searchQuery.toLowerCase()) : t.category === selectedCategory)).map(test => {
                     const isSelected = selectedLabs.includes(test.id);
                     return (
-                      <button key={test.id} onClick={() => toggleLab(test.id, test.price)} className={`p-4 rounded-2xl md:rounded-3xl border transition-all text-left h-24 md:h-28 flex flex-col justify-between hover:scale-105 active:scale-95 shadow-sm`} style={{ background: isSelected ? "var(--primary-light)" : "var(--surface)", borderColor: isSelected ? "var(--primary)" : "var(--border)", color: "var(--text)" }}>
-                        <span className="text-xs md:text-sm font-black line-clamp-2 leading-tight pr-2">{test.name}</span>
+                      <button key={test.id} onClick={() => toggleLab(test.id, test.price)} className={`p-4 rounded-2xl md:rounded-3xl border transition-all text-left min-h-[5.5rem] md:min-h-[6.25rem] flex flex-col justify-between hover:scale-105 active:scale-95 shadow-sm`} style={{ background: isSelected ? "var(--primary-light)" : "var(--surface)", borderColor: isSelected ? "var(--primary)" : "var(--border)", color: "var(--text)" }}>
+                        <span className="text-xs md:text-sm font-black line-clamp-3 leading-tight pr-2">{test.name}</span>
                         <span className="text-[10px] md:text-xs font-bold opacity-80" style={{ color: "var(--primary)" }}>{test.price} ₺</span>
                       </button>
                     );
