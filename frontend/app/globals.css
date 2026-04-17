@@ -38,6 +38,10 @@
 }
 
 :root {
+  --safe-top: 0px;
+  --safe-right: 0px;
+  --safe-bottom: 0px;
+  --safe-left: 0px;
   --bg:          #f5f0e8;
   --bg-subtle:   #ede8df;
   --surface:     #ffffff;
@@ -53,6 +57,13 @@
   --warning-light: rgba(180, 83, 9, 0.1);
   --text-navy:   #1e293b; 
   --text-red:    #991b1b; 
+}
+
+html[data-native-platform="true"] {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
 }
 
 /* ── Dark Mode (True Black & Neon Premium) ────────────────── */

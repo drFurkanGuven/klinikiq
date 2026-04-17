@@ -6,7 +6,7 @@ import { casesApi, usersApi, authApi, sessionsApi, questionsApi, type HistoryIte
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
-  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2
+  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound
 } from "lucide-react";
 import { nativeClient } from "@/lib/native";
 import { biometricsClient } from "@/lib/biometrics";
@@ -60,6 +60,11 @@ export default function DashboardPage() {
   const [profileYear, setProfileYear] = useState("");
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSaveMsg, setProfileSaveMsg] = useState<"ok" | "err" | null>(null);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordMsg, setPasswordMsg] = useState<"ok" | string | null>(null);
 
   const { theme, toggleTheme, palette, setPalette } = useTheme();
 
@@ -157,6 +162,40 @@ export default function DashboardPage() {
       setTimeout(() => setProfileSaveMsg(null), 2500);
     } finally {
       setProfileSaving(false);
+    }
+  }
+
+  async function changePassword() {
+    if (!currentPassword || !newPassword) {
+      setPasswordMsg("Mevcut ve yeni şifre alanlarını doldurun.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordMsg("Yeni şifre en az 6 karakter olmalı.");
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordMsg("Yeni şifre ve doğrulama eşleşmiyor.");
+      return;
+    }
+
+    setPasswordSaving(true);
+    setPasswordMsg(null);
+    try {
+      await authApi.changePassword({
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+      setPasswordMsg("ok");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail;
+      setPasswordMsg(typeof detail === "string" ? detail : "Şifre güncellenemedi.");
+    } finally {
+      setPasswordSaving(false);
+      setTimeout(() => setPasswordMsg(null), 3000);
     }
   }
 
@@ -577,11 +616,11 @@ export default function DashboardPage() {
         {/* Settings Modal */}
         {showSettings && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowSettings(false); setIsEditingProfile(false); setProfileSaveMsg(null); }} />
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowSettings(false); setIsEditingProfile(false); setProfileSaveMsg(null); setPasswordMsg(null); }} />
                 <div className="relative w-full max-w-md glass-card p-6 sm:p-8 animate-fade-in-up max-h-[90vh] overflow-y-auto" style={{ background: "var(--surface)" }}>
                     <div className="flex items-center justify-between mb-8">
                         <h3 className="text-xl font-black tracking-tight">Ayarlar</h3>
-                        <button onClick={() => { setShowSettings(false); setIsEditingProfile(false); setProfileSaveMsg(null); }} className="opacity-40 hover:opacity-100 p-1"><X className="w-6 h-6" /></button>
+                        <button onClick={() => { setShowSettings(false); setIsEditingProfile(false); setProfileSaveMsg(null); setPasswordMsg(null); }} className="opacity-40 hover:opacity-100 p-1"><X className="w-6 h-6" /></button>
                     </div>
 
                     <div className="space-y-8">
@@ -701,6 +740,60 @@ export default function DashboardPage() {
                                         )}
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Password Section */}
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 opacity-40">Şifre Değiştir</p>
+                            <div className="rounded-2xl border p-4 space-y-3" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+                                <div className="flex items-center gap-2 text-[11px] font-bold opacity-70" style={{ color: "var(--text-muted)" }}>
+                                    <KeyRound className="w-3.5 h-3.5" />
+                                    Güvenlik için mevcut şifreniz doğrulanır.
+                                </div>
+                                <input
+                                    type="password"
+                                    value={currentPassword}
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                    className="w-full bg-transparent text-xs font-bold outline-none border rounded-xl px-3 py-2"
+                                    style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                                    placeholder="Mevcut şifre"
+                                />
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    className="w-full bg-transparent text-xs font-bold outline-none border rounded-xl px-3 py-2"
+                                    style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                                    placeholder="Yeni şifre (min 6 karakter)"
+                                />
+                                <input
+                                    type="password"
+                                    value={confirmNewPassword}
+                                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                    className="w-full bg-transparent text-xs font-bold outline-none border rounded-xl px-3 py-2"
+                                    style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                                    placeholder="Yeni şifre (tekrar)"
+                                />
+                                <button
+                                    onClick={changePassword}
+                                    disabled={passwordSaving}
+                                    className="w-full flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-wider px-3 py-2.5 rounded-xl transition-all text-white"
+                                    style={{ background: "var(--primary)" }}
+                                >
+                                    {passwordSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <KeyRound className="w-3.5 h-3.5" />}
+                                    Şifreyi Güncelle
+                                </button>
+                                {passwordMsg === "ok" && (
+                                    <div className="px-3 py-2 rounded-xl text-[11px] font-bold" style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)", color: "var(--success)" }}>
+                                        Şifre başarıyla güncellendi.
+                                    </div>
+                                )}
+                                {passwordMsg && passwordMsg !== "ok" && (
+                                    <div className="px-3 py-2 rounded-xl text-[11px] font-bold" style={{ background: "color-mix(in srgb, var(--danger) 15%, transparent)", color: "var(--danger)" }}>
+                                        {passwordMsg}
+                                    </div>
+                                )}
                             </div>
                         </div>
 

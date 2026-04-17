@@ -233,6 +233,8 @@ export interface UserOut {
 
 export const authApi = {
   me: () => api.get<UserOut>("/auth/me"),
+  changePassword: (data: { current_password: string; new_password: string }) =>
+    api.post("/auth/change-password", data),
 };
 
 export interface AdminUser {

@@ -19,6 +19,11 @@ class UserLogin(BaseModel):
     password: str
 
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=6)
+
+
 class TokenRefresh(BaseModel):
     refresh_token: str
 
