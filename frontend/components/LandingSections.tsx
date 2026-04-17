@@ -134,9 +134,9 @@ export function FeatureSection() {
       icon: Stethoscope,
     },
     {
-      title: "Topluluk Not Akışı",
+      title: "TUS not akışı",
       description:
-        "Tıp (TUS) sınıflandırması: temel ve klinik bilimler, dal ve konu etiketleriyle paylaşılan notları keşfet.",
+        "Temel ve klinik bilimler, dal ve konu seçerek not paylaş; beğeni ve kişisel kayıtlar.",
       icon: Users,
       href: "/topluluk",
     },
@@ -177,7 +177,7 @@ export function FeatureSection() {
                 </p>
                 {f.href ? (
                   <p className="mt-5 text-xs font-black uppercase tracking-widest flex items-center gap-2" style={{ color: "var(--primary)" }}>
-                    Topluluk sayfası
+                    Not akışı
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                   </p>
                 ) : null}

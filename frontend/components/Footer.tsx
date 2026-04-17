@@ -36,7 +36,7 @@ export default function Footer() {
             <Link href="/topluluk"
               className="transition-colors hover:underline"
               style={{ color: "var(--text-muted)" }}>
-              Topluluk
+              Notlar
             </Link>
             <Link href="/privacy"
               className="transition-colors hover:underline"

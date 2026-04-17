@@ -4,7 +4,7 @@ import uuid
 
 from sqlalchemy import (
     Column, String, Integer, Float, Boolean, Text, DateTime,
-    ForeignKey, Enum as SAEnum, UniqueConstraint
+    ForeignKey, Enum as SAEnum, UniqueConstraint, Index,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID, ARRAY
 from sqlalchemy.orm import relationship
@@ -266,6 +266,30 @@ class CommunityNote(Base):
     created_at = Column(DateTime(timezone=True), default=now_utc, index=True)
 
     user = relationship("User", back_populates="community_notes")
+
+
+class CommunityNoteLike(Base):
+    """Not beğenileri — her kullanıcı bir notu en fazla bir kez beğenir (toggle)."""
+
+    __tablename__ = "community_note_likes"
+
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    note_id = Column(String, ForeignKey("community_notes.id", ondelete="CASCADE"), primary_key=True)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
+
+    __table_args__ = (Index("ix_cn_like_note", "note_id"),)
+
+
+class CommunityNoteSave(Base):
+    """Kişisel kayıtlar — kullanıcı notu kaydeder; başkaları görmez."""
+
+    __tablename__ = "community_note_saves"
+
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    note_id = Column(String, ForeignKey("community_notes.id", ondelete="CASCADE"), primary_key=True)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
+
+    __table_args__ = (Index("ix_cn_save_user", "user_id"), Index("ix_cn_save_note", "note_id"))
 
 
 class Annotation(Base):

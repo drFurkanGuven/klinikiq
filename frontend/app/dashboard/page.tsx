@@ -6,7 +6,7 @@ import { casesApi, usersApi, authApi, sessionsApi, questionsApi, type HistoryIte
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
-  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound, RefreshCw, Filter, Users, PenLine
+  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound, RefreshCw, Filter, Users, PenLine, Bookmark
 } from "lucide-react";
 
 function timeAgo(dateStr: string | undefined): string {
@@ -360,7 +360,12 @@ export default function DashboardPage() {
             <Link href="/topluluk" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Users className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
-              <span className="hidden lg:inline">Topluluk</span>
+              <span className="hidden lg:inline">Notlar</span>
+            </Link>
+            <Link href="/topluluk/kaydedilenler" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
+              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
+              <Bookmark className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
+              <span className="hidden lg:inline">Kaydedilenler</span>
             </Link>
             <Link href="/topluluk/paylas" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", borderColor: "var(--primary)", color: "var(--primary)" }}>
@@ -475,7 +480,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Topluluk kısayolu */}
+        {/* Not akışı kısayolu */}
         <div
           className="mb-5 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-2xl px-5 py-4 border shadow-md"
           style={{ background: "var(--surface)", borderColor: "var(--border)" }}
@@ -489,10 +494,10 @@ export default function DashboardPage() {
             </div>
             <div className="min-w-0">
               <p className="text-sm font-black tracking-tight" style={{ color: "var(--text)" }}>
-                Topluluk not akışı
+                TUS not akışı
               </p>
               <p className="text-[11px] font-medium opacity-60 leading-snug" style={{ color: "var(--text-muted)" }}>
-                TUS sınıflandırmasıyla notları keşfet veya paylaş.
+                Notları keşfet, beğen; kayıtların sadece sende.
               </p>
             </div>
           </div>
@@ -502,7 +507,14 @@ export default function DashboardPage() {
               className="text-center px-5 py-2.5 rounded-xl text-xs font-black border transition-all"
               style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
             >
-              Keşfet
+              Akış
+            </Link>
+            <Link
+              href="/topluluk/kaydedilenler"
+              className="text-center px-5 py-2.5 rounded-xl text-xs font-black border transition-all"
+              style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+            >
+              Kaydedilenler
             </Link>
             <Link href="/topluluk/paylas" className="btn-premium text-center px-5 py-2.5 text-xs">
               Not paylaş

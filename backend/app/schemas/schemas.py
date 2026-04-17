@@ -334,8 +334,19 @@ class CommunityNoteOut(BaseModel):
     excerpt: str
     author_display: str
     likes: int = 0
-    saved: int = 0
+    liked_by_me: bool = False
+    saved_by_me: bool = False
+    is_mine: bool = False
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class ToggleLikeOut(BaseModel):
+    liked: bool
+    likes: int
+
+
+class ToggleSaveOut(BaseModel):
+    saved: bool

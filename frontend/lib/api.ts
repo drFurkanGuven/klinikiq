@@ -222,8 +222,19 @@ export interface CommunityNoteItem {
   excerpt: string;
   author_display: string;
   likes: number;
-  saved: number;
+  liked_by_me: boolean;
+  saved_by_me: boolean;
+  is_mine: boolean;
   created_at: string;
+}
+
+export interface ToggleLikeResponse {
+  liked: boolean;
+  likes: number;
+}
+
+export interface ToggleSaveResponse {
+  saved: boolean;
 }
 
 export const communityApi = {
@@ -235,6 +246,14 @@ export const communityApi = {
     limit?: number;
     offset?: number;
   }) => api.get<CommunityNoteItem[]>("/community/notes", { params }),
+  listSavedNotes: (params?: {
+    group?: string;
+    branch_id?: string;
+    topic_id?: string;
+    q?: string;
+    limit?: number;
+    offset?: number;
+  }) => api.get<CommunityNoteItem[]>("/community/me/kaydedilenler", { params }),
   createNote: (data: {
     group: "temel" | "klinik";
     branch_id: string;
@@ -242,6 +261,10 @@ export const communityApi = {
     title: string;
     body: string;
   }) => api.post<CommunityNoteItem>("/community/notes", data),
+  toggleLike: (noteId: string) =>
+    api.post<ToggleLikeResponse>(`/community/notes/${noteId}/like`),
+  toggleSave: (noteId: string) =>
+    api.post<ToggleSaveResponse>(`/community/notes/${noteId}/kaydet`),
 };
 
 export const usersApi = {

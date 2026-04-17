@@ -9,6 +9,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.core.config import settings
 
 bearer_scheme = HTTPBearer()
+optional_bearer = HTTPBearer(auto_error=False)
 
 
 # ── Password ──────────────────────────────────────────────────────────────────
@@ -64,3 +65,14 @@ def get_current_user_id(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ) -> str:
     return decode_token(credentials.credentials, "access")
+
+
+def get_optional_user_id(
+    credentials: HTTPAuthorizationCredentials | None = Depends(optional_bearer),
+) -> str | None:
+    if credentials is None:
+        return None
+    try:
+        return decode_token(credentials.credentials, "access")
+    except HTTPException:
+        return None
