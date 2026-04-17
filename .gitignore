@@ -33,6 +33,7 @@ frontend/capacitor.config.ts
 
 # SQL & Data
 *.sql
+!backend/scripts/*.sql
 *.jsonl
 postgres_data/
 redis_data/
