@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -41,6 +42,18 @@ class OrphanDziOut(BaseModel):
     relative_path: str
     image_url: str
     has_thumb: bool
+
+
+class HfTiffImportIn(BaseModel):
+    """Hugging Face Hub üzerinden TIFF/SVS/NDPI indirip sunucuda DZI üretir."""
+
+    repo_id: str
+    path_in_repo: str
+    title: str
+    description: str | None = None
+    specialty: str | None = None
+    repo_type: str = "dataset"
+
 
 # ── Admin Dependency ──
 async def get_current_admin_user(
@@ -216,3 +229,54 @@ async def register_dzi_tile(
     await db.refresh(img)
     await _invalidate_histology_list_cache()
     return img
+
+
+@router.post("/hf/import-tiff", response_model=HistologyImageOut, status_code=201)
+async def import_tiff_from_huggingface(
+    body: HfTiffImportIn,
+    admin: User = Depends(get_current_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Hugging Face'ten tek bir dosya indirir (TIFF/SVS/NDPI), libvips ile DZI üretir, /tiles altına yazar.
+    Önceden hazır DZI paketi olan veri kümeleri nadir; çoğu zaman pyramidal TIFF veya SVS kullanılır.
+    Kapalı veri kümeleri için sunucuda HF_TOKEN ortam değişkeni ayarlayın.
+    """
+    from app.api.microscope import ingest_local_file_as_dzi
+
+    if body.repo_type not in ("dataset", "model"):
+        raise HTTPException(status_code=400, detail="repo_type 'dataset' veya 'model' olmalıdır")
+
+    try:
+        from huggingface_hub import hf_hub_download
+    except ImportError as e:
+        raise HTTPException(
+            status_code=501,
+            detail="huggingface_hub kurulu değil. pip install huggingface_hub",
+        ) from e
+
+    def _download() -> str:
+        return hf_hub_download(
+            repo_id=body.repo_id.strip(),
+            filename=body.path_in_repo.strip().lstrip("/"),
+            repo_type=body.repo_type,
+            token=settings.HF_TOKEN or None,
+        )
+
+    loop = asyncio.get_event_loop()
+    try:
+        local_path = await loop.run_in_executor(None, _download)
+    except Exception as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Hugging Face indirilemedi (repo, yol veya token kontrolü): {e!s}",
+        ) from e
+
+    return await ingest_local_file_as_dzi(
+        local_path,
+        body.title,
+        body.description,
+        body.specialty,
+        db,
+        asset_source="huggingface",
+    )

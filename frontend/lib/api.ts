@@ -370,6 +370,18 @@ export const adminApi = {
   listOrphanDzi: () => api.get<OrphanDziFile[]>("/admin/tiles/orphan-dzi"),
   registerDzi: (body: { relative_path: string; title: string; specialty?: string }) =>
     api.post<HistologyImage>("/admin/tiles/register-dzi", body),
+  /** Hugging Face Hub'dan TIFF/SVS indirip sunucuda DZI üretir (admin). */
+  importHfTiff: (body: {
+    repo_id: string;
+    path_in_repo: string;
+    title: string;
+    description?: string;
+    specialty?: string;
+    repo_type?: string;
+  }) =>
+    api.post<HistologyImage>("/admin/hf/import-tiff", body, {
+      timeout: 600_000,
+    }),
 };
 
 export interface HuggingFaceDatasetSpotlight {

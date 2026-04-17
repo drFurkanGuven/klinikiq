@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { microscopyApi, AnnotationOut, AnnotationCreate, HistologyImage } from "@/lib/api";
-import { ZoomIn, ZoomOut, Maximize2, StickyNote, X, Trash2 } from "lucide-react";
+import { ZoomIn, ZoomOut, Maximize2, StickyNote, X, Trash2, Layers } from "lucide-react";
+import "./histology-viewer.css";
 
 declare global {
   interface Window {
@@ -145,13 +146,20 @@ export default function HistologyViewer({ image }: Props) {
           },
       showNavigator: true,
       navigatorPosition: "BOTTOM_RIGHT",
-      animationTime: 0.5,
-      blendTime: 0.1,
+      navigatorSizeRatio: 0.18,
+      navigatorMaintainSizeRatio: true,
+      showNavigationControl: false,
+      showZoomControl: false,
+      showHomeControl: false,
+      showFullPageControl: false,
+      animationTime: 0.35,
+      blendTime: 0.12,
       constrainDuringPan: true,
-      maxZoomPixelRatio: 10,  // Daha derin zoom için artırıldı
-      minZoomImageRatio: 0.5,
-      visibilityRatio: 0.5,
+      maxZoomPixelRatio: 12,
+      minZoomImageRatio: 0.45,
+      visibilityRatio: 0.55,
       zoomPerClick: 1,
+      zoomPerScroll: 1.15,
       gestureSettingsMouse: { clickToZoom: false },
     });
 
@@ -275,92 +283,55 @@ export default function HistologyViewer({ image }: Props) {
       <Script src={OSD_CDN} onLoad={() => setOsdReady(true)} strategy="afterInteractive" />
 
       <div className="flex flex-col gap-4">
-        {/* Araç çubuğu */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => viewerRef.current?.viewport.zoomBy(1.5)}
-            disabled={annotateMode}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm transition-colors disabled:opacity-40"
-          >
-            <ZoomIn size={15} /> Yaklaştır
-          </button>
-          <button
-            onClick={() => viewerRef.current?.viewport.zoomBy(0.67)}
-            disabled={annotateMode}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm transition-colors disabled:opacity-40"
-          >
-            <ZoomOut size={15} /> Uzaklaştır
-          </button>
-          <button
-            onClick={() => viewerRef.current?.viewport.goHome()}
-            disabled={annotateMode}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm transition-colors disabled:opacity-40"
-          >
-            <Maximize2 size={15} /> Sıfırla
-          </button>
+        {/* Görüntüleyici + overlay — HistAI benzeri cam çerçeve + yüzen kontroller */}
+        <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-[0_24px_80px_-12px_rgba(88,28,135,0.35)] bg-slate-950 select-none">
+          <div className="absolute top-0 left-0 right-0 z-30 pointer-events-none flex items-center justify-between px-4 py-3 bg-gradient-to-b from-slate-950/90 to-transparent">
+            <div className="pointer-events-none flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-violet-300/90">
+              <Layers size={14} className="text-violet-400" />
+              Dijital preparat
+            </div>
+          </div>
 
-          <button
-            onClick={() => { setAnnotateMode((v) => !v); setPending(null); }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              annotateMode
-                ? "bg-blue-600 text-white ring-2 ring-blue-400"
-                : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-            }`}
-          >
-            <StickyNote size={15} />
-            {annotateMode ? "Çizim modu — Kare çiz" : "Annotation ekle"}
-          </button>
-
-          {annotateMode && (
-            <span className="text-xs text-blue-500 font-medium animate-pulse">
-              Görüntü üzerinde sürükle → kare çiz
-            </span>
-          )}
-        </div>
-
-        {/* Görüntüleyici + overlay katmanı */}
-        <div className="relative rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-black select-none">
           {(loading || !osdReady) && (
-            <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/80 z-10">
-              <span className="text-white text-sm">
-                {!osdReady ? "Görüntüleyici hazırlanıyor..." : "Görüntü yükleniyor..."}
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 z-[35] gap-2">
+              <div className="h-9 w-9 rounded-full border-2 border-violet-500/30 border-t-violet-400 animate-spin" />
+              <span className="text-slate-300 text-sm font-medium">
+                {!osdReady ? "Görüntüleyici hazırlanıyor…" : "Pyramidal görüntü yükleniyor…"}
               </span>
             </div>
           )}
           {error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/80 z-10">
-              <span className="text-red-400 text-sm">{error}</span>
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-950/90 z-[35] px-6">
+              <span className="text-red-400 text-sm text-center">{error}</span>
             </div>
           )}
 
-          {/* OpenSeadragon Container - Key ekleyerek her resim değişiminde temiz mount sağlıyoruz */}
-          <div 
+          <div
             key={image.id}
             ref={(el) => {
               if (el) {
-                // WebGL sızıntısını önlemek için içeriği zorla temizle
                 if (containerRef.current !== el) {
                   el.innerHTML = "";
                   containerRef.current = el;
                 }
               }
             }}
-            className="w-full h-[520px]" 
+            className="hist-osd-root w-full h-[min(72vh,640px)] min-h-[360px]"
           />
 
-            <div
-              ref={overlayRef}
-              className={`absolute inset-0 z-20 ${
-                annotateMode ? "cursor-crosshair" : "pointer-events-none"
-              }`}
-              onMouseDown={annotateMode ? onOverlayDown : undefined}
-              onMouseMove={annotateMode ? onOverlayMove : undefined}
-              onMouseUp={annotateMode ? onOverlayUp : undefined}
-              onTouchStart={annotateMode ? onOverlayDown : undefined}
-              onTouchMove={annotateMode ? onOverlayMove : undefined}
-              onTouchEnd={annotateMode ? onOverlayUp : undefined}
-              style={{ touchAction: annotateMode ? "none" : "auto" }}
-            >
+          <div
+            ref={overlayRef}
+            className={`absolute inset-0 z-20 ${
+              annotateMode ? "cursor-crosshair" : "pointer-events-none"
+            }`}
+            onMouseDown={annotateMode ? onOverlayDown : undefined}
+            onMouseMove={annotateMode ? onOverlayMove : undefined}
+            onMouseUp={annotateMode ? onOverlayUp : undefined}
+            onTouchStart={annotateMode ? onOverlayDown : undefined}
+            onTouchMove={annotateMode ? onOverlayMove : undefined}
+            onTouchEnd={annotateMode ? onOverlayUp : undefined}
+            style={{ touchAction: annotateMode ? "none" : "auto" }}
+          >
             {/* Kaydedilmiş annotation kutuları */}
             {annotations.map((a) => (
               <div
@@ -393,6 +364,55 @@ export default function HistologyViewer({ image }: Props) {
               />
             )}
           </div>
+
+          {/* Yüzen araç çubuğu — overlay üstünde, tıklanabilir */}
+          <div className="pointer-events-auto absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex flex-wrap items-center justify-center gap-1.5 px-2 py-2 rounded-2xl bg-slate-900/90 backdrop-blur-xl border border-white/10 shadow-xl max-w-[95%]">
+            <button
+              type="button"
+              onClick={() => viewerRef.current?.viewport.zoomBy(1.45)}
+              disabled={annotateMode}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-100 text-xs font-bold transition-colors disabled:opacity-35 border border-white/5"
+            >
+              <ZoomIn size={16} className="text-violet-400" /> Yakın
+            </button>
+            <button
+              type="button"
+              onClick={() => viewerRef.current?.viewport.zoomBy(0.69)}
+              disabled={annotateMode}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-100 text-xs font-bold transition-colors disabled:opacity-35 border border-white/5"
+            >
+              <ZoomOut size={16} className="text-cyan-400" /> Uzak
+            </button>
+            <button
+              type="button"
+              onClick={() => viewerRef.current?.viewport.goHome()}
+              disabled={annotateMode}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-100 text-xs font-bold transition-colors disabled:opacity-35 border border-white/5"
+            >
+              <Maximize2 size={16} className="text-slate-400" /> Tümü
+            </button>
+            <div className="w-px h-6 bg-white/10 mx-0.5" />
+            <button
+              type="button"
+              onClick={() => {
+                setAnnotateMode((v) => !v);
+                setPending(null);
+              }}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
+                annotateMode
+                  ? "bg-violet-600 text-white border-violet-400/50 shadow-lg shadow-violet-500/20"
+                  : "bg-white/5 text-slate-200 border-white/5 hover:bg-white/10"
+              }`}
+            >
+              <StickyNote size={16} />
+              {annotateMode ? "Çiz — kare seç" : "Not alanı"}
+            </button>
+          </div>
+          {annotateMode && (
+            <p className="pointer-events-none absolute bottom-[5.25rem] left-1/2 -translate-x-1/2 z-40 text-[11px] font-semibold text-violet-300/90 animate-pulse">
+              Görüntü üzerinde sürükleyerek alan seç
+            </p>
+          )}
         </div>
 
         {/* Not formu — kare çizildikten sonra açılır */}

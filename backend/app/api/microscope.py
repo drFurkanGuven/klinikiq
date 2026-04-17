@@ -83,6 +83,75 @@ def _run_vips_dzsave(tiff_path: str, output_base: str) -> None:
     except Exception as e:
         print(f"Thumbnail uretimi basarisiz (kritik degil): {e}")
 
+
+async def ingest_local_file_as_dzi(
+    local_source_path: str,
+    title: str,
+    description: Optional[str],
+    specialty: Optional[str],
+    db: AsyncSession,
+    asset_source: str = "upload",
+) -> HistologyImage:
+    """
+    Yerel bir WSI dosyasından (TIFF/TIF/SVS/NDPI vb.) Deep Zoom (DZI) üretir ve veritabanına kaydeder.
+    Upload ve Hugging Face içe aktarma ortak kullanır.
+    """
+    os.makedirs(settings.TILES_DIR, exist_ok=True)
+    slug = _slugify(title) or "image"
+    counter = 0
+    while True:
+        name = slug if counter == 0 else f"{slug}_{counter}"
+        dzi_path = os.path.join(settings.TILES_DIR, f"{name}.dzi")
+        if not os.path.exists(dzi_path):
+            break
+        counter += 1
+
+    output_base = os.path.join(settings.TILES_DIR, name)
+    loop = asyncio.get_event_loop()
+    try:
+        await loop.run_in_executor(None, _run_vips_dzsave, local_source_path, output_base)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    dzi_url = f"/tiles/{name}.dzi"
+    thumb_url = f"/tiles/{name}_thumb.jpg"
+
+    if redis_client:
+        await redis_client.delete(CACHE_KEY_LIST)
+
+    image = HistologyImage(
+        title=title.strip(),
+        description=(description or "").strip() or None,
+        image_url=dzi_url,
+        thumbnail_url=thumb_url,
+        specialty=specialty or None,
+        asset_source=asset_source,
+    )
+    try:
+        db.add(image)
+        await db.commit()
+        await db.refresh(image)
+        return image
+    except Exception as e:
+        print(f"DB Kayit Hatasi (Dosyalar temizleniyor): {e}")
+        try:
+            filename = f"{name}.dzi"
+            files_dir = f"{name}_files"
+            thumb_file = f"{name}_thumb.jpg"
+            for path in [os.path.join(settings.TILES_DIR, f) for f in [filename, files_dir, thumb_file]]:
+                if os.path.exists(path):
+                    if os.path.isdir(path):
+                        shutil.rmtree(path)
+                    else:
+                        os.remove(path)
+        except Exception:
+            pass
+        raise HTTPException(
+            status_code=500,
+            detail="Görüntü veritabanına kaydedilirken hata oluştu.",
+        ) from e
+
+
 router = APIRouter()
 
 
@@ -243,74 +312,25 @@ async def upload_tiff_image(
     if content_type not in allowed and not is_tiff:
         raise HTTPException(status_code=400, detail="Desteklenmeyen dosya tipi. TIFF/TIF yükleyin.")
 
-    os.makedirs(settings.TILES_DIR, exist_ok=True)
-    slug = _slugify(title) or "image"
-
-    # Çakışma kontrolü
-    counter = 0
-    while True:
-        name = slug if counter == 0 else f"{slug}_{counter}"
-        dzi_path = os.path.join(settings.TILES_DIR, f"{name}.dzi")
-        if not os.path.exists(dzi_path):
-            break
-        counter += 1
-
-    # Geçici dosyaya kaydet
     suffix = os.path.splitext(file.filename or "upload.tiff")[1] or ".tiff"
     tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
     try:
         content = await file.read()
         tmp_file.write(content)
         tmp_file.close()
-
-        output_base = os.path.join(settings.TILES_DIR, name)
-
-        # vips'i thread pool'da çalıştır (blocking)
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, _run_vips_dzsave, tmp_file.name, output_base)
-
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        return await ingest_local_file_as_dzi(
+            tmp_file.name,
+            title,
+            description,
+            specialty,
+            db,
+            asset_source="upload",
+        )
     finally:
-        os.unlink(tmp_file.name)
-
-    dzi_url = f"/tiles/{name}.dzi"
-    thumb_url = f"/tiles/{name}_thumb.jpg"
-
-    # Cache geçersiz kılma
-    if redis_client:
-        await redis_client.delete(CACHE_KEY_LIST)
-
-    # 3. Veritabanına Kayıt (Hata durumunda dosya temizliği)
-    image = HistologyImage(
-        title=title.strip(),
-        description=description.strip() or None,
-        image_url=dzi_url,
-        thumbnail_url=thumb_url,
-        specialty=specialty or None,
-        asset_source="upload",
-    )
-    
-    try:
-        db.add(image)
-        await db.commit()
-        await db.refresh(image)
-        return image
-    except Exception as e:
-        # DB kaydi basarisiz ise uretilen dosyalari temizle
-        print(f"DB Kayit Hatasi (Dosyalar temizleniyor): {e}")
         try:
-            filename = f"{name}.dzi"
-            files_dir = f"{name}_files"
-            thumb_file = f"{name}_thumb.jpg"
-            
-            for path in [os.path.join(settings.TILES_DIR, f) for f in [filename, files_dir, thumb_file]]:
-                if os.path.exists(path):
-                    if os.path.isdir(path): shutil.rmtree(path)
-                    else: os.remove(path)
-        except Exception:
+            os.unlink(tmp_file.name)
+        except OSError:
             pass
-        raise HTTPException(status_code=500, detail="Görüntü veritabanına kaydedilirken hata oluştu.")
 
 
 @router.delete("/images/{image_id}", status_code=204)

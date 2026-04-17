@@ -499,9 +499,20 @@ function HistologyPageInner() {
                 <Database className="w-5 h-5 text-amber-400/90" />
                 Hugging Face veri keşfi
               </h2>
-              <p className="text-sm text-slate-400 mt-1 max-w-xl font-medium">
+              <p className="text-sm text-slate-400 mt-1 max-w-2xl font-medium leading-relaxed">
                 Açık histopatoloji ve WSI veri kümeleri (indirme, lisans ve boyutlar veri kartında). KlinikIQ
-                burada yalnızca keşif bağlantısı sunar; veri Hugging Face üzerindedir.
+                burada yalnızca keşif bağlantısı sunar; veri Hugging Face üzerindedir.{" "}
+                <span className="text-slate-300">
+                  Yöneticiler: Hugging Face&apos;teki pyramidal TIFF/SVS dosyasını sunucuya indirip DZI&apos;ye
+                  çevirmek için{" "}
+                  <Link
+                    href="/admin"
+                    className="text-violet-400 hover:text-violet-300 underline underline-offset-2 font-semibold"
+                  >
+                    Yönetim → HF&apos;den TIFF
+                  </Link>{" "}
+                  kullanılabilir (daha hızlı yerel okuma, çoğu veri kümesinde hazır DZI yerine TIFF vardır).
+                </span>
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">

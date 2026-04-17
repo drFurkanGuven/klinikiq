@@ -1,0 +1,33 @@
+/* OpenSeadragon — HistAI tarzı modern kabuk (varsayılan düğmeleri gizledik, kendi toolbar kullanılıyor) */
+
+.hist-osd-root .openseadragon-container {
+  border-radius: 1rem;
+  background: radial-gradient(ellipse at center, #0f172a 0%, #020617 100%) !important;
+}
+
+.hist-osd-root .openseadragon-canvas {
+  outline: none;
+}
+
+/* Minimap */
+.hist-osd-root .navigator {
+  border-radius: 0.75rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.15),
+    0 12px 40px rgba(0, 0, 0, 0.45) !important;
+  background: rgba(15, 23, 42, 0.92) !important;
+  margin: 0.75rem !important;
+  overflow: hidden;
+}
+
+.hist-osd-root .navigator .displayregion {
+  border: 2px solid rgba(168, 85, 247, 0.85) !important;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+}
+
+/* Gömülü OSD kontrolleri kapalı (showNavigationControl: false) — yine de gizle */
+.hist-osd-root .openseadragon-control,
+.hist-osd-root .openseadragon-navigation-control {
+  display: none !important;
+}

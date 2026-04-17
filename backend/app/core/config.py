@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     # OpenAI
     OPENAI_API_KEY: str = "sk-placeholder"
 
+    # Hugging Face (isteğe bağlı — kapalı veri kümeleri veya rate limit için)
+    HF_TOKEN: str | None = None
+
     # JWT
     JWT_SECRET: str = "change_this_secret"
     JWT_ALGORITHM: str = "HS256"

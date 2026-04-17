@@ -21,6 +21,7 @@ import {
   RefreshCcw,
   FolderOpen,
   Link2,
+  CloudDownload,
 } from "lucide-react";
 
 const SPECIALTY_LABEL: Record<string, string> = {
@@ -59,6 +60,12 @@ export default function AdminDashboardPage() {
   const [orphans, setOrphans] = useState<OrphanDziFile[]>([]);
   const [orphansLoading, setOrphansLoading] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isHfModalOpen, setIsHfModalOpen] = useState(false);
+  const [hfRepoId, setHfRepoId] = useState("");
+  const [hfPathInRepo, setHfPathInRepo] = useState("");
+  const [hfTitle, setHfTitle] = useState("");
+  const [hfRepoType, setHfRepoType] = useState<"dataset" | "model">("dataset");
+  const [hfImporting, setHfImporting] = useState(false);
 
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
@@ -157,6 +164,36 @@ export default function AdminDashboardPage() {
       setImages(images.filter(img => img.id !== id));
     } catch (err) {
       alert("Silme hatası oluştu.");
+    }
+  };
+
+  const handleHfImport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!hfRepoId.trim() || !hfPathInRepo.trim() || !hfTitle.trim()) {
+      alert("Repo, dosya yolu ve başlık zorunlu.");
+      return;
+    }
+    setHfImporting(true);
+    try {
+      await adminApi.importHfTiff({
+        repo_id: hfRepoId.trim(),
+        path_in_repo: hfPathInRepo.trim(),
+        title: hfTitle.trim(),
+        repo_type: hfRepoType,
+      });
+      setIsHfModalOpen(false);
+      setHfRepoId("");
+      setHfPathInRepo("");
+      setHfTitle("");
+      await fetchImages();
+      await fetchOrphans();
+    } catch (err: unknown) {
+      console.error(err);
+      alert(
+        "İçe aktarılamadı. Repo/yol doğru mu? Büyük dosyalar dakikalar sürebilir. Kapalı veri için sunucuda HF_TOKEN ayarlayın.",
+      );
+    } finally {
+      setHfImporting(false);
     }
   };
 
@@ -329,6 +366,14 @@ export default function AdminDashboardPage() {
                 >
                   <Plus className="w-5 h-5" />
                   TIFF / görüntü yükle
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsHfModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest border border-border bg-surface hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                >
+                  <CloudDownload className="w-5 h-5 text-violet-500" />
+                  HF&apos;den TIFF
                 </button>
               </div>
             </div>
@@ -508,6 +553,90 @@ export default function AdminDashboardPage() {
         onClose={() => setIsUploadModalOpen(false)}
         onSuccess={fetchImages}
       />
+
+      {isHfModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div
+            className="w-full max-w-lg rounded-3xl border border-border bg-surface shadow-2xl p-8 space-y-6"
+            style={{ background: "var(--surface)", color: "var(--text)" }}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-black tracking-tight">Hugging Face → DZI</h2>
+                <p className="text-sm opacity-60 mt-1">
+                  Veri kümesindeki bir TIFF/SVS/NDPI dosyası indirilir, sunucuda Deep Zoom üretilir. Hazır DZI paketi
+                  nadir; çoğu veri kümesi pyramidal TIFF kullanır.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => !hfImporting && setIsHfModalOpen(false)}
+                className="p-2 rounded-xl opacity-50 hover:opacity-100"
+              >
+                ×
+              </button>
+            </div>
+            <form onSubmit={handleHfImport} className="space-y-4">
+              <label className="block space-y-1.5">
+                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Repo türü</span>
+                <select
+                  value={hfRepoType}
+                  onChange={(e) => setHfRepoType(e.target.value as "dataset" | "model")}
+                  className="w-full rounded-xl border border-border bg-black/5 dark:bg-white/5 px-4 py-3 text-sm font-semibold"
+                >
+                  <option value="dataset">dataset</option>
+                  <option value="model">model</option>
+                </select>
+              </label>
+              <label className="block space-y-1.5">
+                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Repo ID</span>
+                <input
+                  required
+                  value={hfRepoId}
+                  onChange={(e) => setHfRepoId(e.target.value)}
+                  placeholder="örn. organization/wsi-sample"
+                  className="w-full rounded-xl border border-border bg-black/5 dark:bg-white/5 px-4 py-3 text-sm"
+                />
+              </label>
+              <label className="block space-y-1.5">
+                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Dosya yolu (repo içi)</span>
+                <input
+                  required
+                  value={hfPathInRepo}
+                  onChange={(e) => setHfPathInRepo(e.target.value)}
+                  placeholder="örn. data/slide.tif veya slides/case1.svs"
+                  className="w-full rounded-xl border border-border bg-black/5 dark:bg-white/5 px-4 py-3 text-sm font-mono text-xs"
+                />
+              </label>
+              <label className="block space-y-1.5">
+                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Başlık (uygulamada)</span>
+                <input
+                  required
+                  value={hfTitle}
+                  onChange={(e) => setHfTitle(e.target.value)}
+                  placeholder="Listede görünecek isim"
+                  className="w-full rounded-xl border border-border bg-black/5 dark:bg-white/5 px-4 py-3 text-sm"
+                />
+              </label>
+              <button
+                type="submit"
+                disabled={hfImporting}
+                className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500 disabled:opacity-50 transition-all"
+              >
+                {hfImporting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" /> İndiriliyor ve DZI oluşturuluyor…
+                  </>
+                ) : (
+                  <>
+                    <CloudDownload className="w-5 h-5" /> İçe aktar
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
