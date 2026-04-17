@@ -465,6 +465,45 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Aktif oturum kart */}
+        {(() => {
+          const activeSession = history.find(h => h.status === "active");
+          if (!activeSession) return null;
+          return (
+            <div
+              className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl px-5 py-4 border shadow-md animate-fade-in-up"
+              style={{
+                background: "color-mix(in srgb, var(--primary) 8%, var(--surface))",
+                borderColor: "var(--primary)",
+              }}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+                  style={{ background: "var(--primary)" }}>
+                  <Play className="w-4 h-4 text-white" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-black uppercase tracking-widest mb-0.5" style={{ color: "var(--primary)" }}>
+                    Devam eden vakan var
+                  </p>
+                  <p className="text-sm font-bold truncate" style={{ color: "var(--text)" }}>
+                    {activeSession.case_title}
+                  </p>
+                  <p className="text-[10px] font-medium opacity-60 mt-0.5" style={{ color: "var(--text-muted)" }}>
+                    {activeSession.specialty} · {activeSession.difficulty} · {timeAgo(activeSession.started_at)}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => { nativeClient.impact(); router.push(`/case?id=${activeSession.session_id}`); }}
+                className="btn-premium shrink-0 px-5 py-2.5 text-sm rounded-xl active:scale-95 w-full sm:w-auto"
+              >
+                Devam Et →
+              </button>
+            </div>
+          );
+        })()}
+
         {/* Tab navigasyon */}
         <div className="flex gap-1 p-1 rounded-xl w-fit mb-6 border shadow-inner"
           style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
