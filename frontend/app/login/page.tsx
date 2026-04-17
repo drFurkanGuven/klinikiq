@@ -9,6 +9,7 @@ import { useTheme, type Palette } from "@/components/ThemeProvider";
 import { biometricsClient } from "@/lib/biometrics";
 import { nativeClient } from "@/lib/native";
 import PremiumAlert from "@/components/PremiumAlert";
+import { storage } from "@/lib/storage";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,16 +30,23 @@ export default function LoginPage() {
 
   React.useEffect(() => {
     setMounted(true);
-    // Kaydedilmiş email varsa doldur
-    const savedEmail = localStorage.getItem("remembered_email");
-    if (savedEmail) {
-      setForm((f) => ({ ...f, email: savedEmail }));
-      setRememberMe(true);
-    }
-    // Biyometrik login kontrolü
-    if (biometricsClient.isEnabled()) {
+    // Zaten giriş yapılmışsa direkt dashboard'a yönlendir
+    storage.waitForInit().then(() => {
+      if (storage.getItem("access_token")) {
+        router.replace("/dashboard");
+        return;
+      }
+      // Kaydedilmiş email varsa doldur
+      const savedEmail = localStorage.getItem("remembered_email");
+      if (savedEmail) {
+        setForm((f) => ({ ...f, email: savedEmail }));
+        setRememberMe(true);
+      }
+      // Biyometrik login kontrolü
+      if (biometricsClient.isEnabled()) {
         handleBiometricLogin();
-    }
+      }
+    });
   }, []);
 
   async function handleBiometricLogin() {

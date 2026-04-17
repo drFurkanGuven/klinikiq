@@ -27,7 +27,8 @@ export default function Navbar() {
         borderBottom: isScrolled ? "1px solid var(--border)" : "none",
         backgroundColor: isScrolled ? "var(--bg)" : "transparent",
         opacity: isScrolled ? 0.97 : 1,
-        padding: isScrolled ? "10px 0" : "18px 0",
+        paddingTop: `calc(${isScrolled ? "10px" : "18px"} + var(--safe-top, 0px))`,
+        paddingBottom: isScrolled ? "10px" : "18px",
       }}
     >
       <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
