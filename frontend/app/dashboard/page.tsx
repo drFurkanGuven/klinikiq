@@ -274,7 +274,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* Navbar */}
-      <nav className="glass border-b sticky top-0 z-50 transition-all" style={{ borderColor: "var(--border)" }}>
+      <nav className="glass border-b sticky top-0 z-[100] transition-all" style={{ borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group cursor-pointer transition-transform hover:scale-105">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
@@ -284,56 +284,55 @@ export default function DashboardPage() {
             <span className="font-bold text-lg tracking-tight" style={{ color: "var(--text)" }}>KlinikIQ</span>
           </Link>
 
-          <div className="flex flex-1 items-center justify-end gap-1 sm:gap-4 mr-1 sm:mr-4 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1 sm:gap-2">
             {userProfile?.is_admin && (
-                <Link href="/admin" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+                <Link href="/admin" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
                   style={{ background: "color-mix(in srgb, var(--error) 10%, transparent)", borderColor: "var(--error)", color: "var(--error)" }}>
                     <ShieldAlert className="w-3.5 h-3.5" />
                     <span className="hidden md:inline">Admin</span>
                 </Link>
             )}
-            <Link href="/histology" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+            <Link href="/histology" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Microscope className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
               <span className="hidden lg:inline">Histoloji</span>
             </Link>
-            <Link href="/sinir-lezyon" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+            <Link href="/sinir-lezyon" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Brain className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
               <span className="hidden lg:inline">Nöroloji</span>
             </Link>
-            <Link href="/questions" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+            <Link href="/questions" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <GraduationCap className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
               <span className="hidden lg:inline">Sorular</span>
             </Link>
-            <Link href="/leaderboard" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+            <Link href="/leaderboard" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Trophy className="w-3.5 h-3.5" style={{ color: "var(--warning)" }} />
               <span className="hidden lg:inline">Sıralama</span>
             </Link>
             <button
                 onClick={() => { nativeClient.impact(); setShowSettings(true); }}
-                className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm shrink-0"
+                className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
                 style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}
             >
                 <Settings className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
                 <span className="hidden lg:inline">Ayarlar</span>
             </button>
+            <button
+              onClick={logout}
+              className="flex items-center gap-1 text-[10px] sm:text-sm transition-colors px-2 py-2 rounded-lg hover:bg-slate-500/10"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Çıkış</span>
+            </button>
           </div>
-
-          <button
-            onClick={logout}
-            className="flex items-center gap-1 text-[10px] sm:text-sm transition-colors px-2 py-2 rounded-lg hover:bg-slate-500/10 shrink-0"
-            style={{ color: "var(--text-muted)" }}
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Çıkış</span>
-          </button>
         </div>
       </nav>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8">
+      <main className="relative z-0 flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8">
         {/* AI Disclaimer & Limit Banner */}
         <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6">
             <div className="flex-1 flex items-center gap-2.5 border rounded-2xl px-4 py-3 text-[10px] sm:text-xs shadow-sm"
