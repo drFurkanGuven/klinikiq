@@ -584,6 +584,17 @@ export default function DashboardPage() {
                     <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-wider opacity-60" style={{ color: "var(--text-muted)" }}>
                       <span className="px-2 py-0.5 rounded-lg" style={{ background: "var(--surface-2)" }}>{item.specialty}</span>
                       <span className="px-2 py-0.5 rounded-lg" style={{ background: "var(--surface-2)" }}>{item.difficulty}</span>
+                      <span
+                        className="px-2 py-0.5 rounded-lg"
+                        style={{
+                          background: item.status === "active"
+                            ? "color-mix(in srgb, var(--warning) 15%, transparent)"
+                            : "color-mix(in srgb, var(--success) 15%, transparent)",
+                          color: item.status === "active" ? "var(--warning)" : "var(--success)",
+                        }}
+                      >
+                        {item.status === "active" ? "Devam Ediyor" : "Tamamlandı"}
+                      </span>
                       <span className="opacity-60">{new Date(item.started_at).toLocaleDateString("tr-TR")}</span>
                     </div>
                   </div>
@@ -602,6 +613,14 @@ export default function DashboardPage() {
                         style={{ background: "transparent", border: "2px solid var(--primary)", color: "var(--primary)" }}
                       >
                         Rapor
+                      </button>
+                    )}
+                    {item.status === "active" && (
+                      <button
+                        onClick={() => router.push(`/case?id=${item.session_id}`)}
+                        className="btn-premium px-5 py-2.5 text-xs active:scale-95"
+                      >
+                        Devam Et
                       </button>
                     )}
                   </div>
