@@ -29,7 +29,7 @@ try:
 except ImportError:
     redis_client = None
 
-CACHE_KEY_LIST = "microscope:images:list:v2"
+CACHE_KEY_LIST = "microscope:images:list:v3"
 CACHE_TTL = 3600  # 1 hour
 
 
@@ -92,11 +92,15 @@ async def list_images(
     stain: Optional[str] = None,
     organ: Optional[str] = None,
     asset_source: Optional[str] = None,
+    curriculum_track: Optional[str] = None,
+    science_unit: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
     _: str = Depends(get_current_user_id),
 ):
-    """Histolojik görüntü listesi. Vaka, branş, boya, organ veya kaynağa göre filtrelenebilir."""
-    use_cache = not case_id and not specialty and not stain and not organ and not asset_source
+    """Histolojik görüntü listesi. Vaka, branş, boya, organ, müfredat veya kaynağa göre filtrelenebilir."""
+    use_cache = not any(
+        [case_id, specialty, stain, organ, asset_source, curriculum_track, science_unit]
+    )
     # Cache kontrolü
     if redis_client and use_cache:
         cached = await redis_client.get(CACHE_KEY_LIST)
@@ -116,6 +120,12 @@ async def list_images(
         query = query.where(cast(HistologyImage.organ, String) == organ)
     if asset_source:
         query = query.where(cast(HistologyImage.asset_source, String) == asset_source)
+    if curriculum_track == "clinical":
+        query = query.where(HistologyImage.curriculum_track.is_(None))
+    elif curriculum_track:
+        query = query.where(cast(HistologyImage.curriculum_track, String) == curriculum_track)
+    if science_unit:
+        query = query.where(cast(HistologyImage.science_unit, String) == science_unit)
 
     result = await db.execute(query)
     images = result.scalars().all()

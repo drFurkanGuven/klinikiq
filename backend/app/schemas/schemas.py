@@ -277,6 +277,8 @@ class HistologyImageCreate(BaseModel):
     stain: Optional[str] = None
     organ: Optional[str] = None
     asset_source: Optional[str] = None
+    curriculum_track: Optional[str] = None
+    science_unit: Optional[str] = None
 
 
 class HistologyImageOut(BaseModel):
@@ -290,6 +292,8 @@ class HistologyImageOut(BaseModel):
     stain: Optional[str] = None
     organ: Optional[str] = None
     asset_source: Optional[str] = None
+    curriculum_track: Optional[str] = None
+    science_unit: Optional[str] = None
     created_at: datetime
 
     class Config:

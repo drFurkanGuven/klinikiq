@@ -50,7 +50,10 @@ function resolveFullImageUrl(url: string): string {
   
   // Unicode karakterleri (böbrek -> b%C3%B6brek) encode etmeliyiz
   const encodedPath = encodeURI(finalPath);
-  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/api\/?$/, "");
+  const fromEnv = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/api\/?$/, "");
+  const baseUrl =
+    fromEnv ||
+    (typeof window !== "undefined" ? window.location.origin : "");
   
   return `${baseUrl}${encodedPath}`;
 }
@@ -135,7 +138,11 @@ export default function HistologyViewer({ image }: Props) {
       prefixUrl: "https://cdn.jsdelivr.net/npm/openseadragon@6.0.2/build/openseadragon/images/",
       tileSources: fullUrl.endsWith(".dzi")
         ? fullUrl
-        : { type: "image", url: fullUrl },
+        : {
+            type: "image",
+            url: fullUrl,
+            crossOriginPolicy: "Anonymous",
+          },
       showNavigator: true,
       navigatorPosition: "BOTTOM_RIGHT",
       animationTime: 0.5,

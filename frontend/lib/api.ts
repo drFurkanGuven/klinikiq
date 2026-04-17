@@ -354,6 +354,10 @@ export interface HistologyImage {
   organ?: string | null;
   /** wikimedia | huggingface | upload */
   asset_source?: string | null;
+  /** clinical (boş) | basic_cell_tissue | basic_organ_system */
+  curriculum_track?: string | null;
+  /** epithelium, muscle_tissue, respiratory, … */
+  science_unit?: string | null;
   created_at: string;
 }
 
@@ -394,6 +398,8 @@ export const microscopyApi = {
     stain?: string;
     organ?: string;
     asset_source?: string;
+    curriculum_track?: string;
+    science_unit?: string;
   }) => api.get<HistologyImage[]>("/microscope/images", { params }),
   exploreHuggingface: (params?: { q?: string; limit?: number }) =>
     api.get<{ query: string; datasets: HuggingFaceDatasetSpotlight[] }>(

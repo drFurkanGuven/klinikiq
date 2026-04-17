@@ -254,6 +254,11 @@ class HistologyImage(Base):
     organ = Column(String, nullable=True, index=True)
     # wikimedia | huggingface | upload
     asset_source = Column(String, nullable=True, index=True)
+    # Temel histoloji müfredatı (Histology Guide tarzı) vs klinik branş
+    # clinical | basic_cell_tissue | basic_organ_system — NULL eski kayıtlar için klinik kabul edilir
+    curriculum_track = Column(String, nullable=True, index=True)
+    # Örn. epithelium, muscle_tissue, respiratory — filtre etiketi
+    science_unit = Column(String, nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), default=now_utc)
 
 

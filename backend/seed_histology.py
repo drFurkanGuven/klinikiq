@@ -13,6 +13,17 @@ from app.core.database import engine, Base, AsyncSessionLocal
 from app.models.models import HistologyImage
 
 
+def commons_thumb(full_url: str, width: int = 400) -> str:
+    """Wikimedia Commons tam URL'sinden liste küçük resim yolu üretir (daha hızlı kart önizlemesi)."""
+    if "upload.wikimedia.org" not in full_url or "/wikipedia/commons/" not in full_url:
+        return full_url
+    if "/commons/thumb/" in full_url:
+        return full_url
+    path, filename = full_url.rsplit("/", 1)
+    thumb_base = path.replace("/commons/", "/commons/thumb/")
+    return f"{thumb_base}/{filename}/{width}px-{filename}"
+
+
 IMAGES = [
     # ── Patoloji / Onkoloji ────────────────────────────────────────────────
     {
@@ -272,6 +283,207 @@ IMAGES = [
     },
 ]
 
+# Temel bilimler / histoloji müfredatı — [Histology Guide](https://histologyguide.com) yapısına yakın:
+# hücre ve doku + seçilmiş organ sistemleri (Wikimedia Commons, açık lisans).
+BASIC_CURRICULUM_IMAGES = [
+    {
+        "title": "Küboidal epitel — kesit",
+        "description": (
+            "Basit küboidal epitel örneği. Salgı bezleri, böbrek tübülleri ve tiroid folikülleri "
+            "çevresinde sık görülür; absorpsiyon ve sekresyon ile ilişkilidir."
+        ),
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/Cuboidal_Epithelium_Section.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Epitel",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "epithelium",
+    },
+    {
+        "title": "Kolumnar (silindirik) epitel",
+        "description": (
+            "Basit kolumnar epitel; mide-bağırsak mukozası ve salgı yapan kanallarda yaygındır. "
+            "Absorpsiyon ve sekresyon için uygundur."
+        ),
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Cylindrical_Epithelium.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Epitel",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "epithelium",
+    },
+    {
+        "title": "Korneal epitel",
+        "description": "Gözün kornea yüzeyini örten stratifiye epitel; bariyer ve optik şeffaflık sağlar.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Corneal_epith%C3%A9lium.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Göz",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "epithelium",
+    },
+    {
+        "title": "Bukkal mukoza — epitel hücreleri",
+        "description": "Ağız mukozasından yassı epitel hücreleri; temel epitel morfolojisini gösterir.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Buccal_Epithelium_Cells.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Ağız",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "epithelium",
+    },
+    {
+        "title": "Alveol duvarı — yassı epitel bağlamı",
+        "description": (
+            "Akciğer alveollerinde gaz değişimi bölgesi; ince yassı epitel ile uyumlu yapı. "
+            "Basit skuamöz epitelin fonksiyonel örneği olarak incelenebilir."
+        ),
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Alveolar_wall.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Akciğer",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "epithelium",
+    },
+    {
+        "title": "Epitel sınıflaması (şema)",
+        "description": (
+            "Epitel tiplerinin görsel özeti (İspanyolca etiketler). "
+            "Basit/stratife ve hücre şekli sınıflandırmasını pekiştirmek için referans."
+        ),
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Clasificaci%C3%B3n_del_tejido_epitelial.jpg",
+        "specialty": "basic_sciences",
+        "organ": "Epitel",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "epithelium",
+    },
+    {
+        "title": "Adipoz doku",
+        "description": (
+            "Yağ hücreleri (adiposit) ve destekleyici bağ doku iskelesi. "
+            "Enerji deposu, yalıtım ve dolgu görevi görür."
+        ),
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Adipose_tissue.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Bağ doku",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "connective_tissue",
+    },
+    {
+        "title": "İskelet kası — kesit",
+        "description": "Çizgili kas lifleri; çok çekirdekli, periferde yerleşen nükleuslar.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Skeletal_muscle.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Kas",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "muscle_tissue",
+    },
+    {
+        "title": "Düz kas dokusu",
+        "description": "Visseral organ duvarları ve damarların düz kası; involüner kasılma.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Smooth_muscle_tissue.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Kas",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "muscle_tissue",
+    },
+    {
+        "title": "Kardiyak kas",
+        "description": "Kalp kası; dallanan lifler ve interkalated diskler ile ayırt edilir.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Cardiac_muscle.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Kalp",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "muscle_tissue",
+    },
+    {
+        "title": "Hyalin kıkırdak",
+        "description": "Camımsı matriks ve kondrositler; eklem yüzleri ve solunum yollarında yaygındır.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Hyaline_cartilage.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Kıkırdak",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "cartilage_bone",
+    },
+    {
+        "title": "Kemik dokusu — histoloji",
+        "description": "Kompakt/spongiyöz kemik yapısına ait tipik H&E görünümü; osteosit ve lameller.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Bone_histology.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Kemik",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "cartilage_bone",
+    },
+    {
+        "title": "Nöron — ışık mikroskopisi",
+        "description": "Nöron gövdesi ve çıkıntıları; sinir dokusunun temel birimini gösterir.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Neuron_%28100x_magnification%29.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Sinir sistemi",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "nervous_tissue",
+    },
+    {
+        "title": "İnsan kan yayması",
+        "description": "Eritrosit, lökosit ve trombosit morfolojisi; periferik kan yayması temeli.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Blood_smear_%28265_21%29_Human.jpg",
+        "specialty": "basic_sciences",
+        "stain": "Wright-Giemsa",
+        "organ": "Kan",
+        "curriculum_track": "basic_cell_tissue",
+        "science_unit": "blood",
+    },
+    {
+        "title": "Lenf nodu — genel yapı",
+        "description": "Lenfoid organ; B ve T hücre bölgeleri ve sinüsler (müfredatta lenfoid sistem).",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Lymph_node.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Lenfoid",
+        "curriculum_track": "basic_organ_system",
+        "science_unit": "lymphoid",
+    },
+    {
+        "title": "Akciğer histolojisi",
+        "description": "Solunum sistemine ait tipik alveoler mimari ve destek dokusu.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Lung_histology.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Akciğer",
+        "curriculum_track": "basic_organ_system",
+        "science_unit": "respiratory",
+    },
+    {
+        "title": "Duodenum mukozası",
+        "description": "Bağırsak villusları ve bez yapıları; gastrointestinal sistem histolojisine giriş.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Duodenum_histology.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Bağırsak",
+        "curriculum_track": "basic_organ_system",
+        "science_unit": "digestive",
+    },
+    {
+        "title": "Karaciğer dokusu (rezeksiyon materyali)",
+        "description": "Karaciğer lobülü ve hepatosit plakaları; portal alanlar ile birlikte değerlendirilir.",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/Histology_of_liver_tissue_from_a_gallbladder_resection.jpg",
+        "specialty": "basic_sciences",
+        "stain": "H&E",
+        "organ": "Karaciğer",
+        "curriculum_track": "basic_organ_system",
+        "science_unit": "digestive",
+    },
+]
+
+ALL_IMAGES = IMAGES + BASIC_CURRICULUM_IMAGES
+
 
 async def seed():
     async with engine.begin() as conn:
@@ -286,19 +498,23 @@ async def seed():
 
         added = 0
         skipped = 0
-        for data in IMAGES:
+        for data in ALL_IMAGES:
             if data["image_url"] in existing_urls:
                 skipped += 1
                 continue
+            full = data["image_url"]
+            thumb = data.get("thumbnail_url") or commons_thumb(full)
             payload = {
                 "title": data["title"],
                 "description": data.get("description"),
-                "image_url": data["image_url"],
-                "thumbnail_url": data.get("thumbnail_url"),
+                "image_url": full,
+                "thumbnail_url": thumb,
                 "specialty": data.get("specialty"),
                 "stain": data.get("stain"),
                 "organ": data.get("organ"),
                 "asset_source": data.get("asset_source", "wikimedia"),
+                "curriculum_track": data.get("curriculum_track"),
+                "science_unit": data.get("science_unit"),
             }
             img = HistologyImage(**payload)
             db.add(img)

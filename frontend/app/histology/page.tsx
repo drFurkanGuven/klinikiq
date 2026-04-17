@@ -41,11 +41,44 @@ const SPECIALTIES: Record<string, string> = {
   infectious_disease: "Enfeksiyon",
   hematology: "Hematoloji",
   rheumatology: "Romatoloji",
+  basic_sciences: "Temel bilimler (histoloji)",
 };
 
-const STAIN_FILTERS = ["", "H&E", "PAS", "Masson", "IHC"];
+/** Histology Guide tarzı müfredat — hücre/doku ve organ sistemleri */
+const CURRICULUM_OPTIONS: { value: string; label: string }[] = [
+  { value: "", label: "Tüm preparatlar" },
+  { value: "clinical", label: "Klinik branşlar" },
+  { value: "basic_cell_tissue", label: "Hücre ve doku" },
+  { value: "basic_organ_system", label: "Organ sistemleri (temel)" },
+];
 
-const ORGAN_FILTERS = ["", "Böbrek", "Meme", "Adrenal", "Akciğer", "Serebellum"];
+const SCIENCE_UNIT_LABELS: Record<string, string> = {
+  epithelium: "Epitel",
+  connective_tissue: "Bağ doku",
+  muscle_tissue: "Kas dokusu",
+  cartilage_bone: "Kıkırdak ve kemik",
+  nervous_tissue: "Sinir dokusu",
+  blood: "Kan ve yayma",
+  lymphoid: "Lenfoid sistem",
+  respiratory: "Solunum",
+  digestive: "Sindirim",
+};
+
+const STAIN_FILTERS = ["", "H&E", "PAS", "Masson", "IHC", "Wright-Giemsa"];
+
+const ORGAN_FILTERS = [
+  "",
+  "Epitel",
+  "Bağ doku",
+  "Kas",
+  "Kemik",
+  "Kan",
+  "Akciğer",
+  "Böbrek",
+  "Meme",
+  "Adrenal",
+  "Serebellum",
+];
 
 const SOURCE_FILTERS: { value: string; label: string }[] = [
   { value: "", label: "Tüm kaynaklar" },
@@ -63,7 +96,9 @@ function resolveImageUrl(url?: string | null, fullUrl?: string | null) {
     cleanPath = cleanPath.replace(".dzi", "_thumb.jpg");
   }
   const finalPath = cleanPath.startsWith("tiles/") ? `/${cleanPath}` : `/tiles/${cleanPath}`;
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "") || "";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, "") ||
+    (typeof window !== "undefined" ? window.location.origin : "");
   return `${baseUrl}${encodeURI(finalPath)}`;
 }
 
@@ -75,6 +110,8 @@ export default function HistologyPage() {
   const [stain, setStain] = useState("");
   const [organ, setOrgan] = useState("");
   const [assetSource, setAssetSource] = useState("");
+  const [curriculumTrack, setCurriculumTrack] = useState("");
+  const [scienceUnit, setScienceUnit] = useState("");
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [hfLoading, setHfLoading] = useState(true);
@@ -95,6 +132,8 @@ export default function HistologyPage() {
         stain: stain || undefined,
         organ: organ || undefined,
         asset_source: assetSource || undefined,
+        curriculum_track: curriculumTrack || undefined,
+        science_unit: scienceUnit || undefined,
       });
       setImages(res.data);
       setSelected((prev) => {
@@ -108,7 +147,7 @@ export default function HistologyPage() {
     } finally {
       setLoading(false);
     }
-  }, [specialty, stain, organ, assetSource]);
+  }, [specialty, stain, organ, assetSource, curriculumTrack, scienceUnit]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -188,8 +227,17 @@ export default function HistologyPage() {
             </h1>
             <p className="text-sm md:text-base text-slate-400 leading-relaxed font-medium">
               Wikimedia Commons ve benzeri açık kaynaklardan derlenen H&amp;E / özel boyalı kesitler.
-              Aşağıda Hugging Face üzerindeki histopatoloji veri kümelerine de tek tıkla ulaşabilirsin — tam
-              slayt veya patch veri setlerini kendi araştırman için keşfet.
+              Temel bilimler için{" "}
+              <a
+                href="https://histologyguide.com/slidebox/02-epithelium.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-violet-300 hover:text-white underline underline-offset-2"
+              >
+                Histology Guide
+              </a>{" "}
+              tarzında epitel, bağ doku, kas ve organ sistemleri sınıflamasıyla da süzebilirsin. Hugging Face
+              üzerindeki histopatoloji veri kümelerine aşağıdan ulaşabilirsin.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <span className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300">
@@ -203,7 +251,48 @@ export default function HistologyPage() {
         </header>
 
         {/* Filters */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Akademik iz</span>
+            <div className="relative">
+              <select
+                value={curriculumTrack}
+                onChange={(e) => {
+                  setCurriculumTrack(e.target.value);
+                  setScienceUnit("");
+                }}
+                className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50"
+              >
+                {CURRICULUM_OPTIONS.map((o) => (
+                  <option key={o.value || "all"} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+            </div>
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              Konu (temel ünite)
+            </span>
+            <div className="relative">
+              <select
+                value={scienceUnit}
+                onChange={(e) => setScienceUnit(e.target.value)}
+                className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50 disabled:opacity-40"
+                disabled={!!curriculumTrack && curriculumTrack === "clinical"}
+              >
+                <option value="">Tümü</option>
+                {Object.entries(SCIENCE_UNIT_LABELS).map(([key, label]) => (
+                  <option key={key} value={key}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+            </div>
+          </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Branş</span>
             <div className="relative">
@@ -222,6 +311,8 @@ export default function HistologyPage() {
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
             </div>
           </label>
+        </section>
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Boya</span>
             <div className="relative">
@@ -316,6 +407,8 @@ export default function HistologyPage() {
                           <img
                             src={resolveImageUrl(img.thumbnail_url, img.image_url)}
                             alt=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
                             className="w-full h-full object-cover opacity-95 group-hover:opacity-100 transition-opacity"
                           />
                         ) : (
@@ -341,6 +434,11 @@ export default function HistologyPage() {
                           {img.organ && (
                             <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-cyan-500/15 text-cyan-200">
                               {img.organ}
+                            </span>
+                          )}
+                          {img.science_unit && (
+                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-100">
+                              {SCIENCE_UNIT_LABELS[img.science_unit] ?? img.science_unit}
                             </span>
                           )}
                         </div>
