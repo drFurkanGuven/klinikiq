@@ -12,6 +12,7 @@ from sqlalchemy import select
 from typing import Optional
 
 from app.core.config import settings
+from app.core.tile_files import remove_dzi_bundle
 from app.core.database import get_db
 from app.core.security import get_current_user_id
 from app.models.models import HistologyImage, Annotation, User
@@ -329,25 +330,13 @@ async def delete_image(
     if not image:
         raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
 
-    # Fiziksel dosyaları sil
-    if image.image_url and image.image_url.startswith("/tiles/"):
-        filename = os.path.basename(image.image_url)
-        name = os.path.splitext(filename)[0]
-        
-        # Dosya yolları
-        dzi_path = os.path.join(settings.TILES_DIR, filename)
-        files_path = os.path.join(settings.TILES_DIR, f"{name}_files")
-        thumb_path = os.path.join(settings.TILES_DIR, f"{name}_thumb.jpg")
-        
-        try:
-            if os.path.exists(dzi_path): os.remove(dzi_path)
-            if os.path.exists(files_path): shutil.rmtree(files_path)
-            if os.path.exists(thumb_path): os.remove(thumb_path)
-        except Exception as e:
-            print(f"Dosya silme hatası: {e}")
+    remove_dzi_bundle(settings.TILES_DIR, image.image_url)
 
     await db.delete(image)
     await db.commit()
+
+    if redis_client:
+        await redis_client.delete(CACHE_KEY_LIST)
 
 
 @router.get("/images/{image_id}/annotations", response_model=list[AnnotationOut])

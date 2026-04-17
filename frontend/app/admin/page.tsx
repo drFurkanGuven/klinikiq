@@ -2,11 +2,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { adminApi, authApi, microscopyApi, type AdminUser, type HistologyImage } from "@/lib/api";
+import { adminApi, authApi, type AdminUser, type HistologyImage, type OrphanDziFile } from "@/lib/api";
+import { resolvePublicAssetUrl } from "@/lib/tileUrl";
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
-  Stethoscope,
   LogOut,
   ShieldAlert,
   ArrowLeft,
@@ -19,7 +19,23 @@ import {
   ExternalLink,
   Plus,
   RefreshCcw,
+  FolderOpen,
+  Link2,
 } from "lucide-react";
+
+const SPECIALTY_LABEL: Record<string, string> = {
+  pathology: "Patoloji",
+  cardiology: "Kardiyoloji",
+  endocrinology: "Endokrinoloji",
+  neurology: "Nöroloji",
+  pulmonology: "Pulmonoloji",
+  gastroenterology: "Gastroenteroloji",
+  nephrology: "Nefroloji",
+  infectious_disease: "Enfeksiyon",
+  hematology: "Hematoloji",
+  rheumatology: "Romatoloji",
+  basic_sciences: "Temel bilimler",
+};
 
 import { ThemeToggle } from "@/components/ThemeToggle";
 import dynamic from "next/dynamic";
@@ -40,6 +56,8 @@ export default function AdminDashboardPage() {
   // Histology State
   const [images, setImages] = useState<HistologyImage[]>([]);
   const [imagesLoading, setImagesLoading] = useState(false);
+  const [orphans, setOrphans] = useState<OrphanDziFile[]>([]);
+  const [orphansLoading, setOrphansLoading] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
@@ -83,7 +101,7 @@ export default function AdminDashboardPage() {
   const fetchImages = async () => {
     setImagesLoading(true);
     try {
-      const res = await microscopyApi.listImages();
+      const res = await adminApi.listHistologyImages();
       setImages(res.data);
     } catch (err) {
       console.error(err);
@@ -92,9 +110,23 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const fetchOrphans = async () => {
+    setOrphansLoading(true);
+    try {
+      const res = await adminApi.listOrphanDzi();
+      setOrphans(res.data);
+    } catch (err) {
+      console.error(err);
+      setOrphans([]);
+    } finally {
+      setOrphansLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === "histology") {
       fetchImages();
+      fetchOrphans();
     }
   }, [activeTab]);
 
@@ -121,10 +153,23 @@ export default function AdminDashboardPage() {
   const handleDeleteImage = async (id: string) => {
     if (!confirm("Bu görüntüyü HEM veritabanından HEM DE sunucudan kalıcı olarak silmek istediğinizden emin misiniz?")) return;
     try {
-      await microscopyApi.deleteImage(id);
+      await adminApi.deleteImage(id);
       setImages(images.filter(img => img.id !== id));
     } catch (err) {
       alert("Silme hatası oluştu.");
+    }
+  };
+
+  const handleRegisterOrphan = async (relativePath: string) => {
+    const def = relativePath.replace(/\.dzi$/i, "").split("/").pop() || relativePath;
+    const title = window.prompt("Listede görünecek başlık", def);
+    if (!title?.trim()) return;
+    try {
+      await adminApi.registerDzi({ relative_path: relativePath, title: title.trim() });
+      await fetchImages();
+      await fetchOrphans();
+    } catch {
+      alert("Kayıt eklenemedi (dosya yolu veya zaten kayıtlı olabilir).");
     }
   };
 
@@ -254,90 +299,204 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         ) : (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-8">
-                <div>
-                  <h1 className="text-4xl font-black tracking-tight leading-tight">Histoloji <span className="text-primary">Arşivi</span></h1>
-                  <p className="text-sm font-medium mt-2 opacity-60">Sistemdeki dijital slaytları yönetin ve yenilerini ekleyin.</p>
-                </div>
-                <div className="flex gap-4 w-full lg:w-fit">
-                    <button 
-                        onClick={fetchImages}
-                        className="p-4 rounded-2xl border border-border bg-surface hover:bg-black/5 transition-all"
-                    >
-                        <RefreshCcw className={`w-5 h-5 ${imagesLoading ? 'animate-spin' : ''}`} />
-                    </button>
-                    <button 
-                         onClick={() => setIsUploadModalOpen(true)}
-                         className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest text-white bg-primary shadow-xl hover:scale-[1.05] active:scale-95 transition-all"
-                    >
-                        <Plus className="w-5 h-5" />
-                        YENİ EKLE
-                    </button>
-                </div>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
+              <div>
+                <h1 className="text-4xl font-black tracking-tight leading-tight">
+                  Histoloji <span className="text-primary">Arşivi</span>
+                </h1>
+                <p className="text-sm font-medium mt-2 opacity-60 max-w-xl">
+                  Veritabanı kayıtları (önbelleksiz liste). DZI dosyaları <code className="text-xs opacity-80">/tiles/</code> altında
+                  olup veritabanında yoksa aşağıda &quot;Yetim dosyalar&quot; bölümünde listelenir — tek tıkla kayıt ekleyebilirsiniz.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    fetchImages();
+                    fetchOrphans();
+                  }}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl border border-border bg-surface hover:bg-black/5 dark:hover:bg-white/5 transition-all text-sm font-bold"
+                >
+                  <RefreshCcw className={`w-4 h-4 ${imagesLoading || orphansLoading ? "animate-spin" : ""}`} />
+                  Yenile
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsUploadModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-white bg-primary shadow-lg hover:opacity-95 transition-all"
+                >
+                  <Plus className="w-5 h-5" />
+                  TIFF / görüntü yükle
+                </button>
+              </div>
             </div>
 
             <div className="glass rounded-[2rem] border shadow-xl overflow-hidden">
-                <table className="w-full text-left text-sm">
-                    <thead>
-                        <tr className="bg-black/5 dark:bg-white/5 border-b border-border">
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40">Önizleme</th>
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40">Başlık / Branş</th>
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40">URL / Yol</th>
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest opacity-40 text-right">İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                        {imagesLoading ? (
-                             <tr><td colSpan={4} className="px-8 py-24 text-center opacity-40 font-bold italic">Yükleniyor...</td></tr>
-                        ) : images.length === 0 ? (
-                            <tr><td colSpan={4} className="px-8 py-24 text-center opacity-40 font-bold">Arşivde henüz görüntü bulunmuyor.</td></tr>
-                        ) : images.map(img => (
-                            <tr key={img.id} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors group">
-                                <td className="px-8 py-4">
-                                     <div className="w-16 h-16 rounded-xl overflow-hidden border border-border bg-black/5">
-                                         {img.thumbnail_url && (
-                                            <img 
-                                                src={`${(process.env.NEXT_PUBLIC_API_URL || "").replace("/api", "")}${img.thumbnail_url}`} 
-                                                className="w-full h-full object-cover" 
-                                                alt="" 
-                                                onError={(e) => (e.currentTarget.style.display = 'none')}
-                                            />
-                                         )}
-                                     </div>
-                                </td>
-                                <td className="px-8 py-6">
-                                    <p className="font-black text-base">{img.title}</p>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">{img.specialty}</p>
-                                </td>
-                                <td className="px-8 py-6">
-                                    <code className="text-xs bg-black/5 dark:bg-white/5 px-3 py-1.5 rounded-lg opacity-60">
-                                        {img.image_url.length > 30 ? img.image_url.substring(0, 30) + "..." : img.image_url}
-                                    </code>
-                                </td>
-                                <td className="px-8 py-6">
-                                    <div className="flex items-center justify-end gap-3">
-                                        <Link 
-                                            href={`/histology?image=${img.id}`}
-                                            className="p-2.5 rounded-xl bg-surface border border-border hover:border-primary hover:text-primary transition-all"
-                                            title="Görüntüle"
-                                            target="_blank"
-                                        >
-                                            <ExternalLink className="w-4 h-4" />
-                                        </Link>
-                                        <button 
-                                            onClick={() => handleDeleteImage(img.id)}
-                                            className="p-2.5 rounded-xl bg-danger/10 text-danger hover:bg-danger hover:text-white transition-all"
-                                            title="Sunucudan Sil"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
+              <div className="px-6 py-4 border-b border-border bg-black/[0.03] dark:bg-white/[0.04] flex items-center gap-2">
+                <ImageIcon className="w-4 h-4 text-primary opacity-80" />
+                <span className="text-xs font-black uppercase tracking-widest opacity-50">Kayıtlı preparatlar</span>
+                <span className="text-xs font-bold opacity-40">({images.length})</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm min-w-[720px]">
+                  <thead>
+                    <tr className="bg-black/5 dark:bg-white/5 border-b border-border">
+                      <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-40">Önizleme</th>
+                      <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-40">Başlık</th>
+                      <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-40">Kaynak / yol</th>
+                      <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-40 text-right">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {imagesLoading ? (
+                      <tr>
+                        <td colSpan={4} className="px-8 py-20 text-center opacity-40 font-bold italic">
+                          Yükleniyor…
+                        </td>
+                      </tr>
+                    ) : images.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="px-8 py-20 text-center opacity-40 font-bold">
+                          Kayıtlı görüntü yok. TIFF yükleyin veya diskteki DZI için aşağıdan kayıt ekleyin.
+                        </td>
+                      </tr>
+                    ) : (
+                      images.map((img) => {
+                        const thumbSrc = resolvePublicAssetUrl(img.thumbnail_url || img.image_url);
+                        return (
+                          <tr key={img.id} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                            <td className="px-6 py-4 align-middle">
+                              <div className="w-20 h-20 rounded-xl overflow-hidden border border-border bg-zinc-900/10 flex items-center justify-center">
+                                {thumbSrc ? (
+                                  <img
+                                    src={thumbSrc}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                    referrerPolicy="no-referrer"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = "none";
+                                    }}
+                                  />
+                                ) : (
+                                  <ImageIcon className="w-8 h-8 opacity-20" />
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 align-middle max-w-[220px]">
+                              <p className="font-black text-base leading-snug line-clamp-2">{img.title}</p>
+                              <p className="text-[10px] font-bold uppercase tracking-wide text-primary mt-1">
+                                {img.specialty ? SPECIALTY_LABEL[img.specialty] ?? img.specialty : "—"}
+                              </p>
+                              {img.asset_source && (
+                                <p className="text-[10px] font-bold opacity-40 mt-0.5">kaynak: {img.asset_source}</p>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 align-middle">
+                              <code className="text-[11px] leading-relaxed block bg-black/5 dark:bg-white/5 px-3 py-2 rounded-lg opacity-70 break-all max-w-md">
+                                {img.image_url}
+                              </code>
+                            </td>
+                            <td className="px-6 py-4 align-middle text-right">
+                              <div className="inline-flex items-center justify-end gap-2">
+                                <Link
+                                  href={`/histology?image=${img.id}`}
+                                  className="p-2.5 rounded-xl bg-surface border border-border hover:border-primary hover:text-primary transition-all"
+                                  title="Histoloji sayfasında aç"
+                                >
+                                  <ExternalLink className="w-4 h-4" />
+                                </Link>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteImage(img.id)}
+                                  className="p-2.5 rounded-xl bg-danger/10 text-danger hover:bg-danger hover:text-white transition-all"
+                                  title="Veritabanı ve sunucudan sil"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
                 </table>
+              </div>
+            </div>
+
+            <div className="glass rounded-[2rem] border border-amber-500/20 shadow-xl overflow-hidden bg-amber-500/[0.04]">
+              <div className="px-6 py-4 border-b border-border flex flex-wrap items-center gap-2 justify-between">
+                <div className="flex items-center gap-2">
+                  <FolderOpen className="w-4 h-4 text-amber-600/90" />
+                  <span className="text-xs font-black uppercase tracking-widest opacity-60">Yetim DZI dosyaları</span>
+                  <span className="text-xs font-bold opacity-40">({orphans.length})</span>
+                </div>
+                <p className="text-[11px] opacity-50 max-w-lg">
+                  Diskte var, veritabanında kayıt yok. Kayıt ekleyince Histoloji sayfasında görünür.
+                </p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm min-w-[640px]">
+                  <thead>
+                    <tr className="bg-black/5 dark:bg-white/5 border-b border-border">
+                      <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest opacity-40">Göreli yol</th>
+                      <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest opacity-40">Önizleme</th>
+                      <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest opacity-40 text-right">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {orphansLoading ? (
+                      <tr>
+                        <td colSpan={3} className="px-8 py-12 text-center opacity-40 font-bold italic">
+                          Taranıyor…
+                        </td>
+                      </tr>
+                    ) : orphans.length === 0 ? (
+                      <tr>
+                        <td colSpan={3} className="px-8 py-12 text-center opacity-40 text-sm">
+                          Yetim DZI yok — tüm klasördeki .dzi dosyaları veritabanında kayıtlı veya henüz dosya yok.
+                        </td>
+                      </tr>
+                    ) : (
+                      orphans.map((o) => (
+                        <tr key={o.relative_path} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                          <td className="px-6 py-4 align-middle">
+                            <code className="text-xs break-all block">{o.relative_path}</code>
+                          </td>
+                          <td className="px-6 py-4 align-middle">
+                            {o.has_thumb ? (
+                              <div className="w-16 h-16 rounded-lg overflow-hidden border border-border">
+                                <img
+                                  src={resolvePublicAssetUrl(
+                                    `/tiles/${o.relative_path.replace(/\.dzi$/i, "_thumb.jpg")}`,
+                                  )}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                  referrerPolicy="no-referrer"
+                                />
+                              </div>
+                            ) : (
+                              <span className="text-[10px] font-bold opacity-40">thumb yok</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 align-middle text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleRegisterOrphan(o.relative_path)}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wide bg-primary text-white hover:opacity-95 transition-all"
+                            >
+                              <Link2 className="w-3.5 h-3.5" />
+                              Veritabanına ekle
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}

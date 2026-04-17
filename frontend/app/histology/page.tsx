@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   microscopyApi,
@@ -102,8 +102,9 @@ function resolveImageUrl(url?: string | null, fullUrl?: string | null) {
   return `${baseUrl}${encodeURI(finalPath)}`;
 }
 
-export default function HistologyPage() {
+function HistologyPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [images, setImages] = useState<HistologyImage[]>([]);
   const [selected, setSelected] = useState<HistologyImage | null>(null);
   const [specialty, setSpecialty] = useState("");
@@ -181,6 +182,13 @@ export default function HistologyPage() {
       cancelled = true;
     };
   }, [mounted, debouncedHfQuery, hfTick]);
+
+  useEffect(() => {
+    const id = searchParams.get("image");
+    if (!id || images.length === 0) return;
+    const found = images.find((i) => i.id === id);
+    if (found) setSelected(found);
+  }, [searchParams, images]);
 
   if (!mounted) return null;
 
@@ -563,5 +571,19 @@ export default function HistologyPage() {
         </section>
       </div>
     </div>
+  );
+}
+
+export default function HistologyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-violet-950/25 to-slate-950 flex items-center justify-center text-slate-400 text-sm">
+          Histoloji yükleniyor…
+        </div>
+      }
+    >
+      <HistologyPageInner />
+    </Suspense>
   );
 }

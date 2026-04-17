@@ -330,14 +330,6 @@ export interface AdminUser {
   daily_limit: number;
 }
 
-export const adminApi = {
-  getUsers: () => api.get<AdminUser[]>("/admin/users"),
-  updateLimit: (userId: string, limit: number) =>
-    api.put(`/admin/users/${userId}/limit`, { daily_limit: limit }),
-  deleteImage: (imageId: string) =>
-    api.delete(`/admin/images/${imageId}`),
-};
-
 // ── Histoloji ─────────────────────────────────────────────────────────────────
 
 export interface HistologyImage {
@@ -360,6 +352,25 @@ export interface HistologyImage {
   science_unit?: string | null;
   created_at: string;
 }
+
+export interface OrphanDziFile {
+  relative_path: string;
+  image_url: string;
+  has_thumb: boolean;
+}
+
+export const adminApi = {
+  getUsers: () => api.get<AdminUser[]>("/admin/users"),
+  updateLimit: (userId: string, limit: number) =>
+    api.put(`/admin/users/${userId}/limit`, { daily_limit: limit }),
+  deleteImage: (imageId: string) =>
+    api.delete(`/admin/images/${imageId}`),
+  /** Redis önbelleği atlanır; admin paneli için tam liste. */
+  listHistologyImages: () => api.get<HistologyImage[]>("/admin/histology-images"),
+  listOrphanDzi: () => api.get<OrphanDziFile[]>("/admin/tiles/orphan-dzi"),
+  registerDzi: (body: { relative_path: string; title: string; specialty?: string }) =>
+    api.post<HistologyImage>("/admin/tiles/register-dzi", body),
+};
 
 export interface HuggingFaceDatasetSpotlight {
   id: string;
