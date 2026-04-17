@@ -237,7 +237,17 @@ export interface ToggleSaveResponse {
   saved: boolean;
 }
 
+/** Sunucu taksonomisi — `tus-taxonomy.ts` ile senkron tutulmalı. */
+export type TusTaxonomyPayload = {
+  version: number;
+  groups: {
+    temel: Record<string, string[]>;
+    klinik: Record<string, string[]>;
+  };
+};
+
 export const communityApi = {
+  getTaxonomy: () => api.get<TusTaxonomyPayload>("/community/taksonomi"),
   listNotes: (params?: {
     group?: string;
     branch_id?: string;

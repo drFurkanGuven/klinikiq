@@ -1,6 +1,11 @@
 /**
  * Tıp (TUS) — Temel / Klinik bilimler sınıflandırması.
- * Paylaşım formları ve topluluk akışı filtreleri için tek kaynak.
+ * Paylaşım formları ve not akışı filtreleri için tek kaynak.
+ *
+ * Sunucu doğrulaması: `backend/app/data/tus_taxonomy.json` ile aynı ağaç olmalı.
+ * TS güncelledikten sonra kök dizinde:
+ *   python3 backend/scripts/export_tus_taxonomy_json.py
+ * API: GET /api/community/taksonomi (aynı JSON).
  */
 
 export type TusGroupId = "temel" | "klinik";
@@ -93,6 +98,51 @@ export const TUS_TEMEL_BRANCHES: TusBranch[] = [
       { id: "vitamin-mineral", name: "Vitaminler ve mineraller" },
       { id: "hemoglobin-porfiri", name: "Hemoglobin ve porfiri" },
       { id: "doku-metabolizma", name: "Karaciğer, kas, beyin metabolizması" },
+      /* Tıp 2 — klinik biyokimya / endokrin (kurul) */
+      { id: "klinik-biyokimyaya-giris", name: "Klinik Biyokimyaya Giriş" },
+      { id: "ornek-toplama-saklama", name: "Örnek Toplama ve Saklama" },
+      {
+        id: "vucut-sivilarinin-klinik-biyokimyasi",
+        name: "Vücut Sıvılarının Klinik Biyokimyası (Kan, İdrar, BOS, Sinovyal ve Seröz Sıvılar)",
+      },
+      { id: "hipotalamus-hipofiz-hormonlari", name: "Hipotalamus ve Hipofiz Bezi Hormonları" },
+      {
+        id: "tiroid-hormonlari-fonksiyon-bozukluklari",
+        name: "Tiroid Bezi Hormonları ve Fonksiyon Bozuklukları",
+      },
+      {
+        id: "paratiroid-parathormon-kalsiyum",
+        name: "Paratiroid Bezi, Parathormon ve Kalsiyum Metabolizması",
+      },
+      {
+        id: "adrenal-medulla-hormonlari",
+        name: "Adrenal Medulla Hormonları ve Fonksiyon Bozuklukları",
+      },
+      {
+        id: "adrenal-korteks-hormonlari",
+        name: "Adrenal Korteks Hormonları ve Fonksiyon Bozuklukları",
+      },
+      {
+        id: "cinsiyet-bezi-hormonlari",
+        name: "Cinsiyet Bezi Hormonları (Androjenler, Östrojenler, Progesteron)",
+      },
+      {
+        id: "pankreas-hormonlari",
+        name: "Pankreas Bezi Hormonları (İnsülin, Glukagon, Somatostatin)",
+      },
+      { id: "gastrointestinal-hormonlari", name: "Gastrointestinal Sistem Hormonları" },
+      {
+        id: "ozel-doku-hormonlari",
+        name: "Özel Doku Hormonları (Serotonin, Histamin, Melatonin, Timozinler)",
+      },
+      {
+        id: "eikozanoidler",
+        name: "Eikozanoidler (Prostaglandinler, Tromboksanlar, Lökotrienler)",
+      },
+      {
+        id: "adipoz-doku-hormonlari",
+        name: "Adipoz Doku Hormonları (Leptin, Adiponektin, Resistin vb.)",
+      },
     ],
   },
   {

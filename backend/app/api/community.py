@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.users import mask_name
 from app.core.database import get_db
 from app.core.security import get_current_user_id, get_optional_user_id
+from app.services.tus_taxonomy import get_taxonomy_payload, validate_classification
 from app.models.models import (
     CommunityNote,
     CommunityNoteLike,
@@ -25,6 +26,12 @@ from app.schemas.schemas import (
 router = APIRouter()
 
 EXCERPT_LEN = 280
+
+
+@router.get("/taksonomi")
+async def get_taksonomi():
+    """TUS dal/konu ağacı (not etiketleme ve arama ile uyumlu). Herkese açık."""
+    return get_taxonomy_payload()
 
 
 def _make_excerpt(body: str) -> str:
@@ -212,6 +219,12 @@ async def create_note(
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+
+    validate_classification(
+        data.group,
+        data.branch_id.strip(),
+        data.topic_id.strip(),
+    )
 
     note = CommunityNote(
         user_id=user_id,

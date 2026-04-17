@@ -1,0 +1,207 @@
+{
+  "version": 1,
+  "groups": {
+    "temel": {
+      "anatomi": [
+        "ust-alt-ekstremite",
+        "gogus-mediasten-kalp",
+        "karin-periton-retroperiton",
+        "gastrointestinal-anatomi",
+        "karaciger-safra-pankreas-anat",
+        "bobrek-uriner",
+        "pelvis-genital-anat",
+        "bas-boyun",
+        "omurga-sinir-sistemi-anat",
+        "endokrin-anat"
+      ],
+      "histoloji-embriyoloji": [
+        "temel-dokular",
+        "dolasim-kan",
+        "gi-histoloji",
+        "solunum-uriner-histoloji",
+        "genital-histoloji",
+        "embriyo-ilk-haftalar",
+        "yuz-agiz-gelisim",
+        "kalp-damar-embriyo",
+        "urogenital-embriyo",
+        "sinir-embriyo"
+      ],
+      "fizyoloji": [
+        "hucre-membran-transport",
+        "sinir-kas-fizyolojisi",
+        "kardiyovaskuler-fiz",
+        "solunum-fiz",
+        "bobrek-sivi-elektrolit-asitbaz",
+        "gi-motilite-emilim",
+        "endokrin-fiz",
+        "ureme-fiz"
+      ],
+      "biyokimya": [
+        "amino-asit-protein-enzim",
+        "karbonhidrat-metabolizma",
+        "lipid-metabolizma",
+        "mitokondri-etz",
+        "vitamin-mineral",
+        "hemoglobin-porfiri",
+        "doku-metabolizma",
+        "klinik-biyokimyaya-giris",
+        "ornek-toplama-saklama",
+        "vucut-sivilarinin-klinik-biyokimyasi",
+        "hipotalamus-hipofiz-hormonlari",
+        "tiroid-hormonlari-fonksiyon-bozukluklari",
+        "paratiroid-parathormon-kalsiyum",
+        "adrenal-medulla-hormonlari",
+        "adrenal-korteks-hormonlari",
+        "cinsiyet-bezi-hormonlari",
+        "pankreas-hormonlari",
+        "gastrointestinal-hormonlari",
+        "ozel-doku-hormonlari",
+        "eikozanoidler",
+        "adipoz-doku-hormonlari"
+      ],
+      "mikrobiyoloji": [
+        "bakteriler",
+        "mantarlar",
+        "virusler",
+        "sterilizasyon-asepsi",
+        "antibiyotik-direnc",
+        "asi-bagisiklik",
+        "lab-tani"
+      ],
+      "parazitoloji": [
+        "protozoonlar",
+        "helmintler",
+        "ektoparazitler",
+        "parazit-epidemi-tedavi"
+      ],
+      "patoloji": [
+        "hucre-hasari-adaptasyon",
+        "inflamasyon-onarim",
+        "tromboz-emboli-sok",
+        "immun-patoloji",
+        "neoplazi-genel",
+        "sistem-patolojileri"
+      ],
+      "farmakoloji": [
+        "pk-pd",
+        "otonon-farm",
+        "kardiyovaskuler-ilac",
+        "solunum-gi-ilac",
+        "diuretik-raas",
+        "endokrin-ilac",
+        "antimikrobiyal",
+        "analjezik-nsaii-opioid",
+        "antikoagulan",
+        "sns-psikoaktif"
+      ],
+      "genetik": [
+        "mendel-kalitim",
+        "kromozom-bozukluklari",
+        "mutasyon-dna-onarim",
+        "populasyon-genetigi"
+      ]
+    },
+    "klinik": {
+      "dahiliye": [
+        "akciger-hastaliklari",
+        "kardiyoloji-dahiliye",
+        "gastroenteroloji-dahiliye",
+        "nefroloji",
+        "hematoloji",
+        "endokrinoloji-dahiliye",
+        "romatoloji",
+        "enfeksiyon",
+        "noroloji-dahiliye"
+      ],
+      "cerrahi": [
+        "preop-degerlendirme",
+        "yara-enfeksiyon",
+        "abdominal-aciller",
+        "herni",
+        "safra-pankreas-cerrahi",
+        "travma-cerrahi",
+        "meme-kolorektal-temel"
+      ],
+      "kadin-dogum": [
+        "gebelik-takibi",
+        "preeklampsi-eklampsi",
+        "dogum-obstetrik-acil",
+        "jinekolojik-kanama",
+        "endometriozis-adenomiyozis",
+        "hpv-serviks",
+        "kontrasepsiyon"
+      ],
+      "pediatri": [
+        "buyume-beslenme",
+        "asi-takvimi",
+        "solunum-enfeksiyonlari-ped",
+        "gastroenterit-dehidratasyon",
+        "konjenital-kalp-ped",
+        "konvulsiyon-ped"
+      ],
+      "psikiyatri": [
+        "depresyon-bipolar",
+        "anksiyete",
+        "sizofreni-spektrum",
+        "madde-kotu-kullanim",
+        "intihar-riski",
+        "psikofarmakoloji"
+      ],
+      "acil-tip": [
+        "travma-atls",
+        "sok-sepsis",
+        "zehirlenme",
+        "termal-yaralanma",
+        "acil-karin"
+      ],
+      "halk-sagligi": [
+        "epidemiyoloji-temel",
+        "tarama-programlari",
+        "bagisiklam-genel",
+        "meslek-hastaliklari"
+      ],
+      "radyoloji": [
+        "akciger-grafisi",
+        "akut-abdomen-goruntu",
+        "bt-mr-endikasyon"
+      ],
+      "anestezi": [
+        "asa-preop",
+        "anestezi-turleri",
+        "havayolu-temel",
+        "agri-yonetimi"
+      ],
+      "gogus": [
+        "astim-koah",
+        "pnomoni-tbc",
+        "pe-pah-temel"
+      ],
+      "dermatoloji": [
+        "egzama-psoriasis",
+        "ilac-dokuntuleri",
+        "deri-enfeksiyon",
+        "melanom-temel"
+      ],
+      "goz": [
+        "refraksiyon",
+        "glokom-temel",
+        "retinopati-temel"
+      ],
+      "kbb": [
+        "otitis",
+        "sinuzit",
+        "isitme-kaybi-temel"
+      ],
+      "ortopedi": [
+        "kirik-turleri",
+        "spor-yaralanma",
+        "osteoporoz-artroz"
+      ],
+      "uroloji": [
+        "bph",
+        "tas-hastaligi",
+        "urolojik-enfeksiyon"
+      ]
+    }
+  }
+}
