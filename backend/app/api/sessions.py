@@ -15,6 +15,7 @@ from app.models.models import (
 from app.schemas.schemas import SessionCreate, SessionOut, MessageCreate, DiagnoseSubmit, MessageOut
 from app.services.ai_service import stream_patient_response
 from app.services.report_service import create_report_for_session
+from app.services.session_maintenance import abandon_stale_active_sessions
 
 router = APIRouter()
 
@@ -25,6 +26,9 @@ async def create_session(
     db: AsyncSession = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ):
+    # Uzun süre bekleyen aktif oturumları terk edilmişe çevir.
+    await abandon_stale_active_sessions(db, user_id=user_id)
+
     # Vaka var mı?
     case_result = await db.execute(select(Case).where(Case.id == data.case_id, Case.is_active == True))
     case = case_result.scalar_one_or_none()

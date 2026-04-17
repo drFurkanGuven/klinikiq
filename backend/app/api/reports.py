@@ -8,6 +8,7 @@ from app.core.security import get_current_user_id
 from app.models.models import Report, SimulationSession, Case, User, Message
 from app.schemas.schemas import ReportOut, HistoryItem, ClinicalReasoningOut
 from app.services.ai_service import analyze_clinical_reasoning
+from app.services.session_maintenance import abandon_stale_active_sessions
 
 router = APIRouter()
 
@@ -65,6 +66,9 @@ async def get_history(
     db: AsyncSession = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ):
+    # Geçmişi döndürmeden önce süresi geçen aktif oturumları kapat.
+    await abandon_stale_active_sessions(db, user_id=user_id)
+
     result = await db.execute(
         select(SimulationSession, Case, Report)
         .join(Case, SimulationSession.case_id == Case.id)

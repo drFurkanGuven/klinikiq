@@ -589,11 +589,21 @@ export default function DashboardPage() {
                         style={{
                           background: item.status === "active"
                             ? "color-mix(in srgb, var(--warning) 15%, transparent)"
-                            : "color-mix(in srgb, var(--success) 15%, transparent)",
-                          color: item.status === "active" ? "var(--warning)" : "var(--success)",
+                            : item.status === "abandoned"
+                              ? "color-mix(in srgb, var(--danger) 15%, transparent)"
+                              : "color-mix(in srgb, var(--success) 15%, transparent)",
+                          color: item.status === "active"
+                            ? "var(--warning)"
+                            : item.status === "abandoned"
+                              ? "var(--danger)"
+                              : "var(--success)",
                         }}
                       >
-                        {item.status === "active" ? "Devam Ediyor" : "Tamamlandı"}
+                        {item.status === "active"
+                          ? "Devam Ediyor"
+                          : item.status === "abandoned"
+                            ? "Yarım Kaldı"
+                            : "Tamamlandı"}
                       </span>
                       <span className="opacity-60">{new Date(item.started_at).toLocaleDateString("tr-TR")}</span>
                     </div>
