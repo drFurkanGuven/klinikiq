@@ -12,7 +12,7 @@ from app.core.security import get_current_user_id
 from app.core.config import settings
 from app.core.tile_files import iter_dzi_relative_paths, remove_dzi_bundle
 from app.models.models import User
-from app.schemas.schemas import HistologyImageOut
+from app.schemas.schemas import HistologyImageOut, HistologyImagePatch
 
 router = APIRouter()
 
@@ -52,6 +52,10 @@ class HfTiffImportIn(BaseModel):
     title: str
     description: str | None = None
     specialty: str | None = None
+    stain: str | None = None
+    organ: str | None = None
+    curriculum_track: str | None = None
+    science_unit: str | None = None
     repo_type: str = "dataset"
 
 
@@ -162,6 +166,41 @@ async def list_all_histology_images(
     result = await db.execute(select(HistologyImage).order_by(HistologyImage.created_at.desc()))
     rows = result.scalars().all()
     return rows
+
+
+@router.patch("/histology-images/{image_id}", response_model=HistologyImageOut)
+async def patch_histology_image(
+    image_id: str,
+    body: HistologyImagePatch,
+    admin: User = Depends(get_current_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Başlık ve/veya açıklama güncelle (diskteki DZI dosyalarına dokunulmaz)."""
+    from app.models.models import HistologyImage
+
+    if body.title is None and body.description is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Güncellenecek alan yok (title veya description gönderin).",
+        )
+
+    result = await db.execute(select(HistologyImage).where(HistologyImage.id == image_id))
+    image = result.scalar_one_or_none()
+    if not image:
+        raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
+
+    if body.title is not None:
+        t = body.title.strip()
+        if not t:
+            raise HTTPException(status_code=400, detail="Başlık boş olamaz.")
+        image.title = t
+    if body.description is not None:
+        image.description = body.description.strip() or None
+
+    await db.commit()
+    await db.refresh(image)
+    await _invalidate_histology_list_cache()
+    return image
 
 
 @router.get("/tiles/orphan-dzi", response_model=List[OrphanDziOut])
@@ -279,4 +318,8 @@ async def import_tiff_from_huggingface(
         body.specialty,
         db,
         asset_source="huggingface",
+        stain=body.stain,
+        organ=body.organ,
+        curriculum_track=body.curriculum_track,
+        science_unit=body.science_unit,
     )

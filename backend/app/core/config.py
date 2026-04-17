@@ -10,6 +10,8 @@ class Settings(BaseSettings):
 
     # Paths
     TILES_DIR: str = "/tiles"
+    # Topluluk notu ekleri (PDF / görsel); mutlak yol veya proje köküne göreli
+    COMMUNITY_UPLOADS_DIR: str = "data/community_uploads"
 
     # Redis
     REDIS_URL: str = "redis://redis:6379/0"

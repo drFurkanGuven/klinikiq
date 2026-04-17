@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from app.core.config import settings
+from app.core.paths import community_uploads_abs
 from app.core.database import engine, Base
 from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, community
 
@@ -60,6 +61,14 @@ if not os.path.exists(settings.TILES_DIR):
     os.makedirs(settings.TILES_DIR, exist_ok=True)
 
 app.mount("/tiles", StaticFiles(directory=settings.TILES_DIR), name="tiles")
+
+_community_root = community_uploads_abs()
+_community_root.mkdir(parents=True, exist_ok=True)
+app.mount(
+    "/uploads/community-notes",
+    StaticFiles(directory=str(_community_root)),
+    name="community_uploads",
+)
 
 
 @app.get("/health", tags=["Health"])

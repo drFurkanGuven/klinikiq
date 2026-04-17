@@ -1,13 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   TUS_GROUP_META,
   findTopicPath,
   type TusGroupId,
 } from "@/lib/tus-taxonomy";
-import type { CommunityNoteItem } from "@/lib/api";
-import { Heart, Bookmark, Pencil, Trash2 } from "lucide-react";
+import { communityApi, type CommunityNoteDetail, type CommunityNoteItem } from "@/lib/api";
+import { resolveCommunityUploadUrl } from "@/lib/communityUploadUrl";
+import {
+  Heart,
+  Bookmark,
+  Pencil,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Loader2,
+} from "lucide-react";
 
 type Props = {
   note: CommunityNoteItem;
@@ -34,6 +45,36 @@ export function NotAkisiCard({
   const path = findTopicPath(g, note.branch_id, note.topic_id);
   const branchLabel = path?.branch.name ?? note.branch_id;
   const topicLabel = path?.topic.name ?? note.topic_id;
+
+  const [expanded, setExpanded] = useState(false);
+  const [detail, setDetail] = useState<CommunityNoteDetail | null>(null);
+  const [loadingFull, setLoadingFull] = useState(false);
+
+  const attachments = detail?.attachments ?? note.attachments ?? [];
+  const truncated =
+    note.body_truncated ??
+    (typeof note.excerpt === "string" && note.excerpt.endsWith("…"));
+
+  async function showFullText() {
+    if (detail) {
+      setExpanded(true);
+      return;
+    }
+    setLoadingFull(true);
+    try {
+      const res = await communityApi.getNote(note.id);
+      setDetail(res.data);
+      setExpanded(true);
+    } catch {
+      /* sessiz */
+    } finally {
+      setLoadingFull(false);
+    }
+  }
+
+  const bodyText =
+    expanded && detail ? detail.body : note.excerpt;
+  const showExpandBtn = truncated && !expanded;
 
   return (
     <li
@@ -72,9 +113,88 @@ export function NotAkisiCard({
       <h3 className="text-xl font-black mb-2 tracking-tight" style={{ color: "var(--text)" }}>
         {note.title}
       </h3>
-      <p className="text-sm leading-relaxed font-medium opacity-70 mb-6" style={{ color: "var(--text-muted)" }}>
-        {note.excerpt}
-      </p>
+      <div className="space-y-3 mb-6">
+        <p className="text-sm leading-relaxed font-medium opacity-70 whitespace-pre-wrap" style={{ color: "var(--text-muted)" }}>
+          {bodyText}
+        </p>
+        {expanded && detail && (
+          <button
+            type="button"
+            onClick={() => setExpanded(false)}
+            className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wide opacity-70 hover:opacity-100"
+            style={{ color: "var(--primary)" }}
+          >
+            <ChevronUp className="w-4 h-4" />
+            Özeti göster
+          </button>
+        )}
+        {showExpandBtn && (
+          <button
+            type="button"
+            disabled={loadingFull}
+            onClick={() => void showFullText()}
+            className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wide rounded-xl px-3 py-2 border transition-all disabled:opacity-50"
+            style={{
+              borderColor: "var(--border)",
+              color: "var(--primary)",
+              background: "var(--surface-2)",
+            }}
+          >
+            {loadingFull ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+            Tüm metni göster
+          </button>
+        )}
+      </div>
+
+      {attachments.length > 0 && (
+        <div className="mb-6 space-y-2">
+          <p className="text-[10px] font-black uppercase tracking-widest opacity-40" style={{ color: "var(--text-muted)" }}>
+            Ekler ({attachments.length})
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {attachments.map((a) => {
+              const href = resolveCommunityUploadUrl(a.url);
+              if (a.kind === "image") {
+                return (
+                  <a
+                    key={a.id}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block rounded-xl overflow-hidden border max-w-[140px] shrink-0"
+                    style={{ borderColor: "var(--border)" }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={href}
+                      alt={a.filename}
+                      className="w-full h-24 object-cover"
+                      loading="lazy"
+                    />
+                  </a>
+                );
+              }
+              return (
+                <a
+                  key={a.id}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs font-bold rounded-xl px-3 py-2 border max-w-full"
+                  style={{ borderColor: "var(--border)", background: "var(--surface-2)", color: "var(--text)" }}
+                >
+                  <FileText className="w-4 h-4 shrink-0 opacity-70" />
+                  <span className="truncate">{a.filename}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
       {note.is_mine && (
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <Link

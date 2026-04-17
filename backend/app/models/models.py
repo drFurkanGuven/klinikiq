@@ -70,6 +70,9 @@ class User(Base):
 
     sessions = relationship("SimulationSession", back_populates="user")
     community_notes = relationship("CommunityNote", back_populates="user")
+    community_note_attachments = relationship(
+        "CommunityNoteAttachment", back_populates="user"
+    )
 
 
 class Case(Base):
@@ -277,6 +280,38 @@ class CommunityNote(Base):
     created_at = Column(DateTime(timezone=True), default=now_utc, index=True)
 
     user = relationship("User", back_populates="community_notes")
+    attachments = relationship(
+        "CommunityNoteAttachment",
+        back_populates="note",
+        cascade="all, delete-orphan",
+    )
+
+
+class CommunityNoteAttachment(Base):
+    """Not eki — PDF veya görsel; diskte kullanıcı/not klasöründe saklanır."""
+
+    __tablename__ = "community_note_attachments"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    note_id = Column(
+        String,
+        ForeignKey("community_notes.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    kind = Column(String(16), nullable=False)  # image | pdf
+    original_filename = Column(String(255), nullable=False)
+    content_type = Column(String(120), nullable=True)
+    size_bytes = Column(Integer, nullable=False, default=0)
+    # Örn. /uploads/community-notes/{user_id}/{note_id}/{id}.pdf
+    public_path = Column(String(512), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=now_utc, index=True)
+
+    note = relationship("CommunityNote", back_populates="attachments")
+    user = relationship("User", back_populates="community_note_attachments")
+
+    __table_args__ = (Index("ix_cna_note_created", "note_id", "created_at"),)
 
 
 class CommunityNoteLike(Base):

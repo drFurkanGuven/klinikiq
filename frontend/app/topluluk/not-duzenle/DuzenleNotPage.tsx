@@ -12,10 +12,11 @@ import {
 } from "@/lib/tus-taxonomy";
 import { isAuthenticated, logout } from "@/lib/auth";
 import { storage } from "@/lib/storage";
-import { communityApi } from "@/lib/api";
+import { communityApi, type CommunityNoteAttachment } from "@/lib/api";
+import { resolveCommunityUploadUrl } from "@/lib/communityUploadUrl";
 import Footer from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ArrowLeft, PenLine, Send, CheckCircle2, LogOut, Loader2 } from "lucide-react";
+import { ArrowLeft, PenLine, Send, CheckCircle2, LogOut, Loader2, Paperclip, FileText, Trash2 } from "lucide-react";
 
 function apiErrMessage(err: unknown): string {
   const d = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
@@ -44,6 +45,8 @@ export default function DuzenleNotPage() {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [attachments, setAttachments] = useState<CommunityNoteAttachment[]>([]);
+  const [attBusy, setAttBusy] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -80,6 +83,7 @@ export default function DuzenleNotPage() {
         setTopicId(n.topic_id);
         setTitle(n.title);
         setBody(n.body);
+        setAttachments(n.attachments ?? []);
       } catch (err: unknown) {
         const status = (err as { response?: { status?: number } })?.response?.status;
         if (cancelled) return;
@@ -105,6 +109,38 @@ export default function DuzenleNotPage() {
     setGroup(g);
     setBranchId("");
     setTopicId("");
+  }
+
+  async function uploadMoreFiles(files: FileList | null) {
+    if (!files?.length || !noteId) return;
+    const list = Array.from(files).slice(0, 12 - attachments.length);
+    if (list.length === 0) return;
+    setAttBusy("up");
+    try {
+      const next = [...attachments];
+      for (const f of list) {
+        const r = await communityApi.uploadNoteAttachment(noteId, f);
+        next.push(r.data);
+      }
+      setAttachments(next);
+    } catch {
+      /* sessiz */
+    } finally {
+      setAttBusy(null);
+    }
+  }
+
+  async function removeAttachment(att: CommunityNoteAttachment) {
+    if (!noteId) return;
+    setAttBusy(att.id);
+    try {
+      await communityApi.deleteNoteAttachment(noteId, att.id);
+      setAttachments((prev) => prev.filter((a) => a.id !== att.id));
+    } catch {
+      /* sessiz */
+    } finally {
+      setAttBusy(null);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -348,6 +384,70 @@ export default function DuzenleNotPage() {
                   <p className="text-[10px] font-bold opacity-35 mt-1.5" style={{ color: "var(--text-muted)" }}>
                     {body.length} karakter
                   </p>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-45" style={{ color: "var(--text-muted)" }}>
+                    Ekler (PDF / görsel)
+                  </label>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-black cursor-pointer" style={{ borderColor: "var(--border)", background: "var(--surface-2)", color: "var(--text)" }}>
+                      <Paperclip className="w-4 h-4" />
+                      {attBusy === "up" ? "Yükleniyor…" : "Dosya ekle"}
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*"
+                        multiple
+                        disabled={attachments.length >= 12 || attBusy !== null}
+                        className="sr-only"
+                        onChange={(e) => {
+                          void uploadMoreFiles(e.target.files);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    <span className="text-[10px] font-bold self-center opacity-40">{attachments.length}/12</span>
+                  </div>
+                  {attachments.length > 0 && (
+                    <ul className="space-y-2">
+                      {attachments.map((a) => {
+                        const href = resolveCommunityUploadUrl(a.url);
+                        return (
+                          <li
+                            key={a.id}
+                            className="flex items-center justify-between gap-3 rounded-xl border px-3 py-2 text-xs font-semibold"
+                            style={{ borderColor: "var(--border)", background: "var(--bg)" }}
+                          >
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 min-w-0 flex-1 hover:opacity-80"
+                              style={{ color: "var(--primary)" }}
+                            >
+                              {a.kind === "image" ? (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img src={href} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0 border" style={{ borderColor: "var(--border)" }} />
+                              ) : (
+                                <FileText className="w-5 h-5 shrink-0 opacity-70" />
+                              )}
+                              <span className="truncate">{a.filename}</span>
+                            </a>
+                            <button
+                              type="button"
+                              disabled={attBusy !== null}
+                              onClick={() => void removeAttachment(a)}
+                              className="p-2 rounded-lg shrink-0 disabled:opacity-40"
+                              style={{ color: "var(--danger)" }}
+                              title="Eki sil"
+                            >
+                              {attBusy === a.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </div>
               </div>
 

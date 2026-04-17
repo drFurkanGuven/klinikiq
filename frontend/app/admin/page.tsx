@@ -22,6 +22,7 @@ import {
   FolderOpen,
   Link2,
   CloudDownload,
+  Pencil,
 } from "lucide-react";
 
 const SPECIALTY_LABEL: Record<string, string> = {
@@ -68,6 +69,10 @@ export default function AdminDashboardPage() {
   const [hfImporting, setHfImporting] = useState(false);
 
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [editImage, setEditImage] = useState<HistologyImage | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -194,6 +199,41 @@ export default function AdminDashboardPage() {
       );
     } finally {
       setHfImporting(false);
+    }
+  };
+
+  const openEditImage = (img: HistologyImage) => {
+    setEditImage(img);
+    setEditTitle(img.title);
+    setEditDescription(img.description ?? "");
+  };
+
+  const handleSaveEditImage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editImage) return;
+    const t = editTitle.trim();
+    if (!t) {
+      alert("Başlık boş olamaz.");
+      return;
+    }
+    setEditSaving(true);
+    try {
+      await adminApi.patchHistologyImage(editImage.id, {
+        title: t,
+        description: editDescription.trim() || null,
+      });
+      setImages((prev) =>
+        prev.map((i) =>
+          i.id === editImage.id
+            ? { ...i, title: t, description: editDescription.trim() || undefined }
+            : i,
+        ),
+      );
+      setEditImage(null);
+    } catch {
+      alert("Güncellenemedi.");
+    } finally {
+      setEditSaving(false);
     }
   };
 
@@ -445,6 +485,14 @@ export default function AdminDashboardPage() {
                             </td>
                             <td className="px-6 py-4 align-middle text-right">
                               <div className="inline-flex items-center justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => openEditImage(img)}
+                                  className="p-2.5 rounded-xl bg-surface border border-border hover:border-primary hover:text-primary transition-all"
+                                  title="Başlık ve açıklama düzenle"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
                                 <Link
                                   href={`/histology?image=${img.id}`}
                                   className="p-2.5 rounded-xl bg-surface border border-border hover:border-primary hover:text-primary transition-all"
@@ -553,6 +601,71 @@ export default function AdminDashboardPage() {
         onClose={() => setIsUploadModalOpen(false)}
         onSuccess={fetchImages}
       />
+
+      {editImage && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <form
+            onSubmit={handleSaveEditImage}
+            className="w-full max-w-lg rounded-3xl border border-border bg-surface shadow-2xl p-8 space-y-5"
+            style={{ background: "var(--surface)", color: "var(--text)" }}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-black tracking-tight">Görüntü metni</h2>
+                <p className="text-sm opacity-60 mt-1">
+                  Başlık ve açıklama yalnızca listede ve görüntüleyicide görünür; dosya yolu değişmez.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => !editSaving && setEditImage(null)}
+                className="p-2 rounded-xl opacity-50 hover:opacity-100"
+              >
+                ×
+              </button>
+            </div>
+            <label className="block space-y-1.5">
+              <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Başlık</span>
+              <input
+                required
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                disabled={editSaving}
+                className="w-full rounded-xl border border-border bg-black/5 dark:bg-white/5 px-4 py-3 text-sm font-semibold"
+              />
+            </label>
+            <label className="block space-y-1.5">
+              <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Açıklama</span>
+              <textarea
+                rows={4}
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                disabled={editSaving}
+                placeholder="İsteğe bağlı"
+                className="w-full rounded-xl border border-border bg-black/5 dark:bg-white/5 px-4 py-3 text-sm resize-none"
+              />
+            </label>
+            <div className="flex gap-3 justify-end pt-2">
+              <button
+                type="button"
+                disabled={editSaving}
+                onClick={() => setEditImage(null)}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold border border-border opacity-80 hover:opacity-100"
+              >
+                İptal
+              </button>
+              <button
+                type="submit"
+                disabled={editSaving}
+                className="px-5 py-2.5 rounded-xl text-sm font-black bg-primary text-white hover:opacity-95 disabled:opacity-50 flex items-center gap-2"
+              >
+                {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Kaydet
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {isHfModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">

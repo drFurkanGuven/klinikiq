@@ -9,7 +9,7 @@ import httpx
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from typing import Optional
+from typing import List, Optional
 
 from app.core.config import settings
 from app.core.tile_files import remove_dzi_bundle
@@ -84,6 +84,13 @@ def _run_vips_dzsave(tiff_path: str, output_base: str) -> None:
         print(f"Thumbnail uretimi basarisiz (kritik degil): {e}")
 
 
+def _opt_metadata_str(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    t = str(value).strip()
+    return t or None
+
+
 async def ingest_local_file_as_dzi(
     local_source_path: str,
     title: str,
@@ -91,6 +98,10 @@ async def ingest_local_file_as_dzi(
     specialty: Optional[str],
     db: AsyncSession,
     asset_source: str = "upload",
+    stain: Optional[str] = None,
+    organ: Optional[str] = None,
+    curriculum_track: Optional[str] = None,
+    science_unit: Optional[str] = None,
 ) -> HistologyImage:
     """
     Yerel bir WSI dosyasından (TIFF/TIF/SVS/NDPI vb.) Deep Zoom (DZI) üretir ve veritabanına kaydeder.
@@ -124,7 +135,11 @@ async def ingest_local_file_as_dzi(
         description=(description or "").strip() or None,
         image_url=dzi_url,
         thumbnail_url=thumb_url,
-        specialty=specialty or None,
+        specialty=_opt_metadata_str(specialty),
+        stain=_opt_metadata_str(stain),
+        organ=_opt_metadata_str(organ),
+        curriculum_track=_opt_metadata_str(curriculum_track),
+        science_unit=_opt_metadata_str(science_unit),
         asset_source=asset_source,
     )
     try:
@@ -144,6 +159,127 @@ async def ingest_local_file_as_dzi(
                         shutil.rmtree(path)
                     else:
                         os.remove(path)
+        except Exception:
+            pass
+        raise HTTPException(
+            status_code=500,
+            detail="Görüntü veritabanına kaydedilirken hata oluştu.",
+        ) from e
+
+
+def _walk_has_files(path: str) -> bool:
+    if not os.path.isdir(path):
+        return False
+    for _root, _dirs, files in os.walk(path):
+        if files:
+            return True
+    return False
+
+
+def _find_dzi_rel_paths(root: str) -> list[str]:
+    out: list[str] = []
+    for dirpath, _dnames, fnames in os.walk(root):
+        for fn in fnames:
+            if fn.lower().endswith(".dzi"):
+                full = os.path.join(dirpath, fn)
+                rel = os.path.relpath(full, root).replace("\\", "/")
+                out.append(rel)
+    return sorted(out)
+
+
+async def ingest_prebuilt_dzi_bundle(
+    abs_dzi_path: str,
+    title: str,
+    description: Optional[str],
+    specialty: Optional[str],
+    db: AsyncSession,
+    asset_source: str = "upload",
+    stain: Optional[str] = None,
+    organ: Optional[str] = None,
+    curriculum_track: Optional[str] = None,
+    science_unit: Optional[str] = None,
+) -> HistologyImage:
+    """
+    Hazır Deep Zoom paketini (.dzi + aynı kökte stem_files/) TILES_DIR altına kopyalar ve DB kaydı oluşturur.
+    """
+    abs_dzi_path = os.path.realpath(abs_dzi_path)
+    if not abs_dzi_path.lower().endswith(".dzi") or not os.path.isfile(abs_dzi_path):
+        raise HTTPException(status_code=400, detail="Geçerli bir .dzi dosyası gerekli.")
+
+    stem = abs_dzi_path[:-4]
+    files_dir = stem + "_files"
+    if not os.path.isdir(files_dir):
+        raise HTTPException(
+            status_code=400,
+            detail=f"DZI karo klasörü eksik: {os.path.basename(files_dir)}",
+        )
+    if not _walk_has_files(files_dir):
+        raise HTTPException(status_code=400, detail="DZI karo klasörü boş.")
+
+    os.makedirs(settings.TILES_DIR, exist_ok=True)
+    slug = _slugify(title) or "slide"
+    counter = 0
+    while True:
+        name = slug if counter == 0 else f"{slug}_{counter}"
+        dzi_path = os.path.join(settings.TILES_DIR, f"{name}.dzi")
+        if not os.path.exists(dzi_path):
+            break
+        counter += 1
+
+    output_base = os.path.join(settings.TILES_DIR, name)
+    loop = asyncio.get_event_loop()
+
+    def _copy_bundle() -> tuple[str, Optional[str]]:
+        shutil.copy2(abs_dzi_path, f"{output_base}.dzi")
+        dest_files = f"{output_base}_files"
+        if os.path.exists(dest_files):
+            shutil.rmtree(dest_files)
+        shutil.copytree(files_dir, dest_files)
+        try:
+            subprocess.run(
+                ["chmod", "-R", "755", f"{output_base}.dzi"],
+                check=False,
+            )
+            subprocess.run(["chmod", "-R", "755", dest_files], check=False)
+        except Exception:
+            pass
+        thumb_src = f"{stem}_thumb.jpg"
+        thumb_url: Optional[str] = None
+        if os.path.isfile(thumb_src):
+            tdst = f"{output_base}_thumb.jpg"
+            shutil.copy2(thumb_src, tdst)
+            thumb_url = f"/tiles/{name}_thumb.jpg"
+        return f"/tiles/{name}.dzi", thumb_url
+
+    try:
+        dzi_url, thumb_url = await loop.run_in_executor(None, _copy_bundle)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"DZI kopyalanamadı: {exc}") from exc
+
+    if redis_client:
+        await redis_client.delete(CACHE_KEY_LIST)
+
+    image = HistologyImage(
+        title=title.strip(),
+        description=(description or "").strip() or None,
+        image_url=dzi_url,
+        thumbnail_url=thumb_url,
+        specialty=_opt_metadata_str(specialty),
+        stain=_opt_metadata_str(stain),
+        organ=_opt_metadata_str(organ),
+        curriculum_track=_opt_metadata_str(curriculum_track),
+        science_unit=_opt_metadata_str(science_unit),
+        asset_source=asset_source,
+    )
+    try:
+        db.add(image)
+        await db.commit()
+        await db.refresh(image)
+        return image
+    except Exception as e:
+        print(f"DB Kayit Hatasi (DZI bundle): {e}")
+        try:
+            remove_dzi_bundle(settings.TILES_DIR, dzi_url)
         except Exception:
             pass
         raise HTTPException(
@@ -295,6 +431,10 @@ async def upload_tiff_image(
     title: str = Form(...),
     description: str = Form(""),
     specialty: str = Form(""),
+    stain: str = Form(""),
+    organ: str = Form(""),
+    curriculum_track: str = Form(""),
+    science_unit: str = Form(""),
     db: AsyncSession = Depends(get_db),
     user_id: str = Depends(get_current_user_id),
 ):
@@ -304,15 +444,19 @@ async def upload_tiff_image(
     if not user or not user.is_admin:
         raise HTTPException(status_code=403, detail="Yetki gerekli")
 
-    # Sadece TIFF / genel image formatlarına izin ver
-    allowed = {"image/tiff", "image/tif", "application/octet-stream", "image/jpeg", "image/png"}
-    content_type = file.content_type or ""
     filename_lower = (file.filename or "").lower()
-    is_tiff = filename_lower.endswith((".tiff", ".tif", ".svs", ".ndpi"))
-    if content_type not in allowed and not is_tiff:
-        raise HTTPException(status_code=400, detail="Desteklenmeyen dosya tipi. TIFF/TIF yükleyin.")
+    ext = os.path.splitext(filename_lower)[1]
+    convertible = ext in (
+        ".tif", ".tiff", ".svs", ".ndpi",
+        ".jpg", ".jpeg", ".png", ".gif",
+    )
+    if not convertible:
+        raise HTTPException(
+            status_code=400,
+            detail="Desteklenmeyen dosya tipi. TIFF/TIF, SVS, NDPI, JPEG, PNG veya GIF yükleyin.",
+        )
 
-    suffix = os.path.splitext(file.filename or "upload.tiff")[1] or ".tiff"
+    suffix = ext or ".tiff"
     tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
     try:
         content = await file.read()
@@ -325,12 +469,85 @@ async def upload_tiff_image(
             specialty,
             db,
             asset_source="upload",
+            stain=stain,
+            organ=organ,
+            curriculum_track=curriculum_track,
+            science_unit=science_unit,
         )
     finally:
         try:
             os.unlink(tmp_file.name)
         except OSError:
             pass
+
+
+@router.post("/images/upload-dzi-bundle", response_model=HistologyImageOut, status_code=201)
+async def upload_dzi_bundle(
+    bundle_paths: List[str] = Form(...),
+    bundle_files: List[UploadFile] = File(...),
+    title: str = Form(...),
+    description: str = Form(""),
+    specialty: str = Form(""),
+    stain: str = Form(""),
+    organ: str = Form(""),
+    curriculum_track: str = Form(""),
+    science_unit: str = Form(""),
+    db: AsyncSession = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    """
+    Hazır Deep Zoom paketi: .dzi ve aynı kökte stem_files/ altındaki karoları tek istekte yükler (admin).
+    Tarayıcı klasör seçiminde tüm dosyalar birlikte gönderilir.
+    """
+    user_result = await db.execute(select(User).where(User.id == user_id))
+    user = user_result.scalar_one_or_none()
+    if not user or not user.is_admin:
+        raise HTTPException(status_code=403, detail="Yetki gerekli")
+
+    if len(bundle_paths) != len(bundle_files):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Yol ve dosya sayısı eşleşmiyor ({len(bundle_paths)} yol, {len(bundle_files)} dosya).",
+        )
+    if not bundle_paths:
+        raise HTTPException(status_code=400, detail="Boş paket.")
+
+    tmp_root = tempfile.mkdtemp(prefix="dzi_bundle_")
+    try:
+        for rel, up in zip(bundle_paths, bundle_files):
+            rel_n = rel.replace("\\", "/").strip().lstrip("/")
+            if not rel_n or ".." in rel_n.split("/"):
+                raise HTTPException(status_code=400, detail="Geçersiz göreli dosya yolu.")
+            dest = os.path.join(tmp_root, rel_n.replace("/", os.sep))
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            content = await up.read()
+            with open(dest, "wb") as f:
+                f.write(content)
+
+        dzis = _find_dzi_rel_paths(tmp_root)
+        if len(dzis) != 1:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Pakette tam olarak bir .dzi olmalı (ve yanında aynı ada sahip _files klasörü). "
+                    f"Bulunan: {len(dzis)}"
+                ),
+            )
+        abs_dzi = os.path.join(tmp_root, dzis[0].replace("/", os.sep))
+        return await ingest_prebuilt_dzi_bundle(
+            abs_dzi,
+            title,
+            description,
+            specialty,
+            db,
+            asset_source="upload",
+            stain=stain,
+            organ=organ,
+            curriculum_track=curriculum_track,
+            science_unit=science_unit,
+        )
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
 
 
 @router.delete("/images/{image_id}", status_code=204)

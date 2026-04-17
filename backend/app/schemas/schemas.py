@@ -300,6 +300,13 @@ class HistologyImageOut(BaseModel):
         from_attributes = True
 
 
+class HistologyImagePatch(BaseModel):
+    """Yönetim panelinde başlık / açıklama güncellemesi."""
+
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+
 class AnnotationCreate(BaseModel):
     x: float
     y: float
@@ -335,6 +342,14 @@ class CommunityNoteCreate(BaseModel):
     body: str = Field(..., min_length=20, max_length=50_000)
 
 
+class NoteAttachmentOut(BaseModel):
+    id: str
+    kind: str  # image | pdf
+    filename: str
+    url: str
+    size_bytes: int = 0
+
+
 class CommunityNoteOut(BaseModel):
     id: str
     group: str
@@ -348,6 +363,8 @@ class CommunityNoteOut(BaseModel):
     saved_by_me: bool = False
     is_mine: bool = False
     created_at: datetime
+    body_truncated: bool = False
+    attachments: List["NoteAttachmentOut"] = []
 
     class Config:
         from_attributes = True

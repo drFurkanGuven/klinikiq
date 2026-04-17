@@ -3,82 +3,28 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { microscopyApi, type HistologyImage } from "@/lib/api";
 import {
-  microscopyApi,
-  type HistologyImage,
-  type HuggingFaceDatasetSpotlight,
-} from "@/lib/api";
+  HISTOLOGY_SPECIALTIES,
+  CURRICULUM_FILTER_OPTIONS,
+  SCIENCE_UNIT_LABELS,
+  STAIN_OPTIONS,
+  ORGAN_OPTIONS,
+} from "@/lib/histologyTaxonomy";
 import { isAuthenticated } from "@/lib/auth";
-import dynamic from "next/dynamic";
 import {
   Microscope,
   ArrowLeft,
   ImageOff,
   Sparkles,
   ExternalLink,
-  Database,
   Layers,
   ChevronDown,
+  BookOpen,
+  Lightbulb,
+  GraduationCap,
 } from "lucide-react";
-
-const HistologyViewer = dynamic(() => import("@/components/HistologyViewer"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[min(70vh,560px)] flex items-center justify-center rounded-2xl bg-slate-950/80 border border-white/10">
-      <span className="text-slate-400 text-sm">Görüntüleyici yükleniyor…</span>
-    </div>
-  ),
-});
-
-const SPECIALTIES: Record<string, string> = {
-  pathology: "Patoloji",
-  cardiology: "Kardiyoloji",
-  endocrinology: "Endokrinoloji",
-  neurology: "Nöroloji",
-  pulmonology: "Pulmonoloji",
-  gastroenterology: "Gastroenteroloji",
-  nephrology: "Nefroloji",
-  infectious_disease: "Enfeksiyon",
-  hematology: "Hematoloji",
-  rheumatology: "Romatoloji",
-  basic_sciences: "Temel bilimler (histoloji)",
-};
-
-/** Histology Guide tarzı müfredat — hücre/doku ve organ sistemleri */
-const CURRICULUM_OPTIONS: { value: string; label: string }[] = [
-  { value: "", label: "Tüm preparatlar" },
-  { value: "clinical", label: "Klinik branşlar" },
-  { value: "basic_cell_tissue", label: "Hücre ve doku" },
-  { value: "basic_organ_system", label: "Organ sistemleri (temel)" },
-];
-
-const SCIENCE_UNIT_LABELS: Record<string, string> = {
-  epithelium: "Epitel",
-  connective_tissue: "Bağ doku",
-  muscle_tissue: "Kas dokusu",
-  cartilage_bone: "Kıkırdak ve kemik",
-  nervous_tissue: "Sinir dokusu",
-  blood: "Kan ve yayma",
-  lymphoid: "Lenfoid sistem",
-  respiratory: "Solunum",
-  digestive: "Sindirim",
-};
-
-const STAIN_FILTERS = ["", "H&E", "PAS", "Masson", "IHC", "Wright-Giemsa"];
-
-const ORGAN_FILTERS = [
-  "",
-  "Epitel",
-  "Bağ doku",
-  "Kas",
-  "Kemik",
-  "Kan",
-  "Akciğer",
-  "Böbrek",
-  "Meme",
-  "Adrenal",
-  "Serebellum",
-];
+import HistologyViewer from "@/components/HistologyViewer";
 
 const SOURCE_FILTERS: { value: string; label: string }[] = [
   { value: "", label: "Tüm kaynaklar" },
@@ -115,11 +61,6 @@ function HistologyPageInner() {
   const [scienceUnit, setScienceUnit] = useState("");
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [hfLoading, setHfLoading] = useState(true);
-  const [hfSets, setHfSets] = useState<HuggingFaceDatasetSpotlight[]>([]);
-  const [hfQuery, setHfQuery] = useState("histopathology");
-  const [debouncedHfQuery, setDebouncedHfQuery] = useState("histopathology");
-  const [hfTick, setHfTick] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -158,30 +99,6 @@ function HistologyPageInner() {
     }
     loadImages();
   }, [mounted, router, loadImages]);
-
-  useEffect(() => {
-    const t = setTimeout(() => setDebouncedHfQuery(hfQuery.trim() || "histopathology"), 450);
-    return () => clearTimeout(t);
-  }, [hfQuery]);
-
-  useEffect(() => {
-    if (!mounted || !isAuthenticated()) return;
-    let cancelled = false;
-    (async () => {
-      setHfLoading(true);
-      try {
-        const res = await microscopyApi.exploreHuggingface({ q: debouncedHfQuery, limit: 14 });
-        if (!cancelled) setHfSets(res.data.datasets ?? []);
-      } catch {
-        if (!cancelled) setHfSets([]);
-      } finally {
-        if (!cancelled) setHfLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [mounted, debouncedHfQuery, hfTick]);
 
   useEffect(() => {
     const id = searchParams.get("image");
@@ -225,7 +142,7 @@ function HistologyPageInner() {
           <div className="relative max-w-3xl space-y-4">
             <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-violet-300/90">
               <Layers size={12} />
-              Açık lisanslı örnekler + keşif
+              Açık lisanslı preparatlar
             </p>
             <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">
               Preparatları{" "}
@@ -234,18 +151,9 @@ function HistologyPageInner() {
               </span>
             </h1>
             <p className="text-sm md:text-base text-slate-400 leading-relaxed font-medium">
-              Wikimedia Commons ve benzeri açık kaynaklardan derlenen H&amp;E / özel boyalı kesitler.
-              Temel bilimler için{" "}
-              <a
-                href="https://histologyguide.com/slidebox/02-epithelium.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-violet-300 hover:text-white underline underline-offset-2"
-              >
-                Histology Guide
-              </a>{" "}
-              tarzında epitel, bağ doku, kas ve organ sistemleri sınıflamasıyla da süzebilirsin. Hugging Face
-              üzerindeki histopatoloji veri kümelerine aşağıdan ulaşabilirsin.
+              Wikimedia Commons ve benzeri açık kaynaklardan derlenen H&amp;E / özel boyalı kesitleri
+              yüksek çözünürlükte inceleyebilirsin. Müfredat, branş, boya ve organ filtreleriyle temel
+              bilim ve klinik izleri ayırabilirsin; görüntü üzerinde alan seçerek not tutabilirsin.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <span className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300">
@@ -271,7 +179,7 @@ function HistologyPageInner() {
                 }}
                 className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50"
               >
-                {CURRICULUM_OPTIONS.map((o) => (
+                {CURRICULUM_FILTER_OPTIONS.map((o) => (
                   <option key={o.value || "all"} value={o.value}>
                     {o.label}
                   </option>
@@ -310,7 +218,7 @@ function HistologyPageInner() {
                 className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50"
               >
                 <option value="">Tüm branşlar</option>
-                {Object.entries(SPECIALTIES).map(([key, label]) => (
+                {Object.entries(HISTOLOGY_SPECIALTIES).map(([key, label]) => (
                   <option key={key} value={key}>
                     {label}
                   </option>
@@ -329,7 +237,7 @@ function HistologyPageInner() {
                 onChange={(e) => setStain(e.target.value)}
                 className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50"
               >
-                {STAIN_FILTERS.map((s) => (
+                {STAIN_OPTIONS.map((s) => (
                   <option key={s || "all"} value={s}>
                     {s || "Tüm boyalar"}
                   </option>
@@ -346,7 +254,7 @@ function HistologyPageInner() {
                 onChange={(e) => setOrgan(e.target.value)}
                 className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50"
               >
-                {ORGAN_FILTERS.map((o) => (
+                {ORGAN_OPTIONS.map((o) => (
                   <option key={o || "all"} value={o}>
                     {o || "Tümü"}
                   </option>
@@ -431,7 +339,7 @@ function HistologyPageInner() {
                         <div className="flex flex-wrap gap-1">
                           {img.specialty && (
                             <span className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-white/10 text-slate-300">
-                              {SPECIALTIES[img.specialty] ?? img.specialty}
+                              {HISTOLOGY_SPECIALTIES[img.specialty] ?? img.specialty}
                             </span>
                           )}
                           {img.stain && (
@@ -491,94 +399,107 @@ function HistologyPageInner() {
           </div>
         </div>
 
-        {/* Hugging Face keşif */}
-        <section className="rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-md p-6 md:p-8 space-y-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <Database className="w-5 h-5 text-amber-400/90" />
-                Hugging Face veri keşfi
-              </h2>
-              <p className="text-sm text-slate-400 mt-1 max-w-2xl font-medium leading-relaxed">
-                Açık histopatoloji ve WSI veri kümeleri (indirme, lisans ve boyutlar veri kartında). KlinikIQ
-                burada yalnızca keşif bağlantısı sunar; veri Hugging Face üzerindedir.{" "}
-                <span className="text-slate-300">
-                  Yöneticiler: Hugging Face&apos;teki pyramidal TIFF/SVS dosyasını sunucuya indirip DZI&apos;ye
-                  çevirmek için{" "}
-                  <Link
-                    href="/admin"
-                    className="text-violet-400 hover:text-violet-300 underline underline-offset-2 font-semibold"
-                  >
-                    Yönetim → HF&apos;den TIFF
-                  </Link>{" "}
-                  kullanılabilir (daha hızlı yerel okuma, çoğu veri kümesinde hazır DZI yerine TIFF vardır).
-                </span>
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <input
-                type="search"
-                value={hfQuery}
-                onChange={(e) => setHfQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setDebouncedHfQuery(hfQuery.trim() || "histopathology");
-                    setHfTick((t) => t + 1);
-                  }
-                }}
-                placeholder="Ara: breast pathology, WSI…"
-                className="rounded-xl border border-white/10 bg-slate-950/80 px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 min-w-[200px] focus:outline-none focus:ring-2 focus:ring-violet-500/40"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  const q = hfQuery.trim() || "histopathology";
-                  setHfQuery(q);
-                  setDebouncedHfQuery(q);
-                  setHfTick((t) => t + 1);
-                }}
-                className="rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold px-4 py-2.5 transition-colors"
-              >
-                Yenile
-              </button>
-            </div>
+        {/* Öğrenme kaynakları + ipuçları */}
+        <section className="rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-md p-6 md:p-8 space-y-8">
+          <div className="space-y-1">
+            <h2 className="text-lg font-black text-white flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-cyan-400/90 shrink-0" />
+              Öğrenme ve pratik
+            </h2>
+            <p className="text-sm text-slate-400 max-w-2xl font-medium leading-relaxed">
+              Histoloji ve patoloji öğreniminde sık kullanılan açık kaynaklar. Bunlar harici sitelerdir;
+              KlinikIQ içeriği değildir — müfredatını desteklemek için seçilmiş bağlantılardır.
+            </p>
           </div>
 
-          {hfLoading ? (
-            <div className="flex gap-3 overflow-hidden">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-36 min-w-[260px] rounded-2xl bg-white/5 animate-pulse" />
-              ))}
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
+                <BookOpen size={14} className="text-violet-400" />
+                Seçilmiş kaynaklar
+              </h3>
+              <ul className="space-y-3">
+                {[
+                  {
+                    href: "https://histologyguide.com/",
+                    title: "Histology Guide",
+                    desc: "Etiketli slaytlar; epitel, bağ doku, organ sistemleri.",
+                  },
+                  {
+                    href: "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Book%3A_Histology_A_Text_and_Atlas_with_Correlated_Cell_and_Molecular_Biology_(Ross)",
+                    title: "LibreTexts — Histology",
+                    desc: "Ders kitabı ve atlas yapısı; hücre ve doku biyolojisi bağlamı.",
+                  },
+                  {
+                    href: "https://www.pathologyoutlines.com/topic/normalhistology.html",
+                    title: "Pathology Outlines — Normal histoloji",
+                    desc: "Kısa özetler ve referans görüntüler; normal doku hatırlatması.",
+                  },
+                  {
+                    href: "https://openstax.org/books/anatomy-and-physiology/pages/4-introduction",
+                    title: "OpenStax — Doku tipleri",
+                    desc: "Açık ders kitabı; epitel, bağ doku, kas ve sinir temelleri (İngilizce).",
+                  },
+                ].map((item) => (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex gap-3 rounded-2xl border border-white/10 bg-slate-950/50 p-4 transition-colors hover:border-cyan-500/30 hover:bg-slate-950/80"
+                    >
+                      <span className="mt-0.5 text-cyan-400/80 group-hover:text-cyan-300">
+                        <ExternalLink size={16} />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-sm font-bold text-white group-hover:text-cyan-100">
+                          {item.title}
+                        </span>
+                        <span className="mt-0.5 block text-xs text-slate-500 leading-relaxed">
+                          {item.desc}
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
-          ) : hfSets.length === 0 ? (
-            <p className="text-sm text-slate-500">Veri kümeleri yüklenemedi veya sonuç yok.</p>
-          ) : (
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1">
-              {hfSets.map((ds) => (
-                <a
-                  key={ds.id}
-                  href={ds.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex-shrink-0 w-[min(100%,280px)] rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/90 to-violet-950/20 p-4 hover:border-violet-400/40 transition-all"
-                >
-                  <p className="text-xs font-bold text-violet-300 line-clamp-2 mb-2 group-hover:text-white">
-                    {ds.id}
-                  </p>
-                  <p className="text-[11px] text-slate-500 line-clamp-3 leading-relaxed mb-4">
-                    {ds.description || "—"}
-                  </p>
-                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
-                    <span>⬇ {ds.downloads?.toLocaleString?.() ?? ds.downloads}</span>
-                    <span className="inline-flex items-center gap-1 text-violet-400">
-                      Hub
-                      <ExternalLink size={12} />
-                    </span>
-                  </div>
-                </a>
-              ))}
+
+            <div className="space-y-4 rounded-2xl border border-white/5 bg-violet-950/15 p-5 md:p-6">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
+                <Lightbulb size={14} className="text-amber-400" />
+                Bu sayfada
+              </h3>
+              <ul className="space-y-3 text-sm text-slate-300 leading-relaxed">
+                <li className="flex gap-2">
+                  <span className="text-violet-400 font-bold">·</span>
+                  Soldan filtrelerle müfredat, branş, boya ve organa göre preparat daralt.
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-violet-400 font-bold">·</span>
+                  Görüntüleyicide <strong className="text-slate-200 font-semibold">Yakın / Uzak / Tümü</strong> ile
+                  zoom; sağ alttaki küçük haritada genel görünümü takip et.
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-violet-400 font-bold">·</span>
+                  <strong className="text-slate-200 font-semibold">Not alanı</strong> ile dikdörtgen seç; her
+                  oturumda farklı renkte çerçeve, notunu kaydet ve listeden yönet.
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-violet-400 font-bold">·</span>
+                  Kendi TIFF/SVS dosyanı veya URL ile görüntü eklemek için yükleme akışını kullan (hesap ve yetki
+                  gerekebilir).
+                </li>
+              </ul>
+              <p className="pt-2 text-xs text-slate-500 border-t border-white/10 mt-4">
+                Kurum yöneticileri harici veri kümelerinden TIFF içe aktarma için{" "}
+                <Link href="/admin" className="text-violet-400 hover:text-violet-300 underline underline-offset-2">
+                  yönetim paneline
+                </Link>{" "}
+                gidebilir.
+              </p>
             </div>
-          )}
+          </div>
         </section>
       </div>
     </div>

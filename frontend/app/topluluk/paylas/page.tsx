@@ -15,7 +15,7 @@ import { storage } from "@/lib/storage";
 import { communityApi } from "@/lib/api";
 import Footer from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ArrowLeft, PenLine, Send, CheckCircle2, LogOut, Loader2 } from "lucide-react";
+import { ArrowLeft, PenLine, Send, CheckCircle2, LogOut, Loader2, Paperclip } from "lucide-react";
 
 const DRAFT_KEY = "klinikiq:topluluk-not-taslak";
 
@@ -39,6 +39,8 @@ export default function PaylasPage() {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [publishWarn, setPublishWarn] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -120,20 +122,40 @@ export default function PaylasPage() {
       return;
     }
 
+    if (pendingFiles.length > 12) {
+      setError("En fazla 12 ek dosya seçebilirsin (PDF veya görsel).");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      await communityApi.createNote({
+      const res = await communityApi.createNote({
         group,
         branch_id: branchId,
         topic_id: topicId,
         title: title.trim(),
         body: body.trim(),
       });
+      const noteId = res.data.id;
+      let attachFailed = 0;
+      for (const file of pendingFiles) {
+        try {
+          await communityApi.uploadNoteAttachment(noteId, file);
+        } catch {
+          attachFailed += 1;
+        }
+      }
       try {
         localStorage.removeItem(DRAFT_KEY);
       } catch {
         /* ignore */
       }
+      setPendingFiles([]);
+      setPublishWarn(
+        attachFailed > 0
+          ? `${attachFailed} ek dosya yüklenemedi; not metni yayınlandı. Notu düzenleyerek ekleri tekrar yükleyebilirsin.`
+          : null,
+      );
       setDone(true);
     } catch (err) {
       setError(apiErrMessage(err));
@@ -182,6 +204,18 @@ export default function PaylasPage() {
             <h1 className="text-2xl font-black" style={{ color: "var(--text)" }}>
               Not yayınlandı
             </h1>
+            {publishWarn && (
+              <p
+                className="text-sm font-bold px-4 py-3 rounded-xl border text-left"
+                style={{
+                  color: "var(--warning, #b45309)",
+                  borderColor: "var(--border)",
+                  background: "color-mix(in srgb, var(--warning, #f59e0b) 12%, transparent)",
+                }}
+              >
+                {publishWarn}
+              </p>
+            )}
             <p className="text-sm font-medium opacity-70 leading-relaxed" style={{ color: "var(--text-muted)" }}>
               Notun topluluk akışında listeleniyor. İstersen aşağıdan yeni bir not daha paylaşabilirsin.
             </p>
@@ -193,6 +227,7 @@ export default function PaylasPage() {
                 type="button"
                 onClick={() => {
                   setDone(false);
+                  setPublishWarn(null);
                 }}
                 className="px-8 py-3 rounded-2xl text-xs font-black border transition-all"
                 style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
@@ -321,6 +356,48 @@ export default function PaylasPage() {
                   <p className="text-[10px] font-bold opacity-35 mt-1.5" style={{ color: "var(--text-muted)" }}>
                     {body.length} karakter · form alanları tarayıcıda taslak olarak saklanır (sayfa yenilenince)
                   </p>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-45" style={{ color: "var(--text-muted)" }}>
+                    Ek dosyalar (isteğe bağlı)
+                  </label>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-black cursor-pointer transition-all hover:opacity-90" style={{ borderColor: "var(--border)", background: "var(--surface-2)", color: "var(--text)" }}>
+                      <Paperclip className="w-4 h-4" />
+                      PDF / görsel seç
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*"
+                        multiple
+                        className="sr-only"
+                        onChange={(e) => {
+                          const fl = e.target.files;
+                          if (!fl?.length) return;
+                          setPendingFiles((prev) => [...prev, ...Array.from(fl)].slice(0, 12));
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    <span className="text-[10px] font-bold opacity-40">En fazla 12 · not yayından sonra da eklenebilir</span>
+                  </div>
+                  {pendingFiles.length > 0 && (
+                    <ul className="mt-3 space-y-1.5 text-xs font-semibold text-left opacity-80">
+                      {pendingFiles.map((f, i) => (
+                        <li key={`${f.name}-${i}`} className="flex items-center justify-between gap-2">
+                          <span className="truncate">{f.name}</span>
+                          <button
+                            type="button"
+                            className="shrink-0 text-[10px] font-black uppercase opacity-50 hover:opacity-100"
+                            style={{ color: "var(--danger)" }}
+                            onClick={() => setPendingFiles((prev) => prev.filter((_, j) => j !== i))}
+                          >
+                            Kaldır
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
 

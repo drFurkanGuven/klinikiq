@@ -213,6 +213,14 @@ export interface StudyNoteItem {
   created_at: string;
 }
 
+export interface CommunityNoteAttachment {
+  id: string;
+  kind: "image" | "pdf" | string;
+  filename: string;
+  url: string;
+  size_bytes: number;
+}
+
 export interface CommunityNoteItem {
   id: string;
   group: "temel" | "klinik";
@@ -226,6 +234,9 @@ export interface CommunityNoteItem {
   saved_by_me: boolean;
   is_mine: boolean;
   created_at: string;
+  /** Sunucu: metin 280 karakterden uzunsa true */
+  body_truncated?: boolean;
+  attachments?: CommunityNoteAttachment[];
 }
 
 /** GET /community/notes/:id — tam metin dahil */
@@ -294,6 +305,19 @@ export const communityApi = {
     api.post<ToggleLikeResponse>(`/community/notes/${noteId}/like`),
   toggleSave: (noteId: string) =>
     api.post<ToggleSaveResponse>(`/community/notes/${noteId}/kaydet`),
+  uploadNoteAttachment: (noteId: string, file: File, onProgress?: (pct: number) => void) => {
+    const form = new FormData();
+    form.append("file", file);
+    return api.post<CommunityNoteAttachment>(`/community/notes/${noteId}/attachments`, form, {
+      headers: { "Content-Type": undefined },
+      timeout: 120_000,
+      onUploadProgress: (e) => {
+        if (onProgress && e.total) onProgress(Math.round((e.loaded / e.total) * 100));
+      },
+    });
+  },
+  deleteNoteAttachment: (noteId: string, attachmentId: string) =>
+    api.delete<void>(`/community/notes/${noteId}/attachments/${attachmentId}`),
 };
 
 export const usersApi = {
@@ -370,6 +394,10 @@ export const adminApi = {
   listOrphanDzi: () => api.get<OrphanDziFile[]>("/admin/tiles/orphan-dzi"),
   registerDzi: (body: { relative_path: string; title: string; specialty?: string }) =>
     api.post<HistologyImage>("/admin/tiles/register-dzi", body),
+  patchHistologyImage: (
+    imageId: string,
+    data: { title?: string; description?: string | null },
+  ) => api.patch<HistologyImage>(`/admin/histology-images/${imageId}`, data),
   /** Hugging Face Hub'dan TIFF/SVS indirip sunucuda DZI üretir (admin). */
   importHfTiff: (body: {
     repo_id: string;
@@ -377,6 +405,10 @@ export const adminApi = {
     title: string;
     description?: string;
     specialty?: string;
+    stain?: string;
+    organ?: string;
+    curriculum_track?: string;
+    science_unit?: string;
     repo_type?: string;
   }) =>
     api.post<HistologyImage>("/admin/hf/import-tiff", body, {
@@ -433,9 +465,18 @@ export const microscopyApi = {
     api.get<HistologyImage>(`/microscope/images/${id}`),
   createImage: (data: Omit<HistologyImage, "id" | "created_at">) =>
     api.post<HistologyImage>("/microscope/images", data),
+  /** TIFF/SVS/NDPI ve raster (JPEG, PNG, GIF) → sunucuda DZI */
   uploadTiff: (
     file: File,
-    meta: { title: string; description?: string; specialty?: string },
+    meta: {
+      title: string;
+      description?: string;
+      specialty?: string;
+      stain?: string;
+      organ?: string;
+      curriculum_track?: string;
+      science_unit?: string;
+    },
     onProgress?: (pct: number) => void,
   ) => {
     const form = new FormData();
@@ -443,12 +484,51 @@ export const microscopyApi = {
     form.append("title", meta.title);
     form.append("description", meta.description ?? "");
     form.append("specialty", meta.specialty ?? "");
+    form.append("stain", meta.stain ?? "");
+    form.append("organ", meta.organ ?? "");
+    form.append("curriculum_track", meta.curriculum_track ?? "");
+    form.append("science_unit", meta.science_unit ?? "");
     return api.post<HistologyImage>("/microscope/images/upload", form, {
       headers: { "Content-Type": undefined }, // axios FormData boundary'i otomatik ekler
       onUploadProgress: (e) => {
         if (onProgress && e.total) onProgress(Math.round((e.loaded / e.total) * 100));
       },
       timeout: 600_000, // 10 dk — büyük dosya + dönüşüm
+    });
+  },
+  /** Hazır .dzi + stem_files/ içindeki tüm karolar (tek istek) */
+  uploadDziBundle: (
+    paths: string[],
+    files: File[],
+    meta: {
+      title: string;
+      description?: string;
+      specialty?: string;
+      stain?: string;
+      organ?: string;
+      curriculum_track?: string;
+      science_unit?: string;
+    },
+    onProgress?: (pct: number) => void,
+  ) => {
+    const form = new FormData();
+    for (let i = 0; i < paths.length; i++) {
+      form.append("bundle_paths", paths[i]);
+      form.append("bundle_files", files[i]);
+    }
+    form.append("title", meta.title);
+    form.append("description", meta.description ?? "");
+    form.append("specialty", meta.specialty ?? "");
+    form.append("stain", meta.stain ?? "");
+    form.append("organ", meta.organ ?? "");
+    form.append("curriculum_track", meta.curriculum_track ?? "");
+    form.append("science_unit", meta.science_unit ?? "");
+    return api.post<HistologyImage>("/microscope/images/upload-dzi-bundle", form, {
+      headers: { "Content-Type": undefined },
+      onUploadProgress: (e) => {
+        if (onProgress && e.total) onProgress(Math.round((e.loaded / e.total) * 100));
+      },
+      timeout: 600_000,
     });
   },
   listAnnotations: (image_id: string) =>

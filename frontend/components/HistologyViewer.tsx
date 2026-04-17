@@ -27,6 +27,16 @@ interface PendingAnnotation {
   px: number; py: number; pw: number; ph: number;
 }
 
+/** Kayıtlı kutular sırayla; yeni oturumda butona her basışta sıradaki renk */
+const ANNOTATION_PALETTE = [
+  { stroke: "#f59e0b", fill: "rgba(245, 158, 11, 0.16)", labelBg: "#d97706", labelText: "#0f172a" },
+  { stroke: "#22d3ee", fill: "rgba(34, 211, 238, 0.16)", labelBg: "#0891b2", labelText: "#0f172a" },
+  { stroke: "#a78bfa", fill: "rgba(167, 139, 250, 0.18)", labelBg: "#7c3aed", labelText: "#fafafa" },
+  { stroke: "#34d399", fill: "rgba(52, 211, 153, 0.16)", labelBg: "#059669", labelText: "#0f172a" },
+  { stroke: "#f472b6", fill: "rgba(244, 114, 182, 0.18)", labelBg: "#db2777", labelText: "#fafafa" },
+  { stroke: "#fbbf24", fill: "rgba(251, 191, 36, 0.18)", labelBg: "#b45309", labelText: "#0f172a" },
+] as const;
+
 const OSD_CDN =
   "https://cdn.jsdelivr.net/npm/openseadragon@6.0.2/build/openseadragon/openseadragon.min.js";
 
@@ -74,10 +84,24 @@ export default function HistologyViewer({ image }: Props) {
   const [annotateMode, setAnnotateMode] = useState(false);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState<string | null>(null);
+  const [annotateColorIdx, setAnnotateColorIdx] = useState(0);
+  const [osdReloadKey, setOsdReloadKey] = useState(0);
 
   // Çizim state'i — ref ile sakla, re-render gerektirmiyor
   const drawStart = useRef<{ x: number; y: number } | null>(null);
   const selBox    = useRef<HTMLDivElement | null>(null);
+  const annotateColorIdxRef = useRef(0);
+  const loadSettledRef = useRef(false);
+
+  useEffect(() => {
+    annotateColorIdxRef.current = annotateColorIdx;
+  }, [annotateColorIdx]);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    setOsdReloadKey(0);
+  }, [image.id, image.image_url]);
 
   // Annotationları yükle
   useEffect(() => {
@@ -131,8 +155,8 @@ export default function HistologyViewer({ image }: Props) {
   useEffect(() => {
     if (!osdReady || !containerRef.current || !window.OpenSeadragon) return;
 
+    loadSettledRef.current = false;
     const fullUrl = resolveFullImageUrl(image.image_url);
-    console.log("OSD Loading:", fullUrl);
 
     const viewer = window.OpenSeadragon({
       element: containerRef.current,
@@ -163,15 +187,30 @@ export default function HistologyViewer({ image }: Props) {
       gestureSettingsMouse: { clickToZoom: false },
     });
 
-    viewer.addHandler("open", () => {
+    viewerRef.current = viewer;
+
+    const markReady = () => {
+      if (viewerRef.current !== viewer) return;
+      if (loadSettledRef.current) return;
+      loadSettledRef.current = true;
       setLoading(false);
       setError(null);
-    });
-    
+    };
+
+    viewer.addHandler("open", markReady);
+    viewer.addHandler("tile-loaded", markReady);
+
     viewer.addHandler("open-failed", (event) => {
       console.error("OSD Failed to open:", event);
-      setLoading(false);
-      setError("Görüntü dosyasına erişilemedi. Lütfen sunucu bağlantısını ve dosya yolunu kontrol edin.");
+      if (viewerRef.current !== viewer) return;
+      if (!loadSettledRef.current) {
+        loadSettledRef.current = true;
+        setLoading(false);
+        setError("Görüntü dosyasına erişilemedi. Lütfen sunucu bağlantısını ve dosya yolunu kontrol edin.");
+        if (osdReloadKey < 1) {
+          window.setTimeout(() => setOsdReloadKey((k) => k + 1), 400);
+        }
+      }
     });
 
     viewer.addHandler("animation", updateAnnotationsOverlay);
@@ -179,9 +218,25 @@ export default function HistologyViewer({ image }: Props) {
     viewer.addHandler("resize", updateAnnotationsOverlay);
     viewer.addHandler("animation-finish", updateAnnotationsOverlay);
 
-    viewerRef.current = viewer;
-    return () => { viewer.destroy(); viewerRef.current = null; };
-  }, [osdReady, image.image_url]);
+    const watchdog = window.setTimeout(() => {
+      if (loadSettledRef.current) return;
+      if (osdReloadKey < 1) {
+        setOsdReloadKey((k) => k + 1);
+        return;
+      }
+      loadSettledRef.current = true;
+      setLoading(false);
+      setError(
+        "Görüntü zamanında yüklenemedi. Bağlantıyı kontrol edin veya sayfayı yenileyin.",
+      );
+    }, 18_000);
+
+    return () => {
+      window.clearTimeout(watchdog);
+      viewer.destroy();
+      viewerRef.current = null;
+    };
+  }, [osdReady, image.image_url, osdReloadKey]);
 
   // ── Annotation overlay mouse/touch handler'ları ─────────────────────────────
   const onOverlayDown = (e: React.MouseEvent | React.TouchEvent) => {
@@ -192,10 +247,10 @@ export default function HistologyViewer({ image }: Props) {
     const rect = overlayRef.current.getBoundingClientRect();
     drawStart.current = { x: pos.clientX - rect.left, y: pos.clientY - rect.top };
 
-    // Canlı seçim kutusu oluştur
+    const pal = ANNOTATION_PALETTE[annotateColorIdxRef.current];
     const box = document.createElement("div");
     box.style.cssText = `
-      position:absolute; border:2px dashed #3b82f6; background:rgba(59,130,246,0.08);
+      position:absolute; border:2px dashed ${pal.stroke}; background:${pal.fill};
       pointer-events:none; z-index:30;
     `;
     overlayRef.current.appendChild(box);
@@ -280,7 +335,15 @@ export default function HistologyViewer({ image }: Props) {
 
   return (
     <>
-      <Script src={OSD_CDN} onLoad={() => setOsdReady(true)} strategy="afterInteractive" />
+      <Script
+        src={OSD_CDN}
+        onLoad={() => setOsdReady(true)}
+        onError={() => {
+          setError("Görüntü motoru (OpenSeadragon) yüklenemedi. Sayfayı yenileyin.");
+          setLoading(false);
+        }}
+        strategy="afterInteractive"
+      />
 
       <div className="flex flex-col gap-4">
         {/* Görüntüleyici + overlay — HistAI benzeri cam çerçeve + yüzen kontroller */}
@@ -307,7 +370,7 @@ export default function HistologyViewer({ image }: Props) {
           )}
 
           <div
-            key={image.id}
+            key={`${image.id}-${osdReloadKey}`}
             ref={(el) => {
               if (el) {
                 if (containerRef.current !== el) {
@@ -333,14 +396,23 @@ export default function HistologyViewer({ image }: Props) {
             style={{ touchAction: annotateMode ? "none" : "auto" }}
           >
             {/* Kaydedilmiş annotation kutuları */}
-            {annotations.map((a) => (
+            {annotations.map((a, idx) => {
+              const pal = ANNOTATION_PALETTE[idx % ANNOTATION_PALETTE.length];
+              return (
               <div
                 id={`anno-${a.id}`}
                 key={a.id}
-                className="absolute border-2 border-yellow-400 group pointer-events-auto"
+                className="absolute border-2 group pointer-events-auto"
+                style={{
+                  borderColor: pal.stroke,
+                  backgroundColor: pal.fill,
+                }}
               >
                 {a.label && (
-                  <span className="absolute -top-5 left-0 bg-yellow-400 text-black text-xs px-1 rounded whitespace-nowrap">
+                  <span
+                    className="absolute -top-5 left-0 text-xs px-1 rounded whitespace-nowrap font-medium shadow-sm"
+                    style={{ backgroundColor: pal.labelBg, color: pal.labelText }}
+                  >
                     {a.label}
                   </span>
                 )}
@@ -354,13 +426,18 @@ export default function HistologyViewer({ image }: Props) {
                   </button>
                 </div>
               </div>
-            ))}
+            );
+            })}
 
             {/* Onay bekleyen (yeni çizilen) kutu */}
             {pending && (
               <div
                 id="anno-pending"
-                className="absolute border-2 border-blue-500 bg-blue-500/10 pointer-events-none"
+                className="absolute border-2 pointer-events-none"
+                style={{
+                  borderColor: ANNOTATION_PALETTE[annotateColorIdx].stroke,
+                  backgroundColor: ANNOTATION_PALETTE[annotateColorIdx].fill,
+                }}
               />
             )}
           </div>
@@ -395,7 +472,16 @@ export default function HistologyViewer({ image }: Props) {
             <button
               type="button"
               onClick={() => {
-                setAnnotateMode((v) => !v);
+                setAnnotateMode((v) => {
+                  const next = !v;
+                  if (next) {
+                    const ni =
+                      (annotateColorIdxRef.current + 1) % ANNOTATION_PALETTE.length;
+                    annotateColorIdxRef.current = ni;
+                    setAnnotateColorIdx(ni);
+                  }
+                  return next;
+                });
                 setPending(null);
               }}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
@@ -417,24 +503,35 @@ export default function HistologyViewer({ image }: Props) {
 
         {/* Not formu — kare çizildikten sonra açılır */}
         {pending && (
-          <div className="rounded-xl border-2 border-blue-500 bg-white dark:bg-zinc-900 p-4 flex flex-col gap-3">
+          <div
+            className="rounded-xl border-2 bg-white p-4 flex flex-col gap-3 shadow-sm"
+            style={{ borderColor: ANNOTATION_PALETTE[annotateColorIdx].stroke }}
+          >
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-sm text-blue-600 dark:text-blue-400">
+              <span
+                className="font-semibold text-sm"
+                style={{ color: "#0f172a" }}
+              >
                 Seçili alan için not ekle
               </span>
-              <button onClick={() => setPending(null)}>
-                <X size={16} className="text-zinc-400 hover:text-zinc-600" />
+              <button
+                type="button"
+                onClick={() => setPending(null)}
+                className="rounded-lg p-1 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                aria-label="Kapat"
+              >
+                <X size={16} />
               </button>
             </div>
             <input
               autoFocus
-              className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400/80"
               placeholder="Kısa etiket (örn: Granülom, Glomerül)"
               value={labelText}
               onChange={(e) => setLabelText(e.target.value)}
             />
             <textarea
-              className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-slate-400/80"
               placeholder="Eğitim notu, patolojik bulgu açıklaması..."
               rows={3}
               value={noteText}
@@ -442,8 +539,9 @@ export default function HistologyViewer({ image }: Props) {
             />
             <div className="flex gap-2 justify-end">
               <button
+                type="button"
                 onClick={() => setPending(null)}
-                className="px-4 py-1.5 rounded-lg text-sm border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                className="px-4 py-1.5 rounded-lg text-sm border border-slate-300 text-slate-800 bg-white hover:bg-slate-100 transition-colors"
               >
                 İptal
               </button>
@@ -460,23 +558,38 @@ export default function HistologyViewer({ image }: Props) {
 
         {/* Annotation listesi */}
         {annotations.length > 0 && (
-          <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4">
-            <p className="text-sm font-medium mb-3">Notlar ({annotations.length})</p>
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="text-sm font-semibold mb-3 text-slate-900">
+              Notlar ({annotations.length})
+            </p>
             <ul className="flex flex-col gap-2">
-              {annotations.map((a) => (
-                <li key={a.id} className="flex items-start gap-2 text-sm border-b border-zinc-100 dark:border-zinc-800 pb-2 last:border-0 last:pb-0">
-                  <span className="mt-0.5 w-2 h-2 rounded-full bg-yellow-400 flex-shrink-0" />
-                  <div className="flex-1">
+              {annotations.map((a, idx) => {
+                const pal = ANNOTATION_PALETTE[idx % ANNOTATION_PALETTE.length];
+                return (
+                <li
+                  key={a.id}
+                  className="flex items-start gap-2 text-sm border-b border-slate-100 pb-2 last:border-0 last:pb-0"
+                >
+                  <span
+                    className="mt-1.5 w-2.5 h-2.5 rounded-sm flex-shrink-0 ring-1 ring-slate-300/80"
+                    style={{ backgroundColor: pal.stroke }}
+                  />
+                  <div className="flex-1 text-slate-800">
                     {a.label && (
-                      <span className="font-medium text-yellow-600 dark:text-yellow-400 mr-1">{a.label}:</span>
+                      <span className="font-semibold text-slate-900 mr-1">{a.label}:</span>
                     )}
                     {a.note}
                   </div>
-                  <button onClick={() => deleteAnnotation(a.id)} className="text-zinc-400 hover:text-red-400 flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => deleteAnnotation(a.id)}
+                    className="text-slate-400 hover:text-red-600 flex-shrink-0"
+                  >
                     <Trash2 size={13} />
                   </button>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </div>
         )}
