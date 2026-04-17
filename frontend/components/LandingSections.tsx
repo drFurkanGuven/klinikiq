@@ -10,6 +10,7 @@ import {
   ArrowRight,
   TrendingUp,
   FlaskConical,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -98,8 +99,15 @@ export function StatsSection() {
   );
 }
 
+type FeatureItem = {
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  href?: string;
+};
+
 export function FeatureSection() {
-  const features = [
+  const features: FeatureItem[] = [
     {
       title: "10.000+ Vaka Kütüphanesi",
       description: "MedQA tabanlı, USMLE standardında gerçek klinik senaryolar. Anti-farming mekanizması ile her açılışta farklı bir vaka.",
@@ -126,6 +134,13 @@ export function FeatureSection() {
       icon: Stethoscope,
     },
     {
+      title: "Topluluk Not Akışı",
+      description:
+        "Tıp (TUS) sınıflandırması: temel ve klinik bilimler, dal ve konu etiketleriyle paylaşılan notları keşfet.",
+      icon: Users,
+      href: "/topluluk",
+    },
+    {
       title: "Güvenli Mimari",
       description: "Admin paneli, kullanıcı izolasyonu ve prompt injection koruması.",
       icon: ShieldCheck,
@@ -145,22 +160,42 @@ export function FeatureSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((f, i) => (
-            <div
-              key={i}
-              className="p-10 glass-card border-metallic group"
-            >
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-transform group-hover:rotate-12 bg-primary-light border border-metallic">
-                <f.icon className="w-7 h-7" style={{ color: "var(--primary)" }} />
+          {features.map((f, i) => {
+            const cardClass =
+              "p-10 glass-card border-metallic group transition-transform duration-300 " +
+              (f.href ? "hover:-translate-y-1 hover:shadow-xl cursor-pointer" : "");
+            const inner = (
+              <>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-8 transition-transform group-hover:rotate-12 bg-primary-light border border-metallic">
+                  <f.icon className="w-7 h-7" style={{ color: "var(--primary)" }} />
+                </div>
+                <h3 className="text-xl font-black mb-4 tracking-tight" style={{ color: "var(--text)" }}>
+                  {f.title}
+                </h3>
+                <p className="text-sm leading-relaxed font-medium opacity-60" style={{ color: "var(--text)" }}>
+                  {f.description}
+                </p>
+                {f.href ? (
+                  <p className="mt-5 text-xs font-black uppercase tracking-widest flex items-center gap-2" style={{ color: "var(--primary)" }}>
+                    Topluluk sayfası
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </p>
+                ) : null}
+              </>
+            );
+            if (f.href) {
+              return (
+                <Link key={i} href={f.href} className={`block ${cardClass}`}>
+                  {inner}
+                </Link>
+              );
+            }
+            return (
+              <div key={i} className={cardClass}>
+                {inner}
               </div>
-              <h3 className="text-xl font-black mb-4 tracking-tight" style={{ color: "var(--text)" }}>
-                {f.title}
-              </h3>
-              <p className="text-sm leading-relaxed font-medium opacity-60" style={{ color: "var(--text)" }}>
-                {f.description}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

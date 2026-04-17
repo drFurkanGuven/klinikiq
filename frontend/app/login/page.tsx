@@ -11,6 +11,13 @@ import { nativeClient } from "@/lib/native";
 import PremiumAlert from "@/components/PremiumAlert";
 import { storage } from "@/lib/storage";
 
+function postLoginPath(): string {
+  if (typeof window === "undefined") return "/dashboard";
+  const q = new URLSearchParams(window.location.search).get("next");
+  if (q && q.startsWith("/") && !q.startsWith("//") && !q.includes("://")) return q;
+  return "/dashboard";
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
@@ -33,7 +40,7 @@ export default function LoginPage() {
     // Zaten giriş yapılmışsa direkt dashboard'a yönlendir
     storage.waitForInit().then(() => {
       if (storage.getItem("access_token")) {
-        router.replace("/dashboard");
+        router.replace(postLoginPath());
         return;
       }
       // Kaydedilmiş email varsa doldur
@@ -55,7 +62,7 @@ export default function LoginPage() {
         setLoading(true);
         try {
             await login(creds.email, creds.password);
-            router.push("/dashboard");
+            router.push(postLoginPath());
         } catch {
             setError("Biyometrik giriş başarısız, lütfen şifrenizi girin.");
         } finally {
@@ -90,7 +97,7 @@ export default function LoginPage() {
       } catch {
         // Biyometrik kontrol başarısız → görmezden gel, dashboard'a geç
       }
-      router.push("/dashboard");
+      router.push(postLoginPath());
     } catch (err: any) {
       setError(err.response?.data?.detail || "Giriş yapılamadı");
     } finally {
@@ -257,7 +264,7 @@ export default function LoginPage() {
 
       <PremiumAlert 
         isOpen={showBiometricEnroll}
-        onClose={() => { setShowBiometricEnroll(false); router.push("/dashboard"); }}
+        onClose={() => { setShowBiometricEnroll(false); router.push(postLoginPath()); }}
         onConfirm={async () => {
             if (pendingCreds) await biometricsClient.enroll(pendingCreds.email, pendingCreds.pass);
         }}

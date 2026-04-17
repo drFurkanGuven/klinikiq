@@ -32,7 +32,12 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          <div className="flex items-center gap-4 text-xs" style={{ color: "var(--text-muted)" }}>
+          <div className="flex items-center gap-4 text-xs flex-wrap justify-center" style={{ color: "var(--text-muted)" }}>
+            <Link href="/topluluk"
+              className="transition-colors hover:underline"
+              style={{ color: "var(--text-muted)" }}>
+              Topluluk
+            </Link>
             <Link href="/privacy"
               className="transition-colors hover:underline"
               style={{ color: "var(--text-muted)" }}>

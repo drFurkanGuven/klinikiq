@@ -213,6 +213,37 @@ export interface StudyNoteItem {
   created_at: string;
 }
 
+export interface CommunityNoteItem {
+  id: string;
+  group: "temel" | "klinik";
+  branch_id: string;
+  topic_id: string;
+  title: string;
+  excerpt: string;
+  author_display: string;
+  likes: number;
+  saved: number;
+  created_at: string;
+}
+
+export const communityApi = {
+  listNotes: (params?: {
+    group?: string;
+    branch_id?: string;
+    topic_id?: string;
+    q?: string;
+    limit?: number;
+    offset?: number;
+  }) => api.get<CommunityNoteItem[]>("/community/notes", { params }),
+  createNote: (data: {
+    group: "temel" | "klinik";
+    branch_id: string;
+    topic_id: string;
+    title: string;
+    body: string;
+  }) => api.post<CommunityNoteItem>("/community/notes", data),
+};
+
 export const usersApi = {
   history: () => api.get<HistoryItem[]>("/users/me/history"),
   getLeaderboard: () => api.get<LeaderboardItem[]>("/users/leaderboard"),

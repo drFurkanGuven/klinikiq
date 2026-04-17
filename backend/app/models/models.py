@@ -69,6 +69,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), default=now_utc)
 
     sessions = relationship("SimulationSession", back_populates="user")
+    community_notes = relationship("CommunityNote", back_populates="user")
 
 
 class Case(Base):
@@ -248,6 +249,23 @@ class HistologyImage(Base):
     thumbnail_url = Column(String, nullable=True)
     specialty = Column(String, nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), default=now_utc)
+
+
+class CommunityNote(Base):
+    """Topluluk not akışı — TUS sınıflandırması (temel/klinik + dal + konu)."""
+
+    __tablename__ = "community_notes"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    tus_group = Column(String, nullable=False, index=True)  # temel | klinik
+    branch_id = Column(String(80), nullable=False, index=True)
+    topic_id = Column(String(80), nullable=False, index=True)
+    title = Column(String(200), nullable=False)
+    body = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=now_utc, index=True)
+
+    user = relationship("User", back_populates="community_notes")
 
 
 class Annotation(Base):

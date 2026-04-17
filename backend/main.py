@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope
+from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, community
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -53,6 +53,7 @@ app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(flashcards.router, prefix="/api/flashcards", tags=["Flashcards"])
 app.include_router(questions.router, prefix="/api/questions", tags=["Questions"])
 app.include_router(microscope.router, prefix="/api/microscope", tags=["Microscope"])
+app.include_router(community.router, prefix="/api/community", tags=["Community"])
 
 # Statik dosyalar (tiles ve önizlemeler)
 if not os.path.exists(settings.TILES_DIR):

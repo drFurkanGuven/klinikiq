@@ -55,6 +55,11 @@ export default function Navbar() {
             style={{ color: "var(--text-muted)" }}>
             Liderlik
           </Link>
+          <Link href="/topluluk"
+            className="text-sm font-bold opacity-60 hover:opacity-100 transition-all hover:text-primary"
+            style={{ color: "var(--text-muted)" }}>
+            Topluluk
+          </Link>
           <Link href="/histology"
             className="text-sm font-bold opacity-60 hover:opacity-100 transition-all hover:text-primary"
             style={{ color: "var(--text-muted)" }}>
@@ -107,6 +112,7 @@ export default function Navbar() {
           style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <Link href="#features" className="text-sm font-bold opacity-70" style={{ color: "var(--text-muted)" }}>Özellikler</Link>
           <Link href="/leaderboard" className="text-sm font-bold opacity-70" style={{ color: "var(--text-muted)" }}>Liderlik</Link>
+          <Link href="/topluluk" className="text-sm font-bold opacity-70" style={{ color: "var(--text-muted)" }}>Topluluk</Link>
           <Link href="/histology" className="text-sm font-bold opacity-70" style={{ color: "var(--text-muted)" }}>Histoloji</Link>
           <Link href="/sinir-lezyon" className="text-sm font-bold opacity-70" style={{ color: "var(--text-muted)" }}>Nöroloji</Link>
           <hr className="opacity-10" />

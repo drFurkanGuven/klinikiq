@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional, List, Any, Dict
+from typing import Optional, List, Any, Dict, Literal
 from datetime import datetime
 from enum import Enum
 
@@ -309,6 +309,32 @@ class AnnotationOut(BaseModel):
     height: float
     label: Optional[str] = None
     note: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ── Topluluk notları ──────────────────────────────────────────────────────────
+
+class CommunityNoteCreate(BaseModel):
+    group: Literal["temel", "klinik"]
+    branch_id: str = Field(..., min_length=1, max_length=80)
+    topic_id: str = Field(..., min_length=1, max_length=80)
+    title: str = Field(..., min_length=1, max_length=200)
+    body: str = Field(..., min_length=20, max_length=50_000)
+
+
+class CommunityNoteOut(BaseModel):
+    id: str
+    group: str
+    branch_id: str
+    topic_id: str
+    title: str
+    excerpt: str
+    author_display: str
+    likes: int = 0
+    saved: int = 0
     created_at: datetime
 
     class Config:
