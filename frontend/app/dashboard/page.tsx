@@ -337,22 +337,22 @@ export default function DashboardPage() {
                     <span className="hidden md:inline">Admin</span>
                 </Link>
             )}
-            <Link href="/histology" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
+            <Link href="/histology" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Microscope className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
               <span className="hidden lg:inline">Histoloji</span>
             </Link>
-            <Link href="/sinir-lezyon" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
+            <Link href="/sinir-lezyon" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Brain className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
               <span className="hidden lg:inline">Nöroloji</span>
             </Link>
-            <Link href="/questions" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
+            <Link href="/questions" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <GraduationCap className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
               <span className="hidden lg:inline">Sorular</span>
             </Link>
-            <Link href="/leaderboard" className="hidden sm:flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
+            <Link href="/leaderboard" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
               style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
               <Trophy className="w-3.5 h-3.5" style={{ color: "var(--warning)" }} />
               <span className="hidden lg:inline">Sıralama</span>
