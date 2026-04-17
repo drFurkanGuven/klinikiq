@@ -228,6 +228,11 @@ export interface CommunityNoteItem {
   created_at: string;
 }
 
+/** GET /community/notes/:id — tam metin dahil */
+export interface CommunityNoteDetail extends CommunityNoteItem {
+  body: string;
+}
+
 export interface ToggleLikeResponse {
   liked: boolean;
   likes: number;
@@ -271,6 +276,20 @@ export const communityApi = {
     title: string;
     body: string;
   }) => api.post<CommunityNoteItem>("/community/notes", data),
+  getNote: (noteId: string) =>
+    api.get<CommunityNoteDetail>(`/community/notes/${noteId}`),
+  updateNote: (
+    noteId: string,
+    data: Partial<{
+      group: "temel" | "klinik";
+      branch_id: string;
+      topic_id: string;
+      title: string;
+      body: string;
+    }>
+  ) => api.patch<CommunityNoteDetail>(`/community/notes/${noteId}`, data),
+  deleteNote: (noteId: string) =>
+    api.delete<void>(`/community/notes/${noteId}`),
   toggleLike: (noteId: string) =>
     api.post<ToggleLikeResponse>(`/community/notes/${noteId}/like`),
   toggleSave: (noteId: string) =>
@@ -329,7 +348,21 @@ export interface HistologyImage {
   image_url: string;
   thumbnail_url?: string;
   specialty?: string;
+  /** Örn. H&E, PAS */
+  stain?: string | null;
+  /** Örn. Böbrek, Meme */
+  organ?: string | null;
+  /** wikimedia | huggingface | upload */
+  asset_source?: string | null;
   created_at: string;
+}
+
+export interface HuggingFaceDatasetSpotlight {
+  id: string;
+  downloads: number;
+  likes: number;
+  url: string;
+  description: string;
 }
 
 export interface AnnotationOut {
@@ -355,8 +388,18 @@ export interface AnnotationCreate {
 }
 
 export const microscopyApi = {
-  listImages: (params?: { case_id?: string; specialty?: string }) =>
-    api.get<HistologyImage[]>("/microscope/images", { params }),
+  listImages: (params?: {
+    case_id?: string;
+    specialty?: string;
+    stain?: string;
+    organ?: string;
+    asset_source?: string;
+  }) => api.get<HistologyImage[]>("/microscope/images", { params }),
+  exploreHuggingface: (params?: { q?: string; limit?: number }) =>
+    api.get<{ query: string; datasets: HuggingFaceDatasetSpotlight[] }>(
+      "/microscope/explore/huggingface",
+      { params }
+    ),
   getImage: (id: string) =>
     api.get<HistologyImage>(`/microscope/images/${id}`),
   createImage: (data: Omit<HistologyImage, "id" | "created_at">) =>

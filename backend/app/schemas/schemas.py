@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, model_validator
 from typing import Optional, List, Any, Dict, Literal
 from datetime import datetime
 from enum import Enum
@@ -274,6 +274,9 @@ class HistologyImageCreate(BaseModel):
     image_url: str
     thumbnail_url: Optional[str] = None
     specialty: Optional[str] = None
+    stain: Optional[str] = None
+    organ: Optional[str] = None
+    asset_source: Optional[str] = None
 
 
 class HistologyImageOut(BaseModel):
@@ -284,6 +287,9 @@ class HistologyImageOut(BaseModel):
     image_url: str
     thumbnail_url: Optional[str] = None
     specialty: Optional[str] = None
+    stain: Optional[str] = None
+    organ: Optional[str] = None
+    asset_source: Optional[str] = None
     created_at: datetime
 
     class Config:
@@ -341,6 +347,32 @@ class CommunityNoteOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CommunityNoteDetailOut(CommunityNoteOut):
+    body: str
+
+
+class CommunityNoteUpdate(BaseModel):
+    group: Optional[Literal["temel", "klinik"]] = None
+    branch_id: Optional[str] = Field(None, min_length=1, max_length=80)
+    topic_id: Optional[str] = Field(None, min_length=1, max_length=80)
+    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    body: Optional[str] = Field(None, min_length=20, max_length=50_000)
+
+    @model_validator(mode="after")
+    def at_least_one_field(self):
+        if not any(
+            [
+                self.group is not None,
+                self.branch_id is not None,
+                self.topic_id is not None,
+                self.title is not None,
+                self.body is not None,
+            ]
+        ):
+            raise ValueError("En az bir alan gönderilmeli")
+        return self
 
 
 class ToggleLikeOut(BaseModel):

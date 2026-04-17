@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import {
   TUS_GROUP_META,
   findTopicPath,
   type TusGroupId,
 } from "@/lib/tus-taxonomy";
 import type { CommunityNoteItem } from "@/lib/api";
-import { Heart, Bookmark } from "lucide-react";
+import { Heart, Bookmark, Pencil, Trash2 } from "lucide-react";
 
 type Props = {
   note: CommunityNoteItem;
@@ -15,6 +16,8 @@ type Props = {
   onSave: (note: CommunityNoteItem) => void;
   likeBusy?: boolean;
   saveBusy?: boolean;
+  onDelete?: (note: CommunityNoteItem) => void | Promise<void>;
+  deleteBusy?: boolean;
 };
 
 export function NotAkisiCard({
@@ -24,6 +27,8 @@ export function NotAkisiCard({
   onSave,
   likeBusy,
   saveBusy,
+  onDelete,
+  deleteBusy,
 }: Props) {
   const g = note.group as TusGroupId;
   const path = findTopicPath(g, note.branch_id, note.topic_id);
@@ -70,6 +75,43 @@ export function NotAkisiCard({
       <p className="text-sm leading-relaxed font-medium opacity-70 mb-6" style={{ color: "var(--text-muted)" }}>
         {note.excerpt}
       </p>
+      {note.is_mine && (
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <Link
+            href={`/topluluk/not-duzenle?id=${encodeURIComponent(note.id)}`}
+            className="inline-flex items-center gap-1.5 text-xs font-black rounded-xl px-3 py-2 border transition-all"
+            style={{ borderColor: "var(--border)", color: "var(--primary)", background: "var(--surface-2)" }}
+          >
+            <Pencil className="w-3.5 h-3.5 shrink-0" />
+            Düzenle
+          </Link>
+          {onDelete && (
+            <button
+              type="button"
+              disabled={Boolean(deleteBusy)}
+              onClick={() => {
+                if (
+                  !window.confirm(
+                    "Bu notu kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+                  )
+                ) {
+                  return;
+                }
+                void onDelete(note);
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-black rounded-xl px-3 py-2 border transition-all disabled:opacity-50"
+              style={{
+                borderColor: "var(--border)",
+                color: "var(--danger)",
+                background: "color-mix(in srgb, var(--danger) 6%, transparent)",
+              }}
+            >
+              <Trash2 className="w-3.5 h-3.5 shrink-0" />
+              {deleteBusy ? "Siliniyor…" : "Sil"}
+            </button>
+          )}
+        </div>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t" style={{ borderColor: "var(--border)" }}>
         <span className="text-xs font-bold opacity-50" style={{ color: "var(--text-muted)" }}>
           {note.author_display}

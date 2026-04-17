@@ -2,7 +2,7 @@
 
 from typing import List, Optional, Set
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,7 +18,9 @@ from app.models.models import (
 )
 from app.schemas.schemas import (
     CommunityNoteCreate,
+    CommunityNoteDetailOut,
     CommunityNoteOut,
+    CommunityNoteUpdate,
     ToggleLikeOut,
     ToggleSaveOut,
 )
@@ -246,6 +248,99 @@ async def create_note(
         saved_by_me=False,
         viewer_id=user_id,
     )
+
+
+async def _note_to_detail_out(
+    db: AsyncSession,
+    note: CommunityNote,
+    user: User,
+    viewer_id: Optional[str],
+) -> CommunityNoteDetailOut:
+    lc_map = await _like_counts_map(db, [note.id])
+    liked_set: Set[str] = set()
+    saved_set: Set[str] = set()
+    if viewer_id:
+        liked_set, saved_set = await _liked_and_saved_sets(db, [note.id], viewer_id)
+    base = _build_note_out(
+        note,
+        user,
+        like_count=lc_map.get(note.id, 0),
+        liked_by_me=note.id in liked_set,
+        saved_by_me=note.id in saved_set,
+        viewer_id=viewer_id,
+    )
+    return CommunityNoteDetailOut(**base.model_dump(), body=note.body)
+
+
+@router.get("/notes/{note_id}", response_model=CommunityNoteDetailOut)
+async def get_note(
+    note_id: str,
+    db: AsyncSession = Depends(get_db),
+    viewer_id: Optional[str] = Depends(get_optional_user_id),
+):
+    result = await db.execute(
+        select(CommunityNote, User)
+        .join(User, CommunityNote.user_id == User.id)
+        .where(CommunityNote.id == note_id)
+    )
+    row = result.one_or_none()
+    if not row:
+        raise HTTPException(status_code=404, detail="Not bulunamadı")
+    note, user = row
+    return await _note_to_detail_out(db, note, user, viewer_id)
+
+
+@router.patch("/notes/{note_id}", response_model=CommunityNoteDetailOut)
+async def update_note(
+    note_id: str,
+    data: CommunityNoteUpdate,
+    db: AsyncSession = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    result = await db.execute(select(CommunityNote).where(CommunityNote.id == note_id))
+    note = result.scalar_one_or_none()
+    if not note:
+        raise HTTPException(status_code=404, detail="Not bulunamadı")
+    if note.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Bu notu düzenleyemezsin")
+
+    g = data.group if data.group is not None else note.tus_group
+    b = data.branch_id.strip() if data.branch_id is not None else note.branch_id
+    t = data.topic_id.strip() if data.topic_id is not None else note.topic_id
+    if data.group is not None or data.branch_id is not None or data.topic_id is not None:
+        validate_classification(g, b, t)
+
+    if data.title is not None:
+        note.title = data.title.strip()
+    if data.body is not None:
+        note.body = data.body.strip()
+    note.tus_group = g
+    note.branch_id = b
+    note.topic_id = t
+
+    await db.commit()
+    await db.refresh(note)
+
+    ur = await db.execute(select(User).where(User.id == note.user_id))
+    user = ur.scalar_one()
+    return await _note_to_detail_out(db, note, user, user_id)
+
+
+@router.delete("/notes/{note_id}")
+async def delete_note(
+    note_id: str,
+    db: AsyncSession = Depends(get_db),
+    user_id: str = Depends(get_current_user_id),
+):
+    result = await db.execute(select(CommunityNote).where(CommunityNote.id == note_id))
+    note = result.scalar_one_or_none()
+    if not note:
+        raise HTTPException(status_code=404, detail="Not bulunamadı")
+    if note.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Bu notu silemezsin")
+    await db.delete(note)
+    await db.commit()
+    return Response(status_code=204)
 
 
 @router.post("/notes/{note_id}/like", response_model=ToggleLikeOut)

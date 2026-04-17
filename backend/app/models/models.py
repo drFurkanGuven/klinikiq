@@ -248,6 +248,12 @@ class HistologyImage(Base):
     image_url = Column(String, nullable=False)  # DZI dosyası veya dış URL
     thumbnail_url = Column(String, nullable=True)
     specialty = Column(String, nullable=True, index=True)
+    # Örn. H&E, PAS, trichrome — filtre ve kart etiketi için
+    stain = Column(String, nullable=True, index=True)
+    # Örn. böbrek, meme, akciğer
+    organ = Column(String, nullable=True, index=True)
+    # wikimedia | huggingface | upload
+    asset_source = Column(String, nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), default=now_utc)
 
 

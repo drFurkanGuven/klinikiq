@@ -24,6 +24,8 @@ IMAGES = [
         ),
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Adrenal_cortical_carcinoma_-_intermed_mag.jpg",
         "specialty": "endocrinology",
+        "stain": "H&E",
+        "organ": "Adrenal",
     },
     {
         "title": "Adrenal Korteks Karsinomu — H&E Çok Düşük Büyütme",
@@ -33,6 +35,8 @@ IMAGES = [
         ),
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Adrenal_cortical_carcinoma_-_very_low_mag.jpg",
         "specialty": "endocrinology",
+        "stain": "H&E",
+        "organ": "Adrenal",
     },
     {
         "title": "Lobüler Karsinoma In Situ (LCIS) — Meme",
@@ -97,6 +101,8 @@ IMAGES = [
         ),
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Kidney_H%26E.jpg",
         "specialty": "nephrology",
+        "stain": "H&E",
+        "organ": "Böbrek",
     },
     {
         "title": "Böbrek Korteksi — H&E",
@@ -261,6 +267,8 @@ IMAGES = [
         ),
         "image_url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Dysplastic_gangliocytoma_lhermitte_duclos.jpg",
         "specialty": "neurology",
+        "stain": "H&E",
+        "organ": "Serebellum",
     },
 ]
 
@@ -282,7 +290,17 @@ async def seed():
             if data["image_url"] in existing_urls:
                 skipped += 1
                 continue
-            img = HistologyImage(**data)
+            payload = {
+                "title": data["title"],
+                "description": data.get("description"),
+                "image_url": data["image_url"],
+                "thumbnail_url": data.get("thumbnail_url"),
+                "specialty": data.get("specialty"),
+                "stain": data.get("stain"),
+                "organ": data.get("organ"),
+                "asset_source": data.get("asset_source", "wikimedia"),
+            }
+            img = HistologyImage(**payload)
             db.add(img)
             added += 1
 

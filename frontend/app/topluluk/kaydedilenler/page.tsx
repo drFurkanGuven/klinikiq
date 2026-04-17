@@ -36,6 +36,7 @@ export default function KaydedilenlerPage() {
   const [err, setErr] = useState<string | null>(null);
   const [busyLike, setBusyLike] = useState<string | null>(null);
   const [busySave, setBusySave] = useState<string | null>(null);
+  const [busyDelete, setBusyDelete] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -98,6 +99,19 @@ export default function KaydedilenlerPage() {
       await handleNoteSave(note, setNotes, router, "/topluluk/kaydedilenler", { removeWhenUnsaved: true });
     } finally {
       setBusySave(null);
+    }
+  }
+
+  async function onDeleteNote(note: CommunityNoteItem) {
+    setBusyDelete(note.id);
+    try {
+      await communityApi.deleteNote(note.id);
+      setNotes((prev) => prev.filter((n) => n.id !== note.id));
+    } catch (e: unknown) {
+      const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      window.alert(typeof detail === "string" ? detail : "Not silinemedi.");
+    } finally {
+      setBusyDelete(null);
     }
   }
 
@@ -182,6 +196,8 @@ export default function KaydedilenlerPage() {
                 onSave={onSave}
                 likeBusy={busyLike === note.id}
                 saveBusy={busySave === note.id}
+                onDelete={onDeleteNote}
+                deleteBusy={busyDelete === note.id}
               />
             ))}
           </ul>

@@ -5,7 +5,8 @@ import shutil
 import subprocess
 import tempfile
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+import httpx
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import Optional
@@ -28,7 +29,7 @@ try:
 except ImportError:
     redis_client = None
 
-CACHE_KEY_LIST = "microscope:images:list"
+CACHE_KEY_LIST = "microscope:images:list:v2"
 CACHE_TTL = 3600  # 1 hour
 
 
@@ -88,12 +89,16 @@ router = APIRouter()
 async def list_images(
     case_id: Optional[str] = None,
     specialty: Optional[str] = None,
+    stain: Optional[str] = None,
+    organ: Optional[str] = None,
+    asset_source: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
     _: str = Depends(get_current_user_id),
 ):
-    """Histolojik görüntü listesi. Vaka veya branşa göre filtrelenebilir."""
+    """Histolojik görüntü listesi. Vaka, branş, boya, organ veya kaynağa göre filtrelenebilir."""
+    use_cache = not case_id and not specialty and not stain and not organ and not asset_source
     # Cache kontrolü
-    if redis_client and not case_id and not specialty:
+    if redis_client and use_cache:
         cached = await redis_client.get(CACHE_KEY_LIST)
         if cached:
             import json
@@ -105,12 +110,18 @@ async def list_images(
         query = query.where(HistologyImage.case_id == case_id)
     if specialty:
         query = query.where(cast(HistologyImage.specialty, String) == specialty)
+    if stain:
+        query = query.where(cast(HistologyImage.stain, String) == stain)
+    if organ:
+        query = query.where(cast(HistologyImage.organ, String) == organ)
+    if asset_source:
+        query = query.where(cast(HistologyImage.asset_source, String) == asset_source)
 
     result = await db.execute(query)
     images = result.scalars().all()
     
     # Cache kayıt
-    if redis_client and not case_id and not specialty:
+    if redis_client and use_cache:
         import json
         from fastapi.encoders import jsonable_encoder
         await redis_client.setex(
@@ -120,6 +131,48 @@ async def list_images(
         )
     
     return images
+
+
+@router.get("/explore/huggingface")
+async def explore_huggingface_datasets(
+    q: str = Query("histopathology", description="Hugging Face Hub arama terimi"),
+    limit: int = Query(12, ge=1, le=30),
+    _: str = Depends(get_current_user_id),
+):
+    """
+    Hugging Face Hub'da açık histopatoloji / WSI veri kümelerini listeler (salt okuma).
+    Görüntü dosyası indirmez; kullanıcıyı keşif ve atıf için yönlendirir.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            r = await client.get(
+                "https://huggingface.co/api/datasets",
+                params={"search": q, "limit": limit},
+            )
+            r.raise_for_status()
+            rows = r.json()
+    except httpx.HTTPError as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Hugging Face API erişilemedi: {e!s}",
+        ) from e
+
+    out = []
+    for d in rows[:limit]:
+        did = d.get("id") or ""
+        desc = (d.get("description") or "").replace("\n", " ").strip()
+        if len(desc) > 220:
+            desc = desc[:217] + "…"
+        out.append(
+            {
+                "id": did,
+                "downloads": d.get("downloads") or 0,
+                "likes": d.get("likes") or 0,
+                "url": f"https://huggingface.co/datasets/{did}" if did else "",
+                "description": desc,
+            }
+        )
+    return {"query": q, "datasets": out}
 
 
 @router.get("/images/{image_id}", response_model=HistologyImageOut)
@@ -224,6 +277,7 @@ async def upload_tiff_image(
         image_url=dzi_url,
         thumbnail_url=thumb_url,
         specialty=specialty or None,
+        asset_source="upload",
     )
     
     try:
