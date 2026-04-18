@@ -168,6 +168,28 @@ class EmergencyMcqReport(Base):
     user = relationship("User", back_populates="emergency_mcq_reports")
 
 
+class EmergencyMcqExplanation(Base):
+    """MCQ şık açıklaması cache (aynı soru+şık+dil için tekrar AI çağrısı yapılmaz)."""
+
+    __tablename__ = "emergency_mcq_explanations"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    question_id = Column(String, nullable=False, index=True)
+    selected_label = Column(String(4), nullable=False)  # A/B/C/D
+    lang = Column(String(4), nullable=False, default="tr")
+    explanation = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
+
+    __table_args__ = (
+        UniqueConstraint(
+            "question_id",
+            "selected_label",
+            "lang",
+            name="uq_mcq_explanation",
+        ),
+    )
+
+
 class TetkikResult(Base):
     """Vaka bazlı tetkik sonuçları cache tablosu.
     Aynı vaka için aynı test kombinasyonu tekrar istenirse AI'a gidilmez.

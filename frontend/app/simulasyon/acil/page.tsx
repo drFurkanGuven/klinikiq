@@ -73,6 +73,27 @@ export default function AcilSimulasyonMcqPage() {
   const [reportError, setReportError] = useState<string | null>(null);
   /** API random(lang): veri setinde question_tr yoksa backend yine İngilizce döner */
   const [mcqLang, setMcqLang] = useState<"en" | "tr">("tr");
+  const [explanation, setExplanation] = useState<string | null>(null);
+  const [explanationLoading, setExplanationLoading] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [sessionTarget, setSessionTarget] = useState<5 | 10 | 20 | null>(null);
+  const [reviewMode, setReviewMode] = useState(false);
+  const [reviewQueue, setReviewQueue] = useState<SessionMcqItem[]>([]);
+  const [reviewIndex, setReviewIndex] = useState(0);
+
+  const submitAnswerRef = useRef<(label: string) => Promise<void>>(async () => {});
+  const reviewQueueRef = useRef<SessionMcqItem[]>([]);
+  const sessionItemsRef = useRef<SessionMcqItem[]>([]);
+  const sessionAiTranscriptRef = useRef<AiMsg[]>([]);
+  const aiMessagesRef = useRef<AiMsg[]>([]);
+  const sessionPatientUrgesRef = useRef<string[]>([]);
+  const createSessionReportRef = useRef<() => Promise<void>>(async () => {});
+
+  sessionItemsRef.current = sessionItems;
+  sessionAiTranscriptRef.current = sessionAiTranscript;
+  aiMessagesRef.current = aiMessages;
+  sessionPatientUrgesRef.current = sessionPatientUrges;
 
   useEffect(() => {
     setMounted(true);
@@ -129,6 +150,8 @@ export default function AcilSimulasyonMcqPage() {
     setPatientUrges([]);
     prevRemRef.current = null;
     urgeSentRef.current = { p120: false, p60: false };
+    setExplanation(null);
+    setExplanationLoading(false);
     if (q?.id) {
       questionStartRef.current = Date.now();
     } else {
@@ -147,9 +170,31 @@ export default function AcilSimulasyonMcqPage() {
     setSessionAiTranscript([]);
     setSessionPatientUrges([]);
     setReportError(null);
+    setStreak(0);
+    setBestStreak(0);
+  }
+
+  async function loadQuestionById(questionId: string) {
+    setLoading(true);
+    setResult(null);
+    setPicked(null);
+    setExplanation(null);
+    setExplanationLoading(false);
+    setQ(null);
+    try {
+      const res = await emergencyMcqApi.byId(questionId, mcqLang);
+      setQ(res.data);
+    } catch {
+      setStatsError("Soru yüklenemedi.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function loadQuestion() {
+    setReviewMode(false);
+    setReviewQueue([]);
+    reviewQueueRef.current = [];
     setLoading(true);
     setSessionAiTranscript((prev) => [...prev, ...aiMessages]);
     setAiMessages([]);
@@ -190,6 +235,46 @@ export default function AcilSimulasyonMcqPage() {
           selected_label: label,
         },
       ]);
+      const newCount = sessionItemsRef.current.length + 1;
+      if (sessionTarget !== null && newCount >= sessionTarget) {
+        setTimeout(() => void createSessionReportRef.current(), 1500);
+      }
+      if (res.data.correct) {
+        setStreak((s) => {
+          const next = s + 1;
+          setBestStreak((b) => Math.max(b, next));
+          return next;
+        });
+      } else {
+        setStreak(0);
+      }
+      setExplanation(null);
+      setExplanationLoading(true);
+      try {
+        const expRes = await emergencyMcqApi.explanation(q.id, label, mcqLang);
+        setExplanation(expRes.data.explanation);
+      } catch {
+        setExplanation(null);
+      } finally {
+        setExplanationLoading(false);
+      }
+      if (reviewMode) {
+        const queue = reviewQueueRef.current;
+        const nextIndex = reviewIndex + 1;
+        if (nextIndex < queue.length) {
+          setTimeout(() => {
+            setReviewIndex(nextIndex);
+            void loadQuestionById(queue[nextIndex].question_id);
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            setReviewMode(false);
+            setReviewQueue([]);
+            reviewQueueRef.current = [];
+            setStatsError(null);
+          }, 2000);
+        }
+      }
     } catch {
       setResult({ correct: false, correct_label: null, correct_answer_text: null });
       setSessionItems((prev) => [
@@ -202,22 +287,60 @@ export default function AcilSimulasyonMcqPage() {
           selected_label: label,
         },
       ]);
+      const newCount = sessionItemsRef.current.length + 1;
+      if (sessionTarget !== null && newCount >= sessionTarget) {
+        setTimeout(() => void createSessionReportRef.current(), 1500);
+      }
+      setStreak(0);
+      if (reviewMode) {
+        const queue = reviewQueueRef.current;
+        const nextIndex = reviewIndex + 1;
+        if (nextIndex < queue.length) {
+          setTimeout(() => {
+            setReviewIndex(nextIndex);
+            void loadQuestionById(queue[nextIndex].question_id);
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            setReviewMode(false);
+            setReviewQueue([]);
+            reviewQueueRef.current = [];
+            setStatsError(null);
+          }, 2000);
+        }
+      }
     }
   }
 
+  submitAnswerRef.current = submitAnswer;
+
+  useEffect(() => {
+    if (!q || result) return;
+    function handleKey(e: KeyboardEvent) {
+      if (e.target instanceof HTMLTextAreaElement) return;
+      if (e.target instanceof HTMLInputElement) return;
+      const map: Record<string, string> = { a: "A", b: "B", c: "C", d: "D" };
+      const lbl = map[e.key.toLowerCase()];
+      if (lbl) void submitAnswerRef.current(lbl);
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [q, result]);
+
   async function createSessionReport() {
-    if (sessionItems.length === 0) {
+    const items = sessionItemsRef.current;
+    if (items.length === 0) {
       setReportError("Önce en az bir soruyu çözün.");
       return;
     }
     setReportLoading(true);
     setReportError(null);
     try {
-      const allAi: AiMsg[] = [...sessionAiTranscript, ...aiMessages];
+      const allAi: AiMsg[] = [...sessionAiTranscriptRef.current, ...aiMessagesRef.current];
       const res = await emergencyMcqApi.createReport({
-        items: sessionItems,
+        items,
         ai_messages: allAi,
-        patient_urges: sessionPatientUrges,
+        patient_urges: sessionPatientUrgesRef.current,
       });
       clearSessionProgress();
       router.push(`/simulasyon/acil/rapor/?id=${encodeURIComponent(res.data.id)}`);
@@ -227,6 +350,8 @@ export default function AcilSimulasyonMcqPage() {
       setReportLoading(false);
     }
   }
+
+  createSessionReportRef.current = createSessionReport;
 
   async function sendAiMessage() {
     const text = aiInput.trim();
@@ -375,7 +500,20 @@ export default function AcilSimulasyonMcqPage() {
                 <Zap className="w-5 h-5 text-white" />
               </div>
               <div className="min-w-0">
-                <span className="font-black text-lg tracking-tight block leading-tight truncate">Acil simülasyon</span>
+                <span className="font-black text-lg tracking-tight block leading-tight truncate flex flex-wrap items-center gap-2">
+                  Acil simülasyon
+                  {reviewMode && (
+                    <span
+                      className="text-xs font-bold px-2 py-1 rounded-lg shrink-0"
+                      style={{
+                        background: "color-mix(in srgb, var(--primary) 15%, transparent)",
+                        color: "var(--primary)",
+                      }}
+                    >
+                      Tekrar: {reviewIndex + 1}/{reviewQueue.length}
+                    </span>
+                  )}
+                </span>
                 <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">MCQ pratik · veri altyapısı</span>
               </div>
             </div>
@@ -457,6 +595,26 @@ export default function AcilSimulasyonMcqPage() {
               EN
             </button>
           </div>
+          <div
+            className="inline-flex rounded-xl border p-0.5 text-[11px] font-black uppercase tracking-wide"
+            style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
+          >
+            {([null, 5, 10, 20] as const).map((t) => (
+              <button
+                key={String(t)}
+                type="button"
+                disabled={loading}
+                onClick={() => setSessionTarget(t)}
+                className="px-3 py-2 rounded-lg transition-all"
+                style={{
+                  background: sessionTarget === t ? "var(--primary)" : "transparent",
+                  color: sessionTarget === t ? "#fff" : "var(--text-muted)",
+                }}
+              >
+                {t === null ? "∞" : `${t}`}
+              </button>
+            ))}
+          </div>
           <button
             type="button"
             disabled={loading || !!statsError}
@@ -497,7 +655,7 @@ export default function AcilSimulasyonMcqPage() {
         >
           <div className="flex items-center gap-2 min-w-0">
             <FileText className="w-4 h-4 shrink-0 opacity-60" style={{ color: "var(--primary)" }} />
-            <span className="text-xs font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
+            <span className="text-xs font-bold uppercase tracking-wide flex flex-wrap items-center gap-2" style={{ color: "var(--text-muted)" }}>
               Bu oturumda {sessionItems.length} soru çözüldü
               {sessionItems.length > 0 ? (
                 <span className="opacity-90">
@@ -505,9 +663,42 @@ export default function AcilSimulasyonMcqPage() {
                   ({sessionItems.filter((x) => x.correct).length} doğru)
                 </span>
               ) : null}
+              {streak >= 2 && (
+                <span
+                  className="inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wide px-2 py-1 rounded-lg"
+                  style={{
+                    background: "color-mix(in srgb, var(--primary) 15%, transparent)",
+                    color: "var(--primary)",
+                  }}
+                >
+                  <Zap className="w-3 h-3" />
+                  {streak} seri
+                </span>
+              )}
+              {bestStreak > 0 ? (
+                <span className="text-[10px] font-bold opacity-60 normal-case">En iyi: {bestStreak}</span>
+              ) : null}
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
+            {sessionItems.filter((x) => !x.correct).length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  const wrongs = sessionItems.filter((x) => !x.correct);
+                  setReviewQueue(wrongs);
+                  reviewQueueRef.current = wrongs;
+                  setReviewIndex(0);
+                  setReviewMode(true);
+                  void loadQuestionById(wrongs[0].question_id);
+                }}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-wide border"
+                style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                Yanlışları tekrar çöz ({sessionItems.filter((x) => !x.correct).length})
+              </button>
+            )}
             <button
               type="button"
               disabled={reportLoading || sessionItems.length === 0 || !!statsError}
@@ -649,6 +840,7 @@ export default function AcilSimulasyonMcqPage() {
                         color: "var(--text)",
                       }}
                     >
+                      <span className="opacity-30 mr-2 font-mono text-xs">[{o.label}]</span>
                       <span className="opacity-60 mr-2">{o.label}.</span>
                       {o.text}
                     </button>
@@ -678,6 +870,39 @@ export default function AcilSimulasyonMcqPage() {
                     Cevaba kadar geçen süre: {fmtMmSs(frozenElapsedSec)} (limit {fmtMmSs(QUESTION_TIME_LIMIT_SEC)})
                   </span>
                 ) : null}
+              </div>
+            )}
+
+            {result && (explanationLoading || explanation) && (
+              <div
+                className="rounded-2xl border px-4 py-4 space-y-2"
+                style={{
+                  borderColor: "var(--border)",
+                  background: "color-mix(in srgb, var(--primary) 5%, var(--surface))",
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Bot className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                  <span
+                    className="text-[11px] font-black uppercase tracking-widest"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    Açıklama
+                  </span>
+                </div>
+                {explanationLoading ? (
+                  <div className="flex items-center gap-2 text-xs opacity-70">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Açıklama üretiliyor…
+                  </div>
+                ) : (
+                  <p
+                    className="text-sm font-medium leading-relaxed whitespace-pre-wrap"
+                    style={{ color: "var(--text)" }}
+                  >
+                    {explanation}
+                  </p>
+                )}
               </div>
             )}
           </div>

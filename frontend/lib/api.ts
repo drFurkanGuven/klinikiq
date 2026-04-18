@@ -510,6 +510,12 @@ export const emergencyMcqApi = {
   /** lang=tr: JSONL'de question_tr / options_tr varsa Türkçe döner; yoksa İngilizce kalır. */
   random: (lang: "en" | "tr" = "en") =>
     api.get<EmergencyMcqRandom>("/emergency-mcq/random", { params: { lang } }),
+  byId: (id: string, lang = "tr") =>
+    api.get<EmergencyMcqRandom>(`/emergency-mcq/by-id/${encodeURIComponent(id)}`, { params: { lang } }),
+  explanation: (id: string, selected_label: string, lang = "tr") =>
+    api.get<{ explanation: string; cached: boolean }>("/emergency-mcq/explanation", {
+      params: { id, selected_label, lang },
+    }),
   verify: (id: string, selected_label: string) =>
     api.post<EmergencyMcqVerifyResult>("/emergency-mcq/verify", { id, selected_label }),
   createReport: (body: EmergencyMcqReportCreateBody) =>

@@ -16,13 +16,15 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import get_current_user_id
-from app.models.models import EmergencyMcqReport
+from app.models.models import EmergencyMcqExplanation, EmergencyMcqReport
 from app.services.emergency_ai_service import (
     generate_emergency_session_report,
+    generate_mcq_answer_explanation,
     generate_patient_time_urge,
     openai_configured,
     stream_emergency_tutor,
@@ -102,6 +104,11 @@ class EmergencyMcqVerifyOut(BaseModel):
     correct: bool
     correct_label: str | None
     correct_answer_text: str | None
+
+
+class ExplanationOut(BaseModel):
+    explanation: str
+    cached: bool
 
 
 class EmergencyMcqStatsOut(BaseModel):
@@ -246,14 +253,7 @@ def _mcq_options_display(item: dict[str, Any], lang: str) -> list[dict[str, Any]
     return raw if isinstance(raw, list) else []
 
 
-@router.get("/random", response_model=EmergencyMcqRandomOut)
-async def emergency_mcq_random(
-    lang: str = Query("en", min_length=2, max_length=12, description="tr: question_tr/options_tr varsa"),
-    _user_id: str = Depends(get_current_user_id),
-):
-    """Rastgele bir acil odaklı çoktan seçmeli soru (doğru cevap dönmez)."""
-    pool, _ = _load_pool()
-    item = random.choice(pool)
+def _item_to_random_out(item: dict[str, Any], lang: str) -> EmergencyMcqRandomOut:
     opts = _mcq_options_display(item, lang)
     options_out: list[EmergencyMcqOptionOut] = []
     if isinstance(opts, list):
@@ -271,6 +271,108 @@ async def emergency_mcq_random(
         source=str(item.get("source") or ""),
         emergency_score=score,
     )
+
+
+async def _generate_explanation(item: dict[str, Any], selected_label: str, lang: str) -> str:
+    opts = _mcq_options_display(item, lang)
+    lines: list[tuple[str, str]] = []
+    if isinstance(opts, list):
+        for o in opts:
+            if isinstance(o, dict) and o.get("label") is not None:
+                lines.append((str(o["label"]), str(o.get("text") or "")))
+    return await generate_mcq_answer_explanation(
+        question_text=_mcq_question_display(item, lang),
+        options_lines=lines,
+        correct_label=str(item.get("correct_option_label") or "").strip().upper(),
+        correct_answer_text=str(item.get("correct_answer_text") or "").strip(),
+        selected_label=selected_label,
+        lang=lang,
+    )
+
+
+def _norm_lang_key(lang: str) -> str:
+    return (lang or "tr").lower()[:4]
+
+
+@router.get("/random", response_model=EmergencyMcqRandomOut)
+async def emergency_mcq_random(
+    lang: str = Query("en", min_length=2, max_length=12, description="tr: question_tr/options_tr varsa"),
+    _user_id: str = Depends(get_current_user_id),
+):
+    """Rastgele bir acil odaklı çoktan seçmeli soru (doğru cevap dönmez)."""
+    pool, _ = _load_pool()
+    item = random.choice(pool)
+    return _item_to_random_out(item, lang)
+
+
+@router.get("/by-id/{question_id}", response_model=EmergencyMcqRandomOut)
+async def emergency_mcq_by_id(
+    question_id: str,
+    lang: str = Query("en", min_length=2, max_length=12, description="tr: question_tr/options_tr varsa"),
+    _user_id: str = Depends(get_current_user_id),
+):
+    """Belirli soru kimliği ile MCQ (random ile aynı response)."""
+    _, by_id = _load_pool()
+    item = by_id.get(question_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Soru bulunamadı.")
+    return _item_to_random_out(item, lang)
+
+
+@router.get("/explanation", response_model=ExplanationOut)
+async def emergency_mcq_explanation(
+    id: str = Query(..., min_length=1, max_length=256),
+    selected_label: str = Query(..., min_length=1, max_length=8),
+    lang: str = Query("tr", min_length=2, max_length=12),
+    db: AsyncSession = Depends(get_db),
+    _user_id: str = Depends(get_current_user_id),
+):
+    """Şık açıklaması (cache’li)."""
+    _, by_id = _load_pool()
+    item = by_id.get(id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Soru bulunamadı.")
+    sel = selected_label.strip().upper()
+    if not sel or sel[0] not in "ABCD":
+        raise HTTPException(status_code=400, detail="selected_label A–D olmalıdır.")
+    sel = sel[0]
+    lang_key = _norm_lang_key(lang)
+
+    result = await db.execute(
+        select(EmergencyMcqExplanation).where(
+            EmergencyMcqExplanation.question_id == id,
+            EmergencyMcqExplanation.selected_label == sel,
+            EmergencyMcqExplanation.lang == lang_key,
+        )
+    )
+    row = result.scalar_one_or_none()
+    if row:
+        return ExplanationOut(explanation=row.explanation, cached=True)
+
+    text = await _generate_explanation(item, sel, lang)
+    new_row = EmergencyMcqExplanation(
+        question_id=id,
+        selected_label=sel,
+        lang=lang_key,
+        explanation=text,
+    )
+    db.add(new_row)
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        result2 = await db.execute(
+            select(EmergencyMcqExplanation).where(
+                EmergencyMcqExplanation.question_id == id,
+                EmergencyMcqExplanation.selected_label == sel,
+                EmergencyMcqExplanation.lang == lang_key,
+            )
+        )
+        again = result2.scalar_one_or_none()
+        if again:
+            return ExplanationOut(explanation=again.explanation, cached=True)
+        raise
+    return ExplanationOut(explanation=text, cached=False)
 
 
 @router.post("/verify", response_model=EmergencyMcqVerifyOut)

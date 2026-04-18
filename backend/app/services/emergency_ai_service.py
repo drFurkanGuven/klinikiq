@@ -94,6 +94,70 @@ async def stream_emergency_tutor(
         yield f"\n[Hata: {str(e)}]\n"
 
 
+async def generate_mcq_answer_explanation(
+    question_text: str,
+    options_lines: list[tuple[str, str]],
+    correct_label: str,
+    correct_answer_text: str,
+    selected_label: str,
+    lang: str,
+) -> str:
+    """Tek şık için kısa doğru/yanlış açıklaması (cache edilmeden önce üretilir)."""
+    if not openai_configured():
+        return "AI yapılandırılmamış — açıklama üretilemedi."
+
+    ln = (lang or "en").lower()
+    write_tr = ln.startswith("tr")
+    opt_str = "\n".join(f"{lab}) {txt}" for lab, txt in options_lines) if options_lines else "(şık yok)"
+    sel_u = (selected_label or "").strip().upper()[:1]
+
+    if write_tr:
+        system = (
+            "Sen klinik farmakoloji ve acil tıp eğitimcisisin.\n"
+            "Öğrenciye seçtiği şıkkın neden doğru veya yanlış olduğunu açıkla.\n"
+            "Eğer yanlışsa: neden yanlış + doğru şık neden doğru.\n"
+            "Eğer doğruysa: neden doğru + diğer şıkların neden yanlış olduğunu kısaca.\n"
+            "3-5 cümle. Türkçe yaz (lang=tr ise). Klinik pearls ekle."
+        )
+        user = (
+            f"Soru:\n{question_text}\n\n"
+            f"Şıklar:\n{opt_str}\n\n"
+            f"Doğru cevap etiketi: {correct_label or '?'}\n"
+            f"Doğru cevap özeti: {correct_answer_text or '—'}\n\n"
+            f"Öğrencinin seçimi: {sel_u}"
+        )
+    else:
+        system = (
+            "You are a clinical pharmacology and emergency medicine educator.\n"
+            "Explain whether the student's selected option is correct or incorrect.\n"
+            "If incorrect: why it is wrong and why the correct option is right.\n"
+            "If correct: why it is correct and briefly why the other options are wrong.\n"
+            "3-5 sentences. Write in English. Add clinical pearls."
+        )
+        user = (
+            f"Question:\n{question_text}\n\n"
+            f"Options:\n{opt_str}\n\n"
+            f"Correct answer label: {correct_label or '?'}\n"
+            f"Correct answer summary: {correct_answer_text or '—'}\n\n"
+            f"Student's choice: {sel_u}"
+        )
+
+    try:
+        response = await _client.chat.completions.create(
+            model=EMERGENCY_TUTOR_MODEL,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            max_tokens=500,
+            temperature=0.35,
+        )
+        text = (response.choices[0].message.content or "").strip()
+        return text if text else "—"
+    except Exception:
+        return "Açıklama üretilirken bir hata oluştu."
+
+
 def _vignette_for_patient(item: dict[str, Any]) -> str:
     return str(item.get("question_tr") or item.get("question") or "").strip()[:8000]
 
