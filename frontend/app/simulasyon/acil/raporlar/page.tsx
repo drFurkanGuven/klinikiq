@@ -104,7 +104,7 @@ export default function AcilMcqReportListPage() {
             {items.map((r) => (
               <li key={r.id}>
                 <Link
-                  href={`/simulasyon/acil/rapor/${r.id}`}
+                  href={`/simulasyon/acil/rapor/?id=${encodeURIComponent(r.id)}`}
                   className="flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 transition hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
                   style={{ borderColor: "var(--border)", background: "var(--surface)" }}
                 >

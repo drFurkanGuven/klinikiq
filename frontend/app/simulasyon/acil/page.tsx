@@ -199,7 +199,7 @@ export default function AcilSimulasyonMcqPage() {
         patient_urges: sessionPatientUrges,
       });
       clearSessionProgress();
-      router.push(`/simulasyon/acil/rapor/${res.data.id}`);
+      router.push(`/simulasyon/acil/rapor/?id=${encodeURIComponent(res.data.id)}`);
     } catch {
       setReportError("Rapor oluşturulamadı. Bağlantı veya sunucu yapılandırmasını kontrol edin.");
     } finally {
