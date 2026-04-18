@@ -62,6 +62,32 @@ Ayrıntılı lisans notları: `licenses/SOURCES.md`.
 
 Yine de **tüm acil vakaları yakalamaz**; üretimde LLM/etiket ile doğrulama önerilir.
 
+## Türkçe çeviri (acil MCQ)
+
+`unified_emergency.jsonl` üretildikten sonra, satırlara `question_tr` / `options_tr` eklemek için:
+
+```bash
+cd backend/scripts/medical_qa_dataset
+python3 -m pip install -r requirements.txt
+export OPENAI_API_KEY=sk-...
+# Önce 3 satırla dene:
+python3 translate_emergency_mcq.py \
+  --in ../../data/medical_qa/emergency/unified_emergency.jsonl \
+  --out ../../data/medical_qa/emergency/unified_emergency_tr.jsonl \
+  --limit 3
+
+# Tüm havuz (uzun sürer, maliyetli):
+python3 translate_emergency_mcq.py \
+  --in ../../data/medical_qa/emergency/unified_emergency.jsonl \
+  --out ../../data/medical_qa/emergency/unified_emergency_tr.jsonl
+```
+
+- **`--force`:** `question_tr` olsa bile yeniden çevir.
+- Çıktı dosyasını kullanmak için backend’de `MEDICAL_QA_EMERGENCY_JSONL` yolunu bu dosyaya ayarlayın veya dosyayı `unified_emergency.jsonl` adıyla değiştirin.
+
+API: `GET /api/emergency-mcq/random?lang=tr` — çeviri yoksa metin İngilizce kalır.  
+Frontend (Acil simülasyon): **TR / EN** seçici + `Yeni soru` bir sonraki soruda seçilen dili kullanır.
+
 ## Not
 
-Tıbbi ürünlerde içerik **mutlaka** klinik doğruluk ve hukuk açısından gözden geçirilmelidir; bu pipeline yalnızca veri toplama ve biçimlendirme sağlar.
+Tıbbi ürünlerde içerik **mutlaka** klinik doğruluk ve hukuk açısından gözden geçirilmelidir; bu pipeline yalnızca veri toplama ve biçimlendirme sağlar. Otomatik çeviriler için örneklemle insan kontrolü önerilir.

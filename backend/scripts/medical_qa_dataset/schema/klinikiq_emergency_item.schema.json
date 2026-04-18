@@ -30,6 +30,10 @@
     "question": {
       "type": "string"
     },
+    "question_tr": {
+      "type": "string",
+      "description": "translate_emergency_mcq.py ile üretilen Türkçe soru kökü (opsiyonel)"
+    },
     "options": {
       "type": ["array", "null"],
       "items": {
@@ -40,6 +44,22 @@
           "text": { "type": "string" }
         }
       }
+    },
+    "options_tr": {
+      "type": ["array", "null"],
+      "description": "İngilizce options ile aynı label sırası; Türkçe şık metinleri",
+      "items": {
+        "type": "object",
+        "required": ["label", "text"],
+        "properties": {
+          "label": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "translation_meta": {
+      "type": "object",
+      "description": "Toplu çeviri meta (model, tarih)"
     },
     "correct_option_label": {
       "type": ["string", "null"],

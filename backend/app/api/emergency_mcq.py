@@ -230,12 +230,31 @@ async def emergency_mcq_stats(_user_id: str = Depends(get_current_user_id)):
     )
 
 
+def _mcq_question_display(item: dict[str, Any], lang: str) -> str:
+    l = (lang or "en").lower()
+    if l.startswith("tr") and (str(item.get("question_tr") or "").strip()):
+        return str(item["question_tr"])
+    return str(item.get("question") or "")
+
+
+def _mcq_options_display(item: dict[str, Any], lang: str) -> list[dict[str, Any]]:
+    l = (lang or "en").lower()
+    tr = item.get("options_tr")
+    if l.startswith("tr") and isinstance(tr, list) and len(tr) > 0:
+        return tr
+    raw = item.get("options") or []
+    return raw if isinstance(raw, list) else []
+
+
 @router.get("/random", response_model=EmergencyMcqRandomOut)
-async def emergency_mcq_random(_user_id: str = Depends(get_current_user_id)):
+async def emergency_mcq_random(
+    lang: str = Query("en", min_length=2, max_length=12, description="tr: question_tr/options_tr varsa"),
+    _user_id: str = Depends(get_current_user_id),
+):
     """Rastgele bir acil odaklı çoktan seçmeli soru (doğru cevap dönmez)."""
     pool, _ = _load_pool()
     item = random.choice(pool)
-    opts = item.get("options") or []
+    opts = _mcq_options_display(item, lang)
     options_out: list[EmergencyMcqOptionOut] = []
     if isinstance(opts, list):
         for o in opts:
@@ -247,7 +266,7 @@ async def emergency_mcq_random(_user_id: str = Depends(get_current_user_id)):
         score = fm["emergency_score"]
     return EmergencyMcqRandomOut(
         id=str(item["id"]),
-        question=str(item.get("question") or ""),
+        question=_mcq_question_display(item, lang),
         options=options_out,
         source=str(item.get("source") or ""),
         emergency_score=score,

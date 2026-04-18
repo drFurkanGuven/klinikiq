@@ -28,8 +28,8 @@ import {
   FileText,
 } from "lucide-react";
 
-/** Simüle acil süre baskısı (dakika); tam simülatörde tetkik süreleri ayrı eklenebilir */
-const QUESTION_TIME_LIMIT_SEC = 8 * 60;
+/** Simüle acil süre baskısı (dakika); anamnez/tetkik olmadan tek MCQ için kısa tutuldu */
+const QUESTION_TIME_LIMIT_SEC = 4 * 60;
 
 function fmtMmSs(totalSec: number) {
   const m = Math.floor(totalSec / 60);
@@ -71,10 +71,31 @@ export default function AcilSimulasyonMcqPage() {
   const [sessionPatientUrges, setSessionPatientUrges] = useState<string[]>([]);
   const [reportLoading, setReportLoading] = useState(false);
   const [reportError, setReportError] = useState<string | null>(null);
+  /** API random(lang): veri setinde question_tr yoksa backend yine İngilizce döner */
+  const [mcqLang, setMcqLang] = useState<"en" | "tr">("tr");
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!mounted || typeof window === "undefined") return;
+    try {
+      const s = localStorage.getItem("emergency_mcq_lang");
+      if (s === "en" || s === "tr") setMcqLang(s);
+    } catch {
+      /* ignore */
+    }
+  }, [mounted]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem("emergency_mcq_lang", mcqLang);
+    } catch {
+      /* ignore */
+    }
+  }, [mcqLang]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -138,7 +159,7 @@ export default function AcilSimulasyonMcqPage() {
     setFrozenElapsedSec(null);
     setQ(null);
     try {
-      const res = await emergencyMcqApi.random();
+      const res = await emergencyMcqApi.random(mcqLang);
       setQ(res.data);
     } catch (e: unknown) {
       const d = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
@@ -406,6 +427,36 @@ export default function AcilSimulasyonMcqPage() {
         )}
 
         <div className="flex flex-wrap gap-2 mb-4 items-center">
+          <div
+            className="inline-flex rounded-xl border p-0.5 text-[11px] font-black uppercase tracking-wide"
+            style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
+            title="Çeviri JSONL’de yoksa soru İngilizce gelir"
+          >
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => setMcqLang("tr")}
+              className="px-3 py-2 rounded-lg transition-all"
+              style={{
+                background: mcqLang === "tr" ? "var(--primary)" : "transparent",
+                color: mcqLang === "tr" ? "#fff" : "var(--text-muted)",
+              }}
+            >
+              TR
+            </button>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => setMcqLang("en")}
+              className="px-3 py-2 rounded-lg transition-all"
+              style={{
+                background: mcqLang === "en" ? "var(--primary)" : "transparent",
+                color: mcqLang === "en" ? "#fff" : "var(--text-muted)",
+              }}
+            >
+              EN
+            </button>
+          </div>
           <button
             type="button"
             disabled={loading || !!statsError}

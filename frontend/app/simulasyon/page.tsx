@@ -77,7 +77,7 @@ export default function SimulasyonHubPage() {
             <li className="flex items-start gap-2">
               <Clock className="w-4 h-4 shrink-0 mt-0.5 opacity-60" />
               <span>
-                Simüle süre: acil MCQ sayfasında <strong style={{ color: "var(--text)" }}>8 dk</strong> geri sayım ve çubuk; tam simülatörde tetkik süreleri eklenecek.
+                Simüle süre: acil MCQ sayfasında <strong style={{ color: "var(--text)" }}>4 dk</strong> geri sayım ve çubuk; tam simülatörde tetkik süreleri eklenecek.
               </span>
             </li>
             <li className="flex items-start gap-2">

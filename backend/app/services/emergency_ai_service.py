@@ -24,8 +24,8 @@ def openai_configured() -> bool:
 
 
 def build_emergency_tutor_system_prompt(item: dict[str, Any]) -> str:
-    q = str(item.get("question") or "").strip()
-    opts = item.get("options") or []
+    q = str(item.get("question_tr") or item.get("question") or "").strip()
+    opts = item.get("options_tr") or item.get("options") or []
     lines: list[str] = []
     if isinstance(opts, list):
         for o in opts:
@@ -36,7 +36,7 @@ def build_emergency_tutor_system_prompt(item: dict[str, Any]) -> str:
     ans_text = str(item.get("correct_answer_text") or "").strip()
 
     return f"""Sen Türkiye'de acil serviste asistanlara eğitim veren bir hekim eğitmenisin (TUS / acil perspektifi).
-Kullanıcı aşağıdaki çoktan seçmeli soruda yardım istiyor. Soru metni İngilizce olabilir; sen yanıtları Türkçe ver.
+Kullanıcı aşağıdaki çoktan seçmeli soruda yardım istiyor. Soru metni Türkçe veya İngilizce olabilir; sen yanıtları Türkçe ver.
 
 --- VİGNET ---
 {q}
@@ -95,7 +95,7 @@ async def stream_emergency_tutor(
 
 
 def _vignette_for_patient(item: dict[str, Any]) -> str:
-    return str(item.get("question") or "").strip()[:8000]
+    return str(item.get("question_tr") or item.get("question") or "").strip()[:8000]
 
 
 async def generate_patient_time_urge(
@@ -191,7 +191,7 @@ def _fallback_emergency_report(
         ),
         "tus_reference": "",
         "time_management_note": (
-            "Süre verisi gönderildiyse kendi kendinize: 8 dakikalık limit altında "
+            "Süre verisi gönderildiyse kendi kendinize: 4 dakikalık limit altında "
             "kalan süreyi gözden geçirin."
         ),
         "ai_chat_note": (

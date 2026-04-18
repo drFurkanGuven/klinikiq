@@ -447,7 +447,9 @@ export interface EmergencyMcqReportListItem {
 
 export const emergencyMcqApi = {
   stats: () => api.get<EmergencyMcqStats>("/emergency-mcq/stats"),
-  random: () => api.get<EmergencyMcqRandom>("/emergency-mcq/random"),
+  /** lang=tr: JSONL'de question_tr / options_tr varsa Türkçe döner; yoksa İngilizce kalır. */
+  random: (lang: "en" | "tr" = "en") =>
+    api.get<EmergencyMcqRandom>("/emergency-mcq/random", { params: { lang } }),
   verify: (id: string, selected_label: string) =>
     api.post<EmergencyMcqVerifyResult>("/emergency-mcq/verify", { id, selected_label }),
   createReport: (body: EmergencyMcqReportCreateBody) =>
