@@ -40,5 +40,8 @@ frontend/capacitor.config.ts
 ilac.json
 ilac.sql
 backend/data/ilac_atlas.db
+
+# MedQA / PubMedQA script çıktıları (büyük jsonl; script ile yeniden üretilir)
+backend/data/medical_qa/
 postgres_data/
 redis_data/

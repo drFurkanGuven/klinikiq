@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://klinikiq.local/schema/klinikiq_emergency_item.json",
+  "title": "KlinikiqEmergencyTrainingItem",
+  "description": "MedQA-USMLE ve PubMedQA kaynaklı birleşik öğe; acil odaklı filtre sonrası üretilir.",
+  "type": "object",
+  "required": ["id", "source", "question_type", "question"],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Benzersiz anahtar: örn. medqa_usmle:train:42"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["medqa_usmle", "pubmedqa_labeled"]
+    },
+    "source_split": {
+      "type": "string",
+      "description": "HF split adı: train, test, validation vb."
+    },
+    "source_row_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "question_type": {
+      "type": "string",
+      "enum": ["mcq_four", "yes_no_maybe"]
+    },
+    "question": {
+      "type": "string"
+    },
+    "options": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "required": ["label", "text"],
+        "properties": {
+          "label": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "correct_option_label": {
+      "type": ["string", "null"],
+      "description": "MCQ için A, B, C veya D"
+    },
+    "correct_option_index": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "maximum": 3
+    },
+    "correct_answer_text": {
+      "type": ["string", "null"],
+      "description": "MedQA ham doğru şık metni"
+    },
+    "final_decision": {
+      "type": ["string", "null"],
+      "description": "PubMedQA: yes | no | maybe"
+    },
+    "context_excerpt": {
+      "type": ["string", "null"],
+      "description": "PubMedQA özet bağlamı (filtre ve gösterim için)"
+    },
+    "meta": {
+      "type": "object",
+      "description": "Ek alanlar: meta_info, pubid, metamap_phrases vb."
+    },
+    "matched_keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Acil filtresinde eşleşen desen adları"
+    },
+    "filter_meta": {
+      "type": "object",
+      "description": "Filtre v2: emergency_score, clinical_context (PubMed), pubmed_excluded vb."
+    }
+  }
+}
