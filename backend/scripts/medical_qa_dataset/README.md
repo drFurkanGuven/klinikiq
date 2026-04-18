@@ -88,6 +88,12 @@ python3 translate_emergency_mcq.py \
 API: `GET /api/emergency-mcq/random?lang=tr` — çeviri yoksa metin İngilizce kalır.  
 Frontend (Acil simülasyon): **TR / EN** seçici + `Yeni soru` bir sonraki soruda seçilen dili kullanır.
 
+### Uzun çeviride takip (nohup / log)
+
+- `stdout` dosyaya yönlendirilmediyse çıktı çalışma dizinindeki **`nohup.out`** içinde olabilir: `tail -f nohup.out`
+- **`--progress /tam/yol/translate.progress`** kullanın; her adım bu dosyaya yazılır: `tail -f /tam/yol/translate.progress`
+- Süreç hangi dizinde: `pwdx $(pgrep -f translate_emergency_mcq)`
+
 ## Not
 
 Tıbbi ürünlerde içerik **mutlaka** klinik doğruluk ve hukuk açısından gözden geçirilmelidir; bu pipeline yalnızca veri toplama ve biçimlendirme sağlar. Otomatik çeviriler için örneklemle insan kontrolü önerilir.

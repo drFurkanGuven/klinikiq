@@ -194,6 +194,27 @@ class StudyNoteItem(BaseModel):
         from_attributes = True
 
 
+class LearningCardOut(BaseModel):
+    """Tamamlanan vaka raporlarından türetilen havuz özet kartı (vaka başına en güncel rapor)."""
+
+    report_id: str
+    case_id: str
+    case_title: str
+    specialty: str
+    difficulty: str
+    pathophysiology_note: Optional[str] = None
+    tus_reference: Optional[str] = None
+    score: float
+    created_at: datetime
+
+
+class LearningCardsPage(BaseModel):
+    items: List[LearningCardOut]
+    total: int
+    limit: int
+    offset: int
+
+
 # ── TUS MCQ ───────────────────────────────────────────────────────────────────
 
 class QuestionOut(BaseModel):

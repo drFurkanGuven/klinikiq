@@ -13,6 +13,10 @@ Kullanım:
   export OPENAI_API_KEY=...
   python translate_emergency_mcq.py --in ../../data/medical_qa/emergency/unified_emergency.jsonl --out ../../data/medical_qa/emergency/unified_emergency_tr.jsonl --limit 3
 
+Arka planda takip için (her satır anında dosyaya yazılır):
+  python3 -u translate_emergency_mcq.py ... --progress /opt/klinikiq/translate.progress
+  tail -f /opt/klinikiq/translate.progress
+
 Tüm havuz (uzun sürer, maliyetli):
   python translate_emergency_mcq.py --in ... --out ...
 
@@ -133,6 +137,16 @@ def translate_one(
     return out
 
 
+def _progress_append(path: Path | None, message: str) -> None:
+    if not path:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as pf:
+        pf.write(message.rstrip() + "\n")
+        pf.flush()
+        os.fsync(pf.fileno())
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Acil MCQ JSONL Türkçe çeviri")
     ap.add_argument(
@@ -170,10 +184,17 @@ def main() -> None:
         action="store_true",
         help="API çağrısı yapma; kaç satır işleneceğini yaz",
     )
+    ap.add_argument(
+        "--progress",
+        dest="progress_path",
+        default=None,
+        help="Her çeviri adımında bu dosyaya satır eklenir (tail -f ile canlı takip)",
+    )
     args = ap.parse_args()
 
     in_path = Path(args.in_path).resolve()
     out_path = Path(args.out_path).resolve()
+    progress_file = Path(args.progress_path).resolve() if args.progress_path else None
     if not in_path.is_file():
         print(f"Dosya yok: {in_path}", file=sys.stderr)
         sys.exit(1)
@@ -204,20 +225,30 @@ def main() -> None:
 
     if args.dry_run:
         n_mcq = sum(1 for ln in lines_in if json.loads(ln).get("question_type") == "mcq_four")
-        print(f"Toplam satır: {len(lines_in)} (mcq_four: {n_mcq})")
-        print(f"Çevrilecek: {len(need_translate)}")
+        print(f"Toplam satır: {len(lines_in)} (mcq_four: {n_mcq})", flush=True)
+        print(f"Çevrilecek: {len(need_translate)}", flush=True)
         sys.exit(0)
 
     client = OpenAI(api_key=api_key)
     out_lines = lines_in[:]
 
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    _progress_append(
+        progress_file,
+        f"START {ts} toplam_cevirilecek={len(need_translate)} cikti={out_path}",
+    )
+
     for idx, (line_idx, item) in enumerate(need_translate):
         try:
             new_item = translate_one(client, item, args.model)
             out_lines[line_idx] = json.dumps(new_item, ensure_ascii=False)
-            print(f"[{idx + 1}/{len(need_translate)}] ok id={item.get('id')}")
+            line = f"[{idx + 1}/{len(need_translate)}] ok id={item.get('id')}"
+            print(line, flush=True)
+            _progress_append(progress_file, line)
         except Exception as e:
-            print(f"HATA id={item.get('id')}: {e}", file=sys.stderr)
+            err = f"HATA id={item.get('id')}: {e}"
+            print(err, file=sys.stderr, flush=True)
+            _progress_append(progress_file, err)
         time.sleep(args.sleep)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -225,7 +256,9 @@ def main() -> None:
         for ln in out_lines:
             f.write(ln + "\n")
 
-    print(f"Yazıldı: {out_path}")
+    done_msg = f"Yazıldı: {out_path}"
+    print(done_msg, flush=True)
+    _progress_append(progress_file, done_msg)
 
 
 if __name__ == "__main__":
