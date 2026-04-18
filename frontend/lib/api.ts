@@ -233,6 +233,8 @@ export interface CommunityNoteItem {
   liked_by_me: boolean;
   saved_by_me: boolean;
   is_mine: boolean;
+  /** pending: onay bekliyor | published: akışta | rejected: reddedildi */
+  moderation_status: "pending" | "published" | "rejected";
   created_at: string;
   /** Sunucu: metin 280 karakterden uzunsa true */
   body_truncated?: boolean;
@@ -383,6 +385,19 @@ export interface OrphanDziFile {
   has_thumb: boolean;
 }
 
+export interface PendingCommunityNote {
+  id: string;
+  title: string;
+  excerpt: string;
+  body_preview: string;
+  group: string;
+  branch_id: string;
+  topic_id: string;
+  author_name: string;
+  author_email: string;
+  created_at: string;
+}
+
 export const adminApi = {
   getUsers: () => api.get<AdminUser[]>("/admin/users"),
   updateLimit: (userId: string, limit: number) =>
@@ -414,6 +429,13 @@ export const adminApi = {
     api.post<HistologyImage>("/admin/hf/import-tiff", body, {
       timeout: 600_000,
     }),
+  /** Topluluk notları — onay kuyruğu */
+  pendingCommunityNotesCount: () => api.get<{ count: number }>("/admin/community-notes/pending-count"),
+  listPendingCommunityNotes: () => api.get<PendingCommunityNote[]>("/admin/community-notes/pending"),
+  approveCommunityNote: (noteId: string) =>
+    api.post<{ ok: boolean; id: string }>(`/admin/community-notes/${noteId}/approve`),
+  rejectCommunityNote: (noteId: string) =>
+    api.post<{ ok: boolean; id: string }>(`/admin/community-notes/${noteId}/reject`),
 };
 
 export interface HuggingFaceDatasetSpotlight {

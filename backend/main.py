@@ -8,11 +8,38 @@ from app.core.paths import community_uploads_abs
 from app.core.database import engine, Base
 from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, community
 
+
+def _ensure_community_notes_moderation_column(sync_conn) -> None:
+    """Mevcut veritabanına moderation_status sütunu ekler (create_all yeni tablolara ekler)."""
+    from sqlalchemy import inspect, text
+
+    insp = inspect(sync_conn)
+    if "community_notes" not in insp.get_table_names():
+        return
+    cols = {c["name"] for c in insp.get_columns("community_notes")}
+    if "moderation_status" in cols:
+        return
+    dialect = sync_conn.dialect.name
+    if dialect == "sqlite":
+        sync_conn.execute(
+            text(
+                "ALTER TABLE community_notes ADD COLUMN moderation_status VARCHAR(20) NOT NULL DEFAULT 'published'"
+            )
+        )
+    else:
+        sync_conn.execute(
+            text(
+                "ALTER TABLE community_notes ADD COLUMN moderation_status VARCHAR(20) NOT NULL DEFAULT 'published'"
+            )
+        )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: tabloları oluştur
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(_ensure_community_notes_moderation_column)
     
     # DIAGNOSTIC: Logging (Using standard logger to ensure it shows in Docker)
     import logging

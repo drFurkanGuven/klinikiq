@@ -16,7 +16,7 @@ import { communityApi, type CommunityNoteAttachment } from "@/lib/api";
 import { resolveCommunityUploadUrl } from "@/lib/communityUploadUrl";
 import Footer from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ArrowLeft, PenLine, Send, CheckCircle2, LogOut, Loader2, Paperclip, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, PenLine, Send, CheckCircle2, LogOut, Loader2, Paperclip, FileText, Trash2, ShieldAlert } from "lucide-react";
 
 function apiErrMessage(err: unknown): string {
   const d = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
@@ -47,6 +47,7 @@ export default function DuzenleNotPage() {
   const [submitting, setSubmitting] = useState(false);
   const [attachments, setAttachments] = useState<CommunityNoteAttachment[]>([]);
   const [attBusy, setAttBusy] = useState<string | null>(null);
+  const [moderationStatus, setModerationStatus] = useState<"pending" | "published" | "rejected" | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -84,6 +85,7 @@ export default function DuzenleNotPage() {
         setTitle(n.title);
         setBody(n.body);
         setAttachments(n.attachments ?? []);
+        setModerationStatus(n.moderation_status ?? "published");
       } catch (err: unknown) {
         const status = (err as { response?: { status?: number } })?.response?.status;
         if (cancelled) return;
@@ -166,13 +168,14 @@ export default function DuzenleNotPage() {
 
     setSubmitting(true);
     try {
-      await communityApi.updateNote(noteId, {
+      const res = await communityApi.updateNote(noteId, {
         group,
         branch_id: branchId,
         topic_id: topicId,
         title: title.trim(),
         body: body.trim(),
       });
+      setModerationStatus(res.data.moderation_status ?? "published");
       setDone(true);
     } catch (err) {
       setError(apiErrMessage(err));
@@ -258,7 +261,9 @@ export default function DuzenleNotPage() {
               Not güncellendi
             </h1>
             <p className="text-sm font-medium opacity-70 leading-relaxed" style={{ color: "var(--text-muted)" }}>
-              Değişiklikler kaydedildi. Akışta güncel hâliyle görünür.
+              {moderationStatus === "pending"
+                ? "Değişiklikler kaydedildi. Not yönetici onayından sonra akışta görünecek."
+                : "Değişiklikler kaydedildi. Akışta güncel hâliyle görünür."}
             </p>
             <Link href="/topluluk" className="btn-premium inline-block px-8 py-3 text-xs mt-4">
               Akışa dön
@@ -266,6 +271,36 @@ export default function DuzenleNotPage() {
           </div>
         ) : (
           <>
+            {moderationStatus === "pending" && (
+              <div
+                className="mb-6 flex gap-3 rounded-2xl border p-4 sm:p-5"
+                style={{
+                  borderColor: "var(--border)",
+                  background: "color-mix(in srgb, var(--warning, #f59e0b) 10%, transparent)",
+                }}
+              >
+                <ShieldAlert className="w-6 h-6 shrink-0 mt-0.5" style={{ color: "var(--warning, #d97706)" }} />
+                <div className="text-sm font-bold leading-relaxed" style={{ color: "var(--text)" }}>
+                  Bu not yönetici onayı bekliyor. Onaylandıktan sonra topluluk akışında herkese açık olur; bu sürede düzenlemeye devam
+                  edebilirsin.
+                </div>
+              </div>
+            )}
+            {moderationStatus === "rejected" && (
+              <div
+                className="mb-6 flex gap-3 rounded-2xl border p-4 sm:p-5"
+                style={{
+                  borderColor: "var(--border)",
+                  background: "color-mix(in srgb, var(--error) 8%, transparent)",
+                }}
+              >
+                <ShieldAlert className="w-6 h-6 shrink-0 mt-0.5" style={{ color: "var(--error)" }} />
+                <div className="text-sm font-bold leading-relaxed" style={{ color: "var(--text)" }}>
+                  Bu not reddedildi. Kaydettiğinde tekrar incelemeye alınır ve yönetici onayı bekler.
+                </div>
+              </div>
+            )}
+
             <div className="mb-8 flex items-start gap-3">
               <div
                 className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-md"
@@ -278,7 +313,9 @@ export default function DuzenleNotPage() {
                   Notu düzenle
                 </h1>
                 <p className="text-sm font-medium opacity-60 mt-1" style={{ color: "var(--text-muted)" }}>
-                  Sınıflandırma, başlık veya metni değiştirebilirsin. Kaydettiğinde akışta güncellenir.
+                  {moderationStatus === "published"
+                    ? "Sınıflandırma, başlık veya metni değiştirebilirsin. Kaydettiğinde akışta güncellenir."
+                    : "Sınıflandırma, başlık veya metni değiştirebilirsin. Yayınlanmış notlar akışta; onay bekleyen veya reddedilmiş notlar yönetici incelemesinden sonra akışa düşer."}
                 </p>
               </div>
             </div>

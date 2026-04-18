@@ -277,6 +277,14 @@ class CommunityNote(Base):
     topic_id = Column(String(80), nullable=False, index=True)
     title = Column(String(200), nullable=False)
     body = Column(Text, nullable=False)
+    # pending → yönetici onayı bekliyor | published → akışta | rejected → reddedildi (yazar görür)
+    moderation_status = Column(
+        String(20),
+        nullable=False,
+        default="published",
+        server_default="published",
+        index=True,
+    )
     created_at = Column(DateTime(timezone=True), default=now_utc, index=True)
 
     user = relationship("User", back_populates="community_notes")

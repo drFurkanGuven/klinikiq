@@ -2,7 +2,7 @@
 
 import os
 from collections import defaultdict
-from typing import List, Optional, Set
+from typing import List, Literal, Optional, Set, cast
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile
 from sqlalchemy import desc, func, or_, select
@@ -134,6 +134,31 @@ async def _liked_and_saved_sets(
     return {row[0] for row in rl.all()}, {row[0] for row in rs.all()}
 
 
+def _moderation_status_out(note: CommunityNote) -> str:
+    ms = getattr(note, "moderation_status", None) or "published"
+    if ms in ("pending", "published", "rejected"):
+        return ms
+    return "published"
+
+
+async def _viewer_can_see_note(
+    db: AsyncSession,
+    note: CommunityNote,
+    viewer_id: Optional[str],
+) -> bool:
+    if _moderation_status_out(note) == "published":
+        return True
+    if not viewer_id:
+        return False
+    if note.user_id == viewer_id:
+        return True
+    r = await db.execute(select(User.is_admin).where(User.id == viewer_id))
+    row = r.one_or_none()
+    if not row:
+        return False
+    return bool(row[0])
+
+
 def _build_note_out(
     note: CommunityNote,
     user: User,
@@ -146,6 +171,7 @@ def _build_note_out(
 ) -> CommunityNoteOut:
     is_mine = viewer_id is not None and note.user_id == viewer_id
     atts = [_attachment_to_out(a) for a in (attachments or [])]
+    ms = _moderation_status_out(note)
     return CommunityNoteOut(
         id=note.id,
         group=note.tus_group,
@@ -158,6 +184,7 @@ def _build_note_out(
         liked_by_me=liked_by_me,
         saved_by_me=saved_by_me,
         is_mine=is_mine,
+        moderation_status=cast(Literal["pending", "published", "rejected"], ms),
         created_at=note.created_at,
         body_truncated=_body_truncated(note.body),
         attachments=atts,
@@ -187,6 +214,8 @@ async def _list_core(
             (CommunityNoteSave.note_id == CommunityNote.id)
             & (CommunityNoteSave.user_id == saved_only_user_id),
         )
+
+    stmt = stmt.where(CommunityNote.moderation_status == "published")
 
     if group in ("temel", "klinik"):
         stmt = stmt.where(CommunityNote.tus_group == group)
@@ -302,6 +331,7 @@ async def create_note(
         topic_id=data.topic_id.strip(),
         title=data.title.strip(),
         body=data.body.strip(),
+        moderation_status="pending",
     )
     db.add(note)
     await db.commit()
@@ -357,6 +387,8 @@ async def get_note(
     if not row:
         raise HTTPException(status_code=404, detail="Not bulunamadı")
     note, user = row
+    if not await _viewer_can_see_note(db, note, viewer_id):
+        raise HTTPException(status_code=404, detail="Not bulunamadı")
     return await _note_to_detail_out(db, note, user, viewer_id)
 
 
@@ -387,6 +419,8 @@ async def update_note(
     note.tus_group = g
     note.branch_id = b
     note.topic_id = t
+    if _moderation_status_out(note) == "rejected":
+        note.moderation_status = "pending"
 
     await db.commit()
     await db.refresh(note)
@@ -521,6 +555,8 @@ async def toggle_like(
     note = result.scalar_one_or_none()
     if not note:
         raise HTTPException(status_code=404, detail="Not bulunamadı")
+    if _moderation_status_out(note) != "published":
+        raise HTTPException(status_code=400, detail="Yalnızca yayınlanmış notlar beğenilebilir.")
     if note.user_id == user_id:
         raise HTTPException(status_code=400, detail="Kendi notunu beğenemezsin")
 
@@ -555,6 +591,8 @@ async def toggle_save(
     note = result.scalar_one_or_none()
     if not note:
         raise HTTPException(status_code=404, detail="Not bulunamadı")
+    if _moderation_status_out(note) != "published":
+        raise HTTPException(status_code=400, detail="Yalnızca yayınlanmış notlar kaydedilebilir.")
 
     result = await db.execute(
         select(CommunityNoteSave).where(

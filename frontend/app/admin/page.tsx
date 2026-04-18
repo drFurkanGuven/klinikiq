@@ -2,7 +2,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { adminApi, authApi, type AdminUser, type HistologyImage, type OrphanDziFile } from "@/lib/api";
+import {
+  adminApi,
+  authApi,
+  type AdminUser,
+  type HistologyImage,
+  type OrphanDziFile,
+  type PendingCommunityNote,
+} from "@/lib/api";
 import { resolvePublicAssetUrl } from "@/lib/tileUrl";
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
@@ -23,6 +30,9 @@ import {
   Link2,
   CloudDownload,
   Pencil,
+  MessageSquare,
+  Check,
+  X,
 } from "lucide-react";
 
 const SPECIALTY_LABEL: Record<string, string> = {
@@ -43,7 +53,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import dynamic from "next/dynamic";
 const HistologyUploadModal = dynamic(() => import("@/components/HistologyUploadModal"), { ssr: false });
 
-type Tab = "users" | "histology";
+type Tab = "users" | "histology" | "moderation";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -74,6 +84,10 @@ export default function AdminDashboardPage() {
   const [editDescription, setEditDescription] = useState("");
   const [editSaving, setEditSaving] = useState(false);
 
+  const [pendingNotes, setPendingNotes] = useState<PendingCommunityNote[]>([]);
+  const [pendingLoading, setPendingLoading] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+
   useEffect(() => {
     const init = async () => {
       if (!isAuthenticated()) {
@@ -89,6 +103,12 @@ export default function AdminDashboardPage() {
         }
         setIsAdmin(true);
         fetchUsers();
+        try {
+          const pc = await adminApi.pendingCommunityNotesCount();
+          setPendingCount(pc.data.count);
+        } catch {
+          setPendingCount(0);
+        }
       } catch (err) {
         console.error("Admin check failed:", err);
         router.replace("/dashboard");
@@ -141,6 +161,55 @@ export default function AdminDashboardPage() {
       fetchOrphans();
     }
   }, [activeTab]);
+
+  const fetchPendingNotes = async () => {
+    setPendingLoading(true);
+    try {
+      const res = await adminApi.listPendingCommunityNotes();
+      setPendingNotes(res.data);
+    } catch (err) {
+      console.error(err);
+      setPendingNotes([]);
+    } finally {
+      setPendingLoading(false);
+    }
+  };
+
+  const refreshPendingCount = async () => {
+    try {
+      const pc = await adminApi.pendingCommunityNotesCount();
+      setPendingCount(pc.data.count);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "moderation") {
+      fetchPendingNotes();
+    }
+  }, [activeTab]);
+
+  const handleApproveNote = async (id: string) => {
+    try {
+      await adminApi.approveCommunityNote(id);
+      setPendingNotes((prev) => prev.filter((n) => n.id !== id));
+      await refreshPendingCount();
+    } catch {
+      alert("Onaylanamadı.");
+    }
+  };
+
+  const handleRejectNote = async (id: string) => {
+    if (!confirm("Bu notu reddetmek istediğinize emin misiniz? Yazar düzenleyerek tekrar gönderebilir.")) return;
+    try {
+      await adminApi.rejectCommunityNote(id);
+      setPendingNotes((prev) => prev.filter((n) => n.id !== id));
+      await refreshPendingCount();
+    } catch {
+      alert("Reddedilemedi.");
+    }
+  };
 
   useEffect(() => {
     if (search) {
@@ -309,9 +378,23 @@ export default function AdminDashboardPage() {
                 <ImageIcon className="w-4 h-4" />
                 Histoloji Arşivi
             </button>
+            <button
+                onClick={() => setActiveTab("moderation")}
+                className={`relative flex items-center gap-2 px-8 py-3 text-xs font-black uppercase tracking-widest transition-all rounded-xl ${
+                    activeTab === "moderation" ? "bg-white dark:bg-zinc-800 shadow-xl text-primary" : "opacity-40 hover:opacity-100"
+                }`}
+            >
+                <MessageSquare className="w-4 h-4" />
+                Topluluk notları
+                {pendingCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[1.25rem] h-5 px-1 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center justify-center">
+                    {pendingCount > 99 ? "99+" : pendingCount}
+                  </span>
+                )}
+            </button>
         </div>
 
-        {activeTab === "users" ? (
+        {activeTab === "users" && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-8">
                 <div>
@@ -375,7 +458,9 @@ export default function AdminDashboardPage() {
                 </table>
             </div>
           </div>
-        ) : (
+        )}
+
+        {activeTab === "histology" && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
               <div>
@@ -583,6 +668,120 @@ export default function AdminDashboardPage() {
                               <Link2 className="w-3.5 h-3.5" />
                               Veritabanına ekle
                             </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "moderation" && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
+              <div>
+                <h1 className="text-4xl font-black tracking-tight leading-tight">
+                  Topluluk <span className="text-primary">onayı</span>
+                </h1>
+                <p className="text-sm font-medium mt-2 opacity-60 max-w-xl">
+                  Yeni paylaşılan notlar önce burada listelenir. Onaylanınca akışta herkese açık olur; reddedilen notlar
+                  yazara özel kalır ve düzenleyerek tekrar gönderebilir.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  fetchPendingNotes();
+                  refreshPendingCount();
+                }}
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl border border-border bg-surface hover:bg-black/5 dark:hover:bg-white/5 transition-all text-sm font-bold"
+              >
+                <RefreshCcw className={`w-4 h-4 ${pendingLoading ? "animate-spin" : ""}`} />
+                Yenile
+              </button>
+            </div>
+
+            <div className="glass rounded-[2rem] border shadow-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-border bg-black/[0.03] dark:bg-white/[0.04] flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-primary opacity-80" />
+                <span className="text-xs font-black uppercase tracking-widest opacity-50">Bekleyen notlar</span>
+                <span className="text-xs font-bold opacity-40">({pendingNotes.length})</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm min-w-[960px]">
+                  <thead>
+                    <tr className="bg-black/5 dark:bg-white/5 border-b border-border">
+                      <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-40">Yazar</th>
+                      <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-40">Başlık / özet</th>
+                      <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-40">Sınıf</th>
+                      <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-40 text-right">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {pendingLoading ? (
+                      <tr>
+                        <td colSpan={4} className="px-8 py-20 text-center opacity-40 font-bold italic">
+                          Yükleniyor…
+                        </td>
+                      </tr>
+                    ) : pendingNotes.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="px-8 py-20 text-center opacity-40 text-sm">
+                          Onay bekleyen not yok.
+                        </td>
+                      </tr>
+                    ) : (
+                      pendingNotes.map((n) => (
+                        <tr key={n.id} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors align-top">
+                          <td className="px-6 py-4 max-w-[200px]">
+                            <p className="font-black text-sm">{n.author_name}</p>
+                            <p className="text-[11px] font-bold opacity-45 break-all">{n.author_email}</p>
+                            <p className="text-[10px] font-bold opacity-35 mt-1">
+                              {new Date(n.created_at).toLocaleString("tr-TR")}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="font-black text-base leading-snug">{n.title}</p>
+                            <p className="text-xs font-medium opacity-70 mt-1 line-clamp-3 whitespace-pre-wrap">
+                              {n.body_preview}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-[10px] font-black uppercase tracking-wide opacity-50">{n.group}</span>
+                            <p className="text-[11px] font-mono opacity-60 mt-0.5">{n.branch_id}</p>
+                            <p className="text-[11px] font-mono opacity-60">{n.topic_id}</p>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="inline-flex flex-wrap justify-end gap-2">
+                              <Link
+                                href={`/topluluk/not/${encodeURIComponent(n.id)}`}
+                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border bg-surface text-xs font-bold hover:border-primary"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                                Görüntüle
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => handleApproveNote(n.id)}
+                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs font-black uppercase tracking-wide hover:opacity-95"
+                              >
+                                <Check className="w-3.5 h-3.5" />
+                                Onayla
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRejectNote(n.id)}
+                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-danger/15 text-danger border border-danger/30 text-xs font-black uppercase tracking-wide hover:bg-danger hover:text-white"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                                Reddet
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))

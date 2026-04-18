@@ -3,7 +3,8 @@ import os
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import func, select
+from datetime import datetime
 from typing import List
 from pydantic import BaseModel
 
@@ -11,7 +12,7 @@ from app.core.database import get_db
 from app.core.security import get_current_user_id
 from app.core.config import settings
 from app.core.tile_files import iter_dzi_relative_paths, remove_dzi_bundle
-from app.models.models import User
+from app.models.models import CommunityNote, User
 from app.schemas.schemas import HistologyImageOut, HistologyImagePatch
 
 router = APIRouter()
@@ -28,6 +29,35 @@ class UserAdminView(BaseModel):
 
 class UpdateLimitRequest(BaseModel):
     daily_limit: int
+
+
+class PendingCommunityNoteOut(BaseModel):
+    id: str
+    title: str
+    excerpt: str
+    body_preview: str
+    group: str
+    branch_id: str
+    topic_id: str
+    author_name: str
+    author_email: str
+    created_at: datetime
+
+
+def _body_preview(body: str, max_len: int = 500) -> str:
+    b = (body or "").strip()
+    if len(b) <= max_len:
+        return b
+    return b[:max_len].rstrip() + "…"
+
+
+def _note_excerpt(body: str) -> str:
+    from app.api.community import EXCERPT_LEN
+
+    b = (body or "").strip()
+    if len(b) <= EXCERPT_LEN:
+        return b
+    return b[:EXCERPT_LEN].rstrip() + "…"
 
 
 class RegisterDziIn(BaseModel):
@@ -323,3 +353,81 @@ async def import_tiff_from_huggingface(
         curriculum_track=body.curriculum_track,
         science_unit=body.science_unit,
     )
+
+
+@router.get("/community-notes/pending-count")
+async def pending_community_notes_count(
+    admin: User = Depends(get_current_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Bekleyen topluluk notu sayısı (sekme rozeti için)."""
+    n = await db.scalar(
+        select(func.count()).select_from(CommunityNote).where(CommunityNote.moderation_status == "pending")
+    )
+    return {"count": int(n or 0)}
+
+
+@router.get("/community-notes/pending", response_model=List[PendingCommunityNoteOut])
+async def list_pending_community_notes(
+    admin: User = Depends(get_current_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Onay bekleyen topluluk notları (eskiden yeniye)."""
+    result = await db.execute(
+        select(CommunityNote, User)
+        .join(User, CommunityNote.user_id == User.id)
+        .where(CommunityNote.moderation_status == "pending")
+        .order_by(CommunityNote.created_at.asc())
+    )
+    rows = result.all()
+    out: List[PendingCommunityNoteOut] = []
+    for note, author in rows:
+        out.append(
+            PendingCommunityNoteOut(
+                id=note.id,
+                title=note.title,
+                excerpt=_note_excerpt(note.body),
+                body_preview=_body_preview(note.body),
+                group=note.tus_group,
+                branch_id=note.branch_id,
+                topic_id=note.topic_id,
+                author_name=author.name,
+                author_email=author.email,
+                created_at=note.created_at,
+            )
+        )
+    return out
+
+
+@router.post("/community-notes/{note_id}/approve", status_code=200)
+async def approve_community_note(
+    note_id: str,
+    admin: User = Depends(get_current_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(CommunityNote).where(CommunityNote.id == note_id))
+    note = result.scalar_one_or_none()
+    if not note:
+        raise HTTPException(status_code=404, detail="Not bulunamadı")
+    if note.moderation_status != "pending":
+        raise HTTPException(status_code=400, detail="Bu not onay beklemiyor.")
+    note.moderation_status = "published"
+    await db.commit()
+    return {"ok": True, "id": note.id}
+
+
+@router.post("/community-notes/{note_id}/reject", status_code=200)
+async def reject_community_note(
+    note_id: str,
+    admin: User = Depends(get_current_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(CommunityNote).where(CommunityNote.id == note_id))
+    note = result.scalar_one_or_none()
+    if not note:
+        raise HTTPException(status_code=404, detail="Not bulunamadı")
+    if note.moderation_status != "pending":
+        raise HTTPException(status_code=400, detail="Bu not onay beklemiyor.")
+    note.moderation_status = "rejected"
+    await db.commit()
+    return {"ok": True, "id": note.id}

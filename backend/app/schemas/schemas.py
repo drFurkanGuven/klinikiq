@@ -362,6 +362,7 @@ class CommunityNoteOut(BaseModel):
     liked_by_me: bool = False
     saved_by_me: bool = False
     is_mine: bool = False
+    moderation_status: Literal["pending", "published", "rejected"] = "published"
     created_at: datetime
     body_truncated: bool = False
     attachments: List["NoteAttachmentOut"] = []

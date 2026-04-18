@@ -153,7 +153,7 @@ export default function PaylasPage() {
       setPendingFiles([]);
       setPublishWarn(
         attachFailed > 0
-          ? `${attachFailed} ek dosya yüklenemedi; not metni yayınlandı. Notu düzenleyerek ekleri tekrar yükleyebilirsin.`
+          ? `${attachFailed} ek dosya yüklenemedi; metin kaydedildi. Ekleri notu düzenleyerek tekrar yükleyebilirsin.`
           : null,
       );
       setDone(true);
@@ -202,7 +202,7 @@ export default function PaylasPage() {
           >
             <CheckCircle2 className="w-14 h-14 mx-auto" style={{ color: "var(--success)" }} />
             <h1 className="text-2xl font-black" style={{ color: "var(--text)" }}>
-              Not yayınlandı
+              Not gönderildi
             </h1>
             {publishWarn && (
               <p
@@ -217,7 +217,8 @@ export default function PaylasPage() {
               </p>
             )}
             <p className="text-sm font-medium opacity-70 leading-relaxed" style={{ color: "var(--text-muted)" }}>
-              Notun topluluk akışında listeleniyor. İstersen aşağıdan yeni bir not daha paylaşabilirsin.
+              Notun yönetici onayından sonra topluluk akışında herkese açık olacak. Onay beklerken notunu düzenleyebilir veya ek dosya
+              yükleyebilirsin. İstersen aşağıdan yeni bir not daha paylaşabilirsin.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
               <Link href="/topluluk" className="btn-premium px-8 py-3 text-xs">
