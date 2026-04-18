@@ -6,7 +6,7 @@ import { casesApi, usersApi, authApi, sessionsApi, questionsApi, type HistoryIte
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
-  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound, RefreshCw, Filter, Users, PenLine, Bookmark
+  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound, RefreshCw, Filter, Users, PenLine, Bookmark, ChevronDown
 } from "lucide-react";
 
 function timeAgo(dateStr: string | undefined): string {
@@ -81,11 +81,23 @@ export default function DashboardPage() {
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [passwordMsg, setPasswordMsg] = useState<"ok" | string | null>(null);
 
+  /** Navbar: sınıflı menü (mobilde taşmayı önlemek için) */
+  const [openNavMenu, setOpenNavMenu] = useState<null | "study" | "community" | "account">(null);
+
   const { theme, toggleTheme, palette, setPalette } = useTheme();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!openNavMenu) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenNavMenu(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openNavMenu]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -329,68 +341,241 @@ export default function DashboardPage() {
             <span className="font-bold text-lg tracking-tight" style={{ color: "var(--text)" }}>KlinikIQ</span>
           </Link>
 
-          <div className="flex items-center gap-1 sm:gap-2">
-            {userProfile?.is_admin && (
-                <Link href="/admin" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
-                  style={{ background: "color-mix(in srgb, var(--error) 10%, transparent)", borderColor: "var(--error)", color: "var(--error)" }}>
-                    <ShieldAlert className="w-3.5 h-3.5" />
-                    <span className="hidden md:inline">Admin</span>
-                </Link>
-            )}
-            <Link href="/histology" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
-              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
-              <Microscope className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
-              <span className="hidden lg:inline">Histoloji</span>
-            </Link>
-            <Link href="/sinir-lezyon" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
-              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
-              <Brain className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
-              <span className="hidden lg:inline">Nöroloji</span>
-            </Link>
-            <Link href="/questions" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
-              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
-              <GraduationCap className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
-              <span className="hidden lg:inline">Sorular</span>
-            </Link>
-            <Link href="/leaderboard" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
-              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
-              <Trophy className="w-3.5 h-3.5" style={{ color: "var(--warning)" }} />
-              <span className="hidden lg:inline">Sıralama</span>
-            </Link>
-            <Link href="/topluluk" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
-              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
-              <Users className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
-              <span className="hidden lg:inline">Notlar</span>
-            </Link>
-            <Link href="/topluluk/kaydedilenler" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
-              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
-              <Bookmark className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
-              <span className="hidden lg:inline">Kaydedilenler</span>
-            </Link>
-            <Link href="/topluluk/paylas" className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
-              style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", borderColor: "var(--primary)", color: "var(--primary)" }}>
-              <PenLine className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden lg:inline">Not paylaş</span>
-            </Link>
+          <div className="flex items-center gap-1 sm:gap-1.5">
             <button
-                onClick={() => { nativeClient.impact(); setShowSettings(true); }}
-                className="flex items-center gap-1.5 transition-all text-[10px] sm:text-sm font-bold px-2 py-1.5 rounded-lg border shadow-sm"
-                style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}
+              type="button"
+              onClick={() => {
+                nativeClient.impact();
+                setOpenNavMenu((m) => (m === "study" ? null : "study"));
+              }}
+              className="flex items-center gap-0.5 sm:gap-1 transition-all text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-2 rounded-xl border shadow-sm"
+              style={{
+                background: openNavMenu === "study" ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--surface-2)",
+                borderColor: openNavMenu === "study" ? "var(--primary)" : "var(--border)",
+                color: "var(--text)",
+              }}
+              aria-expanded={openNavMenu === "study"}
+              aria-haspopup="true"
+              title="Öğren — histoloji, atlas, sorular"
             >
-                <Settings className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
-                <span className="hidden lg:inline">Ayarlar</span>
+              <BookOpen className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--primary)" }} />
+              <span className="max-[360px]:hidden">Öğren</span>
+              <ChevronDown className={`w-3 h-3 shrink-0 opacity-70 transition-transform ${openNavMenu === "study" ? "rotate-180" : ""}`} />
             </button>
             <button
-              onClick={logout}
-              className="flex items-center gap-1 text-[10px] sm:text-sm transition-colors px-2 py-2 rounded-lg hover:bg-slate-500/10"
-              style={{ color: "var(--text-muted)" }}
+              type="button"
+              onClick={() => {
+                nativeClient.impact();
+                setOpenNavMenu((m) => (m === "community" ? null : "community"));
+              }}
+              className="flex items-center gap-0.5 sm:gap-1 transition-all text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-2 rounded-xl border shadow-sm"
+              style={{
+                background: openNavMenu === "community" ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--surface-2)",
+                borderColor: openNavMenu === "community" ? "var(--primary)" : "var(--border)",
+                color: "var(--text)",
+              }}
+              aria-expanded={openNavMenu === "community"}
+              aria-haspopup="true"
+              title="Topluluk — not akışı ve paylaşım"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Çıkış</span>
+              <Users className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--primary)" }} />
+              <span className="max-[360px]:hidden">Topluluk</span>
+              <ChevronDown className={`w-3 h-3 shrink-0 opacity-70 transition-transform ${openNavMenu === "community" ? "rotate-180" : ""}`} />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                nativeClient.impact();
+                setOpenNavMenu((m) => (m === "account" ? null : "account"));
+              }}
+              className="flex items-center gap-0.5 sm:gap-1 transition-all text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-2 rounded-xl border shadow-sm"
+              style={{
+                background: openNavMenu === "account" ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--surface-2)",
+                borderColor: openNavMenu === "account" ? "var(--primary)" : "var(--border)",
+                color: "var(--text)",
+              }}
+              aria-expanded={openNavMenu === "account"}
+              aria-haspopup="true"
+              title="Hesap — ayarlar ve çıkış"
+            >
+              <User className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--primary)" }} />
+              <span className="max-[360px]:hidden">Hesap</span>
+              <ChevronDown className={`w-3 h-3 shrink-0 opacity-70 transition-transform ${openNavMenu === "account" ? "rotate-180" : ""}`} />
             </button>
           </div>
         </div>
       </nav>
+
+      {openNavMenu && (
+        <>
+          <div
+            className="fixed inset-0 top-16 z-[105] bg-black/35 backdrop-blur-[1px]"
+            aria-hidden
+            onClick={() => setOpenNavMenu(null)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={
+              openNavMenu === "study"
+                ? "Öğren menüsü"
+                : openNavMenu === "community"
+                  ? "Topluluk menüsü"
+                  : "Hesap menüsü"
+            }
+            className="fixed left-3 right-3 top-[4.25rem] z-[110] sm:left-auto sm:right-6 sm:w-[min(100vw-3rem,22rem)] rounded-2xl border shadow-2xl max-h-[min(72vh,440px)] overflow-y-auto"
+            style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+          >
+            <div className="p-2 space-y-0.5">
+              {openNavMenu === "study" && (
+                <>
+                  <p className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest opacity-40">Öğren ve pratik</p>
+                  <Link
+                    href="/histology"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <Microscope className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    Histoloji
+                  </Link>
+                  <Link
+                    href="/sinir-lezyon"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <Brain className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    Nöro lezyon atlası
+                  </Link>
+                  <Link
+                    href="/questions"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <GraduationCap className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    Sorular
+                  </Link>
+                  <Link
+                    href="/leaderboard"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <Trophy className="w-4 h-4 shrink-0" style={{ color: "var(--warning)" }} />
+                    Sıralama
+                  </Link>
+                </>
+              )}
+              {openNavMenu === "community" && (
+                <>
+                  <p className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest opacity-40">Topluluk notları</p>
+                  <Link
+                    href="/topluluk"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <Users className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    Not akışı
+                  </Link>
+                  <Link
+                    href="/topluluk/kaydedilenler"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <Bookmark className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    Kaydedilenler
+                  </Link>
+                  <Link
+                    href="/topluluk/paylas"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors"
+                    style={{
+                      background: "color-mix(in srgb, var(--primary) 10%, transparent)",
+                      color: "var(--primary)",
+                    }}
+                  >
+                    <PenLine className="w-4 h-4 shrink-0" />
+                    Not paylaş
+                  </Link>
+                </>
+              )}
+              {openNavMenu === "account" && (
+                <>
+                  <p className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest opacity-40">Hesap</p>
+                  {userProfile?.is_admin && (
+                    <Link
+                      href="/admin"
+                      onClick={() => {
+                        nativeClient.impact();
+                        setOpenNavMenu(null);
+                      }}
+                      className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors"
+                      style={{
+                        background: "color-mix(in srgb, var(--error) 8%, transparent)",
+                        color: "var(--error)",
+                        border: "1px solid color-mix(in srgb, var(--error) 25%, transparent)",
+                      }}
+                    >
+                      <ShieldAlert className="w-4 h-4 shrink-0" />
+                      Yönetim paneli
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                      setShowSettings(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-left transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <Settings className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    Ayarlar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenNavMenu(null);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-left transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    <LogOut className="w-4 h-4 shrink-0" />
+                    Çıkış yap
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       <main className="relative z-0 flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8">
         {/* AI Disclaimer & Limit Banner */}

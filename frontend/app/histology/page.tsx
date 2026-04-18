@@ -23,6 +23,7 @@ import {
   BookOpen,
   Lightbulb,
   GraduationCap,
+  Database,
 } from "lucide-react";
 import HistologyViewer from "@/components/HistologyViewer";
 
