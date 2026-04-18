@@ -176,7 +176,8 @@ class LeaderboardItem(BaseModel):
     total_cases: int
     average_score: float
     total_score: float
-    
+    emergency_correct: int = 0  # acil MCQ'dan toplam doğru cevap sayısı
+
     class Config:
         from_attributes = True
 

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ArrowLeft, LogOut, Zap, ChevronRight, Clock, Stethoscope } from "lucide-react";
+import { ArrowLeft, LogOut, Zap, ChevronRight, Stethoscope } from "lucide-react";
 
 export default function SimulasyonHubPage() {
   const router = useRouter();
@@ -69,22 +69,10 @@ export default function SimulasyonHubPage() {
           <h1 className="text-xl sm:text-2xl font-black tracking-tight mb-3" style={{ color: "var(--text)" }}>
             Acil vaka simülatörü
           </h1>
-          <p className="text-sm font-medium leading-relaxed mb-4" style={{ color: "var(--text-muted)" }}>
-            Bu başlık <strong style={{ color: "var(--text)" }}>farmakolojiden ayrıdır</strong>. Hedef: acil veri seti, süre baskısı, yalnızca acilde yapılabilecek
-            tetkikler ve doğru triyaj / yönlendirme değerlendirmesi. Ana paneldeki klasik AI vaka akışını değiştirmez.
+          <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
+            MedQA acil veri setiyle süre baskısı altında çoktan seçmeli pratik. Her oturum sonunda AI özet raporu üretilir ve raporlar
+            geçmişe kaydedilir. Doğru cevaplar leaderboard puanına katkı sağlar.
           </p>
-          <ul className="text-xs sm:text-sm font-medium space-y-2 mb-0" style={{ color: "var(--text-muted)" }}>
-            <li className="flex items-start gap-2">
-              <Clock className="w-4 h-4 shrink-0 mt-0.5 opacity-60" />
-              <span>
-                Simüle süre: acil MCQ sayfasında <strong style={{ color: "var(--text)" }}>4 dk</strong> geri sayım ve çubuk; tam simülatörde tetkik süreleri eklenecek.
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <Zap className="w-4 h-4 shrink-0 mt-0.5 opacity-60" />
-              <span>Planlanan: ED menüsü (sadece acil uygun tetkikler).</span>
-            </li>
-          </ul>
         </div>
 
         <h2 className="text-xs font-black uppercase tracking-widest mb-4 px-1" style={{ color: "var(--text-muted)" }}>

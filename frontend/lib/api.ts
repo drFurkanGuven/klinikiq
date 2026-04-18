@@ -201,6 +201,8 @@ export interface LeaderboardItem {
   total_cases: number;
   average_score: number;
   total_score: number;
+  /** Acil MCQ raporlarından toplam doğru cevap sayısı */
+  emergency_correct: number;
 }
 
 export interface StudyNoteItem {

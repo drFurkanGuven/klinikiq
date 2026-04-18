@@ -5,7 +5,7 @@ from typing import List
 
 from app.core.database import get_db
 from app.core.security import get_current_user_id
-from app.models.models import User, SimulationSession, Report, Case, SessionStatus
+from app.models.models import EmergencyMcqReport, User, SimulationSession, Report, Case, SessionStatus
 from app.schemas.schemas import LeaderboardItem, StudyNoteItem, UpdateProfile, UserOut
 
 router = APIRouter()
@@ -65,7 +65,18 @@ async def get_leaderboard(db: AsyncSession = Depends(get_db)):
         .subquery()
     )
 
-    # Bulduğumuz bu eşsiz vaka rekorlarını toplayarak skor tablosu oluştururuz
+    # Acil MCQ: kullanıcı başına toplam doğru cevap (tüm raporların correct_count toplamı)
+    emcq_subq = (
+        select(
+            EmergencyMcqReport.user_id,
+            func.sum(EmergencyMcqReport.correct_count).label("emergency_correct"),
+        )
+        .group_by(EmergencyMcqReport.user_id)
+        .subquery()
+    )
+
+    # Bulduğumuz bu eşsiz vaka rekorlarını toplayarak skor tablosu oluştururuz.
+    # emcq_subq tekrarlayan satırlarda çoğalmaması için max(coalesce(...)) kullanılır.
     stmt = (
         select(
             User.id,
@@ -74,9 +85,11 @@ async def get_leaderboard(db: AsyncSession = Depends(get_db)):
             User.year,
             func.count(subq.c.case_id).label("total_cases"),
             func.avg(subq.c.max_score).label("avg_score"),
-            func.sum(subq.c.max_score).label("total_score")
+            func.sum(subq.c.max_score).label("total_score"),
+            func.max(func.coalesce(emcq_subq.c.emergency_correct, 0)).label("emergency_correct"),
         )
         .join(subq, subq.c.user_id == User.id)
+        .outerjoin(emcq_subq, emcq_subq.c.user_id == User.id)
         .group_by(User.id)
         .order_by(desc("total_score"))
         .limit(50)
@@ -94,6 +107,7 @@ async def get_leaderboard(db: AsyncSession = Depends(get_db)):
             total_cases=row.total_cases,
             average_score=float(row.avg_score) if row.avg_score else 0.0,
             total_score=float(row.total_score) if row.total_score else 0.0,
+            emergency_correct=int(row.emergency_correct or 0),
         ))
         
     return leaderboard

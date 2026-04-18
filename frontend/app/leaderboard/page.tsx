@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usersApi, type LeaderboardItem } from "@/lib/api";
 import { isAuthenticated, logout } from "@/lib/auth";
@@ -7,6 +7,10 @@ import Footer from "@/components/Footer";
 import { Stethoscope, LogOut, ArrowLeft, Trophy, Medal, Award, Sparkles, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
+
+function effectiveScore(user: LeaderboardItem) {
+  return user.total_score + (user.emergency_correct ?? 0) * 3;
+}
 
 export default function LeaderboardPage() {
   const router = useRouter();
@@ -39,6 +43,11 @@ export default function LeaderboardPage() {
       setLoading(false);
     }
   }
+
+  const sortedLeaderboard = useMemo(
+    () => [...data].sort((a, b) => effectiveScore(b) - effectiveScore(a)),
+    [data]
+  );
 
   const getRankIcon = (index: number) => {
     switch (index) {
@@ -101,7 +110,8 @@ export default function LeaderboardPage() {
           </div>
           <h1 className="text-5xl sm:text-6xl font-black tracking-tight" style={{ color: "var(--text)" }}>Klinik <span style={{ color: "var(--primary)" }}>Üstadları</span></h1>
           <p className="text-sm sm:text-base font-medium max-w-xl mx-auto leading-relaxed opacity-60" style={{ color: "var(--text-muted)" }}>
-            Sıralama "Toplam Puan" (Vaka × Ortalama Skor) üzerinden gerçek zamanlı hesaplanmaktadır. Zirveye giden yol klinik doğruluktan geçer.
+            Sıralama, vaka raporlarından gelen toplam puana acil MCQ doğrularının katkısı (her doğru +3) eklenerek hesaplanır. Zirveye giden yol klinik
+            doğruluktan geçer.
           </p>
         </div>
 
@@ -121,7 +131,7 @@ export default function LeaderboardPage() {
           </div>
         ) : (
           <div className="space-y-4 relative">
-            {data.map((user, index) => {
+            {sortedLeaderboard.map((user, index) => {
               const isTop3 = index < 3;
               const rankColor = index === 0 ? "var(--warning)" : index === 1 ? "#94a3b8" : index === 2 ? "#b45309" : "var(--text-muted)";
               
@@ -178,6 +188,11 @@ export default function LeaderboardPage() {
                     <div className="text-center sm:text-right">
                       <div className="text-[10px] font-black uppercase tracking-widest mb-1 opacity-40" style={{ color: "var(--text-muted)" }}>Vaka</div>
                       <div className="font-black text-lg" style={{ color: "var(--text)" }}>{user.total_cases}</div>
+                      {(user.emergency_correct ?? 0) > 0 && (
+                        <div className="text-[10px] font-bold mt-1" style={{ color: "var(--text-muted)" }}>
+                          + {user.emergency_correct} acil doğru
+                        </div>
+                      )}
                     </div>
                     <div className="w-px h-8 bg-current opacity-10" />
                     <div className="text-center sm:text-right">
@@ -188,7 +203,7 @@ export default function LeaderboardPage() {
                     <div className="text-right min-w-[100px]">
                       <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: rankColor }}>Toplam Puan</div>
                       <div className={`font-black leading-none ${isTop3 ? "text-4xl" : "text-2xl"}`} style={{ color: isTop3 ? rankColor : "var(--text)" }}>
-                        {Math.round(user.total_score).toLocaleString()}
+                        {Math.round(effectiveScore(user)).toLocaleString()}
                       </div>
                     </div>
                   </div>
