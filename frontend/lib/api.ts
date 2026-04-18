@@ -336,9 +336,14 @@ export interface TurkishMedicineSearchResponse {
 export type TurkishMedicineRecord = Record<string, unknown>;
 
 export const pharmacologyApi = {
-  search: (q: string, page = 1, limit = 25) =>
+  search: (q: string, page = 1, limit = 25, sheet?: string) =>
     api.get<TurkishMedicineSearchResponse>("/pharmacology/search", {
-      params: { q, page, limit },
+      params: {
+        q,
+        page,
+        limit,
+        ...(sheet && sheet.length > 0 ? { sheet } : {}),
+      },
       timeout: 45_000,
     }),
   medicine: (id: number) =>

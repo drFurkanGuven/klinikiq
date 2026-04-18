@@ -65,15 +65,20 @@ async def search_turkey_medicines(
     q: str = Query(..., min_length=2, max_length=200),
     page: int = Query(1, ge=1),
     limit: int = Query(25, ge=1, le=100),
+    sheet: str | None = Query(
+        None,
+        max_length=120,
+        description="Opsiyonel TİTCK sayfa adı (örn. AKTİF ÜRÜNLER LİSTESİ). Boş = tüm sayfalar.",
+    ),
 ):
     """TİTCK listesinde tam metin arama (upstream: GET /api/medicines/search)."""
     q = q.strip()
     if len(q) < 2:
         raise HTTPException(status_code=400, detail="En az 2 karakter girin.")
-    return await _proxy_get(
-        "/api/medicines/search",
-        {"q": q, "page": page, "limit": limit},
-    )
+    params: dict[str, Any] = {"q": q, "page": page, "limit": limit}
+    if sheet and sheet.strip():
+        params["sheet"] = sheet.strip()
+    return await _proxy_get("/api/medicines/search", params)
 
 
 @router.get("/medicine/{medicine_id}")
