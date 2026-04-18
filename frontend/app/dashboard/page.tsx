@@ -6,7 +6,7 @@ import { casesApi, usersApi, authApi, sessionsApi, questionsApi, type HistoryIte
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
-  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound, RefreshCw, Filter, Users, PenLine, Bookmark, ChevronDown
+  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound, RefreshCw, Filter, Users, PenLine, Bookmark, ChevronDown, Pill
 } from "lucide-react";
 
 function timeAgo(dateStr: string | undefined): string {
@@ -465,6 +465,18 @@ export default function DashboardPage() {
                   >
                     <GraduationCap className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
                     Sorular
+                  </Link>
+                  <Link
+                    href="/farmakoloji"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <Pill className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    Farmakoloji
                   </Link>
                   <Link
                     href="/leaderboard"
