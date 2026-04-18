@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Stethoscope, Heart, ExternalLink } from "lucide-react";
+import { Stethoscope, Heart, ExternalLink, BookOpen } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="mt-auto border-t" style={{ borderColor: "var(--border)" }}>
-      <div className="max-w-5xl mx-auto px-6 py-8">
+    <footer className="mt-auto border-t pb-[max(1.5rem,env(safe-area-inset-bottom))]" style={{ borderColor: "var(--border)" }}>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
 
           {/* Logo & Copyright */}
@@ -33,6 +33,14 @@ export default function Footer() {
 
           {/* Links */}
           <div className="flex items-center gap-4 text-xs flex-wrap justify-center" style={{ color: "var(--text-muted)" }}>
+            <Link
+              href="/ogrenme"
+              className="flex items-center gap-1 transition-colors hover:underline"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <BookOpen className="w-3.5 h-3.5 shrink-0 opacity-80" />
+              Vaka özetleri
+            </Link>
             <Link href="/topluluk"
               className="transition-colors hover:underline"
               style={{ color: "var(--text-muted)" }}>

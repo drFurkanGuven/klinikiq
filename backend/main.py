@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.core.paths import community_uploads_abs
 from app.core.database import engine, Base
-from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, community, pharmacology, ilac_atlas, emergency_mcq
+from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, community, drugs, antibiotics, emergency_mcq, learning
 
 
 def _ensure_community_notes_moderation_column(sync_conn) -> None:
@@ -82,9 +82,10 @@ app.include_router(flashcards.router, prefix="/api/flashcards", tags=["Flashcard
 app.include_router(questions.router, prefix="/api/questions", tags=["Questions"])
 app.include_router(microscope.router, prefix="/api/microscope", tags=["Microscope"])
 app.include_router(community.router, prefix="/api/community", tags=["Community"])
-app.include_router(pharmacology.router, prefix="/api/pharmacology", tags=["Pharmacology"])
-app.include_router(ilac_atlas.router, prefix="/api/pharmacology", tags=["Pharmacology"])
+app.include_router(drugs.router, prefix="/api/drugs", tags=["Drugs"])
+app.include_router(antibiotics.router, prefix="/api/antibiotics", tags=["Antibiotics"])
 app.include_router(emergency_mcq.router, prefix="/api/emergency-mcq", tags=["Emergency MCQ"])
+app.include_router(learning.router, prefix="/api/learning", tags=["Learning"])
 
 # Statik dosyalar (tiles ve önizlemeler)
 if not os.path.exists(settings.TILES_DIR):

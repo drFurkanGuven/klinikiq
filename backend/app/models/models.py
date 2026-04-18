@@ -377,3 +377,45 @@ class Annotation(Base):
     label = Column(String, nullable=True)
     note = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), default=now_utc)
+
+
+class Drug(Base):
+    """DrugBank open data (import_drugbank.py) — TİTCK proxy yerine."""
+
+    __tablename__ = "drugs"
+
+    drugbank_id = Column(String, primary_key=True)  # DB00001
+    name = Column(String, nullable=False, index=True)
+    drug_type = Column(String)  # small molecule / biotech
+    groups = Column(String)  # approved, investigational...
+    description = Column(Text)
+    indication = Column(Text)
+    mechanism = Column(Text)
+    pharmacodynamics = Column(Text)
+    toxicity = Column(Text)
+    metabolism = Column(Text)
+    absorption = Column(Text)
+    half_life = Column(Text)
+    protein_binding = Column(Text)
+    route_of_elimination = Column(Text)
+    volume_of_distribution = Column(Text)
+    drug_interactions = Column(Text)  # boşlukla ayrılmış DrugBank ID listesi
+    food_interactions = Column(Text)
+    targets = Column(Text)
+    atc_codes = Column(Text)  # full text: "BLOOD AND BLOOD FORMING..."
+    average_mass = Column(String)
+
+
+class AntibioticSpectrum(Base):
+    """CARD / antibiyotik spektrumu — DrugBank ile soft join (drugbank_id FK değil)."""
+
+    __tablename__ = "antibiotic_spectrum"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    drugbank_id = Column(String, index=True)  # drugs tablosuyla soft join
+    antibiotic_name = Column(String, nullable=False, index=True)
+    organism = Column(String, nullable=False, index=True)
+    resistance_mechanism = Column(Text)
+    aro_accession = Column(String)
+    amr_gene_family = Column(Text)
+    drug_class = Column(String)

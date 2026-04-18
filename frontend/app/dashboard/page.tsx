@@ -431,6 +431,30 @@ export default function DashboardPage() {
                 <>
                   <p className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest opacity-40">Öğren ve pratik</p>
                   <Link
+                    href="/ogrenme"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <Sparkles className="w-4 h-4 shrink-0" style={{ color: "var(--accent)" }} />
+                    Vaka özetleri (havuz)
+                  </Link>
+                  <Link
+                    href="/study-notes"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <PenLine className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    Kişisel özetler
+                  </Link>
+                  <Link
                     href="/histology"
                     onClick={() => {
                       nativeClient.impact();

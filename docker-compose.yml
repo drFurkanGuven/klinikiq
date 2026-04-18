@@ -6,7 +6,6 @@ volumes:
   postgres_data:
   redis_data:
   frontend_next:
-  titck_medicine_data:
 
 x-logging: &default-logging
   driver: "json-file"
@@ -49,32 +48,6 @@ services:
       timeout: 5s
       retries: 5
 
-  titck-medicine-api:
-    build:
-      context: ./docker/titck-medicine-api
-      dockerfile: Dockerfile
-    container_name: klinikiq_titck_medicine_api
-    restart: unless-stopped
-    logging: *default-logging
-    environment:
-      PORT: "3000"
-      DOWNLOAD_PATH: /app/data
-      EXCEL_FILENAME: medicines.xlsx
-    volumes:
-      - titck_medicine_data:/app/data
-    networks:
-      - klinikiq_net
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          'node -e "fetch(\"http://127.0.0.1:3000/health\").then(r=>r.json()).then(j=>process.exit(j.dataLoaded===true?0:1)).catch(()=>process.exit(1))"',
-        ]
-      interval: 20s
-      timeout: 15s
-      retries: 45
-      start_period: 300s
-
   backend:
     build:
       context: ./backend
@@ -86,12 +59,9 @@ services:
       - .env
     environment:
       - BACKEND_CORS_ORIGINS=["https://klinikiq.furkanguven.space", "http://localhost:3000"]
-      # Docker ağı: host port açmadan TİTCK API (port çakışması yok)
-      - TURKISH_MEDICINE_API_URL=http://titck-medicine-api:3000
     volumes:
       # Prod modunda reload'a gerek yok, sadece gerekli veriler mount edilir
       - ./tiles:/tiles
-      # Tıp Atlası SQLite (build_ilac_atlas_db.py çıktısı)
       - ./backend/data:/app/data
     networks:
       - klinikiq_net
@@ -100,9 +70,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      # TİTCK ilk indirme uzun sürebilir; backend beklemesin (farmakoloji hazır olana kadar 503 olabilir)
-      titck-medicine-api:
-        condition: service_started
     command: uvicorn main:app --host 0.0.0.0 --port 8000
 
   frontend:
