@@ -373,21 +373,15 @@ function HistologyPageInner() {
               Görüntüleyici
             </h2>
             {selected ? (
-              <div className="rounded-3xl border border-white/10 bg-slate-900/50 backdrop-blur-sm p-5 md:p-6 shadow-2xl">
-                <div className="mb-5 space-y-2">
-                  <h3 className="text-xl font-bold text-white tracking-tight">{selected.title}</h3>
-                  {selected.description && (
-                    <p className="text-sm text-slate-400 leading-relaxed font-medium">{selected.description}</p>
-                  )}
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {selected.asset_source && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-white/10 text-slate-300">
-                        Kaynak: {selected.asset_source}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <HistologyViewer image={selected} />
+              <div className="rounded-3xl border border-white/10 bg-slate-900/50 p-5 md:p-6 shadow-2xl">
+                <HistologyViewer
+                  image={selected}
+                  title={selected.title}
+                  description={selected.description ?? undefined}
+                  assetSource={selected.asset_source}
+                  allImages={images}
+                  onNavigateToImage={(img) => setSelected(img)}
+                />
               </div>
             ) : (
               <div className="rounded-3xl border border-dashed border-white/15 bg-white/[0.02] p-16 flex flex-col items-center justify-center gap-4 text-slate-500">

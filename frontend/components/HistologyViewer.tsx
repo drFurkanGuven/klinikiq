@@ -2,7 +2,19 @@
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { microscopyApi, AnnotationOut, AnnotationCreate, HistologyImage } from "@/lib/api";
-import { ZoomIn, ZoomOut, Maximize2, StickyNote, X, Trash2, Layers } from "lucide-react";
+import {
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  StickyNote,
+  X,
+  Trash2,
+  Layers,
+  Expand,
+  Minimize2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import "./histology-viewer.css";
 
 declare global {
@@ -19,6 +31,13 @@ interface OSDViewer {
 
 interface Props {
   image: HistologyImage;
+  /** Başlık / açıklama (tam ekranda da aynı üslup) */
+  title?: string;
+  description?: string;
+  assetSource?: string | null;
+  /** Soldaki listedeki tüm preparatlar — verilirse tam ekranda önceki/sonraki */
+  allImages?: HistologyImage[];
+  onNavigateToImage?: (img: HistologyImage) => void;
 }
 
 interface PendingAnnotation {
@@ -69,7 +88,14 @@ function resolveFullImageUrl(url: string): string {
   return `${baseUrl}${encodedPath}`;
 }
 
-export default function HistologyViewer({ image }: Props) {
+export default function HistologyViewer({
+  image,
+  title,
+  description,
+  assetSource,
+  allImages,
+  onNavigateToImage,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const overlayRef   = useRef<HTMLDivElement>(null);
   const viewerRef    = useRef<OSDViewer | null>(null);
@@ -86,6 +112,13 @@ export default function HistologyViewer({ image }: Props) {
   const [error, setError]             = useState<string | null>(null);
   const [annotateColorIdx, setAnnotateColorIdx] = useState(0);
   const [osdReloadKey, setOsdReloadKey] = useState(0);
+  const [immersive, setImmersive] = useState(false);
+
+  const navIndex =
+    allImages && allImages.length > 0 ? allImages.findIndex((i) => i.id === image.id) : -1;
+  const canPrev = navIndex > 0 && onNavigateToImage;
+  const canNext =
+    navIndex >= 0 && allImages && navIndex < allImages.length - 1 && onNavigateToImage;
 
   // Çizim state'i — ref ile sakla, re-render gerektirmiyor
   const drawStart = useRef<{ x: number; y: number } | null>(null);
@@ -96,6 +129,40 @@ export default function HistologyViewer({ image }: Props) {
   useEffect(() => {
     annotateColorIdxRef.current = annotateColorIdx;
   }, [annotateColorIdx]);
+
+  useEffect(() => {
+    if (!immersive) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [immersive]);
+
+  useEffect(() => {
+    if (!immersive) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setImmersive(false);
+        return;
+      }
+      if (e.key === "ArrowLeft" && canPrev && onNavigateToImage && allImages) {
+        e.preventDefault();
+        onNavigateToImage(allImages[navIndex - 1]!);
+      }
+      if (e.key === "ArrowRight" && canNext && onNavigateToImage && allImages) {
+        e.preventDefault();
+        onNavigateToImage(allImages[navIndex + 1]!);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [immersive, canPrev, canNext, navIndex, allImages, onNavigateToImage]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => window.dispatchEvent(new Event("resize")), 200);
+    return () => window.clearTimeout(id);
+  }, [immersive]);
 
   useEffect(() => {
     setLoading(true);
@@ -333,6 +400,13 @@ export default function HistologyViewer({ image }: Props) {
     setAnnotations((prev) => prev.filter((a) => a.id !== id));
   };
 
+  const annotationListClass = immersive
+    ? "rounded-xl border border-white/10 bg-slate-900/60 p-4 shadow-sm shrink-0 max-h-[32vh] overflow-y-auto"
+    : "rounded-xl border border-slate-200 bg-white p-4 shadow-sm";
+
+  const annotationTextClass = immersive ? "text-slate-200" : "text-slate-800";
+  const annotationTitleClass = immersive ? "text-slate-100" : "text-slate-900";
+
   return (
     <>
       <Script
@@ -345,9 +419,80 @@ export default function HistologyViewer({ image }: Props) {
         strategy="afterInteractive"
       />
 
-      <div className="flex flex-col gap-4">
-        {/* Görüntüleyici + overlay — HistAI benzeri cam çerçeve + yüzen kontroller */}
-        <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-[0_24px_80px_-12px_rgba(88,28,135,0.35)] bg-slate-950 select-none">
+      <div
+        className={
+          immersive
+            ? "fixed inset-0 z-[300] flex flex-col bg-slate-950 overflow-hidden p-4 md:p-6 gap-3 md:gap-4"
+            : "flex flex-col gap-4"
+        }
+      >
+        <div
+          className={`flex items-start justify-between gap-3 shrink-0 ${
+            !title && !description && !assetSource ? "justify-end" : ""
+          }`}
+        >
+          {(title || description || assetSource) && (
+            <div className="min-w-0 flex-1 space-y-2">
+              {title && <h3 className="text-xl font-bold text-white tracking-tight">{title}</h3>}
+              {description && (
+                <p className="text-sm text-slate-400 leading-relaxed font-medium">{description}</p>
+              )}
+              {assetSource && (
+                <div className="flex flex-wrap gap-2 pt-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-white/10 text-slate-300">
+                    Kaynak: {assetSource}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setImmersive((v) => !v)}
+            className="shrink-0 flex items-center gap-2 px-3 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-100 transition-colors"
+          >
+            {immersive ? (
+              <>
+                <Minimize2 size={16} className="text-cyan-400 shrink-0" />
+                <span className="hidden sm:inline">Küçült</span>
+              </>
+            ) : (
+              <>
+                <Expand size={16} className="text-violet-400 shrink-0" />
+                <span className="hidden sm:inline">Tam ekran</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        <div className={`relative min-h-0 ${immersive ? "flex flex-1 flex-col" : ""}`}>
+          {immersive && canPrev && (
+            <button
+              type="button"
+              onClick={() => onNavigateToImage!(allImages![navIndex - 1]!)}
+              className="absolute left-0 top-1/2 z-50 -translate-y-1/2 flex h-24 w-10 sm:w-12 items-center justify-center rounded-r-2xl border border-white/10 bg-slate-900/90 text-slate-100 shadow-xl backdrop-blur-sm hover:bg-slate-800"
+              aria-label="Önceki preparat"
+            >
+              <ChevronLeft size={24} />
+            </button>
+          )}
+          {immersive && canNext && (
+            <button
+              type="button"
+              onClick={() => onNavigateToImage!(allImages![navIndex + 1]!)}
+              className="absolute right-0 top-1/2 z-50 -translate-y-1/2 flex h-24 w-10 sm:w-12 items-center justify-center rounded-l-2xl border border-white/10 bg-slate-900/90 text-slate-100 shadow-xl backdrop-blur-sm hover:bg-slate-800"
+              aria-label="Sonraki preparat"
+            >
+              <ChevronRight size={24} />
+            </button>
+          )}
+
+          {/* Görüntüleyici + overlay — HistAI benzeri cam çerçeve + yüzen kontroller */}
+          <div
+            className={`relative rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-[0_24px_80px_-12px_rgba(88,28,135,0.35)] bg-slate-950 select-none ${
+              immersive ? "flex min-h-0 flex-1 flex-col" : ""
+            } ${immersive ? "mx-10 sm:mx-12" : ""}`}
+          >
           <div className="absolute top-0 left-0 right-0 z-30 pointer-events-none flex items-center justify-between px-4 py-3 bg-gradient-to-b from-slate-950/90 to-transparent">
             <div className="pointer-events-none flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-violet-300/90">
               <Layers size={14} className="text-violet-400" />
@@ -379,7 +524,9 @@ export default function HistologyViewer({ image }: Props) {
                 }
               }
             }}
-            className="hist-osd-root w-full h-[min(72vh,640px)] min-h-[360px]"
+            className={`hist-osd-root w-full ${
+              immersive ? "min-h-0 flex-1 h-full" : "h-[min(72vh,640px)] min-h-[360px]"
+            }`}
           />
 
           <div
@@ -500,6 +647,7 @@ export default function HistologyViewer({ image }: Props) {
             </p>
           )}
         </div>
+        </div>
 
         {/* Not formu — kare çizildikten sonra açılır */}
         {pending && (
@@ -558,8 +706,8 @@ export default function HistologyViewer({ image }: Props) {
 
         {/* Annotation listesi */}
         {annotations.length > 0 && (
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p className="text-sm font-semibold mb-3 text-slate-900">
+          <div className={annotationListClass}>
+            <p className={`text-sm font-semibold mb-3 ${annotationTitleClass}`}>
               Notlar ({annotations.length})
             </p>
             <ul className="flex flex-col gap-2">
@@ -568,22 +716,24 @@ export default function HistologyViewer({ image }: Props) {
                 return (
                 <li
                   key={a.id}
-                  className="flex items-start gap-2 text-sm border-b border-slate-100 pb-2 last:border-0 last:pb-0"
+                  className={`flex items-start gap-2 text-sm border-b pb-2 last:border-0 last:pb-0 ${
+                    immersive ? "border-white/10" : "border-slate-100"
+                  }`}
                 >
                   <span
                     className="mt-1.5 w-2.5 h-2.5 rounded-sm flex-shrink-0 ring-1 ring-slate-300/80"
                     style={{ backgroundColor: pal.stroke }}
                   />
-                  <div className="flex-1 text-slate-800">
+                  <div className={`flex-1 ${annotationTextClass}`}>
                     {a.label && (
-                      <span className="font-semibold text-slate-900 mr-1">{a.label}:</span>
+                      <span className={`font-semibold mr-1 ${annotationTitleClass}`}>{a.label}:</span>
                     )}
                     {a.note}
                   </div>
                   <button
                     type="button"
                     onClick={() => deleteAnnotation(a.id)}
-                    className="text-slate-400 hover:text-red-600 flex-shrink-0"
+                    className={`flex-shrink-0 ${immersive ? "text-slate-500 hover:text-red-400" : "text-slate-400 hover:text-red-600"}`}
                   >
                     <Trash2 size={13} />
                   </button>
