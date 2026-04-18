@@ -37,8 +37,8 @@ export async function logout(): Promise<void> {
 
 export function isAuthenticated(): boolean {
   if (typeof window === "undefined") return false;
-  return !!(
-    localStorage.getItem("access_token") ||
-    sessionStorage.getItem("access_token")
-  );
+  // storage.getItem cache'i okur (native'de Preferences'tan init edilir,
+  // web'de localStorage/sessionStorage'dan). waitForInit tamamlandıktan sonra
+  // çağrıldığı sürece doğru sonuç verir.
+  return !!storage.getItem("access_token");
 }
