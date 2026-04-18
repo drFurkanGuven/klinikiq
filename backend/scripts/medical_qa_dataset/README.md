@@ -4,13 +4,28 @@ Bu klasör, **resmi Hugging Face yansıları** üzerinden veriyi indirir, **Klin
 
 ## Hızlı başlangıç
 
+Önce **proje köküne** gidin (burada `backend/` klasörü görünür). Başka bir dizindeyseniz `cd backend/scripts/...` çalışmaz.
+
 ```bash
+# Örnek: proje /opt/klinikip altındaysa
+cd /opt/klinikip
+
+# Doğrulama: bu komut dosyayı göstermeli
+ls backend/scripts/medical_qa_dataset/fetch_normalize_filter.py
+
 cd backend/scripts/medical_qa_dataset
 python3 -m pip install -r requirements.txt
 python3 fetch_normalize_filter.py
 ```
 
-Varsayılan çıktı: `backend/data/medical_qa/`
+Tek satır (mutlak yol, `/opt/klinikip` için):
+
+```bash
+python3 -m pip install -r /opt/klinikip/backend/scripts/medical_qa_dataset/requirements.txt
+python3 /opt/klinikip/backend/scripts/medical_qa_dataset/fetch_normalize_filter.py
+```
+
+Varsayılan çıktı: proje içinde `backend/data/medical_qa/`
 
 ## Çıktı yapısı
 
