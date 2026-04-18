@@ -155,11 +155,19 @@ export default function IlacRehberiPage() {
       setAtlasLoading(false);
     }
 
+    const sheetFromList = typeof rowFromList._sheet === "string" ? rowFromList._sheet : undefined;
     try {
-      const sheetFromList = typeof rowFromList._sheet === "string" ? rowFromList._sheet : undefined;
-      const res = bcFromList
-        ? await pharmacologyApi.medicineByBarcode(bcFromList, sheetFromList)
-        : await pharmacologyApi.medicine(id);
+      let res;
+      if (bcFromList) {
+        res = await pharmacologyApi.medicineByBarcode(bcFromList, sheetFromList);
+      } else if (sheetFromList) {
+        res = await pharmacologyApi.medicineBySheetAndId(sheetFromList, id);
+      } else {
+        setDetailError(
+          "Kayıt güvenli şekilde yüklenemiyor: satırda TİTCK sayfa bilgisi (_sheet) yok. Lütfen aramayı yenileyin veya TİTCK veri kaynağını kontrol edin."
+        );
+        return;
+      }
       setDetail(res.data);
       const keys = sortedDetailKeys(res.data);
       const open: Record<string, boolean> = {};

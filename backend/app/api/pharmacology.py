@@ -8,12 +8,34 @@ Backend: `TURKISH_MEDICINE_API_URL=http://127.0.0.1:3000`
 from __future__ import annotations
 
 import os
+import re
 from typing import Any
 
 import httpx
 from fastapi import APIRouter, HTTPException, Query
 
 router = APIRouter()
+
+# turkish-medicine-api getSheetNameFromSlug ile uyumlu kısa slug'lar
+_TITCK_SHEET_TO_SLUG: dict[str, str] = {
+    "AKTİF ÜRÜNLER LİSTESİ": "active",
+    "PASİF ÜRÜNLER LİSTESİ": "passive",
+    "PASİFE ALINACAK ÜRÜNLER": "to-be-deactivated",
+    "LİSTEYE YENİ EKLENEN ÜRÜNLER": "newly-added",
+    "DEĞİŞİKLİK YAPILAN ÜRÜNLER": "modified",
+}
+
+
+def _sheet_slug_for_upstream(sheet: str) -> str:
+    """Upstream GET /api/sheets/:slug için path parçası (sheet tam adı veya slug)."""
+    s = sheet.strip()
+    if s in _TITCK_SHEET_TO_SLUG:
+        return _TITCK_SHEET_TO_SLUG[s]
+    lower = s.lower()
+    slug = re.sub(r"[^a-z0-9]+", "-", lower).strip("-")
+    if not slug:
+        raise HTTPException(status_code=400, detail="Geçersiz TİTCK sayfa adı.")
+    return slug
 
 
 def _titck_row_barcode_digits(row: dict[str, Any]) -> str | None:
@@ -114,19 +136,6 @@ async def search_turkey_medicines(
     return await _proxy_get("/api/medicines/search", params)
 
 
-@router.get("/medicine/{medicine_id}")
-async def get_turkey_medicine(medicine_id: int):
-    """Tek kayıt (upstream: GET /api/medicines/:id).
-
-    Upstream tüm sayfaları tek dizide birleştirirken her sayfada id 1..n yeniden
-    başladığı için aynı id birden fazla üründe tekrarlanır; id ile yanlış kayıt
-    dönebilir. Mümkünse barkod endpoint'ini kullanın.
-    """
-    if medicine_id < 1:
-        raise HTTPException(status_code=400, detail="Geçersiz kayıt numarası.")
-    return await _proxy_get(f"/api/medicines/{medicine_id}")
-
-
 @router.get("/medicine-by-barcode")
 async def get_turkey_medicine_by_barcode(
     barcode: str = Query(..., min_length=8, max_length=32),
@@ -168,3 +177,35 @@ async def get_turkey_medicine_by_barcode(
             detail="Bu barkod için TİTCK kaydı bulunamadı.",
         )
     return picked
+
+
+@router.get("/medicine-by-sheet-and-id")
+async def get_turkey_medicine_by_sheet_and_id(
+    sheet: str = Query(..., min_length=1, max_length=120, description="Satırdaki _sheet (TİTCK sayfa adı)."),
+    medicine_id: int = Query(..., ge=1, alias="id"),
+):
+    """Barkod yokken tek güvenli yol: sayfa içi id (upstream: GET /api/sheets/:slug?limit=0).
+
+    Birleşik listedeki tekrarlayan id sorunu yoktur; id yalnızca o Excel sayfası içinde benzersizdir.
+    """
+    slug = _sheet_slug_for_upstream(sheet)
+    # Slug yalnızca [a-z0-9-] (bilinen sayfalar + regex); path enjeksiyonu yok
+    path = f"/api/sheets/{slug}"
+    body = await _proxy_get(path, {"limit": 0})
+    rows = body.get("data")
+    if not isinstance(rows, list):
+        raise HTTPException(status_code=502, detail="TİTCK sayfa yanıtı geçersiz.")
+    for r in rows:
+        if not isinstance(r, dict):
+            continue
+        rid = r.get("id")
+        try:
+            rid_int = int(rid)  # type: ignore[arg-type]
+        except (TypeError, ValueError):
+            continue
+        if rid_int == medicine_id:
+            return r
+    raise HTTPException(
+        status_code=404,
+        detail="Bu sayfada bu numaralı kayıt bulunamadı.",
+    )
