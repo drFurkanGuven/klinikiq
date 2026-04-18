@@ -757,7 +757,7 @@ export default function AdminDashboardPage() {
                           <td className="px-6 py-4 text-right">
                             <div className="inline-flex flex-wrap justify-end gap-2">
                               <Link
-                                href={`/topluluk/not/${encodeURIComponent(n.id)}`}
+                                href={`/topluluk/not?id=${encodeURIComponent(n.id)}`}
                                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border bg-surface text-xs font-bold hover:border-primary"
                                 target="_blank"
                                 rel="noopener noreferrer"

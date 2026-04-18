@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { communityApi, type CommunityNoteDetail } from "@/lib/api";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -13,9 +13,9 @@ import { isAuthenticated } from "@/lib/auth";
 import { storage } from "@/lib/storage";
 
 export default function ToplulukNotDetayPage() {
-  const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const id = typeof params?.id === "string" ? params.id : "";
+  const id = searchParams.get("id")?.trim() ?? "";
   const [detail, setDetail] = useState<CommunityNoteDetail | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,7 +30,8 @@ export default function ToplulukNotDetayPage() {
     (async () => {
       await storage.waitForInit();
       if (!isAuthenticated()) {
-        router.replace(`/login?next=${encodeURIComponent(`/topluluk/not/${id}`)}`);
+        const next = `/topluluk/not?id=${encodeURIComponent(id)}`;
+        router.replace(`/login?next=${encodeURIComponent(next)}`);
         return;
       }
       setLoading(true);
