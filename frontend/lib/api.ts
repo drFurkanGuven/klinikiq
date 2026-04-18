@@ -367,6 +367,15 @@ export const pharmacologyApi = {
     api.get<TurkishMedicineRecord>(`/pharmacology/medicine/${id}`, {
       timeout: 45_000,
     }),
+  /** TİTCK birleşik listede tekrarlayan id hatasını önlemek için öncelikli. */
+  medicineByBarcode: (barcode: string, sheet?: string) =>
+    api.get<TurkishMedicineRecord>("/pharmacology/medicine-by-barcode", {
+      params: {
+        barcode,
+        ...(sheet && sheet.length > 0 ? { sheet } : {}),
+      },
+      timeout: 45_000,
+    }),
   atlasByBarcode: (barcode: string) =>
     api.get<IlacAtlasResponse>(`/pharmacology/atlas/barcode/${encodeURIComponent(barcode)}`, {
       timeout: 60_000,

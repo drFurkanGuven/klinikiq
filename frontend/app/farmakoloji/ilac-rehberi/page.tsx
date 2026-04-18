@@ -156,7 +156,10 @@ export default function IlacRehberiPage() {
     }
 
     try {
-      const res = await pharmacologyApi.medicine(id);
+      const sheetFromList = typeof rowFromList._sheet === "string" ? rowFromList._sheet : undefined;
+      const res = bcFromList
+        ? await pharmacologyApi.medicineByBarcode(bcFromList, sheetFromList)
+        : await pharmacologyApi.medicine(id);
       setDetail(res.data);
       const keys = sortedDetailKeys(res.data);
       const open: Record<string, boolean> = {};
