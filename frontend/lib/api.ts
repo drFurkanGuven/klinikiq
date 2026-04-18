@@ -52,8 +52,7 @@ api.interceptors.response.use(
         original.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(original);
       } catch {
-        await storage.removeItem("access_token");
-        await storage.removeItem("refresh_token");
+        await storage.clearAuthTokens();
         window.location.href = "/login";
       }
     }

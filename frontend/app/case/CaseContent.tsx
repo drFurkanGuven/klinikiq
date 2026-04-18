@@ -550,6 +550,18 @@ export default function CasePageContent() {
   }, [sessionId, mounted]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
+  useEffect(() => {
+    if (!sessionId || !mounted || loading) return;
+    if (typeof window === "undefined") return;
+    sessionStorage.setItem(`budget_${sessionId}`, String(budget));
+  }, [budget, sessionId, mounted, loading]);
+
+  useEffect(() => {
+    if (!sessionId || !mounted || loading) return;
+    if (typeof window === "undefined") return;
+    sessionStorage.setItem(`labs_${sessionId}`, JSON.stringify(selectedLabs));
+  }, [selectedLabs, sessionId, mounted, loading]);
+
   async function loadSession() {
     try {
       const res = await sessionsApi.getSession(sessionId);
@@ -559,7 +571,27 @@ export default function CasePageContent() {
       }
       const difficulty = res.data.case?.difficulty || "medium";
       const tier = DIFFICULTY_MAP[difficulty] ? difficulty : "medium";
-      setBudget(DIFFICULTY_MAP[tier].initialBudget);
+      const initialBudget = DIFFICULTY_MAP[tier].initialBudget;
+      let restoredBudget = initialBudget;
+      if (typeof window !== "undefined") {
+        const savedBudget = sessionStorage.getItem(`budget_${sessionId}`);
+        if (savedBudget !== null && savedBudget !== "") {
+          const parsed = parseInt(savedBudget, 10);
+          restoredBudget = isNaN(parsed) ? initialBudget : Math.min(parsed, initialBudget);
+        }
+      }
+      setBudget(restoredBudget);
+      if (typeof window !== "undefined") {
+        const savedLabs = sessionStorage.getItem(`labs_${sessionId}`);
+        if (savedLabs) {
+          try {
+            const parsed = JSON.parse(savedLabs);
+            if (Array.isArray(parsed)) setSelectedLabs(parsed);
+          } catch {
+            /* ignore */
+          }
+        }
+      }
     } catch { setError("Oturum yüklenemedi."); }
     finally { setLoading(false); }
   }
@@ -656,12 +688,24 @@ export default function CasePageContent() {
     if (!diagnosisSaved) { setError("Önce en az bir tanı girmelisiniz."); return; }
     nativeClient.impact();
     setCompleting(true); setError("");
-    try { await sessionsApi.complete(sessionId); router.push(`/report?id=${sessionId}`); }
+    try {
+      await sessionsApi.complete(sessionId);
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem(`budget_${sessionId}`);
+        sessionStorage.removeItem(`labs_${sessionId}`);
+      }
+      router.push(`/report?id=${sessionId}`);
+    }
     catch { setError("Vaka tamamlanamadı."); setCompleting(false); }
   }
 
   if (!mounted) return null;
   const patient = sessionData?.case?.patient;
+  const speakerName =
+    sessionData?.character_name ??
+    sessionData?.consultant_name ??
+    patient?.name ??
+    "Hasta";
   const caseInfo = sessionData?.case;
   const diff = DIFFICULTY_MAP[caseInfo?.difficulty] ?? DIFFICULTY_MAP.medium;
 
@@ -759,7 +803,7 @@ export default function CasePageContent() {
             {messages.map((msg, i) => (
               <div key={i} className={`flex w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed transition-all shadow-sm ${msg.role === "user" ? "rounded-tr-sm bg-primary-light text-primary" : "rounded-tl-sm border bg-surface text-text border-border"}`}>
-                  <div className="flex items-center gap-2 mb-1 opacity-50 text-[10px] font-bold uppercase tracking-wider">{msg.role === "user" ? "Siz" : "KlinikIQ AI"}</div>
+                  <div className="flex items-center gap-2 mb-1 opacity-50 text-[10px] font-bold uppercase tracking-wider">{msg.role === "user" ? "Siz" : speakerName}</div>
                   {msg.role === "assistant" ? <RenderMessage content={msg.content} /> : msg.content}
                   {msg.isError && (
                     <button

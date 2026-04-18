@@ -61,7 +61,7 @@ export default function LoginPage() {
     if (creds) {
         setLoading(true);
         try {
-            await login(creds.email, creds.password);
+            await login(creds.email, creds.password, { rememberMe: true });
             router.push(postLoginPath());
         } catch {
             setError("Biyometrik giriş başarısız, lütfen şifrenizi girin.");
@@ -77,7 +77,7 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      await login(form.email, form.password);
+      await login(form.email, form.password, { rememberMe });
       // Beni hatırla
       if (rememberMe) {
         localStorage.setItem("remembered_email", form.email);

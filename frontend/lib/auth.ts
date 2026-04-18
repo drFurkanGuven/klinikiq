@@ -9,10 +9,14 @@ export interface AuthUser {
   year?: number;
 }
 
-export async function login(email: string, password: string): Promise<void> {
+export async function login(
+  email: string,
+  password: string,
+  options?: { rememberMe?: boolean }
+): Promise<void> {
   const res = await api.post("/auth/login", { email, password });
-  await storage.setItem("access_token", res.data.access_token);
-  await storage.setItem("refresh_token", res.data.refresh_token);
+  const persistent = options?.rememberMe ?? true;
+  await storage.setAuthTokens(res.data.access_token, res.data.refresh_token, persistent);
 }
 
 export async function register(data: {
@@ -23,17 +27,18 @@ export async function register(data: {
   year?: number;
 }): Promise<void> {
   const res = await api.post("/auth/register", data);
-  await storage.setItem("access_token", res.data.access_token);
-  await storage.setItem("refresh_token", res.data.refresh_token);
+  await storage.setAuthTokens(res.data.access_token, res.data.refresh_token, true);
 }
 
 export async function logout(): Promise<void> {
-  await storage.removeItem("access_token");
-  await storage.removeItem("refresh_token");
+  await storage.clearAuthTokens();
   window.location.href = "/login";
 }
 
 export function isAuthenticated(): boolean {
   if (typeof window === "undefined") return false;
-  return !!storage.getItem("access_token");
+  return !!(
+    localStorage.getItem("access_token") ||
+    sessionStorage.getItem("access_token")
+  );
 }
