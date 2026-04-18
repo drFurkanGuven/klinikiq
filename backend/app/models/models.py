@@ -69,6 +69,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), default=now_utc)
 
     sessions = relationship("SimulationSession", back_populates="user")
+    emergency_mcq_reports = relationship("EmergencyMcqReport", back_populates="user")
     community_notes = relationship("CommunityNote", back_populates="user")
     community_note_attachments = relationship(
         "CommunityNoteAttachment", back_populates="user"
@@ -149,6 +150,22 @@ class Report(Base):
     created_at = Column(DateTime(timezone=True), default=now_utc)
 
     session = relationship("SimulationSession", back_populates="report")
+
+
+class EmergencyMcqReport(Base):
+    """Acil MCQ çok soruluk oturum özeti (klasik vaka Report kaydından ayrı tablo)."""
+
+    __tablename__ = "emergency_mcq_reports"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    score = Column(Float, nullable=False)
+    correct_count = Column(Integer, nullable=False)
+    total_count = Column(Integer, nullable=False)
+    detail = Column(JSONB, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=now_utc, index=True)
+
+    user = relationship("User", back_populates="emergency_mcq_reports")
 
 
 class TetkikResult(Base):

@@ -27,6 +27,15 @@ python3 /opt/klinikiq/backend/scripts/medical_qa_dataset/fetch_normalize_filter.
 
 Varsayılan çıktı: proje içinde `backend/data/medical_qa/`
 
+## Uygulama entegrasyonu
+
+Backend, çoktan seçmeli acil soruları **`unified_emergency.jsonl`** içinden okur (varsayılan yol: `backend/data/medical_qa/emergency/unified_emergency.jsonl`). Farklı bir yol için ortam değişkeni:
+
+`MEDICAL_QA_EMERGENCY_JSONL=/tam/yol/unified_emergency.jsonl`
+
+API: `GET /api/emergency-mcq/stats`, `GET /api/emergency-mcq/random`, `POST /api/emergency-mcq/verify`  
+Frontend: **Simülasyon → Acil** (`/simulasyon` → `/simulasyon/acil`). Eski URL `/farmakoloji/acil-mcq` → `/simulasyon/acil` yönlendirir.
+
 ## Çıktı yapısı
 
 | Dosya / klasör | Açıklama |

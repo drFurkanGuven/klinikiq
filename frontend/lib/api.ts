@@ -384,6 +384,79 @@ export const pharmacologyApi = {
     }),
 };
 
+/** MedQA acil alt kümesi — backend unified_emergency.jsonl */
+export interface EmergencyMcqStats {
+  path: string;
+  mcq_count: number;
+  total_jsonl_lines: number;
+  /** Backend OPENAI_API_KEY geçerli mi (AI asistan için) */
+  openai_configured?: boolean;
+}
+
+export interface EmergencyMcqRandom {
+  id: string;
+  question: string;
+  options: { label: string; text: string }[];
+  source: string;
+  emergency_score: number | null;
+}
+
+export interface EmergencyMcqVerifyResult {
+  correct: boolean;
+  correct_label: string | null;
+  correct_answer_text: string | null;
+}
+
+export interface EmergencyMcqReportCreateItem {
+  question_id: string;
+  question_preview: string;
+  correct: boolean;
+  elapsed_sec?: number | null;
+  selected_label?: string | null;
+}
+
+export interface EmergencyMcqReportCreateBody {
+  items: EmergencyMcqReportCreateItem[];
+  ai_messages: { role: "user" | "assistant"; content: string }[];
+  patient_urges: string[];
+}
+
+export interface EmergencyMcqReportOut {
+  id: string;
+  score: number;
+  correct_count: number;
+  total_count: number;
+  strengths: string[];
+  gaps: string[];
+  recommendations: string[];
+  overview_note: string | null;
+  tus_reference: string | null;
+  time_management_note: string | null;
+  ai_chat_note: string | null;
+  patient_urge_note: string | null;
+  created_at: string;
+}
+
+export interface EmergencyMcqReportListItem {
+  id: string;
+  score: number;
+  correct_count: number;
+  total_count: number;
+  created_at: string;
+}
+
+export const emergencyMcqApi = {
+  stats: () => api.get<EmergencyMcqStats>("/emergency-mcq/stats"),
+  random: () => api.get<EmergencyMcqRandom>("/emergency-mcq/random"),
+  verify: (id: string, selected_label: string) =>
+    api.post<EmergencyMcqVerifyResult>("/emergency-mcq/verify", { id, selected_label }),
+  createReport: (body: EmergencyMcqReportCreateBody) =>
+    api.post<EmergencyMcqReportOut>("/emergency-mcq/reports", body, { timeout: 120_000 }),
+  listReports: (limit = 30) =>
+    api.get<EmergencyMcqReportListItem[]>("/emergency-mcq/reports", { params: { limit } }),
+  getReport: (id: string) => api.get<EmergencyMcqReportOut>(`/emergency-mcq/reports/${encodeURIComponent(id)}`),
+};
+
 export const usersApi = {
   history: () => api.get<HistoryItem[]>("/users/me/history"),
   getLeaderboard: () => api.get<LeaderboardItem[]>("/users/leaderboard"),
