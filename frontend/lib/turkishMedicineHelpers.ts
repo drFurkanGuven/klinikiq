@@ -16,6 +16,17 @@ export type IlacRehberiRecent = { q: string; sheet: string; at: number };
 
 const MAX_RECENT = 10;
 
+/** TİTCK satırından barkod (Tıp Atlası ile eşleştirmek için). */
+export function titckBarcode(row: Record<string, unknown>): string | null {
+  const raw = row["Barkod"] ?? row["barkod"];
+  if (typeof raw === "number" && Number.isFinite(raw)) return String(Math.trunc(raw));
+  if (typeof raw === "string") {
+    const d = raw.replace(/\D/g, "");
+    return d.length >= 8 ? d : null;
+  }
+  return null;
+}
+
 export function turkishDrugTitle(row: Record<string, unknown>): string {
   const keys = ["İlaç Adı", "Ürün Adı", "Etken Madde"];
   for (const k of keys) {

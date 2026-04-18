@@ -91,6 +91,8 @@ services:
     volumes:
       # Prod modunda reload'a gerek yok, sadece gerekli veriler mount edilir
       - ./tiles:/tiles
+      # Tıp Atlası SQLite (build_ilac_atlas_db.py çıktısı)
+      - ./backend/data:/app/data
     networks:
       - klinikiq_net
     depends_on:

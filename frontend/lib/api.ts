@@ -335,6 +335,23 @@ export interface TurkishMedicineSearchResponse {
 
 export type TurkishMedicineRecord = Record<string, unknown>;
 
+/** Tıp Atlası ilaclardb — backend SQLite (build_ilac_atlas_db.py) */
+export interface IlacAtlasResponse {
+  id: number | null;
+  barcode: string;
+  atc_code: string | null;
+  active_ingredient: string | null;
+  product_name: string | null;
+  category_1: string | null;
+  category_2: string | null;
+  category_3: string | null;
+  category_4: string | null;
+  category_5: string | null;
+  description: string | null;
+  source: string;
+  disclaimer: string;
+}
+
 export const pharmacologyApi = {
   search: (q: string, page = 1, limit = 25, sheet?: string) =>
     api.get<TurkishMedicineSearchResponse>("/pharmacology/search", {
@@ -349,6 +366,10 @@ export const pharmacologyApi = {
   medicine: (id: number) =>
     api.get<TurkishMedicineRecord>(`/pharmacology/medicine/${id}`, {
       timeout: 45_000,
+    }),
+  atlasByBarcode: (barcode: string) =>
+    api.get<IlacAtlasResponse>(`/pharmacology/atlas/barcode/${encodeURIComponent(barcode)}`, {
+      timeout: 60_000,
     }),
 };
 

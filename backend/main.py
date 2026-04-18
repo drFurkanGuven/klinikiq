@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.core.paths import community_uploads_abs
 from app.core.database import engine, Base
-from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, community, pharmacology
+from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, community, pharmacology, ilac_atlas
 
 
 def _ensure_community_notes_moderation_column(sync_conn) -> None:
@@ -83,6 +83,7 @@ app.include_router(questions.router, prefix="/api/questions", tags=["Questions"]
 app.include_router(microscope.router, prefix="/api/microscope", tags=["Microscope"])
 app.include_router(community.router, prefix="/api/community", tags=["Community"])
 app.include_router(pharmacology.router, prefix="/api/pharmacology", tags=["Pharmacology"])
+app.include_router(ilac_atlas.router, prefix="/api/pharmacology", tags=["Pharmacology"])
 
 # Statik dosyalar (tiles ve önizlemeler)
 if not os.path.exists(settings.TILES_DIR):

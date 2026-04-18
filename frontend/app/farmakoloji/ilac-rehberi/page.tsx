@@ -6,10 +6,11 @@ import Link from "next/link";
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { pharmacologyApi, type TurkishMedicineRecord } from "@/lib/api";
+import { pharmacologyApi, type TurkishMedicineRecord, type IlacAtlasResponse } from "@/lib/api";
 import {
   TITCK_SHEET_FILTERS,
   turkishDrugTitle,
+  titckBarcode,
   formatCell,
   sortedDetailKeys,
   unionKeys,
@@ -58,6 +59,9 @@ export default function IlacRehberiPage() {
   const [detailError, setDetailError] = useState<string | null>(null);
   const [detail, setDetail] = useState<TurkishMedicineRecord | null>(null);
   const [openFields, setOpenFields] = useState<Record<string, boolean>>({});
+  const [atlas, setAtlas] = useState<IlacAtlasResponse | null>(null);
+  const [atlasLoading, setAtlasLoading] = useState(false);
+  const [atlasNotice, setAtlasNotice] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -101,6 +105,47 @@ export default function IlacRehberiPage() {
       cancelled = true;
     };
   }, [compareIds]);
+
+  useEffect(() => {
+    if (!detail) {
+      setAtlas(null);
+      setAtlasNotice(null);
+      return;
+    }
+    const bc = titckBarcode(detail);
+    if (!bc) {
+      setAtlas(null);
+      setAtlasNotice(null);
+      return;
+    }
+    let cancelled = false;
+    setAtlasLoading(true);
+    setAtlasNotice(null);
+    setAtlas(null);
+    pharmacologyApi
+      .atlasByBarcode(bc)
+      .then((res) => {
+        if (!cancelled) setAtlas(res.data);
+      })
+      .catch((err: unknown) => {
+        const ax = err as { response?: { status?: number; data?: { detail?: string } } };
+        const status = ax.response?.status;
+        const msg = ax.response?.data?.detail;
+        if (status === 404) {
+          if (!cancelled) setAtlasNotice("Bu barkod için Tıp Atlası metni yok.");
+        } else if (status === 503) {
+          if (!cancelled) setAtlasNotice(typeof msg === "string" ? msg : "Atlas veritabanı yapılandırılmamış.");
+        } else if (!cancelled) {
+          setAtlasNotice(typeof msg === "string" ? msg : "Kullanma metni alınamadı.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setAtlasLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [detail]);
 
   function toggleCompare(id: number) {
     setCompareIds((prev) => {
@@ -499,9 +544,36 @@ export default function IlacRehberiPage() {
 
           {detail && !detailLoading && (
             <div className="space-y-4 mt-4 border-t pt-6" style={{ borderColor: "var(--border)" }}>
+              {atlasLoading && (
+                <div className="flex items-center gap-2 text-sm font-medium opacity-70">
+                  <Loader2 className="w-4 h-4 animate-spin" style={{ color: "var(--primary)" }} />
+                  Kullanma talimatı (Tıp Atlası) aranıyor…
+                </div>
+              )}
+              {atlasNotice && !atlasLoading && (
+                <p className="text-xs font-medium rounded-xl border px-3 py-2" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+                  {atlasNotice}
+                </p>
+              )}
+              {atlas?.description && !atlasLoading && (
+                <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)", background: "var(--bg)" }}>
+                  <div className="px-4 py-3 border-b font-black text-sm" style={{ borderColor: "var(--border)", color: "var(--text)" }}>
+                    Kullanma talimatı (Tıp Atlası veri seti)
+                  </div>
+                  <p className="text-[10px] px-4 pt-3 font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                    {atlas.disclaimer}
+                  </p>
+                  <div
+                    className="p-4 text-xs sm:text-sm font-medium leading-relaxed whitespace-pre-wrap break-words max-h-[min(70vh,560px)] overflow-y-auto"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    {atlas.description}
+                  </div>
+                </div>
+              )}
               <h3 className="text-sm font-black flex items-center gap-2" style={{ color: "var(--text)" }}>
                 <Pill className="w-4 h-4" style={{ color: "var(--primary)" }} />
-                Seçilen kayıt
+                Seçilen kayıt (TİTCK alanları)
               </h3>
               <div className="space-y-2">
                 {sortedDetailKeys(detail).map((key) => {

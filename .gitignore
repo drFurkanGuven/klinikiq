@@ -36,5 +36,9 @@ frontend/capacitor.config.ts
 *.sql
 !backend/scripts/*.sql
 *.jsonl
+# Tıp Atlası: ham export çok büyük; DB oluşturup backend/data kullanın (JSON veya SQL aynı tablo)
+ilac.json
+ilac.sql
+backend/data/ilac_atlas.db
 postgres_data/
 redis_data/
