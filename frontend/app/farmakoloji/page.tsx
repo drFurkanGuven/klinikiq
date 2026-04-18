@@ -133,7 +133,7 @@ export default function FarmakolojiPage() {
               </h1>
               <p className="text-sm sm:text-base font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
                 Konu özeti ve müfredat çerçevesi aşağıda. Türkiye ilaç listesi (TİTCK) için ayrı rehbere geçin — arama, liste
-                filtresi, son arananlar ve iki ürün karşılaştırma orada.
+                filtresi, son arananlar ve ilaç adına tıklayınca prospektüs orada.
               </p>
               <div
                 className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl border"
@@ -169,7 +169,7 @@ export default function FarmakolojiPage() {
               İlaç rehberi
             </h3>
             <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
-              TİTCK kaynaklı arama, sayfa filtresi (aktif/pasif vb.), son arananlar ve yan yana karşılaştırma.
+              TİTCK araması, liste filtresi, son arananlar; seçilen ilaçta prospektüs (Tıp Atlası) ve liste alanları.
             </p>
           </div>
           <ChevronRight className="w-6 h-6 shrink-0 opacity-40 group-hover:opacity-100 transition" style={{ color: "var(--primary)" }} />
