@@ -386,11 +386,32 @@ export const drugsApi = {
 export interface AntibioticByDrug {
   antibiotic_name: string;
   organisms: {
-    organism: string;
+    antibiotic_name?: string | null;
+    organism: string | null;
     resistance_mechanism: string | null;
     aro_accession: string | null;
     amr_gene_family: string | null;
     drug_class: string | null;
+    description: string | null;
+  }[];
+}
+
+export interface AntibioticByDrugClass {
+  drug_class: string;
+  total: number;
+  resistance_mechanisms: {
+    resistance_mechanism: string;
+    count: number;
+    gene_families: string[];
+    entries: {
+      antibiotic_name: string;
+      organism: string | null;
+      resistance_mechanism: string | null;
+      aro_accession: string | null;
+      amr_gene_family: string | null;
+      drug_class: string | null;
+      description: string | null;
+    }[];
   }[];
 }
 
@@ -416,6 +437,11 @@ export const antibioticsApi = {
   organisms: () => api.get<{ organisms: string[] }>("/antibiotics/organisms"),
 
   drugClasses: () => api.get<{ classes: string[] }>("/antibiotics/drug-classes"),
+
+  byDrugClass: (drug_class: string) =>
+    api.get<AntibioticByDrugClass>("/antibiotics/by-drug-class", {
+      params: { drug_class },
+    }),
 };
 
 /** MedQA acil alt kümesi — backend unified_emergency.jsonl */

@@ -414,8 +414,9 @@ class AntibioticSpectrum(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     drugbank_id = Column(String, index=True)  # drugs tablosuyla soft join
     antibiotic_name = Column(String, nullable=False, index=True)
-    organism = Column(String, nullable=False, index=True)
+    organism = Column(String, nullable=True, index=True)  # CARD Short Name öneki; yoksa None
     resistance_mechanism = Column(Text)
     aro_accession = Column(String)
     amr_gene_family = Column(Text)
     drug_class = Column(String)
+    description = Column(Text)  # ARO ontoloji açıklaması (aro.tsv)

@@ -54,11 +54,36 @@ class ByAtcResponse(BaseModel):
 
 
 class AntibioticOrganismRow(BaseModel):
-    organism: str
+    antibiotic_name: str | None = None
+    organism: str | None = None
     resistance_mechanism: str | None = None
     aro_accession: str | None = None
     amr_gene_family: str | None = None
     drug_class: str | None = None
+    description: str | None = None
+
+
+class AntibioticOrganismItem(BaseModel):
+    antibiotic_name: str
+    organism: str | None = None
+    resistance_mechanism: str | None = None
+    aro_accession: str | None = None
+    amr_gene_family: str | None = None
+    drug_class: str | None = None
+    description: str | None = None
+
+
+class ResistanceMechanismGroupOut(BaseModel):
+    resistance_mechanism: str
+    count: int
+    gene_families: list[str]
+    entries: list[AntibioticOrganismItem]
+
+
+class ByDrugClassResponse(BaseModel):
+    drug_class: str
+    total: int
+    resistance_mechanisms: list[ResistanceMechanismGroupOut]
 
 
 class ByDrugAntibioticResponse(BaseModel):

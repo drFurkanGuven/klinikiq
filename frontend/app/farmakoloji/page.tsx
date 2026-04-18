@@ -245,25 +245,24 @@ export default function FarmakolojiPage() {
             </Link>
           </li>
           <li>
-            <div
-              className="rounded-2xl border p-5 h-full cursor-not-allowed relative opacity-60"
+            <Link
+              href="/farmakoloji/antibiyotikler"
+              className="flex items-start gap-3 rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg h-full group"
               style={{ background: "var(--surface)", borderColor: "var(--border)" }}
             >
-              <span className="absolute top-3 right-3 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
-                Yakında
-              </span>
-              <div className="flex items-start gap-3">
-                <Shield className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--primary)" }} />
-                <div className="space-y-2 min-w-0">
+              <Shield className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--primary)" }} />
+              <div className="space-y-2 min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
                   <h3 className="font-black text-base leading-snug" style={{ color: "var(--text)" }}>
                     Antibiyotik Rehberi
                   </h3>
-                  <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                    CARD verisiyle organizma → antibiyotik spektrumu ve direnç.
-                  </p>
+                  <ChevronRight className="w-5 h-5 shrink-0 opacity-40 group-hover:opacity-100" style={{ color: "var(--primary)" }} />
                 </div>
+                <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                  CARD verisiyle organizma → antibiyotik spektrumu ve direnç.
+                </p>
               </div>
-            </div>
+            </Link>
           </li>
         </ul>
 

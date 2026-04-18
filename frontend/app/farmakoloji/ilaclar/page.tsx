@@ -112,6 +112,18 @@ function IlaclarPageContent() {
     }
   }, [mounted, drugParam]);
 
+  const qParam = searchParams.get("q");
+  useEffect(() => {
+    if (!mounted) return;
+    if (qParam?.trim()) {
+      skipNextPageReset.current = true;
+      const t = qParam.trim();
+      setQuery(t);
+      setDebouncedQuery(t);
+      setPage(1);
+    }
+  }, [mounted, qParam]);
+
   useEffect(() => {
     const t = setTimeout(() => {
       const d = query.trim();
