@@ -33,6 +33,7 @@ frontend/ios/
 frontend/capacitor.config.ts
 
 # SQL & Data
+drugbank_clean.csv
 *.sql
 !backend/scripts/*.sql
 *.jsonl
