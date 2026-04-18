@@ -322,44 +322,28 @@ export const communityApi = {
     api.delete<void>(`/community/notes/${noteId}/attachments/${attachmentId}`),
 };
 
-/** RxNorm (NLM) + openFDA — ABD etiketi, İngilizce */
-export interface PharmacologySearchItem {
-  rxcui: string;
-  name: string;
-  tty?: string | null;
-}
-
-export interface PharmacologySearchResponse {
+/** TİTCK ilaç listesi — backend, turkish-medicine-api’ye proxy eder */
+export interface TurkishMedicineSearchResponse {
   query: string;
-  results: PharmacologySearchItem[];
-  source: string;
+  sheet?: string;
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  data: Record<string, unknown>[];
 }
 
-export interface PharmacologyLabelSection {
-  key: string;
-  title: string;
-  text: string;
-}
-
-export interface PharmacologyLabelResponse {
-  rxcui: string;
-  generic_names: string[];
-  brand_names: string[];
-  manufacturer: string[];
-  sections: PharmacologyLabelSection[];
-  source: string;
-  disclaimer: string;
-}
+export type TurkishMedicineRecord = Record<string, unknown>;
 
 export const pharmacologyApi = {
-  search: (q: string) =>
-    api.get<PharmacologySearchResponse>("/pharmacology/search", {
-      params: { q },
-      timeout: 25_000,
+  search: (q: string, page = 1, limit = 25) =>
+    api.get<TurkishMedicineSearchResponse>("/pharmacology/search", {
+      params: { q, page, limit },
+      timeout: 45_000,
     }),
-  label: (rxcui: string) =>
-    api.get<PharmacologyLabelResponse>(`/pharmacology/label/${encodeURIComponent(rxcui)}`, {
-      timeout: 60_000,
+  medicine: (id: number) =>
+    api.get<TurkishMedicineRecord>(`/pharmacology/medicine/${id}`, {
+      timeout: 45_000,
     }),
 };
 

@@ -6,11 +6,7 @@ import Link from "next/link";
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import {
-  pharmacologyApi,
-  type PharmacologyLabelResponse,
-  type PharmacologySearchItem,
-} from "@/lib/api";
+import { pharmacologyApi, type TurkishMedicineRecord } from "@/lib/api";
 import {
   ArrowLeft,
   LogOut,
@@ -29,6 +25,32 @@ import {
   ChevronUp,
   FileText,
 } from "lucide-react";
+
+function turkishDrugTitle(row: Record<string, unknown>): string {
+  const keys = ["İlaç Adı", "Ürün Adı", "Etken Madde"];
+  for (const k of keys) {
+    const v = row[k];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  const id = row.id;
+  return typeof id === "number" ? `Kayıt #${id}` : "İsimsiz kayıt";
+}
+
+function formatCell(v: unknown): string {
+  if (v === null || v === undefined || v === "") return "—";
+  if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") return String(v);
+  return JSON.stringify(v);
+}
+
+function sortedDetailKeys(obj: TurkishMedicineRecord): string[] {
+  return Object.keys(obj).sort((a, b) => {
+    const pri = (k: string) => (k === "id" ? 0 : k === "_sheet" ? 1 : 2);
+    const pa = pri(a);
+    const pb = pri(b);
+    if (pa !== pb) return pa - pb;
+    return a.localeCompare(b, "tr");
+  });
+}
 
 const UNITS = [
   {
@@ -70,12 +92,15 @@ export default function FarmakolojiPage() {
   const [query, setQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [searchResults, setSearchResults] = useState<PharmacologySearchItem[]>([]);
+  const [searchResults, setSearchResults] = useState<Record<string, unknown>[]>([]);
+  const [searchPage, setSearchPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalHits, setTotalHits] = useState(0);
 
-  const [labelLoading, setLabelLoading] = useState(false);
-  const [labelError, setLabelError] = useState<string | null>(null);
-  const [labelData, setLabelData] = useState<PharmacologyLabelResponse | null>(null);
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const [detail, setDetail] = useState<TurkishMedicineRecord | null>(null);
+  const [openFields, setOpenFields] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setMounted(true);
@@ -88,18 +113,20 @@ export default function FarmakolojiPage() {
     }
   }, [mounted, router]);
 
-  async function handleSearch(e: FormEvent) {
-    e.preventDefault();
+  async function runSearch(page: number) {
     const q = query.trim();
     if (q.length < 2) return;
     setSearchLoading(true);
     setSearchError(null);
     setSearchResults([]);
-    setLabelData(null);
-    setLabelError(null);
+    setDetail(null);
+    setDetailError(null);
     try {
-      const res = await pharmacologyApi.search(q);
-      setSearchResults(res.data.results);
+      const res = await pharmacologyApi.search(q, page, 25);
+      setSearchResults(res.data.data);
+      setSearchPage(res.data.page);
+      setTotalPages(res.data.totalPages);
+      setTotalHits(res.data.total);
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setSearchError(typeof detail === "string" ? detail : "Arama başarısız. Bağlantıyı deneyin.");
@@ -108,29 +135,35 @@ export default function FarmakolojiPage() {
     }
   }
 
-  async function loadLabel(rxcui: string) {
-    setLabelLoading(true);
-    setLabelError(null);
-    setLabelData(null);
-    setOpenSections({});
+  function handleSearch(e: FormEvent) {
+    e.preventDefault();
+    void runSearch(1);
+  }
+
+  async function loadDetail(id: number) {
+    setDetailLoading(true);
+    setDetailError(null);
+    setDetail(null);
+    setOpenFields({});
     try {
-      const res = await pharmacologyApi.label(rxcui);
-      setLabelData(res.data);
-      const first: Record<string, boolean> = {};
-      res.data.sections.forEach((s, i) => {
-        first[s.key] = i < 3;
+      const res = await pharmacologyApi.medicine(id);
+      setDetail(res.data);
+      const keys = sortedDetailKeys(res.data);
+      const open: Record<string, boolean> = {};
+      keys.forEach((k, i) => {
+        open[k] = i < 8;
       });
-      setOpenSections(first);
+      setOpenFields(open);
     } catch (err: unknown) {
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setLabelError(typeof detail === "string" ? detail : "Etiket yüklenemedi.");
+      const d = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setDetailError(typeof d === "string" ? d : "Kayıt yüklenemedi.");
     } finally {
-      setLabelLoading(false);
+      setDetailLoading(false);
     }
   }
 
-  function toggleSection(key: string) {
-    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  function toggleField(key: string) {
+    setOpenFields((prev) => ({ ...prev, [key]: !prev[key] }));
   }
 
   if (!mounted) return null;
@@ -196,8 +229,17 @@ export default function FarmakolojiPage() {
                 Farmakoloji çalışma alanı
               </h1>
               <p className="text-sm sm:text-base font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                Aşağıda ABD kaynaklı açık verilerle (NLM RxNorm + FDA openFDA) ilaç isminden arama yapabilirsiniz. Metinler
-                İngilizce ve ABD etiketine özgüdür; Türkiye ürün bilgisi yerine geçmez.
+                Arama, TİTCK ilaç listesini kullanan yerel{" "}
+                <a
+                  href="https://github.com/tugcantopaloglu/turkish-medicine-api"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline font-semibold"
+                  style={{ color: "var(--primary)" }}
+                >
+                  turkish-medicine-api
+                </a>{" "}
+                üzerinden yapılır (backend proxy). Ruhsat ve liste alanları; ürün etiketi metni değildir.
               </p>
               <div
                 className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl border"
@@ -208,7 +250,7 @@ export default function FarmakolojiPage() {
                 }}
               >
                 <Sparkles className="w-4 h-4 shrink-0" />
-                İleride flashcard / soru seti bu kayıtlara bağlanabilir.
+                API çalışmıyorsa backend’de TURKISH_MEDICINE_API_URL ve turkish-medicine-api (npm start) gerekir.
               </div>
             </div>
           </div>
@@ -221,11 +263,11 @@ export default function FarmakolojiPage() {
           <div className="flex items-center gap-2 mb-4">
             <FileText className="w-5 h-5" style={{ color: "var(--primary)" }} />
             <h2 className="text-lg font-black tracking-tight" style={{ color: "var(--text)" }}>
-              Canlı rehber (deneysel)
+              TİTCK ilaç araması
             </h2>
           </div>
           <p className="text-xs font-medium mb-4 leading-relaxed" style={{ color: "var(--text-muted)" }}>
-            Kaynak: RxNorm (isim çözümleme) ve openFDA (FDA ilaç etiketi). Rate limit: yoğun kullanımda yavaşlayabilir.
+            Veri kaynağı: TİTCK yayınları (API üzerinden). Sonuçlar sayfalanır; yoğun sorgularda yanıt gecikebilir.
           </p>
 
           <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -238,7 +280,7 @@ export default function FarmakolojiPage() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Örn. metformin, aspirin, omeprazole"
+                placeholder="Örn. parol, metformin, barkod"
                 className="w-full rounded-2xl pl-11 pr-4 py-3.5 text-sm font-semibold border outline-none focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--primary)_35%,transparent)] transition"
                 style={{
                   background: "var(--bg)",
@@ -274,36 +316,65 @@ export default function FarmakolojiPage() {
 
           {searchResults.length > 0 && (
             <div className="space-y-2 mb-6">
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-50">Sonuçlar — birine tıklayın</p>
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-50">
+                {totalHits} sonuç — satıra tıklayın (sayfa {searchPage}/{totalPages})
+              </p>
               <ul className="flex flex-col gap-2">
-                {searchResults.map((r) => (
-                  <li key={r.rxcui}>
-                    <button
-                      type="button"
-                      onClick={() => loadLabel(r.rxcui)}
-                      className="w-full text-left rounded-2xl border px-4 py-3 text-sm font-bold transition hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
-                      style={{ borderColor: "var(--border)", color: "var(--text)" }}
-                    >
-                      <span className="block">{r.name}</span>
-                      <span className="text-[11px] font-semibold opacity-50" style={{ color: "var(--text-muted)" }}>
-                        RxCUI {r.rxcui}
-                        {r.tty ? ` · ${r.tty}` : ""}
-                      </span>
-                    </button>
-                  </li>
-                ))}
+                {searchResults.map((r, idx) => {
+                  const id = typeof r.id === "number" ? r.id : Number(r.id);
+                  const sheet = typeof r._sheet === "string" ? r._sheet : "";
+                  return (
+                    <li key={`${sheet}-${id}-${idx}`}>
+                      <button
+                        type="button"
+                        disabled={!Number.isFinite(id)}
+                        onClick={() => loadDetail(id)}
+                        className="w-full text-left rounded-2xl border px-4 py-3 text-sm font-bold transition hover:bg-black/[0.04] dark:hover:bg-white/[0.06] disabled:opacity-50"
+                        style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                      >
+                        <span className="block">{turkishDrugTitle(r)}</span>
+                        <span className="text-[11px] font-semibold opacity-50" style={{ color: "var(--text-muted)" }}>
+                          id {Number.isFinite(id) ? id : "?"}
+                          {sheet ? ` · ${sheet}` : ""}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
+              {totalPages > 1 && (
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <button
+                    type="button"
+                    disabled={searchLoading || searchPage <= 1}
+                    onClick={() => void runSearch(searchPage - 1)}
+                    className="text-xs font-black uppercase tracking-wide px-4 py-2 rounded-xl border disabled:opacity-40"
+                    style={{ borderColor: "var(--border)" }}
+                  >
+                    Önceki
+                  </button>
+                  <button
+                    type="button"
+                    disabled={searchLoading || searchPage >= totalPages}
+                    onClick={() => void runSearch(searchPage + 1)}
+                    className="text-xs font-black uppercase tracking-wide px-4 py-2 rounded-xl border disabled:opacity-40"
+                    style={{ borderColor: "var(--border)" }}
+                  >
+                    Sonraki
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
-          {labelLoading && (
+          {detailLoading && (
             <div className="flex items-center gap-3 py-8 justify-center opacity-70">
               <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--primary)" }} />
-              <span className="text-sm font-bold">FDA etiketi yükleniyor…</span>
+              <span className="text-sm font-bold">Kayıt yükleniyor…</span>
             </div>
           )}
 
-          {labelError && (
+          {detailError && (
             <div
               className="flex items-start gap-2 text-sm font-medium px-4 py-3 rounded-2xl border"
               style={{
@@ -313,59 +384,40 @@ export default function FarmakolojiPage() {
               }}
             >
               <AlertCircle className="w-5 h-5 shrink-0" />
-              {labelError}
+              {detailError}
             </div>
           )}
 
-          {labelData && !labelLoading && (
+          {detail && !detailLoading && (
             <div className="space-y-4 mt-2 border-t pt-6" style={{ borderColor: "var(--border)" }}>
-              <div className="space-y-1">
-                {labelData.generic_names.length > 0 && (
-                  <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                    <span className="font-black" style={{ color: "var(--text)" }}>
-                      Jenerik:
-                    </span>{" "}
-                    {labelData.generic_names.join(", ")}
-                  </p>
-                )}
-                {labelData.brand_names.length > 0 && (
-                  <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                    <span className="font-black" style={{ color: "var(--text)" }}>
-                      Marka:
-                    </span>{" "}
-                    {labelData.brand_names.slice(0, 8).join(", ")}
-                    {labelData.brand_names.length > 8 ? "…" : ""}
-                  </p>
-                )}
-                <p className="text-[11px] font-medium leading-relaxed pt-2" style={{ color: "var(--text-muted)" }}>
-                  {labelData.disclaimer} — {labelData.source}
-                </p>
-              </div>
-
+              <p className="text-[11px] font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                TİTCK liste alanları — tıbbi karar için yeterli değildir; resmi ürün bilgisine başvurun.
+              </p>
               <div className="space-y-2">
-                {labelData.sections.map((sec) => {
-                  const open = openSections[sec.key] ?? false;
+                {sortedDetailKeys(detail).map((key) => {
+                  const open = openFields[key] ?? false;
+                  const val = formatCell(detail[key]);
                   return (
                     <div
-                      key={sec.key}
+                      key={key}
                       className="rounded-xl border overflow-hidden"
                       style={{ borderColor: "var(--border)", background: "var(--bg)" }}
                     >
                       <button
                         type="button"
-                        onClick={() => toggleSection(sec.key)}
+                        onClick={() => toggleField(key)}
                         className="w-full flex items-center justify-between gap-2 px-4 py-3 text-left font-bold text-sm"
                         style={{ color: "var(--text)" }}
                       >
-                        {sec.title}
+                        <span className="truncate">{key}</span>
                         {open ? <ChevronUp className="w-4 h-4 shrink-0" /> : <ChevronDown className="w-4 h-4 shrink-0" />}
                       </button>
                       {open && (
                         <div
-                          className="px-4 pb-4 text-xs sm:text-sm font-medium leading-relaxed whitespace-pre-wrap break-words max-h-[50vh] overflow-y-auto border-t"
+                          className="px-4 pb-4 text-xs sm:text-sm font-medium leading-relaxed whitespace-pre-wrap break-words max-h-[40vh] overflow-y-auto border-t"
                           style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
                         >
-                          {sec.text}
+                          {val}
                         </div>
                       )}
                     </div>
