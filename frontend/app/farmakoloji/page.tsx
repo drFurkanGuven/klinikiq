@@ -18,7 +18,8 @@ import {
   BookOpen,
   Sparkles,
   ChevronRight,
-  FileText,
+  Layers,
+  GitCompare,
 } from "lucide-react";
 
 const UNITS = [
@@ -132,8 +133,12 @@ export default function FarmakolojiPage() {
                 Farmakoloji çalışma alanı
               </h1>
               <p className="text-sm sm:text-base font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                Konu özeti ve müfredat çerçevesi aşağıda. Türkiye ilaç listesi (TİTCK) için ayrı rehbere geçin — arama, liste
-                filtresi, son arananlar ve ilaç adına tıklayınca prospektüs orada.
+                Konu özeti ve müfredat çerçevesi aşağıda. Onaylı ilaç verisi (DrugBank), endikasyon ve farmakoloji alanları için{" "}
+                <Link href="/farmakoloji/ilaclar" className="font-bold underline" style={{ color: "var(--primary)" }}>
+                  İlaç Rehberi
+                </Link>
+                {" "}
+                sayfasını kullanın.
               </p>
               <div
                 className="flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl border"
@@ -149,31 +154,6 @@ export default function FarmakolojiPage() {
             </div>
           </div>
         </div>
-
-        <h2 className="text-xs font-black uppercase tracking-widest mb-4 px-1" style={{ color: "var(--text-muted)" }}>
-          Araçlar
-        </h2>
-        <Link
-          href="/farmakoloji/ilac-rehberi"
-          className="flex items-center gap-4 rounded-3xl border p-6 sm:p-8 mb-10 shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl group"
-          style={{ background: "var(--surface)", borderColor: "var(--border)" }}
-        >
-          <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-            style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}
-          >
-            <FileText className="w-7 h-7" style={{ color: "var(--primary)" }} />
-          </div>
-          <div className="flex-1 min-w-0 space-y-1">
-            <h3 className="text-lg font-black tracking-tight" style={{ color: "var(--text)" }}>
-              İlaç rehberi
-            </h3>
-            <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
-              TİTCK araması, liste filtresi, son arananlar; seçilen ilaçta prospektüs (Tıp Atlası) ve liste alanları.
-            </p>
-          </div>
-          <ChevronRight className="w-6 h-6 shrink-0 opacity-40 group-hover:opacity-100 transition" style={{ color: "var(--primary)" }} />
-        </Link>
 
         <h2 className="text-xs font-black uppercase tracking-widest mb-4 px-1" style={{ color: "var(--text-muted)" }}>
           Müfredat çerçevesi
@@ -198,6 +178,93 @@ export default function FarmakolojiPage() {
               </div>
             </li>
           ))}
+        </ul>
+
+        <h2 className="text-xs font-black uppercase tracking-widest mb-4 mt-12 px-1" style={{ color: "var(--text-muted)" }}>
+          Araçlar
+        </h2>
+        <ul className="grid gap-4 sm:grid-cols-2 mb-10">
+          <li>
+            <Link
+              href="/farmakoloji/ilaclar"
+              className="flex items-start gap-3 rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg h-full group"
+              style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+            >
+              <Pill className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--primary)" }} />
+              <div className="space-y-2 min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-black text-base leading-snug" style={{ color: "var(--text)" }}>
+                    İlaç Rehberi
+                  </h3>
+                  <ChevronRight className="w-5 h-5 shrink-0 opacity-40 group-hover:opacity-100" style={{ color: "var(--primary)" }} />
+                </div>
+                <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                  DrugBank verisiyle 2.700+ onaylı ilaç; mekanizma, endikasyon, PK.
+                </p>
+              </div>
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/farmakoloji/siniflar"
+              className="flex items-start gap-3 rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg h-full group"
+              style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+            >
+              <Layers className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--primary)" }} />
+              <div className="space-y-2 min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-black text-base leading-snug" style={{ color: "var(--text)" }}>
+                    ATC Sınıflandırması
+                  </h3>
+                  <ChevronRight className="w-5 h-5 shrink-0 opacity-40 group-hover:opacity-100" style={{ color: "var(--primary)" }} />
+                </div>
+                <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                  İlaçları terapötik sınıflarına göre incele ve karşılaştır.
+                </p>
+              </div>
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/farmakoloji/karsilastir"
+              className="flex items-start gap-3 rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg h-full group"
+              style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+            >
+              <GitCompare className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--primary)" }} />
+              <div className="space-y-2 min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-black text-base leading-snug" style={{ color: "var(--text)" }}>
+                    İlaç Karşılaştırma
+                  </h3>
+                  <ChevronRight className="w-5 h-5 shrink-0 opacity-40 group-hover:opacity-100" style={{ color: "var(--primary)" }} />
+                </div>
+                <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                  Aynı sınıftaki ilaçları yan yana: PK, yan etki, etkileşim.
+                </p>
+              </div>
+            </Link>
+          </li>
+          <li>
+            <div
+              className="rounded-2xl border p-5 h-full cursor-not-allowed relative opacity-60"
+              style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+            >
+              <span className="absolute top-3 right-3 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
+                Yakında
+              </span>
+              <div className="flex items-start gap-3">
+                <Shield className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--primary)" }} />
+                <div className="space-y-2 min-w-0">
+                  <h3 className="font-black text-base leading-snug" style={{ color: "var(--text)" }}>
+                    Antibiyotik Rehberi
+                  </h3>
+                  <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                    CARD verisiyle organizma → antibiyotik spektrumu ve direnç.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </li>
         </ul>
 
         <div

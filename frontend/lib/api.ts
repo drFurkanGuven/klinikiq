@@ -322,66 +322,100 @@ export const communityApi = {
     api.delete<void>(`/community/notes/${noteId}/attachments/${attachmentId}`),
 };
 
-/** TİTCK ilaç listesi — backend, turkish-medicine-api’ye proxy eder */
-export interface TurkishMedicineSearchResponse {
-  query: string;
-  sheet?: string;
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  data: Record<string, unknown>[];
+// ── DrugBank ──────────────────────────────────────────────────────────────
+
+export interface DrugSummary {
+  drugbank_id: string;
+  name: string;
+  drug_type: string | null;
+  groups: string | null;
+  atc_codes: string | null;
+  indication: string | null;
 }
 
-export type TurkishMedicineRecord = Record<string, unknown>;
-
-/** Tıp Atlası ilaclardb — backend SQLite (build_ilac_atlas_db.py) */
-export interface IlacAtlasResponse {
-  id: number | null;
-  barcode: string;
-  atc_code: string | null;
-  active_ingredient: string | null;
-  product_name: string | null;
-  category_1: string | null;
-  category_2: string | null;
-  category_3: string | null;
-  category_4: string | null;
-  category_5: string | null;
+export interface DrugDetail {
+  drugbank_id: string;
+  name: string;
+  drug_type: string | null;
+  groups: string | null;
   description: string | null;
-  source: string;
-  disclaimer: string;
+  indication: string | null;
+  mechanism: string | null;
+  pharmacodynamics: string | null;
+  toxicity: string | null;
+  metabolism: string | null;
+  absorption: string | null;
+  half_life: string | null;
+  protein_binding: string | null;
+  route_of_elimination: string | null;
+  volume_of_distribution: string | null;
+  drug_interactions: string | null;
+  food_interactions: string | null;
+  targets: string | null;
+  atc_codes: string | null;
+  average_mass: string | null;
 }
 
-export const pharmacologyApi = {
-  search: (q: string, page = 1, limit = 25, sheet?: string) =>
-    api.get<TurkishMedicineSearchResponse>("/pharmacology/search", {
-      params: {
-        q,
-        page,
-        limit,
-        ...(sheet && sheet.length > 0 ? { sheet } : {}),
-      },
-      timeout: 45_000,
+export interface DrugSearchResponse {
+  total: number;
+  page: number;
+  results: DrugSummary[];
+}
+
+export const drugsApi = {
+  search: (q: string, page = 1, limit = 25, atc_class?: string) =>
+    api.get<DrugSearchResponse>("/drugs/search", {
+      params: { q, page, limit, ...(atc_class ? { atc_class } : {}) },
     }),
-  /** Barkod varsa en kesin eşleşme. */
-  medicineByBarcode: (barcode: string, sheet?: string) =>
-    api.get<TurkishMedicineRecord>("/pharmacology/medicine-by-barcode", {
-      params: {
-        barcode,
-        ...(sheet && sheet.length > 0 ? { sheet } : {}),
-      },
-      timeout: 45_000,
+
+  detail: (drugbank_id: string) => api.get<DrugDetail>(`/drugs/${encodeURIComponent(drugbank_id)}`),
+
+  compare: (ids: string[]) =>
+    api.get<{ drugs: DrugDetail[] }>("/drugs/compare", {
+      params: { ids: ids.join(",") },
     }),
-  /** Barkod yok: _sheet + id (sayfa içi id; birleşik listedeki id çakışması yok). */
-  medicineBySheetAndId: (sheet: string, id: number) =>
-    api.get<TurkishMedicineRecord>("/pharmacology/medicine-by-sheet-and-id", {
-      params: { sheet, id },
-      timeout: 45_000,
+
+  atcTree: () => api.get<{ categories: string[] }>("/drugs/atc-tree"),
+
+  byAtc: (category: string) =>
+    api.get<{ results: DrugSummary[] }>("/drugs/by-atc", { params: { category } }),
+};
+
+// ── Antibiotics ───────────────────────────────────────────────────────────
+
+export interface AntibioticByDrug {
+  antibiotic_name: string;
+  organisms: {
+    organism: string;
+    resistance_mechanism: string | null;
+    aro_accession: string | null;
+    amr_gene_family: string | null;
+    drug_class: string | null;
+  }[];
+}
+
+export interface AntibioticByOrganism {
+  organism: string;
+  antibiotics: {
+    antibiotic_name: string;
+    drugbank_id: string | null;
+    resistance_mechanism: string | null;
+    drug_class: string | null;
+  }[];
+}
+
+export const antibioticsApi = {
+  byDrug: (drugbank_id: string) =>
+    api.get<AntibioticByDrug>(`/antibiotics/by-drug/${encodeURIComponent(drugbank_id)}`),
+
+  byOrganism: (organism: string) =>
+    api.get<AntibioticByOrganism>("/antibiotics/by-organism", {
+      params: { organism },
     }),
-  atlasByBarcode: (barcode: string) =>
-    api.get<IlacAtlasResponse>(`/pharmacology/atlas/barcode/${encodeURIComponent(barcode)}`, {
-      timeout: 60_000,
-    }),
+
+  organisms: () => api.get<{ organisms: string[] }>("/antibiotics/organisms"),
+
+  drugClasses: () => api.get<{ classes: string[] }>("/antibiotics/drug-classes"),
 };
 
 /** MedQA acil alt kümesi — backend unified_emergency.jsonl */
@@ -457,6 +491,31 @@ export const emergencyMcqApi = {
   listReports: (limit = 30) =>
     api.get<EmergencyMcqReportListItem[]>("/emergency-mcq/reports", { params: { limit } }),
   getReport: (id: string) => api.get<EmergencyMcqReportOut>(`/emergency-mcq/reports/${encodeURIComponent(id)}`),
+};
+
+export interface LearningCard {
+  report_id: string;
+  case_id: string;
+  case_title: string;
+  specialty: string;
+  difficulty: string;
+  pathophysiology_note: string | null;
+  tus_reference: string | null;
+  score: number;
+  created_at: string;
+}
+
+export interface LearningCardsPage {
+  items: LearningCard[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export const learningApi = {
+  cards: (params?: { specialty?: string; limit?: number; offset?: number }) =>
+    api.get<LearningCardsPage>("/learning/cards", { params }),
+  specialties: () => api.get<string[]>("/learning/specialties"),
 };
 
 export const usersApi = {
