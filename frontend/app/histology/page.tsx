@@ -402,14 +402,14 @@ function HistologyPageInner() {
 
         {/* Öğrenme kaynakları + ipuçları */}
         <section className="rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-md p-6 md:p-8 space-y-8">
-          <div className="space-y-1">
+          <div className="space-y-2">
             <h2 className="text-lg font-black text-white flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-cyan-400/90 shrink-0" />
               Öğrenme ve pratik
             </h2>
             <p className="text-sm text-slate-400 max-w-2xl font-medium leading-relaxed">
-              Histoloji ve patoloji öğreniminde sık kullanılan açık kaynaklar. Bunlar harici sitelerdir;
-              KlinikIQ içeriği değildir — müfredatını desteklemek için seçilmiş bağlantılardır.
+              Histoloji çalışırken sık başvurulan açık kaynaklar. Bunlar harici sitelerdir; KlinikIQ ile bağlantılı
+              değildir — müfredatınızı desteklemek için seçilmiştir.
             </p>
           </div>
 
@@ -427,14 +427,14 @@ function HistologyPageInner() {
                     desc: "Etiketli slaytlar; epitel, bağ doku, organ sistemleri.",
                   },
                   {
-                    href: "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Book%3A_Histology_A_Text_and_Atlas_with_Correlated_Cell_and_Molecular_Biology_(Ross)",
-                    title: "LibreTexts — Histology",
-                    desc: "Ders kitabı ve atlas yapısı; hücre ve doku biyolojisi bağlamı.",
+                    href: "https://med.libretexts.org/Bookshelves/Anatomy_and_Physiology/Anatomy_and_Physiology_2e_(OpenStax)",
+                    title: "LibreTexts — OpenStax Anatomi & Fizyoloji",
+                    desc: "Açık ders kitabı (2. baskı); doku ve organ sistemleri bölümleri LibreTexts üzerinde.",
                   },
                   {
-                    href: "https://www.pathologyoutlines.com/topic/normalhistology.html",
+                    href: "https://www.pathologyoutlines.com/topic/livernormalhistology.html",
                     title: "Pathology Outlines — Normal histoloji",
-                    desc: "Kısa özetler ve referans görüntüler; normal doku hatırlatması.",
+                    desc: "Kısa özet ve görüntüler (örnek: karaciğer). Sitede diğer organlar için benzer sayfaları arayın.",
                   },
                   {
                     href: "https://openstax.org/books/anatomy-and-physiology/pages/4-introduction",
@@ -469,36 +469,48 @@ function HistologyPageInner() {
             <div className="space-y-4 rounded-2xl border border-white/5 bg-violet-950/15 p-5 md:p-6">
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
                 <Lightbulb size={14} className="text-amber-400" />
-                Bu sayfada
+                Bu sayfada neler var?
               </h3>
-              <ul className="space-y-3 text-sm text-slate-300 leading-relaxed">
-                <li className="flex gap-2">
-                  <span className="text-violet-400 font-bold">·</span>
-                  Soldan filtrelerle müfredat, branş, boya ve organa göre preparat daralt.
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-violet-400 font-bold">·</span>
-                  Görüntüleyicide <strong className="text-slate-200 font-semibold">Yakın / Uzak / Tümü</strong> ile
-                  zoom; sağ alttaki küçük haritada genel görünümü takip et.
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-violet-400 font-bold">·</span>
-                  <strong className="text-slate-200 font-semibold">Not alanı</strong> ile dikdörtgen seç; her
-                  oturumda farklı renkte çerçeve, notunu kaydet ve listeden yönet.
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-violet-400 font-bold">·</span>
-                  Kendi TIFF/SVS dosyanı veya URL ile görüntü eklemek için yükleme akışını kullan (hesap ve yetki
-                  gerekebilir).
-                </li>
+              <ul className="space-y-3">
+                {[
+                  {
+                    k: "Filtreler",
+                    t: "Soldan müfredat, branş, boya ve organa göre preparat listesini daraltın.",
+                  },
+                  {
+                    k: "Görüntüleyici",
+                    t: (
+                      <>
+                        <strong className="text-slate-200 font-semibold">Yakın / Uzak / Tümü</strong> ile yakınlaştırın;
+                        sağ alttaki küçük haritadan genel görünümü izleyin.
+                      </>
+                    ),
+                  },
+                  {
+                    k: "Not alanı",
+                    t: (
+                      <>
+                        Dikdörtgen seçerek işaretleyin; her oturumda farklı renkte çerçeve kullanılır. Notları kaydedin ve
+                        listeden yönetin.
+                      </>
+                    ),
+                  },
+                  {
+                    k: "Yükleme",
+                    t: "Kendi TIFF/SVS dosyanızı veya uygun bir bağlantıyı, hesabınıza tanımlı yükleme ile ekleyebilirsiniz (kurum politikası ve yetkilere bağlıdır).",
+                  },
+                ].map((row) => (
+                  <li
+                    key={row.k}
+                    className="rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-slate-300 leading-relaxed"
+                  >
+                    <span className="block text-[11px] font-black uppercase tracking-wider text-violet-300/90 mb-1">
+                      {row.k}
+                    </span>
+                    <span className="text-slate-400">{row.t}</span>
+                  </li>
+                ))}
               </ul>
-              <p className="pt-2 text-xs text-slate-500 border-t border-white/10 mt-4">
-                Kurum yöneticileri harici veri kümelerinden TIFF içe aktarma için{" "}
-                <Link href="/admin" className="text-violet-400 hover:text-violet-300 underline underline-offset-2">
-                  yönetim paneline
-                </Link>{" "}
-                gidebilir.
-              </p>
             </div>
           </div>
         </section>

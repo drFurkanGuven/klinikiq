@@ -39,6 +39,17 @@ export const SCIENCE_UNIT_LABELS: Record<string, string> = {
   lymphoid: "Lenfoid sistem",
   respiratory: "Solunum",
   digestive: "Sindirim",
+  /** Endokrin, ürogenital ve idrar yolu — temel ünite (konu) */
+  pituitary: "Hipofiz",
+  pineal: "Epifiz",
+  thyroid: "Tiroid",
+  parathyroid: "Paratiroid",
+  adrenal: "Adrenal",
+  female_genital: "Kadın genital sistem",
+  testis: "Testis",
+  kidney: "Böbrek",
+  urinary_bladder: "Mesane",
+  ureter: "Üreter",
 };
 
 export const SCIENCE_UNIT_OPTIONS = Object.entries(SCIENCE_UNIT_LABELS).map(([value, label]) => ({
