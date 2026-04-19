@@ -5,6 +5,7 @@ Veri: backend/data/medical_qa/raw — DB yok.
 
 from __future__ import annotations
 
+import datetime
 import json
 import os
 import random
@@ -320,6 +321,61 @@ class PracticeMcqVerifyOut(BaseModel):
     correct_answer_text: str
 
 
+class PracticeMcqCatalogVersionOut(BaseModel):
+    version: str
+    total: int
+
+
+class PracticeMcqAllItem(BaseModel):
+    id: str
+    question: str
+    options: list[PracticeMcqOptionOut]
+    specialty: str
+    meta_info: str
+    correct_option_label: str
+    correct_answer_text: str
+
+
+class PracticeMcqAllOut(BaseModel):
+    total: int
+    version: str
+    questions: list[PracticeMcqAllItem]
+
+
+def _catalog_version_str() -> str:
+    """Train + test JSONL dosyalarından en yeni mtime ile katalog sürümü."""
+    train_p, test_p = _practice_jsonl_paths()
+    if not train_p.is_file() or not test_p.is_file():
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                f"MedQA USMLE JSONL bulunamadı: train={train_p} test={test_p}."
+            ),
+        )
+    mtime = max(os.path.getmtime(train_p), os.path.getmtime(test_p))
+    return datetime.datetime.fromtimestamp(mtime).strftime("%Y%m%d%H%M")
+
+
+def _item_to_all_item(item: dict[str, Any]) -> PracticeMcqAllItem:
+    raw_opts = item.get("options") or []
+    options_out: list[PracticeMcqOptionOut] = []
+    if isinstance(raw_opts, list):
+        for o in raw_opts:
+            if isinstance(o, dict) and o.get("label") is not None and o.get("text") is not None:
+                options_out.append(
+                    PracticeMcqOptionOut(label=str(o["label"]).strip(), text=str(o["text"]))
+                )
+    return PracticeMcqAllItem(
+        id=str(item["id"]),
+        question=str(item.get("question") or ""),
+        options=options_out,
+        specialty=str(item.get("practice_specialty") or "other"),
+        meta_info=str(item.get("practice_meta_info") or "other"),
+        correct_option_label=str(item.get("correct_option_label") or "").strip().upper(),
+        correct_answer_text=str(item.get("correct_answer_text") or ""),
+    )
+
+
 def _item_to_out(item: dict[str, Any]) -> PracticeMcqOut:
     raw_opts = item.get("options") or []
     options_out: list[PracticeMcqOptionOut] = []
@@ -353,6 +409,21 @@ def _filter_pool(
         if st in ("step1", "step2&3"):
             out = [x for x in out if str(x.get("practice_meta_info") or "") == st]
     return out
+
+
+@router.get("/catalog-version", response_model=PracticeMcqCatalogVersionOut)
+async def practice_mcq_catalog_version(_user_id: str = Depends(get_current_user_id)):
+    version = _catalog_version_str()
+    pool, _ = _load_pool()
+    return PracticeMcqCatalogVersionOut(version=version, total=len(pool))
+
+
+@router.get("/all", response_model=PracticeMcqAllOut)
+async def practice_mcq_all(_user_id: str = Depends(get_current_user_id)):
+    version = _catalog_version_str()
+    pool, _ = _load_pool()
+    questions = [_item_to_all_item(x) for x in pool]
+    return PracticeMcqAllOut(total=len(questions), version=version, questions=questions)
 
 
 @router.get("/stats", response_model=PracticeMcqStatsOut)

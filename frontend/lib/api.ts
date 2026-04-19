@@ -181,6 +181,16 @@ export const questionsApi = {
     ),
 };
 
+export interface PracticeMcqAllItem {
+  id: string;
+  question: string;
+  options: { label: string; text: string }[];
+  specialty: string;
+  meta_info: string;
+  correct_option_label: string;
+  correct_answer_text: string;
+}
+
 export const practiceMcqApi = {
   stats: () =>
     api.get<{
@@ -188,6 +198,16 @@ export const practiceMcqApi = {
       by_specialty: Record<string, number>;
       by_step: Record<string, number>;
     }>("/practice-mcq/stats"),
+
+  catalogVersion: () =>
+    api.get<{ version: string; total: number }>("/practice-mcq/catalog-version"),
+
+  catalogAll: () =>
+    api.get<{
+      total: number;
+      version: string;
+      questions: PracticeMcqAllItem[];
+    }>("/practice-mcq/all"),
 
   random: (params?: { specialty?: string; step?: string }) =>
     api.get<{

@@ -5,9 +5,17 @@ import Link from "next/link";
 import {
   questionsApi,
   practiceMcqApi,
+  type PracticeMcqAllItem,
   type Question,
   type QuestionStats,
 } from "@/lib/api";
+import {
+  buildStatsFromQuestions,
+  getAllQuestions,
+  getLocalVersion,
+  getRandom as getPracticeMcqRandom,
+  saveAll,
+} from "@/hooks/usePracticeMcqStore";
 import { isAuthenticated } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
@@ -70,6 +78,17 @@ type UsmleQ = {
   specialty: string;
 };
 
+function toUsmleQ(row: PracticeMcqAllItem): UsmleQ {
+  return {
+    id: row.id,
+    question: row.question,
+    options: row.options,
+    source: "medqa_usmle",
+    meta_info: row.meta_info,
+    specialty: row.specialty,
+  };
+}
+
 export default function QuestionsPage() {
   const router = useRouter();
   const [stats, setStats] = useState<QuestionStats | null>(null);
@@ -108,6 +127,8 @@ export default function QuestionsPage() {
   const [usmleSpecialty, setUsmleSpecialty] = useState("");
   const [usmleStep, setUsmleStep] = useState("");
   const [usmleLoading, setUsmleLoading] = useState(false);
+  const [usmleDownloading, setUsmleDownloading] = useState(false);
+  const [usmleDownloadTotal, setUsmleDownloadTotal] = useState(0);
   const [usmleError, setUsmleError] = useState("");
 
   const [mounted, setMounted] = useState(false);
@@ -134,25 +155,73 @@ export default function QuestionsPage() {
     if (!mounted || bankTab !== "usmle") return;
     let cancelled = false;
     (async () => {
+      if (typeof indexedDB === "undefined") {
+        setUsmleError("Bu tarayıcı IndexedDB desteklemiyor.");
+        return;
+      }
       setUsmleLoading(true);
       setUsmleError("");
       try {
-        const statsRes = await practiceMcqApi.stats();
+        const remote = (await practiceMcqApi.catalogVersion()).data;
         if (cancelled) return;
-        setUsmleStats(statsRes.data);
-        const qRes = await practiceMcqApi.random({
-          specialty: usmleSpecialty || undefined,
-          step: usmleStep || undefined,
+
+        const local = await getLocalVersion();
+        const needsDownload =
+          !local ||
+          local.version !== remote.version ||
+          local.total !== remote.total;
+
+        let questionsForStats: PracticeMcqAllItem[] | null = null;
+
+        if (needsDownload) {
+          setUsmleDownloading(true);
+          setUsmleDownloadTotal(remote.total);
+          const allRes = await practiceMcqApi.catalogAll();
+          if (cancelled) return;
+          await saveAll(allRes.data.questions, allRes.data.version);
+          questionsForStats = allRes.data.questions;
+          setUsmleDownloading(false);
+        }
+
+        let qs = questionsForStats;
+        if (!qs) {
+          qs = await getAllQuestions();
+        }
+        if (cancelled) return;
+
+        if (qs.length === 0) {
+          setUsmleStats(null);
+          setUsmleQuestion(null);
+          setUsmleError("Yerel soru havuzu boş. İndirmeyi tekrar deneyin.");
+          setUsmleSelected(null);
+          setUsmleResult(null);
+          return;
+        }
+
+        setUsmleStats(buildStatsFromQuestions(qs));
+
+        const row = await getPracticeMcqRandom({
+          specialty: usmleStep === "step1" ? "" : usmleSpecialty,
+          step: usmleStep,
         });
         if (cancelled) return;
-        setUsmleQuestion(qRes.data);
+
+        if (!row) {
+          setUsmleQuestion(null);
+          setUsmleError("Filtreye uyan soru yok.");
+        } else {
+          setUsmleQuestion(toUsmleQ(row));
+          setUsmleError("");
+        }
         setUsmleSelected(null);
         setUsmleResult(null);
       } catch {
         if (!cancelled) {
           setUsmleQuestion(null);
+          setUsmleStats(null);
+          setUsmleDownloading(false);
           setUsmleError(
-            "USMLE soru verisi yüklenemedi. Sunucuda MedQA dosyaları veya ağ bağlantısı kontrol edin."
+            "USMLE verisi hazırlanamadı. Bağlantıyı veya sunucuyu kontrol edin."
           );
         }
       } finally {
@@ -237,22 +306,36 @@ export default function QuestionsPage() {
     }
   }
 
+  function handleUsmleStepChange(next: string) {
+    setUsmleStep((prev) => {
+      if (
+        (prev === "step1" && next === "step2&3") ||
+        (prev === "step2&3" && next === "step1")
+      ) {
+        setUsmleSpecialty("");
+      }
+      return next;
+    });
+  }
+
   async function loadNextUsmle() {
-    setUsmleLoading(true);
     setUsmleError("");
     try {
-      const qRes = await practiceMcqApi.random({
-        specialty: usmleSpecialty || undefined,
-        step: usmleStep || undefined,
+      const row = await getPracticeMcqRandom({
+        specialty: usmleStep === "step1" ? "" : usmleSpecialty,
+        step: usmleStep,
       });
-      setUsmleQuestion(qRes.data);
+      if (!row) {
+        setUsmleError("Filtreye uyan soru yok.");
+        setUsmleQuestion(null);
+      } else {
+        setUsmleQuestion(toUsmleQ(row));
+      }
       setUsmleSelected(null);
       setUsmleResult(null);
     } catch {
-      setUsmleError("Yeni soru yüklenemedi.");
+      setUsmleError("Yeni soru seçilemedi.");
       setUsmleQuestion(null);
-    } finally {
-      setUsmleLoading(false);
     }
   }
 
@@ -928,7 +1011,37 @@ export default function QuestionsPage() {
 
         {bankTab === "usmle" && (
           <>
-            {usmleStats && (
+            {usmleDownloading && (
+              <div className="flex flex-col items-center gap-3 py-12">
+                <div
+                  className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
+                  style={{
+                    borderColor: "var(--primary)",
+                    borderTopColor: "transparent",
+                  }}
+                />
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  {usmleDownloadTotal.toLocaleString("tr-TR")} soru yükleniyor
+                </p>
+                <p
+                  className="text-sm font-medium"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Sorular ilk kez indiriliyor...
+                </p>
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Bu işlem bir kez yapılır, sonraki açılışlar anında yüklenir.
+                </p>
+              </div>
+            )}
+
+            {!usmleDownloading && usmleStats && (
               <div
                 className="glass rounded-2xl p-4 border shadow-sm"
                 style={{
@@ -983,6 +1096,7 @@ export default function QuestionsPage() {
               </div>
             )}
 
+            {!usmleDownloading && (
             <div className="flex flex-col gap-3">
               <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible">
                 {(
@@ -995,7 +1109,7 @@ export default function QuestionsPage() {
                   <button
                     key={s.id || "all"}
                     type="button"
-                    onClick={() => setUsmleStep(s.id)}
+                    onClick={() => handleUsmleStepChange(s.id)}
                     className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all shrink-0"
                     style={{
                       background:
@@ -1012,56 +1126,73 @@ export default function QuestionsPage() {
                 ))}
               </div>
 
-              <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible">
-                <button
-                  type="button"
-                  onClick={() => setUsmleSpecialty("")}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all shrink-0"
+              {usmleStep === "step1" ? (
+                <div
+                  className="text-xs px-3 py-2 rounded-xl"
                   style={{
                     background:
-                      usmleSpecialty === ""
-                        ? "var(--primary)"
-                        : "var(--surface)",
-                    borderColor:
-                      usmleSpecialty === ""
-                        ? "var(--primary)"
-                        : "var(--border)",
-                    color:
-                      usmleSpecialty === "" ? "white" : "var(--text-muted)",
+                      "color-mix(in srgb, var(--primary) 8%, transparent)",
+                    color: "var(--text-muted)",
+                    border:
+                      "1px solid color-mix(in srgb, var(--primary) 20%, transparent)",
                   }}
                 >
-                  Tüm branşlar
-                </button>
-                {Object.entries(USMLE_SPECIALTIES).map(([val, label]) => (
+                  Step 1 soruları temel bilimleri kapsar (anatomi, fizyoloji,
+                  farmakoloji, patoloji) — branş filtresi Step 2&3 için geçerlidir.
+                </div>
+              ) : (
+                <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible">
                   <button
-                    key={val}
                     type="button"
-                    onClick={() =>
-                      setUsmleSpecialty(val === usmleSpecialty ? "" : val)
-                    }
+                    onClick={() => setUsmleSpecialty("")}
                     className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all shrink-0"
                     style={{
                       background:
-                        usmleSpecialty === val
-                          ? "var(--accent)"
+                        usmleSpecialty === ""
+                          ? "var(--primary)"
                           : "var(--surface)",
                       borderColor:
-                        usmleSpecialty === val
-                          ? "var(--accent)"
+                        usmleSpecialty === ""
+                          ? "var(--primary)"
                           : "var(--border)",
                       color:
-                        usmleSpecialty === val
-                          ? "var(--primary)"
-                          : "var(--text-muted)",
+                        usmleSpecialty === "" ? "white" : "var(--text-muted)",
                     }}
                   >
-                    {label}
+                    Tüm branşlar
                   </button>
-                ))}
-              </div>
+                  {Object.entries(USMLE_SPECIALTIES).map(([val, label]) => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() =>
+                        setUsmleSpecialty(val === usmleSpecialty ? "" : val)
+                      }
+                      className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all shrink-0"
+                      style={{
+                        background:
+                          usmleSpecialty === val
+                            ? "var(--accent)"
+                            : "var(--surface)",
+                        borderColor:
+                          usmleSpecialty === val
+                            ? "var(--accent)"
+                            : "var(--border)",
+                        color:
+                          usmleSpecialty === val
+                            ? "var(--primary)"
+                            : "var(--text-muted)",
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+            )}
 
-            {usmleError && (
+            {!usmleDownloading && usmleError && (
               <div
                 className="p-4 rounded-2xl flex items-center gap-3 text-sm font-bold border"
                 style={{
@@ -1075,13 +1206,16 @@ export default function QuestionsPage() {
               </div>
             )}
 
-            {usmleLoading && !usmleQuestion && (
+            {!usmleDownloading &&
+              usmleLoading &&
+              !usmleQuestion &&
+              !usmleError && (
               <p className="text-center text-sm" style={{ color: "var(--text-muted)" }}>
                 Soru yükleniyor…
               </p>
             )}
 
-            {!usmleLoading && usmleQuestion && (
+            {!usmleDownloading && usmleQuestion && (
               <div className="space-y-4">
                 <div className="relative">
                   <div className="absolute top-0 right-0 flex flex-wrap gap-1 justify-end max-w-[90%]">
