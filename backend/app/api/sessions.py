@@ -13,7 +13,13 @@ from app.models.models import (
     SimulationSession, Case, Message, DiagnosisSubmitted, SessionStatus, MessageRole
 )
 from app.schemas.schemas import SessionCreate, SessionOut, MessageCreate, DiagnoseSubmit, MessageOut
-from app.services.ai_service import stream_patient_response
+from app.services.ai_service import (
+    stream_patient_response,
+    generate_session_opening_message,
+    save_history,
+    load_history,
+    build_system_prompt,
+)
 from app.services.report_service import create_report_for_session
 from app.services.session_maintenance import abandon_stale_active_sessions
 
@@ -62,12 +68,48 @@ async def create_session(
     await db.commit()
     await db.refresh(session)
 
+    opening_message = ""
+    message_out: list[MessageOut] = []
+
+    redis_hist = await load_history(session.id)
+    if not redis_hist:
+        opening = await generate_session_opening_message(
+            case.patient_json,
+            case.hidden_diagnosis,
+        )
+        if opening:
+            system_prompt = build_system_prompt(
+                case.patient_json,
+                case.hidden_diagnosis,
+            )
+            await save_history(
+                session.id,
+                [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "assistant", "content": opening},
+                ],
+            )
+            ai_msg = Message(
+                session_id=session.id,
+                role=MessageRole.assistant,
+                content=opening,
+            )
+            db.add(ai_msg)
+            await db.commit()
+            await db.refresh(ai_msg)
+            message_out = [MessageOut.model_validate(ai_msg)]
+            opening_message = opening
+
+    st = session.status
+    status_str = st.value if hasattr(st, "value") else str(st)
+
     return SessionOut(
         id=session.id,
         case_id=session.case_id,
-        status=session.status,
+        status=status_str,
         started_at=session.started_at,
-        messages=[],
+        messages=message_out,
+        opening_message=opening_message,
     )
 
 

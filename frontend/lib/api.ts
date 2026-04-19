@@ -88,6 +88,8 @@ export interface SessionOut {
   status: string;
   started_at: string;
   messages: MessageOut[];
+  /** Hastanın otomatik açılış mesajı (varsa `messages` içinde de assistant olarak gelir). */
+  opening_message?: string;
 }
 
 export interface MessageOut {

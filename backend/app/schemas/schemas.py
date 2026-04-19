@@ -119,6 +119,7 @@ class SessionOut(BaseModel):
     started_at: datetime
     ended_at: Optional[datetime] = None
     messages: List[MessageOut] = []
+    opening_message: str = ""
 
     class Config:
         from_attributes = True

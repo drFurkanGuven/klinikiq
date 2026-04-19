@@ -33,6 +33,7 @@ export interface SessionOut {
   status: string;
   started_at: string;
   messages: MessageOut[];
+  opening_message?: string;
 }
 
 /** GET /sessions/:id — tam oturum (native vaka ekranı) */
