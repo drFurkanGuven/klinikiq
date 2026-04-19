@@ -1,7 +1,7 @@
 import json
 import asyncio
 from datetime import datetime, timezone
-from typing import AsyncGenerator, Optional
+from typing import Any, AsyncGenerator, Optional
 
 from openai import AsyncOpenAI
 import redis.asyncio as aioredis
@@ -117,6 +117,46 @@ async def _get_cached_tetkik(case_id: str, test_key: str) -> Optional[str]:
         return row.result_content if row else None
 
 
+def _clinical_case_anchor(
+    patient_json: dict,
+    scoring_rubric: Optional[dict[str, Any]] = None,
+) -> str:
+    """Lab/fizik/konsült için: modele sabit vaka bağlamı — çelişkisiz üretim."""
+    lines: list[str] = []
+    age = patient_json.get("age", "?")
+    gender = patient_json.get("gender", "?")
+    cc = patient_json.get("chief_complaint") or ""
+    if len(cc) > 400:
+        cc = cc[:400] + "…"
+    lines.append(f"Hasta özeti: {age} yaş, {gender}. Başvuru: {cc}")
+    vitals = patient_json.get("vitals") or {}
+    if isinstance(vitals, dict) and vitals:
+        vtxt = ", ".join(f"{k}: {v}" for k, v in vitals.items())
+        lines.append(
+            "Kayıtlı vitaller (LAB sonuçların bunlarla ve birbirleriyle ÇELİŞMEMELİ; "
+            "ör. ağır anemi iddiası varsa Hb ile uyumlu ol): "
+            + vtxt
+        )
+    pe = patient_json.get("physical_exam")
+    if isinstance(pe, dict) and pe:
+        pe_bits = "; ".join(f"{k}: {v}" for k, v in list(pe.items())[:8])
+        lines.append(f"Vaka kaydındaki özet fizik: {pe_bits}")
+    if scoring_rubric:
+        kf = scoring_rubric.get("key_findings")
+        if isinstance(kf, list) and kf:
+            lines.append(
+                "Vaka kilit bulguları (tetkik tablosu bunları desteklemeli): "
+                + "; ".join(str(x) for x in kf[:10])
+            )
+        dd = scoring_rubric.get("differential_diagnoses")
+        if isinstance(dd, list) and dd:
+            lines.append(
+                "Ayırıcı tanı bağlamı (yanlışlıkla bu tabloları destekleyecek sonuç üretme): "
+                + ", ".join(str(x) for x in dd[:6])
+            )
+    return "\n".join(lines)
+
+
 async def _save_tetkik_result(case_id: str, test_key: str, content: str) -> None:
     from app.core.database import AsyncSessionLocal
     from app.models.models import TetkikResult
@@ -137,6 +177,7 @@ async def stream_patient_response(
     patient_json: dict,
     hidden_diagnosis: str,
     case_id: Optional[str] = None,
+    scoring_rubric: Optional[dict[str, Any]] = None,
 ) -> AsyncGenerator[str, None]:
     """SSE streaming için async generator döner."""
 
@@ -154,6 +195,8 @@ async def stream_patient_response(
     is_clinical_ai = is_consultation or is_lab or is_physical
 
     selected_model = "gpt-4o" if is_clinical_ai else "gpt-4o-mini"
+
+    case_anchor = _clinical_case_anchor(patient_json, scoring_rubric)
 
     # ── Tetkik cache kontrolü ─────────────────────────────────────────────────
     if is_lab and case_id:
@@ -173,6 +216,9 @@ async def stream_patient_response(
         
         if is_consultation:
             consult_prompt = f"""GİZLİ TANI (SADECE SEN BİLİYORSUN): {hidden_diagnosis}
+
+VAKA BAĞLAMI (tutarlı kal; asistanı yanlış sisteme yönlendirme):
+{case_anchor}
 
 SEN KİMSİN: Kıdemli, sert, az konuşan bir tıp Profesörüsün. Asistan doktor sana hastayı danışıyor.
 
@@ -196,7 +242,27 @@ Cevabın 3-5 cümleyi geçmesin. Türkçe yaz."""
             request_history.append({"role": "user", "content": user_message})
             
         elif is_lab:
-            lab_prompt = f"GİZLİ TANI: {hidden_diagnosis}\nSİSTEM: Sen nesnel bir Tıbbi Laboratuvar ve Görüntüleme Bilgi Sistemisin (LIS). Asistan doktorun istediği tetkik sonuçlarını gizli tanıya UYGUN olarak üret. SADECE Markdown tablosu (Parametre | Sonuç | Birim | Referans) ver. Asla tablo öncesi veya sonrası 'İşte sonuçlar', 'Yorum', 'Not' yazma. SADECE TABLO."
+            lab_prompt = f"""GİZLİ TANI (tek doğru klinik tablo bununla uyumlu olmalı): {hidden_diagnosis}
+
+{case_anchor}
+
+SİSTEM: Sen nesnel bir Tıbbi Laboratuvar ve Görüntüleme Bilgi Sistemisin (LIS).
+Asistanın istediği tetkikleri, SADECE istenen testler için, gerçekçi referans aralıkları ve birimlerle üret.
+
+ZORUNLU KURALLAR — ÇELİŞKİ YASAK:
+1) Ürettiğin TÜM sayısal sonuçlar birbirini ve yukarıdaki vaka özetini desteklemeli; gizli tanının tipik biyokimyasal/hematolojik tablosu ile UYUMLU olmalı.
+2) Kayıtlı vitallerle ve hasta öyküsüyle çelişen sonuç üretme (ör. öyküde ağır poliüri varken aşırı düşük osmolalite + normal glukoz gibi tutarsızlık yok).
+3) İstenmeyen ekstra test satırı ekleme; sadece kullanıcı mesajındaki tetkiklere yanıt ver.
+4) Rastgele "normal" üretmek yerine tanıyı düşündüren tutarlı bir panel üret; ayırıcı tanılara yanlışlıkla uyan sahte tablolar üretme.
+5) Çıktıda SADECE Markdown tablo (| ile); tablo dışında tek kelime yok. Başlık, özet, yorum yok.
+
+EĞİTİM / USMLE TARZI İPUÇLARI (öğrenci tabloyu okuyunca ayırıcı düşünebilsin):
+6) Bu gizli tanı ve hasta öyküsü için "tipik olarak anlamlı sapma göstermesi beklenen" parametreleri tabloda NET biçimde göster: referans aralığı dışında olduğu açık olsun (↑ patolojik / ↓ patolojik anlamında tutarlı sayılar).
+7) Her şeyi anormal yapma: gerçekçi bir "gürültü/karışıklık" değil, sınırlı sayıda güçlü ipucu + gerekirse bir kısım normal/near-normal değer; ayırıcı tanıları yanlışlıkla destekleyen sahte patern üretme.
+8) İstenen testler arasında tanı için kritik olanlar varsa, sonuç değerleri klinik yorum gerektirecek şekilde tutarlı seç (öğrenci "burada ne var?" diyebilsin).
+9) Referans sütununu gerçekçi laboratuvar referans aralıklarıyla doldur (yaş/cinsiyete uygun genel yetişkin aralığı kabul edilebilir); sonuç ile referans çelişmesin.
+
+TABLO SÜTUNLARI: Parametre | Sonuç | Birim | Referans"""
             request_history.insert(0, {"role": "system", "content": lab_prompt})
             request_history.append({"role": "user", "content": user_message})
             
@@ -208,13 +274,15 @@ Cevabın 3-5 cümleyi geçmesin. Türkçe yaz."""
             )
             exam_prompt = (
                 f"GİZLİ TANI: {hidden_diagnosis}\n"
+                f"{case_anchor}\n"
                 f"{vitals_note}\n"
                 f"SİSTEM: Sen nesnel bir Klinik Simülatörsün. Hasta değilsin. "
                 f"Asistanın yaptığı fizik muayene eyleminin sonuçlarını raporla. "
                 f"ÖNEMLİ: İstenen muayene KB, nabız, ateş, SpO2 gibi kayıtlı vital bulgulardan biriyse, "
                 f"KAYITLI VİTALLER'deki değerleri birebir kullan — yeni değer üretme. "
-                f"Diğer bulgular için gizli tanıyla TAM UYUMLU nesnel klinik bulgular üret "
-                f"(örn: Rebound var, S3 gallop duyuldu). Tıbbi ve nesnel dil kullan, yorum yapma."
+                f"Diğer bulgular için gizli tanı ve vaka kaydındaki fizik özet ile TAM UYUMLU, birbirini çelmeyen "
+                f"nesnel klinik bulgular üret (aynı muayenede çelişen iki bulgu verme). "
+                f"Tıbbi ve nesnel dil kullan, yorum yapma."
             )
             request_history.insert(0, {"role": "system", "content": exam_prompt})
             request_history.append({"role": "user", "content": user_message})
@@ -225,13 +293,23 @@ Cevabın 3-5 cümleyi geçmesin. Türkçe yaz."""
 
     full_response = ""
 
+    # Tetkik/fizik: düşük sıcaklık = daha tutarlı sayı ve bulgu
+    if is_lab:
+        stream_temp = 0.2
+    elif is_physical:
+        stream_temp = 0.25
+    elif is_consultation:
+        stream_temp = 0.3
+    else:
+        stream_temp = 0.5
+
     try:
         stream = await client.chat.completions.create(
             model=selected_model,
             messages=request_history,
             stream=True,
             max_tokens=800 if is_lab else 400,
-            temperature=0.5 if not is_lab else 0.3,
+            temperature=stream_temp,
         )
 
         async for chunk in stream:

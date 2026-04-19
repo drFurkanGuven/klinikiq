@@ -44,10 +44,13 @@ export function HeroSection() {
           <span className="gradient-text">Yeteneklerini Ateşle</span>
         </h1>
 
-        <p className="max-w-2xl mx-auto text-base md:text-xl leading-relaxed mb-12 font-medium opacity-70"
+        <p className="max-w-2xl mx-auto text-base md:text-xl leading-relaxed mb-6 font-medium opacity-70"
           style={{ color: "var(--text)" }}>
-          TUS ve USMLE hazırlığında bir adım öne geç. AI destekli hasta simülasyonları, 
-          gerçekçi tetkik panelleri ve anlık akademik raporlarla sınırlarını zorla.
+          Vaka simülasyonu: tetkik panelleri ve özetlerle pratik yap.
+        </p>
+        <p className="max-w-2xl mx-auto text-xs md:text-sm leading-relaxed mb-12 font-medium opacity-50 px-2"
+          style={{ color: "var(--text)" }}>
+          Tanı veya tedavi tavsiyesi değildir. Diyalog ve tetkik metinleri yapay zeka ile üretilebilir.
         </p>
 
         {/* Fixed Mobile Buttons - No Overlap */}
@@ -115,7 +118,7 @@ export function FeatureSection() {
     },
     {
       title: "AI Hasta Personası",
-      description: "Doğal dilde şikayetlerini aktaran, tutarlı ve dürüst bir hasta rolü oynayan yapay zeka.",
+      description: "Doğal dilde hasta rolü (eğitim); tanı veya muayene yerine geçmez.",
       icon: Brain,
     },
     {
@@ -155,7 +158,7 @@ export function FeatureSection() {
             Neden <span className="gradient-text">KlinikIQ?</span>
           </h2>
           <p className="text-base md:text-lg font-medium opacity-60" style={{ color: "var(--text)" }}>
-            Geleceğin tıp eğitimini, yapay zeka ve üst düzey simülasyonla bugünden deneyimle.
+            Klinik düşünmeyi pratik etmek için — tıbbi karar aracı değildir.
           </p>
         </div>
 

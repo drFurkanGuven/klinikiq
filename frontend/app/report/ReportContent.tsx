@@ -82,14 +82,14 @@ export default function ReportPageContent() {
       <div className="px-4 py-2.5 flex items-center gap-2 justify-center border-b" style={{ background: "var(--primary-light)", borderColor: "var(--primary-light)" }}>
         <Bot className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--primary)" }} />
         <p className="text-[10px] font-bold uppercase tracking-tight" style={{ color: "var(--primary)" }}>
-          AI Değerlendirmesi — Bu rapor GPT-4o tarafından üretilmiştir.
+          AI raporu · Eğitim amaçlı · Tıbbi karar yerine geçmez
         </p>
       </div>
 
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-10 transition-colors" style={{ background: "var(--bg)" }}>
         <div className="mb-8">
           <h2 className="text-2xl sm:text-3xl font-black" style={{ color: "var(--text)" }}>Performans Raporu</h2>
-          <p className="text-sm font-medium mt-1 opacity-60" style={{ color: "var(--text-muted)" }}>AI tarafından oluşturulan detaylı klinik değerlendirme</p>
+          <p className="text-sm font-medium mt-1 opacity-60" style={{ color: "var(--text-muted)" }}>Simülasyon geri bildirimi</p>
         </div>
 
         {loading && (
