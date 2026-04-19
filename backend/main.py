@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.core.paths import community_uploads_abs
 from app.core.database import engine, Base
 from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, community, drugs, antibiotics, emergency_mcq, learning
+from app.api.practice_mcq import router as practice_mcq_router
 
 
 def _ensure_community_notes_moderation_column(sync_conn) -> None:
@@ -85,6 +86,7 @@ app.include_router(community.router, prefix="/api/community", tags=["Community"]
 app.include_router(drugs.router, prefix="/api/drugs", tags=["Drugs"])
 app.include_router(antibiotics.router, prefix="/api/antibiotics", tags=["Antibiotics"])
 app.include_router(emergency_mcq.router, prefix="/api/emergency-mcq", tags=["Emergency MCQ"])
+app.include_router(practice_mcq_router, prefix="/api/practice-mcq", tags=["practice-mcq"])
 app.include_router(learning.router, prefix="/api/learning", tags=["Learning"])
 
 # Statik dosyalar (tiles ve önizlemeler)

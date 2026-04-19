@@ -181,6 +181,32 @@ export const questionsApi = {
     ),
 };
 
+export const practiceMcqApi = {
+  stats: () =>
+    api.get<{
+      total: number;
+      by_specialty: Record<string, number>;
+      by_step: Record<string, number>;
+    }>("/practice-mcq/stats"),
+
+  random: (params?: { specialty?: string; step?: string }) =>
+    api.get<{
+      id: string;
+      question: string;
+      options: { label: string; text: string }[];
+      source: string;
+      meta_info: string;
+      specialty: string;
+    }>("/practice-mcq/random", { params }),
+
+  verify: (id: string, selected_label: string) =>
+    api.post<{
+      correct: boolean;
+      correct_label: string;
+      correct_answer_text: string;
+    }>("/practice-mcq/verify", { id, selected_label }),
+};
+
 export const sessionsApi = {
   create: (case_id: string) =>
     api.post<SessionOut>("/sessions", { case_id }),
