@@ -567,21 +567,6 @@ async def explore_huggingface_datasets(
     return {"query": q, "datasets": out}
 
 
-@router.get("/images/{image_id}", response_model=HistologyImageOut)
-async def get_image(
-    image_id: str,
-    db: AsyncSession = Depends(get_db),
-    _: str = Depends(get_current_user_id),
-):
-    result = await db.execute(
-        select(HistologyImage).where(HistologyImage.id == image_id)
-    )
-    image = result.scalar_one_or_none()
-    if not image:
-        raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
-    return image
-
-
 @router.get("/images/{image_id}/preview")
 async def get_image_preview(
     image_id: str,
@@ -612,6 +597,21 @@ async def get_image_preview(
         raise HTTPException(status_code=404, detail=str(e)) from e
 
     return FileResponse(path, media_type="image/jpeg")
+
+
+@router.get("/images/{image_id}", response_model=HistologyImageOut)
+async def get_image(
+    image_id: str,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(get_current_user_id),
+):
+    result = await db.execute(
+        select(HistologyImage).where(HistologyImage.id == image_id)
+    )
+    image = result.scalar_one_or_none()
+    if not image:
+        raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
+    return image
 
 
 @router.post("/images", response_model=HistologyImageOut, status_code=201)
