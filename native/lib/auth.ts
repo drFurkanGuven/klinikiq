@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { authApi, type UserOut } from "./api";
@@ -30,7 +30,6 @@ export function useAuth(): {
   isAuthenticated: boolean;
   refetchUser: () => void;
 } {
-  const queryClient = useQueryClient();
   const [gate, setGate] = useState<"init" | "in" | "out">("init");
 
   useEffect(() => {
@@ -54,7 +53,7 @@ export function useAuth(): {
 
   const refetchUser = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
-  }, [queryClient]);
+  }, []);
 
   return {
     user,

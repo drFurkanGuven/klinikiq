@@ -1,4 +1,5 @@
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -22,6 +23,7 @@ import {
   type EmergencyMcqVerifyResult,
 } from "../../lib/api";
 import { useTheme } from "../../lib/theme";
+import { X } from "lucide-react-native";
 
 const QUESTION_SECONDS = 45;
 const OPTION_LABELS = ["A", "B", "C", "D"] as const;
@@ -53,6 +55,7 @@ function fontReg() {
 }
 
 export default function AcilTab() {
+  const router = useRouter();
   const theme = useTheme();
 
   const [phase, setPhase] = useState<Phase>("setup");
@@ -614,9 +617,15 @@ export default function AcilTab() {
       <Modal visible={phase === "setup"} transparent animationType="fade">
         <Pressable
           style={[styles.modalBackdrop, { backgroundColor: "#000000aa" }]}
-          onPress={() => {}}
+          onPress={() => router.back()}
         >
           <View style={[styles.modalCard, { backgroundColor: theme.surface }]}>
+            <Pressable
+              onPress={() => router.back()}
+              style={{ position: "absolute", top: 12, right: 12, padding: 8 }}
+            >
+              <X size={20} color={theme.textMuted} />
+            </Pressable>
             <Text style={[styles.modalTitle, { color: theme.text }]}>
               Oturum hedefi
             </Text>

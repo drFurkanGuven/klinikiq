@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import * as LocalAuthentication from "expo-local-authentication";
 import { router } from "expo-router";
 import { AlertCircle, Eye, EyeOff, Fingerprint, ScanFace } from "lucide-react-native";
@@ -18,13 +17,13 @@ import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
 import { login as doLogin } from "../../lib/auth";
+import { queryClient } from "../../lib/query-client";
 import { useTheme } from "../../lib/theme";
 import { storage } from "../../lib/storage";
 
 export default function LoginScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const queryClient = useQueryClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -638,4 +638,40 @@ export const usersApi = {
     api.patch<UserOut>("/users/me", data),
 };
 
+// ── Practice MCQ (USMLE Bankası) ─────────────────────────────────────────────
+
+export interface PracticeMcqItem {
+  id: string;
+  question: string;
+  options: { label: string; text: string }[];
+  specialty: string;
+  meta_info: string;
+  correct_option_label: string;
+  correct_answer_text: string;
+}
+
+export interface PracticeMcqCatalogVersion {
+  version: string;
+  total: number;
+}
+
+export interface PracticeMcqAll {
+  total: number;
+  version: string;
+  questions: PracticeMcqItem[];
+}
+
+export const practiceMcqApi = {
+  catalogVersion: () =>
+    api.get<PracticeMcqCatalogVersion>("/practice-mcq/catalog-version"),
+  catalogAll: () =>
+    api.get<PracticeMcqAll>("/practice-mcq/all", { timeout: 60000 }),
+  verify: (id: string, selected_label: string) =>
+    api.post<{
+      correct: boolean;
+      correct_label: string;
+      correct_answer_text: string;
+    }>("/practice-mcq/verify", { id, selected_label }),
+};
+
 export default api;

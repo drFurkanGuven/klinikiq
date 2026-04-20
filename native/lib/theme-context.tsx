@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { Appearance, ColorSchemeName } from "react-native";
-import { darkTheme, lightTheme, type Theme } from "./theme";
+import { darkTheme, lightTheme, type Theme } from "./theme-definitions";
 
 const STORAGE_KEY = "@klinikiq/theme_mode";
 

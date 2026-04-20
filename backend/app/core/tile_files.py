@@ -36,6 +36,14 @@ def remove_dzi_bundle(tiles_dir: str, image_url: Optional[str]) -> None:
         except OSError as e:
             print(f"[tiles] thumb silinemedi: {e}")
 
+    preview_rel = os.path.join(dirname, f"{stem}_preview.jpg") if dirname else f"{stem}_preview.jpg"
+    preview_path = os.path.join(tiles_dir, preview_rel)
+    if os.path.isfile(preview_path):
+        try:
+            os.remove(preview_path)
+        except OSError as e:
+            print(f"[tiles] preview silinemedi: {e}")
+
 
 def iter_dzi_relative_paths(tiles_dir: str) -> list[str]:
     """TILES_DIR altındaki tüm .dzi dosyalarının göreli yolları (posix)."""

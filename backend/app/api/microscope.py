@@ -1,12 +1,17 @@
 import asyncio
+import math
 import os
 import re
 import shutil
 import subprocess
 import tempfile
+import xml.etree.ElementTree as ET
+from pathlib import Path
 
 import httpx
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
+from fastapi.responses import FileResponse
+from PIL import Image as PilImage
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List, Optional
@@ -32,6 +37,177 @@ except ImportError:
 
 CACHE_KEY_LIST = "microscope:images:list:v3"
 CACHE_TTL = 3600  # 1 hour
+
+_TILE_NAME_RE = re.compile(r"^(\d+)_(\d+)\.(jpg|jpeg|png)$", re.IGNORECASE)
+
+
+def _xml_local_name(tag: str) -> str:
+    return tag.split("}")[-1] if "}" in tag else tag
+
+
+def _parse_dzi_xml(dzi_path: Path) -> tuple[int, int, int, int, str]:
+    """Width, Height, TileSize, Overlap, Format (lower)."""
+    try:
+        tree = ET.parse(dzi_path)
+    except ET.ParseError as e:
+        raise ValueError(f"DZI XML okunamadı: {e}") from e
+    root = tree.getroot()
+    tile_size = int(root.attrib.get("TileSize", "256"))
+    overlap = int(root.attrib.get("Overlap", "0"))
+    fmt = (root.attrib.get("Format", "jpg") or "jpg").lower()
+    width = height = None
+    for child in root:
+        if _xml_local_name(child.tag) == "Size":
+            width = int(child.attrib["Width"])
+            height = int(child.attrib["Height"])
+            break
+    if width is None or height is None:
+        raise ValueError("DZI Size bulunamadı")
+    return width, height, tile_size, overlap, fmt
+
+
+def _disk_max_level(stem_files: Path) -> int:
+    if not stem_files.is_dir():
+        return -1
+    levels: list[int] = []
+    for name in os.listdir(stem_files):
+        if name.isdigit():
+            levels.append(int(name))
+    return max(levels) if levels else -1
+
+
+def _tile_grid_dimensions(level_dir: Path) -> tuple[int, int]:
+    max_i = max_j = -1
+    for fn in os.listdir(level_dir):
+        m = _TILE_NAME_RE.match(fn)
+        if m:
+            max_i = max(max_i, int(m.group(1)))
+            max_j = max(max_j, int(m.group(2)))
+    if max_i < 0:
+        return (0, 0)
+    return (max_i + 1, max_j + 1)
+
+
+def _pick_preview_level(
+    stem_files: Path, width: int, height: int
+) -> int:
+    """Ceil(log2(max(W,H))) seviyesinden başlayıp grid en fazla 4x4 olana kadar seviye düşür."""
+    max_lvl = _disk_max_level(stem_files)
+    if max_lvl < 0:
+        raise FileNotFoundError("DZI karo klasörü yok")
+    start = int(math.ceil(math.log2(max(width, height))))
+    L = min(start, max_lvl)
+    while L >= 0:
+        ld = stem_files / str(L)
+        if not ld.is_dir():
+            L -= 1
+            continue
+        tx, ty = _tile_grid_dimensions(ld)
+        if tx == 0 or ty == 0:
+            L -= 1
+            continue
+        if tx <= 4 and ty <= 4:
+            return L
+        L -= 1
+    return 0
+
+
+def _lanczos_resample():
+    try:
+        return PilImage.Resampling.LANCZOS
+    except AttributeError:
+        return PilImage.LANCZOS
+
+
+def _stitch_level_to_image(
+    stem_files: Path,
+    level: int,
+    width: int,
+    height: int,
+    tile_size: int,
+    overlap: int,
+    max_level: int,
+) -> PilImage.Image:
+    level_dir = stem_files / str(level)
+    if not level_dir.is_dir():
+        raise FileNotFoundError(f"Seviye klasörü yok: {level}")
+
+    step = max(1, tile_size - overlap)
+    scale = 2 ** (max_level - level)
+    wL = max(1, math.ceil(width / scale))
+    hL = max(1, math.ceil(height / scale))
+
+    canvas = PilImage.new("RGB", (wL, hL), (240, 240, 240))
+
+    tiles: dict[tuple[int, int], Path] = {}
+    for fn in os.listdir(level_dir):
+        m = _TILE_NAME_RE.match(fn)
+        if m:
+            tiles[(int(m.group(1)), int(m.group(2)))] = level_dir / fn
+
+    if not tiles:
+        raise FileNotFoundError(f"Seviye {level} içinde karo yok")
+
+    for (i, j) in sorted(tiles.keys()):
+        path = tiles[(i, j)]
+        tile = PilImage.open(path).convert("RGB")
+        x = i * step
+        y = j * step
+        tw = min(tile.width, wL - x)
+        th = min(tile.height, hL - y)
+        if tw <= 0 or th <= 0:
+            continue
+        if tw < tile.width or th < tile.height:
+            tile = tile.crop((0, 0, tw, th))
+        canvas.paste(tile, (x, y))
+
+    return canvas
+
+
+def _ensure_dzi_preview_jpeg(tiles_dir: str, image_url: str) -> str:
+    """
+    DZI için _preview.jpg önbelleğini döndürür; yoksa üretir.
+    image_url örn. /tiles/foo.dzi veya /tiles/sub/bar.dzi
+    """
+    if not image_url.startswith("/tiles/"):
+        raise ValueError("Geçersiz image_url")
+    rel = image_url[len("/tiles/") :].lstrip("/").replace("\\", "/")
+    if not rel.lower().endswith(".dzi"):
+        raise ValueError("Önizleme yalnızca DZI için")
+
+    dzi_path = Path(tiles_dir) / rel
+    if not dzi_path.is_file():
+        raise FileNotFoundError("DZI dosyası bulunamadı")
+
+    cache_path = dzi_path.parent / f"{dzi_path.stem}_preview.jpg"
+    if cache_path.is_file() and cache_path.stat().st_size > 0:
+        return str(cache_path)
+
+    stem_files = dzi_path.parent / f"{dzi_path.stem}_files"
+    if not stem_files.is_dir():
+        raise FileNotFoundError("DZI karo klasörü bulunamadı")
+
+    width, height, tile_size, overlap, _fmt = _parse_dzi_xml(dzi_path)
+    max_lvl = _disk_max_level(stem_files)
+    if max_lvl < 0:
+        raise FileNotFoundError("DZI karo klasörü boş veya geçersiz")
+
+    level = _pick_preview_level(stem_files, width, height)
+    canvas = _stitch_level_to_image(
+        stem_files, level, width, height, tile_size, overlap, max_lvl
+    )
+
+    w, h = canvas.size
+    target_w = 1024
+    if w <= 0 or h <= 0:
+        raise ValueError("Geçersiz önizleme boyutu")
+    new_w = target_w
+    new_h = max(1, int(round(h * (target_w / float(w)))))
+    canvas = canvas.resize((new_w, new_h), _lanczos_resample())
+
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    canvas.save(cache_path, "JPEG", quality=85)
+    return str(cache_path)
 
 
 def _slugify(text: str) -> str:
@@ -404,6 +580,38 @@ async def get_image(
     if not image:
         raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
     return image
+
+
+@router.get("/images/{image_id}/preview")
+async def get_image_preview(
+    image_id: str,
+    db: AsyncSession = Depends(get_db),
+    _: str = Depends(get_current_user_id),
+):
+    """DZI paketinden önbellekli 1024px genişlikte JPEG önizleme."""
+    result = await db.execute(
+        select(HistologyImage).where(HistologyImage.id == image_id)
+    )
+    image = result.scalar_one_or_none()
+    if not image:
+        raise HTTPException(status_code=404, detail="Görüntü bulunamadı")
+    if not image.image_url or not str(image.image_url).lower().endswith(".dzi"):
+        raise HTTPException(status_code=404, detail="Önizleme yalnızca DZI görüntüleri için")
+
+    loop = asyncio.get_event_loop()
+    try:
+        path = await loop.run_in_executor(
+            None,
+            lambda: _ensure_dzi_preview_jpeg(settings.TILES_DIR, image.image_url),
+        )
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e) or "Dosya bulunamadı") from e
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    except OSError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+
+    return FileResponse(path, media_type="image/jpeg")
 
 
 @router.post("/images", response_model=HistologyImageOut, status_code=201)

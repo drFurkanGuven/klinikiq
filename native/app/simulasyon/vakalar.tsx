@@ -197,19 +197,6 @@ export default function VakalarScreen() {
             )}
           </View>
 
-          {/* Title + complaint */}
-          <Text style={[styles.caseTitle, { color: theme.text }]} numberOfLines={2}>
-            {item.title}
-          </Text>
-          {item.chief_complaint ? (
-            <Text
-              style={[styles.caseComplaint, { color: theme.textMuted }]}
-              numberOfLines={1}
-            >
-              {item.chief_complaint}
-            </Text>
-          ) : null}
-
           {/* Patient info */}
           {(item.patient_age != null || item.patient_gender) ? (
             <Text style={[styles.casePatient, { color: theme.textMuted }]}>
@@ -219,6 +206,15 @@ export default function VakalarScreen() {
               ]
                 .filter(Boolean)
                 .join(" · ")}
+            </Text>
+          ) : null}
+
+          {item.chief_complaint ? (
+            <Text
+              style={[styles.caseComplaint, { color: theme.textMuted }]}
+              numberOfLines={2}
+            >
+              {item.chief_complaint}
             </Text>
           ) : null}
 
@@ -560,15 +556,6 @@ const styles = StyleSheet.create({
       android: "Inter_700Bold",
       default: "Inter_700Bold",
     }),
-  },
-  caseTitle: {
-    fontFamily: Platform.select({
-      ios: "Inter_700Bold",
-      android: "Inter_700Bold",
-      default: "Inter_700Bold",
-    }),
-    fontSize: 15,
-    lineHeight: 21,
   },
   caseComplaint: {
     fontSize: 13,
