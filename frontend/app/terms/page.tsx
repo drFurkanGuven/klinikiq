@@ -3,22 +3,21 @@ import {
   ArrowLeft,
   Stethoscope,
   AlertTriangle,
-  ScrollText,
+  AlertCircle,
+  FileText,
   BookOpen,
   Stethoscope as StethoIcon,
-  UserCheck,
+  User,
   CheckCircle2,
-  Ban,
-  Copyright,
-  Cpu,
+  XCircle,
+  Award,
+  Bot,
   ShieldAlert,
-  ShieldOff,
-  PauseCircle,
+  ShieldCheck,
+  Clock,
   Heart,
-  FileEdit,
-  Scale,
+  Edit2,
   Mail,
-  ListChecks,
 } from 'lucide-react';
 
 import Footer from '@/components/Footer';
@@ -70,7 +69,7 @@ export default function TermsOfService() {
         {/* Başlık */}
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-            <ScrollText className="w-6 h-6 text-blue-400" />
+            <FileText className="w-6 h-6 text-blue-400" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-white">
@@ -135,7 +134,7 @@ export default function TermsOfService() {
         {/* İçindekiler */}
         <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 mb-6">
           <h2 className="text-sm font-black text-white mb-3 flex items-center gap-2">
-            <ListChecks className="w-4 h-4 text-slate-400" />
+            <BookOpen className="w-4 h-4 text-slate-400" />
             İçindekiler
           </h2>
           <ol className="text-sm text-slate-400 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 list-decimal pl-5">
@@ -204,7 +203,7 @@ export default function TermsOfService() {
         {/* 3. Uygunluk */}
         <Section
           id="uygunluk"
-          icon={UserCheck}
+          icon={User}
           color="text-emerald-400"
           bg="bg-emerald-500/10"
           title="3. Uygunluk ve Hesap"
@@ -238,7 +237,7 @@ export default function TermsOfService() {
         {/* 5. Yasaklı Davranışlar */}
         <Section
           id="yasaklar"
-          icon={Ban}
+          icon={XCircle}
           color="text-red-400"
           bg="bg-red-500/10"
           title="5. Yasaklı Davranışlar"
@@ -263,7 +262,7 @@ export default function TermsOfService() {
         {/* 6. Fikri Mülkiyet */}
         <Section
           id="fikri-mulkiyet"
-          icon={Copyright}
+          icon={Award}
           color="text-purple-400"
           bg="bg-purple-500/10"
           title="6. Fikri Mülkiyet"
@@ -284,7 +283,7 @@ export default function TermsOfService() {
         {/* 7. Üçüncü Taraf */}
         <Section
           id="ucuncu-taraf"
-          icon={Cpu}
+          icon={Bot}
           color="text-indigo-400"
           bg="bg-indigo-500/10"
           title="7. Üçüncü Taraf İçerikleri ve Yapay Zeka"
@@ -322,7 +321,7 @@ export default function TermsOfService() {
         {/* 9. Garanti */}
         <Section
           id="garanti"
-          icon={ShieldOff}
+          icon={AlertCircle}
           color="text-rose-400"
           bg="bg-rose-500/10"
           title="9. Garanti Sınırlamaları"
@@ -339,7 +338,7 @@ export default function TermsOfService() {
         {/* 10. Değişiklik */}
         <Section
           id="degisiklik"
-          icon={PauseCircle}
+          icon={Clock}
           color="text-slate-300"
           bg="bg-slate-500/10"
           title="10. Hizmette Değişiklik veya Sonlandırma"
@@ -372,7 +371,7 @@ export default function TermsOfService() {
         {/* 12. Şartların Güncellenmesi */}
         <Section
           id="guncelleme"
-          icon={FileEdit}
+          icon={Edit2}
           color="text-cyan-400"
           bg="bg-cyan-500/10"
           title="12. Şartların Güncellenmesi"
@@ -390,7 +389,7 @@ export default function TermsOfService() {
         {/* 13. Geçerli Hukuk */}
         <Section
           id="hukuk"
-          icon={Scale}
+          icon={ShieldCheck}
           color="text-blue-400"
           bg="bg-blue-500/10"
           title="13. Geçerli Hukuk ve Yetki"
@@ -446,7 +445,7 @@ function Section({
   children,
 }: {
   id?: string;
-  icon: typeof ScrollText;
+  icon: typeof FileText;
   color: string;
   bg: string;
   title: string;

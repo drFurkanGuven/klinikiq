@@ -5,17 +5,18 @@ import {
   ShieldCheck,
   Database,
   Activity,
-  Cpu,
+  Bot,
   Clock,
   Lock,
-  Cookie,
-  Baby,
-  UserCheck,
+  Settings,
+  User,
   Trophy,
-  FileEdit,
+  Edit2,
   Mail,
   AlertCircle,
-  ListChecks,
+  BookOpen,
+  Award,
+  Heart,
 } from 'lucide-react';
 
 import Footer from '@/components/Footer';
@@ -115,7 +116,7 @@ export default function PrivacyPolicy() {
         {/* İçindekiler */}
         <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 mb-6">
           <h2 className="text-sm font-black text-white mb-3 flex items-center gap-2">
-            <ListChecks className="w-4 h-4 text-slate-400" />
+            <BookOpen className="w-4 h-4 text-slate-400" />
             İçindekiler
           </h2>
           <ol className="text-sm text-slate-400 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 list-decimal pl-5">
@@ -135,7 +136,7 @@ export default function PrivacyPolicy() {
         {/* 1. Veri Sorumlusu */}
         <Section
           id="veri-sorumlusu"
-          icon={UserCheck}
+          icon={User}
           color="text-cyan-400"
           bg="bg-cyan-500/10"
           title="1. Veri Sorumlusu"
@@ -223,7 +224,7 @@ export default function PrivacyPolicy() {
         {/* 4. Yapay Zeka ve Üçüncü Taraflar */}
         <Section
           id="ucuncu-taraf"
-          icon={Cpu}
+          icon={Bot}
           color="text-indigo-400"
           bg="bg-indigo-500/10"
           title="4. Yapay Zeka ve Üçüncü Taraf İşleyiciler"
@@ -317,7 +318,7 @@ export default function PrivacyPolicy() {
         {/* 7. Çerezler */}
         <Section
           id="cerezler"
-          icon={Cookie}
+          icon={Settings}
           color="text-orange-400"
           bg="bg-orange-500/10"
           title="7. Çerezler ve Yerel Depolama"
@@ -338,7 +339,7 @@ export default function PrivacyPolicy() {
         {/* 8. Çocukların Gizliliği */}
         <Section
           id="cocuklar"
-          icon={Baby}
+          icon={Heart}
           color="text-pink-400"
           bg="bg-pink-500/10"
           title="8. Çocukların Gizliliği"
@@ -357,7 +358,7 @@ export default function PrivacyPolicy() {
         {/* 9. Haklar */}
         <Section
           id="haklar"
-          icon={UserCheck}
+          icon={Award}
           color="text-blue-400"
           bg="bg-blue-500/10"
           title="9. KVKK ve GDPR Kapsamındaki Haklarınız"
@@ -405,7 +406,7 @@ export default function PrivacyPolicy() {
         {/* 11. Değişiklikler */}
         <Section
           id="degisiklikler"
-          icon={FileEdit}
+          icon={Edit2}
           color="text-slate-300"
           bg="bg-slate-500/10"
           title="11. Politikadaki Değişiklikler"

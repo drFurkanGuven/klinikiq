@@ -12,7 +12,7 @@ import {
   ShieldCheck,
   FileText,
   Trash2,
-  Github,
+  ExternalLink,
   Clock,
 } from 'lucide-react';
 
@@ -280,7 +280,7 @@ export default function Destek() {
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-3 rounded-xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900 transition-colors"
             >
-              <Github className="w-4 h-4 text-slate-300 shrink-0" />
+              <ExternalLink className="w-4 h-4 text-slate-300 shrink-0" />
               <span className="text-sm font-bold text-white">GitHub</span>
             </a>
           </div>
