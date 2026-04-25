@@ -48,6 +48,7 @@ async def lifespan(app: FastAPI):
     logger.info("="*50)
     logger.info("🚀 KLINIKIQ BACKEND STARTING")
     logger.info(f"📡 ALLOWED CORS ORIGINS: {settings.BACKEND_CORS_ORIGINS}")
+    logger.info("📡 CORS allow_origin_regex: ^https?://tauri\\.localhost(:\\d+)?$")
     logger.info("="*50)
     
     yield
@@ -61,10 +62,12 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS
+# CORS: Tauri 2 (WKWebView) bazen "https://tauri.localhost" dışında portlu köken gönderebilir;
+# allow_origin_regex, taşıdaki tüm tauri.localhost varyantlarını kapsar.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_origin_regex=r"^https?://tauri\.localhost(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

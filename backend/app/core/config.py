@@ -31,11 +31,14 @@ class Settings(BaseSettings):
     # App
     ENVIRONMENT: str = "development"
     BACKEND_CORS_ORIGINS: List[str] = [
-        "http://localhost:3000", 
-        "http://localhost", 
+        "http://localhost:3000",
+        "http://localhost",
         "https://localhost",
-        "capacitor://localhost", 
-        "http://localhost:8000"
+        "capacitor://localhost",
+        "http://localhost:8000",
+        # Tauri 2 masaüstü (WKWebView) — /auth/login ve API için gerekli
+        "http://tauri.localhost",
+        "https://tauri.localhost",
     ]
 
     class Config:
@@ -53,7 +56,13 @@ settings = Settings()
 
 # 🛡️ BULLETPROOF CORS: Sunucudaki .env dosyası listeyi ezse bile, 
 # Android için gereken izinleri zorla ekleyelim.
-required_origins = ["capacitor://localhost", "http://localhost", "https://localhost"]
+required_origins = [
+    "capacitor://localhost",
+    "http://localhost",
+    "https://localhost",
+    "http://tauri.localhost",
+    "https://tauri.localhost",
+]
 for origin in required_origins:
     if origin not in settings.BACKEND_CORS_ORIGINS:
         settings.BACKEND_CORS_ORIGINS.append(origin)
