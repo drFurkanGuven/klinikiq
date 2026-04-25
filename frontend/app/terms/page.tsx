@@ -26,7 +26,6 @@ const LAST_UPDATED = '25 Nisan 2026';
 const CONTACT_EMAIL = 'drguevenfurkan@icloud.com';
 const PROVIDER = 'Furkan Güven (KlinikIQ — bireysel geliştirici)';
 const GOVERNING_LAW = 'Türkiye Cumhuriyeti';
-const COURT_OF_VENUE = 'İstanbul Mahkemeleri ve İcra Daireleri';
 
 const TOC: { href: string; label: string }[] = [
   { href: '#tanimlar', label: 'Tanımlar' },
@@ -394,11 +393,24 @@ export default function TermsOfService() {
           bg="bg-blue-500/10"
           title="13. Geçerli Hukuk ve Yetki"
         >
+          <p className="mb-3">
+            İşbu Şartlar <span className="font-bold text-white">{GOVERNING_LAW}</span>{' '}
+            hukukuna tâbidir.
+          </p>
+          <p className="mb-3">
+            <span className="font-bold text-white">Tüketici sıfatına sahip kullanıcılar</span>{' '}
+            bakımından 6502 sayılı Tüketicinin Korunması Hakkında Kanun hükümleri
+            saklıdır. Bu kullanıcılar, uyuşmazlıkları kendi yerleşim yerlerindeki{' '}
+            <span className="font-bold text-white">Tüketici Hakem Heyetleri</span> ve{' '}
+            <span className="font-bold text-white">Tüketici Mahkemeleri</span> önünde
+            çözmek üzere yasal başvuru haklarını koruyacaktır.
+          </p>
           <p>
-            İşbu Şartlar <span className="font-bold text-white">{GOVERNING_LAW}</span> hukukuna tâbidir.
-            Şartlardan veya Hizmet'ten doğabilecek her türlü uyuşmazlığın
-            çözümünde <span className="font-bold text-white">{COURT_OF_VENUE}</span> münhasır yetkili
-            kılınmıştır. Tüketici sıfatıyla mevzuattan kaynaklanan haklarınız saklıdır.
+            Tüketici niteliği taşımayan uyuşmazlıklarda (örn. fikri mülkiyet
+            ihlalleri, hizmetin suistimali, prompt injection, hesap manipülasyonu
+            veya ticari kullanım) ise <span className="font-bold text-white">Geliştirici'nin yerleşim yerindeki
+            Türkiye Cumhuriyeti mahkemeleri ve icra daireleri</span> yetkilidir
+            (HMK md. 6 ve 9 uyarınca).
           </p>
         </Section>
 
