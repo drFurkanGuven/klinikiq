@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Stethoscope, Heart, ExternalLink, BookOpen } from "lucide-react";
+import { Stethoscope, Heart, ExternalLink, BookOpen, LifeBuoy, Trash2 } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -46,6 +46,14 @@ export default function Footer() {
               style={{ color: "var(--text-muted)" }}>
               Notlar
             </Link>
+            <Link
+              href="/destek"
+              className="flex items-center gap-1 transition-colors hover:underline"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <LifeBuoy className="w-3.5 h-3.5 shrink-0 opacity-80" />
+              Destek
+            </Link>
             <Link href="/privacy"
               className="transition-colors hover:underline"
               style={{ color: "var(--text-muted)" }}>
@@ -55,6 +63,14 @@ export default function Footer() {
               className="transition-colors hover:underline"
               style={{ color: "var(--text-muted)" }}>
               Kullanım Şartları
+            </Link>
+            <Link
+              href="/delete-account"
+              className="flex items-center gap-1 transition-colors hover:underline"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <Trash2 className="w-3.5 h-3.5 shrink-0 opacity-80" />
+              Hesap Silme
             </Link>
             <a href="https://github.com/drFurkanGuven"
               target="_blank" rel="noopener noreferrer"
