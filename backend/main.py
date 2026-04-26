@@ -10,6 +10,31 @@ from app.api import auth, cases, sessions, reports, users, admin, flashcards, qu
 from app.api.practice_mcq import router as practice_mcq_router
 
 
+class _PreflightCorsMethodNormalizeMiddleware:
+    """
+    Starlette'ın CORS preflight'ı, allow_methods eşleşmesini büyük harfle yapar.
+    Bazı webview'lar (ör. WKWebView) Access-Control-Request-Method: post gönderir; bu
+    da 'Disallowed CORS method' + HTTP 400 üretir. OPTIONS gövdesine gelmeden düzelt.
+    """
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http" and scope.get("method") == "OPTIONS":
+            headers: list = []
+            for k, v in scope.get("headers", []):
+                if k.lower() == b"access-control-request-method" and v:
+                    try:
+                        m = v.decode("latin-1").strip().upper()
+                    except (UnicodeDecodeError, ValueError):
+                        m = ""
+                    v = m.encode("latin-1") if m else v
+                headers.append((k, v))
+            scope = {**scope, "headers": headers}
+        await self.app(scope, receive, send)
+
+
 def _ensure_community_notes_moderation_column(sync_conn) -> None:
     """Mevcut veritabanına moderation_status sütunu ekler (create_all yeni tablolara ekler)."""
     from sqlalchemy import inspect, text
@@ -72,6 +97,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Dış sarmalayıcı: önce method normalize, sonra yukarıdaki CORS (FastAPI: son add = en dıştaki)
+app.add_middleware(_PreflightCorsMethodNormalizeMiddleware)
 
 # Rotalar
 from fastapi.staticfiles import StaticFiles
