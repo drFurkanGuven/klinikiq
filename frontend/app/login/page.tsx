@@ -89,7 +89,13 @@ export default function LoginPage() {
       }
       router.push(postLoginPath());
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Giriş yapılamadı");
+      if (!err.response) {
+        setError("Sunucuya ulaşılamıyor. İnternet bağlantınızı veya API adresini kontrol edin.");
+      } else if (err.response.status >= 500) {
+        setError("Sunucu şu an yanıt vermiyor. Biraz sonra tekrar deneyin veya yöneticiye bildirin.");
+      } else {
+        setError(err.response?.data?.detail || "Giriş yapılamadı");
+      }
     } finally {
       setLoading(false);
     }
