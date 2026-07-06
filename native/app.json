@@ -16,7 +16,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.klinikiq.app",
-      "buildNumber": "8"
+      "buildNumber": "8",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.klinikiq.app",
@@ -26,7 +29,11 @@
         "backgroundColor": "#0A0F1E"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,12 +47,15 @@
         {
           "faceIDPermission": "KlinikIQ hesabınıza hızlı giriş için Face ID kullanılır."
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
+        "projectId": "4ccad1a9-64d0-4ae9-9ee6-f94b4a388559"
       }
-    }
+    },
+    "owner": "furkanguven"
   }
 }
