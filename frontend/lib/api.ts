@@ -343,6 +343,82 @@ export const emergencyMcqApi = {
   getReport: (id: string) => api.get<EmergencyMcqReportOut>(`/emergency-mcq/reports/${encodeURIComponent(id)}`),
 };
 
+// ── Study (günlük çalışma + FSRS) ─────────────────────────────────────────────
+
+export interface StudyWeakTopic {
+  topic_slug: string;
+  topic_label: string;
+  wrong_count: number;
+  total_count: number;
+}
+
+export interface StudyDashboard {
+  daily_goal: number;
+  answered_today: number;
+  due_count: number;
+  current_streak: number;
+  longest_streak: number;
+  pool_mcq_count: number;
+  weak_topics: StudyWeakTopic[];
+}
+
+export interface StudyQuestion {
+  mcq_id: string;
+  pool: string;
+  question: string;
+  options: { label: string; text: string }[];
+  is_review: boolean;
+  topic_slug: string | null;
+  topic_label: string | null;
+}
+
+export interface StudySessionStart {
+  session_id: string;
+  mode: "daily" | "acil" | "usmle";
+  goal: number;
+  questions: StudyQuestion[];
+}
+
+export interface StudyRemediation {
+  topic_slug: string;
+  topic_label: string;
+  map_href?: string | null;
+}
+
+export interface StudyAnswerResult {
+  correct: boolean;
+  correct_label: string | null;
+  correct_answer_text: string | null;
+  remediation: StudyRemediation | null;
+  due_count: number;
+  answered_today: number;
+}
+
+export interface StudyTopicMastery {
+  topic_slug: string;
+  topic_label: string;
+  seen: number;
+  correct: number;
+  mastery_pct: number;
+  map_href: string | null;
+}
+
+export const studyApi = {
+  dashboard: () => api.get<StudyDashboard>("/study/dashboard"),
+  patchSettings: (daily_goal: number) =>
+    api.patch<{ daily_goal: number; preferred_pool: string }>("/study/settings", { daily_goal }),
+  startSession: (goal: number, mode: "daily" | "acil" | "usmle" = "daily") =>
+    api.post<StudySessionStart>("/study/session/start", { goal, mode }),
+  answer: (body: {
+    mcq_id: string;
+    pool: string;
+    selected_label: string;
+    session_id?: string;
+    elapsed_ms?: number;
+  }) => api.post<StudyAnswerResult>("/study/session/answer", body),
+  topics: () => api.get<StudyTopicMastery[]>("/study/topics"),
+};
+
 export interface LearningCard {
   report_id: string;
   case_id: string;
@@ -373,12 +449,20 @@ export const learningApi = {
 export type PharmaNodeType = "receptor" | "mediator" | "organ" | "effect" | "drug_class";
 export type PharmaRelation = "activates" | "inhibits" | "agonist" | "antagonist";
 
+export interface PharmaSignaling {
+  pathway: string;
+  second_messenger: string;
+  clinical_hook_tr: string;
+}
+
 export interface PharmaNode {
   id: string;
   label_tr: string;
   type: PharmaNodeType;
   description_tr: string;
   high_yield: boolean;
+  memory_hook_tr?: string;
+  signaling?: PharmaSignaling | null;
 }
 
 export interface PharmaEdge {
@@ -410,10 +494,28 @@ export interface PharmaQuizItem {
   node_id?: string | null;
 }
 
+export interface PharmaVignette {
+  id: string;
+  title_tr: string;
+  scenario_tr: string;
+  q_tr: string;
+  options_tr: string[];
+  answer_idx: number;
+  explanation_tr: string;
+  node_id?: string | null;
+}
+
 export interface PharmaMapSummary {
   id: string;
   title_tr: string;
   description_tr: string;
+  order: number;
+  level: string;
+  estimated_minutes: number;
+  prerequisites: string[];
+  high_yield_count: number;
+  quiz_count: number;
+  vignette_count: number;
 }
 
 export interface PharmaMap {
@@ -425,11 +527,27 @@ export interface PharmaMap {
   edges: PharmaEdge[];
   interventions: PharmaIntervention[];
   quiz: PharmaQuizItem[];
+  vignettes: PharmaVignette[];
+}
+
+export interface PharmaLearningPathItem {
+  map_id: string;
+  order: number;
+  level: string;
+  estimated_minutes: number;
+  prerequisites: string[];
+}
+
+export interface PharmaLearningPath {
+  title_tr: string;
+  description_tr: string;
+  items: PharmaLearningPathItem[];
 }
 
 export const pharmaApi = {
   listMaps: () => api.get<PharmaMapSummary[]>("/pharma/maps"),
   getMap: (mapId: string) => api.get<PharmaMap>(`/pharma/maps/${mapId}`),
+  getLearningPath: () => api.get<PharmaLearningPath>("/pharma/learning-path"),
 };
 
 export const usersApi = {

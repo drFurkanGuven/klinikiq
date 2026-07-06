@@ -4,166 +4,486 @@
   "description_tr": "Nefron segmentlerinde Na⁺ geri emilimi ve diüretik sınıflarının hedef taşıyıcıları/enzimleri. Loop, tiazid, K⁺ koruyucu, karbonik anhidraz inhibitörleri ve osmotik diüretiklerin mekanizma → elektrolit etkisi zinciri.",
   "source_attribution": "Segment farmakolojisi StatPearls (NBK532918), PMC6682831 (Clinical Pharmacology in Diuretic Use), Guyton & Hall böbrek fizyolojisi ve GtoPdb taşıyıcı/hedef verileri (CC BY-SA 4.0) temel alınarak derlenmiştir.",
   "nodes": [
-    { "id": "med_aldosterone", "label_tr": "Aldosteron", "type": "mediator", "high_yield": true, "description_tr": "RAAS ürünü; toplayıcı kanalda MR uyarısı ile Na⁺ geri emilimini ve K⁺ sekresyonunu artırır. Spironolakton/eplerenon hedefidir." },
-
-    { "id": "r_mr", "label_tr": "Mineralokortikoid reseptör", "type": "receptor", "high_yield": true, "description_tr": "Toplayıcı kanal principal hücrelerinde aldosteron hedefi. ENaC ve Na⁺/K⁺-ATPaz ekspresyonunu artırır." },
-    { "id": "r_enac", "label_tr": "ENaC (epitel Na⁺ kanalı)", "type": "receptor", "high_yield": true, "description_tr": "Toplayıcı kanal luminal Na⁺ kanalı. Amilorid ve triamteren direkt bloke eder. Aldosteron/MR ile upregüle olur." },
-
-    { "id": "o_pct", "label_tr": "Proksimal tübül (PCT)", "type": "organ", "high_yield": true, "description_tr": "Filtratın ~65–70%'i NaHCO₃ ve NaCl olarak geri emilir. Karbonik anhidraz bağımlı asit sekresyonu kritiktir." },
-    { "id": "o_tal", "label_tr": "Henle kulpü — kalın çıkan kol (TAL)", "type": "organ", "high_yield": true, "description_tr": "NKCC2 (Na⁺-K⁺-2Cl⁻ kotransporter) ile ~25% Na⁺ geri emilimi. Loop diüretiklerin (furosemid) birincil hedefi. Makula densa burada." },
-    { "id": "o_dct", "label_tr": "Distal konvolut tübül (DCT)", "type": "organ", "high_yield": true, "description_tr": "NCC (Na⁺-Cl⁻ kotransporter) ile ~5–7% Na⁺ geri emilimi. Tiazid ve tiazid benzeri diüretiklerin hedefi." },
-    { "id": "o_cd", "label_tr": "Toplayıcı kanal (CD)", "type": "organ", "high_yield": true, "description_tr": "Aldosteron/MR ve ENaC ile son Na⁺ geri emilimi ve K⁺ sekresyonu. K⁺ koruyucu diüretiklerin hedefi." },
-
-    { "id": "t_nkcc2", "label_tr": "NKCC2 taşıyıcısı", "type": "receptor", "high_yield": true, "description_tr": "SLC12A1 kodlu luminal Na⁺-K⁺-2Cl⁻ kotransporter. Furosemid, bumetanid, torasemid luminal taraftan bağlanıp inhibe eder." },
-    { "id": "t_ncc", "label_tr": "NCC taşıyıcısı", "type": "receptor", "high_yield": true, "description_tr": "SLC12A3 kodlu thiazide-duyarlı Na⁺-Cl⁻ kotransporter. Hidroklorotiyazid, klortalidon, indapamid hedefidir." },
-    { "id": "t_ca", "label_tr": "Karbonik anhidraz (CA)", "type": "receptor", "high_yield": true, "description_tr": "PCT'de HCO₃⁻ geri emilimi için gerekli enzim. Asetazolamid inhibe eder → bikarbonatüri." },
-
-    { "id": "e_diuresis", "label_tr": "Diürez & natriürez", "type": "effect", "high_yield": true, "description_tr": "Na⁺ geri emiliminin azalması → osmotik su atılımı. Etkinlik segmentteki geri emilim payına bağlıdır." },
-    { "id": "e_hypokalemia", "label_tr": "Hipokalemi riski", "type": "effect", "high_yield": true, "description_tr": "Loop ve tiazidler distal Na⁺ delivery'yi artırır → toplayıcı kanalda K⁺ sekresyonu ↑. RAAS aktivasyonu bunu güçlendirir." },
-    { "id": "e_hyperkalemia", "label_tr": "Hiperkalemi riski", "type": "effect", "high_yield": true, "description_tr": "MRA ve ENaC blokerleri K⁺ atılımını azaltır. ACEİ/ARB ile kombinede risk artar." },
-    { "id": "e_metabolic_alkalosis", "label_tr": "Metabolik alkaloz", "type": "effect", "high_yield": true, "description_tr": "Loop/tiazid → Cl⁻ kaybı, hacim kontraksiyonu, RAAS → sekonder hiperaldosteronizm ile tipik diüretik alkalozu." },
-    { "id": "e_hyponatremia", "label_tr": "Hiponatremi riski", "type": "effect", "high_yield": false, "description_tr": "Tiazidler free water clearance'ı azaltabilir → dilusyonel hiponatremi (özellikle yaşlı). Loop'ta daha az tipik." },
-    { "id": "e_hyperuricemia", "label_tr": "Hiperürisemi / gut", "type": "effect", "high_yield": false, "description_tr": "Tiazid ve loop diüretikler ürik asit sekresyonunu azaltabilir; gut atağı riski artabilir." },
-    { "id": "e_bicarbonaturia", "label_tr": "Bikarbonatüri & metabolik asidoz", "type": "effect", "high_yield": true, "description_tr": "Asetazolamid HCO₃⁻ geri emilimini azaltır → idrar alkalin, plazma asidoz (tip II renal TAT acidozu)." },
-    { "id": "e_ohtn", "label_tr": "Otonom hipertansiyon (tiazid)", "type": "effect", "high_yield": false, "description_tr": "Tiazidler damar düz kasında Ca²⁺'yi artırarak antihipertansif etki gösterir (uzun dönem)." }
+    {
+      "id": "med_aldosterone",
+      "label_tr": "Aldosteron",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "RAAS ürünü; toplayıcı kanalda MR uyarısı ile Na⁺ geri emilimini ve K⁺ sekresyonunu artırır. Spironolakton/eplerenon hedefidir."
+    },
+    {
+      "id": "r_mr",
+      "label_tr": "Mineralokortikoid reseptör",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Toplayıcı kanal principal hücrelerinde aldosteron hedefi. ENaC ve Na⁺/K⁺-ATPaz ekspresyonunu artırır."
+    },
+    {
+      "id": "r_enac",
+      "label_tr": "ENaC (epitel Na⁺ kanalı)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Toplayıcı kanal luminal Na⁺ kanalı. Amilorid ve triamteren direkt bloke eder. Aldosteron/MR ile upregüle olur."
+    },
+    {
+      "id": "o_pct",
+      "label_tr": "Proksimal tübül (PCT)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Filtratın ~65–70%'i NaHCO₃ ve NaCl olarak geri emilir. Karbonik anhidraz bağımlı asit sekresyonu kritiktir."
+    },
+    {
+      "id": "o_tal",
+      "label_tr": "Henle kulpü — kalın çıkan kol (TAL)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "NKCC2 (Na⁺-K⁺-2Cl⁻ kotransporter) ile ~25% Na⁺ geri emilimi. Loop diüretiklerin (furosemid) birincil hedefi. Makula densa burada."
+    },
+    {
+      "id": "o_dct",
+      "label_tr": "Distal konvolut tübül (DCT)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "NCC (Na⁺-Cl⁻ kotransporter) ile ~5–7% Na⁺ geri emilimi. Tiazid ve tiazid benzeri diüretiklerin hedefi."
+    },
+    {
+      "id": "o_cd",
+      "label_tr": "Toplayıcı kanal (CD)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Aldosteron/MR ve ENaC ile son Na⁺ geri emilimi ve K⁺ sekresyonu. K⁺ koruyucu diüretiklerin hedefi."
+    },
+    {
+      "id": "t_nkcc2",
+      "label_tr": "NKCC2 taşıyıcısı",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "SLC12A1 kodlu luminal Na⁺-K⁺-2Cl⁻ kotransporter. Furosemid, bumetanid, torasemid luminal taraftan bağlanıp inhibe eder."
+    },
+    {
+      "id": "t_ncc",
+      "label_tr": "NCC taşıyıcısı",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "SLC12A3 kodlu thiazide-duyarlı Na⁺-Cl⁻ kotransporter. Hidroklorotiyazid, klortalidon, indapamid hedefidir."
+    },
+    {
+      "id": "t_ca",
+      "label_tr": "Karbonik anhidraz (CA)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "PCT'de HCO₃⁻ geri emilimi için gerekli enzim. Asetazolamid inhibe eder → bikarbonatüri."
+    },
+    {
+      "id": "e_diuresis",
+      "label_tr": "Diürez & natriürez",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Na⁺ geri emiliminin azalması → osmotik su atılımı. Etkinlik segmentteki geri emilim payına bağlıdır."
+    },
+    {
+      "id": "e_hypokalemia",
+      "label_tr": "Hipokalemi riski",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Loop ve tiazidler distal Na⁺ delivery'yi artırır → toplayıcı kanalda K⁺ sekresyonu ↑. RAAS aktivasyonu bunu güçlendirir."
+    },
+    {
+      "id": "e_hyperkalemia",
+      "label_tr": "Hiperkalemi riski",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "MRA ve ENaC blokerleri K⁺ atılımını azaltır. ACEİ/ARB ile kombinede risk artar."
+    },
+    {
+      "id": "e_metabolic_alkalosis",
+      "label_tr": "Metabolik alkaloz",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Loop/tiazid → Cl⁻ kaybı, hacim kontraksiyonu, RAAS → sekonder hiperaldosteronizm ile tipik diüretik alkalozu."
+    },
+    {
+      "id": "e_hyponatremia",
+      "label_tr": "Hiponatremi riski",
+      "type": "effect",
+      "high_yield": false,
+      "description_tr": "Tiazidler free water clearance'ı azaltabilir → dilusyonel hiponatremi (özellikle yaşlı). Loop'ta daha az tipik."
+    },
+    {
+      "id": "e_hyperuricemia",
+      "label_tr": "Hiperürisemi / gut",
+      "type": "effect",
+      "high_yield": false,
+      "description_tr": "Tiazid ve loop diüretikler ürik asit sekresyonunu azaltabilir; gut atağı riski artabilir."
+    },
+    {
+      "id": "e_bicarbonaturia",
+      "label_tr": "Bikarbonatüri & metabolik asidoz",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Asetazolamid HCO₃⁻ geri emilimini azaltır → idrar alkalin, plazma asidoz (tip II renal TAT acidozu)."
+    },
+    {
+      "id": "e_ohtn",
+      "label_tr": "Otonom hipertansiyon (tiazid)",
+      "type": "effect",
+      "high_yield": false,
+      "description_tr": "Tiazidler damar düz kasında Ca²⁺'yi artırarak antihipertansif etki gösterir (uzun dönem)."
+    }
   ],
   "edges": [
-    { "source": "o_pct", "target": "t_ca", "relation": "activates", "effect_tr": "CA ile HCO₃⁻ geri emilimi" },
-    { "source": "o_tal", "target": "t_nkcc2", "relation": "activates", "effect_tr": "Na⁺-K⁺-2Cl⁻ geri emilimi (~25%)" },
-    { "source": "o_dct", "target": "t_ncc", "relation": "activates", "effect_tr": "Na⁺-Cl⁻ geri emilimi (~5–7%)" },
-    { "source": "med_aldosterone", "target": "r_mr", "relation": "agonist", "effect_tr": "MR uyarısı" },
-    { "source": "r_mr", "target": "o_cd", "relation": "activates", "effect_tr": "ENaC & Na⁺/K⁺-ATPaz ↑" },
-    { "source": "r_enac", "target": "o_cd", "relation": "activates", "effect_tr": "Luminal Na⁺ girişi" },
-
-    { "source": "t_nkcc2", "target": "e_diuresis", "relation": "activates", "effect_tr": "Loop: güçlü natriürez" },
-    { "source": "t_ncc", "target": "e_diuresis", "relation": "activates", "effect_tr": "Tiazid: orta natriürez" },
-    { "source": "t_ca", "target": "e_bicarbonaturia", "relation": "activates", "effect_tr": "CA inhibisyonu" },
-
-    { "source": "e_diuresis", "target": "e_hypokalemia", "relation": "activates", "effect_tr": "Distal Na⁺ delivery → K⁺ kaybı" },
-    { "source": "e_diuresis", "target": "e_metabolic_alkalosis", "relation": "activates", "effect_tr": "Cl⁻ kaybı + hacim ↓" },
-    { "source": "r_mr", "target": "e_hypokalemia", "relation": "activates", "effect_tr": "Aldosteron K⁺ sekresyonu ↑" }
+    {
+      "source": "o_pct",
+      "target": "t_ca",
+      "relation": "activates",
+      "effect_tr": "CA ile HCO₃⁻ geri emilimi"
+    },
+    {
+      "source": "o_tal",
+      "target": "t_nkcc2",
+      "relation": "activates",
+      "effect_tr": "Na⁺-K⁺-2Cl⁻ geri emilimi (~25%)"
+    },
+    {
+      "source": "o_dct",
+      "target": "t_ncc",
+      "relation": "activates",
+      "effect_tr": "Na⁺-Cl⁻ geri emilimi (~5–7%)"
+    },
+    {
+      "source": "med_aldosterone",
+      "target": "r_mr",
+      "relation": "agonist",
+      "effect_tr": "MR uyarısı"
+    },
+    {
+      "source": "r_mr",
+      "target": "o_cd",
+      "relation": "activates",
+      "effect_tr": "ENaC & Na⁺/K⁺-ATPaz ↑"
+    },
+    {
+      "source": "r_enac",
+      "target": "o_cd",
+      "relation": "activates",
+      "effect_tr": "Luminal Na⁺ girişi"
+    },
+    {
+      "source": "t_nkcc2",
+      "target": "e_diuresis",
+      "relation": "activates",
+      "effect_tr": "Loop: güçlü natriürez"
+    },
+    {
+      "source": "t_ncc",
+      "target": "e_diuresis",
+      "relation": "activates",
+      "effect_tr": "Tiazid: orta natriürez"
+    },
+    {
+      "source": "t_ca",
+      "target": "e_bicarbonaturia",
+      "relation": "activates",
+      "effect_tr": "CA inhibisyonu"
+    },
+    {
+      "source": "e_diuresis",
+      "target": "e_hypokalemia",
+      "relation": "activates",
+      "effect_tr": "Distal Na⁺ delivery → K⁺ kaybı"
+    },
+    {
+      "source": "e_diuresis",
+      "target": "e_metabolic_alkalosis",
+      "relation": "activates",
+      "effect_tr": "Cl⁻ kaybı + hacim ↓"
+    },
+    {
+      "source": "r_mr",
+      "target": "e_hypokalemia",
+      "relation": "activates",
+      "effect_tr": "Aldosteron K⁺ sekresyonu ↑"
+    }
   ],
   "interventions": [
     {
       "drug_class": "loop_diuretic",
       "label_tr": "Loop diüretik (furosemid)",
-      "targets": ["t_nkcc2"],
+      "targets": [
+        "t_nkcc2"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "o_tal", "effect_tr": "TAL'de Na⁺ geri emilimi ↓" },
-        { "nodeId": "e_diuresis", "effect_tr": "Güçlü diürez (akut ödem, kalp yetmezliği)" },
-        { "nodeId": "e_hypokalemia", "effect_tr": "K⁺, Mg²⁺, Ca²⁺ kaybı riski" },
-        { "nodeId": "e_metabolic_alkalosis", "effect_tr": "Loop alkalozu" },
-        { "nodeId": "e_hyperuricemia", "effect_tr": "Hiperürisemi" }
+        {
+          "nodeId": "o_tal",
+          "effect_tr": "TAL'de Na⁺ geri emilimi ↓"
+        },
+        {
+          "nodeId": "e_diuresis",
+          "effect_tr": "Güçlü diürez (akut ödem, kalp yetmezliği)"
+        },
+        {
+          "nodeId": "e_hypokalemia",
+          "effect_tr": "K⁺, Mg²⁺, Ca²⁺ kaybı riski"
+        },
+        {
+          "nodeId": "e_metabolic_alkalosis",
+          "effect_tr": "Loop alkalozu"
+        },
+        {
+          "nodeId": "e_hyperuricemia",
+          "effect_tr": "Hiperürisemi"
+        }
       ],
-      "tr_products_atc": ["C03CA01", "C03CA02"]
+      "tr_products_atc": [
+        "C03CA01",
+        "C03CA02"
+      ]
     },
     {
       "drug_class": "thiazide",
       "label_tr": "Tiazid (HCTZ / klortalidon)",
-      "targets": ["t_ncc"],
+      "targets": [
+        "t_ncc"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "o_dct", "effect_tr": "DCT'de Na⁺ geri emilimi ↓" },
-        { "nodeId": "e_diuresis", "effect_tr": "Orta diüretik etki; HT birinci basamak" },
-        { "nodeId": "e_hypokalemia", "effect_tr": "Hipokalemi (en sık elektrolit sorunu)" },
-        { "nodeId": "e_hyponatremia", "effect_tr": "Hiponatremi riski (yaşlı)" },
-        { "nodeId": "e_ohtn", "effect_tr": "Uzun dönem vazodilatasyon" },
-        { "nodeId": "e_hyperuricemia", "effect_tr": "Hiperürisemi" }
+        {
+          "nodeId": "o_dct",
+          "effect_tr": "DCT'de Na⁺ geri emilimi ↓"
+        },
+        {
+          "nodeId": "e_diuresis",
+          "effect_tr": "Orta diüretik etki; HT birinci basamak"
+        },
+        {
+          "nodeId": "e_hypokalemia",
+          "effect_tr": "Hipokalemi (en sık elektrolit sorunu)"
+        },
+        {
+          "nodeId": "e_hyponatremia",
+          "effect_tr": "Hiponatremi riski (yaşlı)"
+        },
+        {
+          "nodeId": "e_ohtn",
+          "effect_tr": "Uzun dönem vazodilatasyon"
+        },
+        {
+          "nodeId": "e_hyperuricemia",
+          "effect_tr": "Hiperürisemi"
+        }
       ],
-      "tr_products_atc": ["C03AA03", "C03AA04", "C03BA04"]
+      "tr_products_atc": [
+        "C03AA03",
+        "C03AA04",
+        "C03BA04"
+      ]
     },
     {
       "drug_class": "carbonic_anhydrase_inhibitor",
       "label_tr": "Karbonik anhidraz inhibitörü (asetazolamid)",
-      "targets": ["t_ca"],
+      "targets": [
+        "t_ca"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "o_pct", "effect_tr": "PCT HCO₃⁻ geri emilimi ↓" },
-        { "nodeId": "e_bicarbonaturia", "effect_tr": "Bikarbonatüri, idrar alkalin" },
-        { "nodeId": "e_diuresis", "effect_tr": "Zayıf diüretik (CAI)" },
-        { "nodeId": "e_hypokalemia", "effect_tr": "Distal Na⁺ delivery → K⁺ kaybı" }
+        {
+          "nodeId": "o_pct",
+          "effect_tr": "PCT HCO₃⁻ geri emilimi ↓"
+        },
+        {
+          "nodeId": "e_bicarbonaturia",
+          "effect_tr": "Bikarbonatüri, idrar alkalin"
+        },
+        {
+          "nodeId": "e_diuresis",
+          "effect_tr": "Zayıf diüretik (CAI)"
+        },
+        {
+          "nodeId": "e_hypokalemia",
+          "effect_tr": "Distal Na⁺ delivery → K⁺ kaybı"
+        }
       ],
-      "tr_products_atc": ["S01EC01"]
+      "tr_products_atc": [
+        "S01EC01"
+      ]
     },
     {
       "drug_class": "mra_diuretic",
       "label_tr": "MRA (spironolakton)",
-      "targets": ["r_mr"],
+      "targets": [
+        "r_mr"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "o_cd", "effect_tr": "Na⁺ geri emilimi ↓" },
-        { "nodeId": "e_diuresis", "effect_tr": "Zayıf–orta diüretik" },
-        { "nodeId": "e_hyperkalemia", "effect_tr": "K⁺ koruyucu; hiperkalemi riski" }
+        {
+          "nodeId": "o_cd",
+          "effect_tr": "Na⁺ geri emilimi ↓"
+        },
+        {
+          "nodeId": "e_diuresis",
+          "effect_tr": "Zayıf–orta diüretik"
+        },
+        {
+          "nodeId": "e_hyperkalemia",
+          "effect_tr": "K⁺ koruyucu; hiperkalemi riski"
+        }
       ],
-      "tr_products_atc": ["C03DA01"]
+      "tr_products_atc": [
+        "C03DA01"
+      ]
     },
     {
       "drug_class": "enac_blocker",
       "label_tr": "ENaC bloker (amilorid)",
-      "targets": ["r_enac"],
+      "targets": [
+        "r_enac"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "o_cd", "effect_tr": "Luminal Na⁺ girişi ↓" },
-        { "nodeId": "e_diuresis", "effect_tr": "Zayıf diüretik" },
-        { "nodeId": "e_hyperkalemia", "effect_tr": "K⁺ koruyucu (triamteren ile benzer)" }
+        {
+          "nodeId": "o_cd",
+          "effect_tr": "Luminal Na⁺ girişi ↓"
+        },
+        {
+          "nodeId": "e_diuresis",
+          "effect_tr": "Zayıf diüretik"
+        },
+        {
+          "nodeId": "e_hyperkalemia",
+          "effect_tr": "K⁺ koruyucu (triamteren ile benzer)"
+        }
       ],
-      "tr_products_atc": ["C03DB01"]
+      "tr_products_atc": [
+        "C03DB01"
+      ]
     },
     {
       "drug_class": "osmotic_diuretic",
       "label_tr": "Osmotik diüretik (mannitol)",
-      "targets": ["o_pct"],
+      "targets": [
+        "o_pct"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "e_diuresis", "effect_tr": "Osmotik gradient → su atılımı (filtrasyon artmaz)" },
-        { "nodeId": "o_pct", "effect_tr": "Proksimal tübülde su tutulumu engellenir" }
+        {
+          "nodeId": "e_diuresis",
+          "effect_tr": "Osmotik gradient → su atılımı (filtrasyon artmaz)"
+        },
+        {
+          "nodeId": "o_pct",
+          "effect_tr": "Proksimal tübülde su tutulumu engellenir"
+        }
       ],
-      "tr_products_atc": ["B05BC01"]
+      "tr_products_atc": [
+        "B05BC01"
+      ]
     }
   ],
   "quiz": [
     {
       "q_tr": "Furosemidin diüretik etkisinin birincil hedefi nerededir?",
-      "options_tr": ["Proksimal tübül", "Henle kulpü kalın çıkan kol", "Distal konvolut tübül", "Toplayıcı kanal"],
+      "options_tr": [
+        "Proksimal tübül",
+        "Henle kulpü kalın çıkan kol",
+        "Distal konvolut tübül",
+        "Toplayıcı kanal"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Loop diüretikler NKCC2 taşıyıcısını TAL'de inhibe eder. Bu segmentte filtrat Na⁺'unun ~25%'i geri emilir → güçlü diürez.",
       "node_id": "t_nkcc2"
     },
     {
       "q_tr": "Tiazid diüretikler hangi taşıyıcıyı inhibe eder?",
-      "options_tr": ["NKCC2", "NCC (Na⁺-Cl⁻)", "ENaC", "Na⁺/H⁺ exchanger"],
+      "options_tr": [
+        "NKCC2",
+        "NCC (Na⁺-Cl⁻)",
+        "ENaC",
+        "Na⁺/H⁺ exchanger"
+      ],
       "answer_idx": 1,
       "explanation_tr": "HCTZ ve klortalidon distal konvolut tübülde NCC (SLC12A3) taşıyıcısını luminal taraftan bloke eder.",
       "node_id": "t_ncc"
     },
     {
       "q_tr": "Asetazolamid kullanan bir hastada beklenen asit-baz bozukluğu nedir?",
-      "options_tr": ["Metabolik alkaloz", "Metabolik asidoz (hiperkloremik)", "Respiratuvar alkaloz", "Normal asit-baz"],
+      "options_tr": [
+        "Metabolik alkaloz",
+        "Metabolik asidoz (hiperkloremik)",
+        "Respiratuvar alkaloz",
+        "Normal asit-baz"
+      ],
       "answer_idx": 1,
       "explanation_tr": "CA inhibisyonu HCO₃⁻ geri emilimini azaltır → bikarbonatüri ve hiperkloremik metabolik asidoz (tip II renal TAT acidozu).",
       "node_id": "t_ca"
     },
     {
       "q_tr": "Loop diüretik sonrası hipokalemiye katkıda bulunan mekanizma nedir?",
-      "options_tr": ["Doğrudan K⁺ kanal blokajı", "Distal tübüle artan Na⁺ delivery → K⁺ sekresyonu", "Aldosteron inhibisyonu", "ENaC aktivasyonu"],
+      "options_tr": [
+        "Doğrudan K⁺ kanal blokajı",
+        "Distal tübüle artan Na⁺ delivery → K⁺ sekresyonu",
+        "Aldosteron inhibisyonu",
+        "ENaC aktivasyonu"
+      ],
       "answer_idx": 1,
       "explanation_tr": "TAL'de Na⁺ geri emilimi azalınca distal segmente daha fazla Na⁺ ulaşır; toplayıcı kanalda Na⁺/K⁺ değişimi ile K⁺ atılımı artar.",
       "node_id": "e_hypokalemia"
     },
     {
       "q_tr": "Hiperkalemi riski en yüksek diüretik kombinasyonu hangisidir?",
-      "options_tr": ["Furosemid + HCTZ", "Spironolakton + ACE inhibitörü", "Mannitol + asetazolamid", "HCTZ + amilorid"],
+      "options_tr": [
+        "Furosemid + HCTZ",
+        "Spironolakton + ACE inhibitörü",
+        "Mannitol + asetazolamid",
+        "HCTZ + amilorid"
+      ],
       "answer_idx": 1,
       "explanation_tr": "MRA K⁺ atılımını azaltır; ACEİ aldosteron sentezini baskılar. İkisi birlikte ciddi hiperkalemi yapabilir → izlem şart.",
       "node_id": "e_hyperkalemia"
     },
     {
       "q_tr": "Tiazid diüretiklerin uzun dönem antihipertansif etkisinin önemli bir bileşeni nedir?",
-      "options_tr": ["Sadece akut diürez", "Vasküler düz kas Ca²⁺ azaltımı / vazodilatasyon", "Renin artışı", "Aldosteron artışı"],
+      "options_tr": [
+        "Sadece akut diürez",
+        "Vasküler düz kas Ca²⁺ azaltımı / vazodilatasyon",
+        "Renin artışı",
+        "Aldosteron artışı"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Akut etki diüreze bağlı olsa da kronik antihipertansif etki kısmen vasküler düz kas modülasyonu (Ca²⁺ handling) ile ilişkilidir.",
       "node_id": "e_ohtn"
+    }
+  ],
+  "vignettes": [
+    {
+      "id": "v1_loop_edema",
+      "title_tr": "Akut akciğer ödemi",
+      "scenario_tr": "Akut kalp yetmezliği atağında dispne ve raller olan hastaya IV furosemid veriliyor.",
+      "q_tr": "Furosemidin hızlı diürez yapmasının anatomik hedefi nedir?",
+      "options_tr": [
+        "Henle kulpunun çıkan kolu (Na-K-2Cl)",
+        "Proksimal tübül",
+        "Toplayıcı kanal",
+        "Glomerül"
+      ],
+      "answer_idx": 0,
+      "explanation_tr": "Loop diüretikleri Henle çıkan kolundaki NKCC2'yi bloke ederek güçlü natriürez ve diürez yapar.",
+      "node_id": "t_nkcc2"
+    },
+    {
+      "id": "v2_thiazide_ca",
+      "title_tr": "Thiazid ve hiperkalsemi",
+      "scenario_tr": "Hipertansiyon için hidroklorotiyazid kullanan yaşlı hastada serum kalsiyumu hafif yüksek bulunuyor.",
+      "q_tr": "Thiazidlerin kalsiyum metabolizmasına etkisi nedir?",
+      "options_tr": [
+        "Distal tübülde Ca²⁺ geri emilimini artırır",
+        "Ca²⁺ atılımını artırır",
+        "PTH salınımını bloke eder",
+        "Vitamin D aktivasyonunu inhibe eder"
+      ],
+      "answer_idx": 0,
+      "explanation_tr": "Thiazidler distal tübülde Na⁺-Cl⁻ kotransportunu bloke ederek Ca²⁺ geri emilimini artırır; hiperkalsemi riski.",
+      "node_id": "t_ncc"
     }
   ]
 }

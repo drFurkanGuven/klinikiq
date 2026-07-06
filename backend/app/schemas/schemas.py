@@ -357,12 +357,20 @@ class AnnotationOut(BaseModel):
 
 # ── Farmakoloji Mantık Haritaları (curated statik JSON) ────────────────────────
 
+class PharmaSignaling(BaseModel):
+    pathway: str = ""
+    second_messenger: str = ""
+    clinical_hook_tr: str = ""
+
+
 class PharmaNode(BaseModel):
     id: str
     label_tr: str
     type: Literal["receptor", "mediator", "organ", "effect", "drug_class"]
     description_tr: str = ""
     high_yield: bool = False
+    memory_hook_tr: str = ""
+    signaling: Optional[PharmaSignaling] = None
 
 
 class PharmaEdge(BaseModel):
@@ -394,10 +402,28 @@ class PharmaQuizItem(BaseModel):
     node_id: Optional[str] = None
 
 
+class PharmaVignette(BaseModel):
+    id: str
+    title_tr: str
+    scenario_tr: str
+    q_tr: str
+    options_tr: List[str]
+    answer_idx: int
+    explanation_tr: str = ""
+    node_id: Optional[str] = None
+
+
 class PharmaMapSummary(BaseModel):
     id: str
     title_tr: str
     description_tr: str = ""
+    order: int = 0
+    level: str = "temel"
+    estimated_minutes: int = 15
+    prerequisites: List[str] = []
+    high_yield_count: int = 0
+    quiz_count: int = 0
+    vignette_count: int = 0
 
 
 class PharmaMapOut(BaseModel):
@@ -409,3 +435,18 @@ class PharmaMapOut(BaseModel):
     edges: List[PharmaEdge] = []
     interventions: List[PharmaIntervention] = []
     quiz: List[PharmaQuizItem] = []
+    vignettes: List[PharmaVignette] = []
+
+
+class PharmaLearningPathItem(BaseModel):
+    map_id: str
+    order: int
+    level: str = "temel"
+    estimated_minutes: int = 15
+    prerequisites: List[str] = []
+
+
+class PharmaLearningPathOut(BaseModel):
+    title_tr: str
+    description_tr: str = ""
+    items: List[PharmaLearningPathItem] = []

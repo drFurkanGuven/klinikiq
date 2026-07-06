@@ -1,0 +1,109 @@
+{
+  "topics": [
+    {
+      "topic_slug": "autonomic_ns",
+      "label_tr": "Otonom Sinir Sistemi",
+      "pharma_map_id": "autonomic_ns",
+      "pharma_node_id": null,
+      "keywords": ["autonomic", "sympathetic", "parasympathetic", "cholinergic", "adrenergic", "otonom", "sinir sistemi", "asetilkolin", "adrenalin"]
+    },
+    {
+      "topic_slug": "raas",
+      "label_tr": "RAAS",
+      "pharma_map_id": "raas",
+      "pharma_node_id": null,
+      "keywords": ["raas", "renin", "angiotensin", "ace inhibitor", "arb", "aldosterone", "hipertansiyon", "enalapril", "losartan"]
+    },
+    {
+      "topic_slug": "nephron_diuretics",
+      "label_tr": "Nefron ve Diüretikler",
+      "pharma_map_id": "nephron_diuretics",
+      "pharma_node_id": null,
+      "keywords": ["diuretic", "furosemide", "thiazide", "nephron", "loop diuretic", "diüretik", "nefron", "böbrek tübül"]
+    },
+    {
+      "topic_slug": "coagulation",
+      "label_tr": "Koagülasyon",
+      "pharma_map_id": "coagulation",
+      "pharma_node_id": null,
+      "keywords": ["warfarin", "heparin", "anticoagulant", "coagulation", "bleeding", "koagülasyon", "antikoagülan", "kanama"]
+    },
+    {
+      "topic_slug": "insulin_diabetes",
+      "label_tr": "İnsülin ve Diyabet",
+      "pharma_map_id": "insulin_diabetes",
+      "pharma_node_id": null,
+      "keywords": ["insulin", "diabetes", "hypoglycemia", "metformin", "diyabet", "insülin", "hipoglisemi"]
+    },
+    {
+      "topic_slug": "opioids",
+      "label_tr": "Opioidler",
+      "pharma_map_id": "opioids",
+      "pharma_node_id": null,
+      "keywords": ["opioid", "morphine", "fentanyl", "naloxone", "analgesic", "opioid", "morfin", "nalokson"]
+    },
+    {
+      "topic_slug": "cardiology",
+      "label_tr": "Kardiyoloji",
+      "pharma_map_id": null,
+      "pharma_node_id": null,
+      "keywords": ["cardiac", "heart", "myocardial", "arrhythmia", "ecg", "coronary", "kardiyak", "kalp", "aritmi", "miyokard"]
+    },
+    {
+      "topic_slug": "pulmonology",
+      "label_tr": "Pulmonoloji",
+      "pharma_map_id": null,
+      "pharma_node_id": null,
+      "keywords": ["pulmonary", "lung", "pneumonia", "asthma", "copd", "respiratory", "akciğer", "pnömoni", "astım", "solunum"]
+    },
+    {
+      "topic_slug": "nephrology",
+      "label_tr": "Nefroloji",
+      "pharma_map_id": "nephron_diuretics",
+      "pharma_node_id": null,
+      "keywords": ["renal", "kidney", "creatinine", "glomerular", "dialysis", "böbrek", "kreatinin", "diyaliz"]
+    },
+    {
+      "topic_slug": "infectious_disease",
+      "label_tr": "Enfeksiyon",
+      "pharma_map_id": null,
+      "pharma_node_id": null,
+      "keywords": ["infection", "bacterial", "viral", "antibiotic", "sepsis", "fever", "enfeksiyon", "antibiyotik", "sepsis", "ateş"]
+    },
+    {
+      "topic_slug": "neurology",
+      "label_tr": "Nöroloji",
+      "pharma_map_id": null,
+      "pharma_node_id": null,
+      "keywords": ["stroke", "seizure", "brain", "meningitis", "inme", "nöbet", "beyin", "menenjit"]
+    },
+    {
+      "topic_slug": "gastroenterology",
+      "label_tr": "Gastroenteroloji",
+      "pharma_map_id": null,
+      "pharma_node_id": null,
+      "keywords": ["liver", "hepatic", "bowel", "pancreas", "gastric", "karaciğer", "pankreas", "gastrik"]
+    },
+    {
+      "topic_slug": "endocrinology",
+      "label_tr": "Endokrinoloji",
+      "pharma_map_id": "insulin_diabetes",
+      "pharma_node_id": null,
+      "keywords": ["thyroid", "adrenal", "cortisol", "pituitary", "tiroid", "adrenal", "hipofiz"]
+    },
+    {
+      "topic_slug": "hematology",
+      "label_tr": "Hematoloji",
+      "pharma_map_id": "coagulation",
+      "pharma_node_id": null,
+      "keywords": ["anemia", "leukemia", "platelet", "hemoglobin", "anemi", "lösemi", "trombosit"]
+    },
+    {
+      "topic_slug": "emergency_general",
+      "label_tr": "Genel Acil",
+      "pharma_map_id": null,
+      "pharma_node_id": null,
+      "keywords": ["emergency", "acute", "resuscitation", "trauma", "acil", "travma", "resüsitasyon"]
+    }
+  ]
+}

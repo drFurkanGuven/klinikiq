@@ -4,189 +4,621 @@
   "description_tr": "Böbrek perfüzyonu düştüğünde başlayan hormonal kaskad: renin → anjiyotensin II → aldosteron. AT1 uyarısı vazokonstriksiyon, Na/su tutulumu ve kardiyak remodelling yapar. ACEİ, ARB, ARNI, direkt renin inhibitörü ve MRA'ların hedef noktalarını görselleştirir.",
   "source_attribution": "Fizyoloji ve ilaç–hedef ilişkileri StatPearls (NBK470410, NBK430896), AMBOSS RAAS inhibitörleri ve IUPHAR/BPS Guide to PHARMACOLOGY (GtoPdb, CC BY-SA 4.0) temel alınarak derlenmiştir. https://www.guidetopharmacology.org",
   "nodes": [
-    { "id": "med_angiotensinogen", "label_tr": "Anjiyotensinojen", "type": "mediator", "high_yield": true, "description_tr": "Karaciğerde sentezlenen α2-globulin öncül protein. Renin enzimi C-terminalinden dekapeptit anjiyotensin I'i keser." },
-    { "id": "med_ang_i", "label_tr": "Anjiyotensin I", "type": "mediator", "high_yield": false, "description_tr": "Renin ile oluşan, biyolojik olarak zayıf dekapeptit. ACE (anjiyotensin dönüştürücü enzim) tarafından anjiyotensin II'ye dönüştürülür." },
-    { "id": "med_ang_ii", "label_tr": "Anjiyotensin II", "type": "mediator", "high_yield": true, "description_tr": "RAAS'ın ana efektör peptidi. AT1 reseptörü üzerinden güçlü vazokonstriksiyon, aldosteron salınımı, ADH salınımı ve sempatik aktivasyon yapar. Plazma yarı ömrü <1 dk." },
-    { "id": "med_aldosterone", "label_tr": "Aldosteron", "type": "mediator", "high_yield": true, "description_tr": "Adrenal korteks zona glomerulosa'dan salınan mineralokortikoid. Distal tübül ve toplayıcı kanalda Na⁺ geri emilimini, K⁺ ve H⁺ atılımını artırır." },
-    { "id": "med_bradykinin", "label_tr": "Bradykinin", "type": "mediator", "high_yield": true, "description_tr": "ACE tarafından yıkılan vazodilatör peptid. ACE inhibitörleri bradykinin düzeyini artırır → öksürük ve nadiren anjiyoödem (TUS klasiği)." },
-    { "id": "med_anp", "label_tr": "ANP / BNP", "type": "mediator", "high_yield": false, "description_tr": "Natriüretik peptidler; RAAS'ın karşıt düzenleyicisi. Neprilysin (NEP) ile yıkılır. ARNI (sakubitril) NEP'i inhibe ederek natriürez ve vazodilatasyon sağlar." },
-
-    { "id": "r_at1", "label_tr": "AT1 reseptörü", "type": "receptor", "high_yield": true, "description_tr": "Anjiyotensin II'nin Gq/Gi bağlı ana reseptörü. Vazokonstriksiyon, aldosteron salınımı, sempatik aktivasyon, kardiyak/hipertrofi ve fibrozis. ARB'ler burayı bloke eder." },
-    { "id": "r_at2", "label_tr": "AT2 reseptörü", "type": "receptor", "high_yield": false, "description_tr": "Anjiyotensin II'nin AT1'e zıt koruyucu reseptörü. Vasodilatasyon, natriürez, antiproliferatif etkiler. Erişkin dokularda AT1'den daha az yoğundur." },
-    { "id": "r_mr", "label_tr": "Mineralokortikoid reseptör (MR)", "type": "receptor", "high_yield": true, "description_tr": "Aldosteronun toplayıcı kanal epitelindeki hedefi. Na⁺ kanalları (ENaC) ve Na⁺/K⁺-ATPaz aktivitesini artırır. Spironolakton/eplerenon burayı bloke eder." },
-
-    { "id": "o_jga", "label_tr": "Juxtaglomerüler aparat", "type": "organ", "high_yield": true, "description_tr": "Afferent arteriolde granüler hücreler. Böbrek perfüzyon basıncı ↓, sempatik β1 uyarısı ↑ veya NaCl (makula densa) ↓ olunca renin salgılar." },
-    { "id": "o_renin", "label_tr": "Renin (enzim)", "type": "organ", "high_yield": true, "description_tr": "Aspartil proteaz; anjiyotensinojeni anjiyotensin I'e keser. RAAS kaskadının hız kısıtlayıcı basamağı. β-blokerler renin salınımını azaltır (dolaylı RAAS baskılama)." },
-    { "id": "o_ace", "label_tr": "ACE (endotel / akciğer)", "type": "organ", "high_yield": true, "description_tr": "Anjiyotensin dönüştürücü enzim; anjiyotensin I → II dönüşümü ve bradykinin yıkımı. Akciğer kapillerleri ve böbrek endotelinde yoğundur." },
-    { "id": "o_vascular", "label_tr": "Vasküler düz kas", "type": "organ", "high_yield": true, "description_tr": "AT1 uyarısı ile arteriyel vazokonstriksiyon → periferik direnç ve kan basıncı artışı." },
-    { "id": "o_adrenal_zg", "label_tr": "Adrenal korteks (ZG)", "type": "organ", "high_yield": true, "description_tr": "Zona glomerulosa. Anjiyotensin II AT1 uyarısı ile aldosteron sentezi ve salınımı artar." },
-    { "id": "o_collecting_duct", "label_tr": "Toplayıcı kanal", "type": "organ", "high_yield": true, "description_tr": "Aldosteron/MR etkisi ile principal hücrelerde ENaC ve Na⁺/K⁺-ATPaz artar → Na⁺ geri emilimi, K⁺ sekresyonu. RAAS inhibitörlerinin renal koruyucu etkisinin hedefi." },
-    { "id": "o_heart", "label_tr": "Kalp (miyokard)", "type": "organ", "high_yield": true, "description_tr": "Kronik AT1 aktivasyonu hipertrofi, fibrozis ve remodelleme yapar. ACEİ/ARB kalp yetmezliğinde mortaliteyi azaltır." },
-    { "id": "o_neprilysin", "label_tr": "Neprilysin (NEP)", "type": "organ", "high_yield": false, "description_tr": "ANP/BNP ve bradykinin yıkımında rol oynayan endopeptidaz. Sakubitril ile inhibe edilir (ARNI)." },
-
-    { "id": "e_vasocon", "label_tr": "Vazokonstriksiyon", "type": "effect", "high_yield": true, "description_tr": "Anjiyotensin II → AT1 aracılı arteriyol kasılması. Sistemik vasküler direnç artar." },
-    { "id": "e_bp_up", "label_tr": "Kan basıncı ↑", "type": "effect", "high_yield": true, "description_tr": "Vazokonstriksiyon + hacim genişlemesinin birleşik sonucu. Kronik RAAS aktivasyonu hipertansiyon ve kalp yetmezliğini kötüleştirir." },
-    { "id": "e_na_retention", "label_tr": "Na⁺ & su tutulumu", "type": "effect", "high_yield": true, "description_tr": "Aldosteron/MR → toplayıcı kanalda Na⁺ geri emilimi → osmotik su tutulumu → preload artışı." },
-    { "id": "e_k_loss", "label_tr": "K⁺ atılımı ↑ (hipokalemi riski)", "type": "effect", "high_yield": true, "description_tr": "Aldosteron/MR ile toplayıcı kanalda K⁺ sekresyonu artar. Loop/tiazid diüretiklerle birlikte hipokalemi riski yükselir." },
-    { "id": "e_hyperkalemia", "label_tr": "Hiperkalemi riski", "type": "effect", "high_yield": true, "description_tr": "ACEİ, ARB, MRA ve ARNI aldosteron etkisini baskılayınca K⁺ atılımı azalır. Böbrek yetmezliğinde dikkat." },
-    { "id": "e_remodel", "label_tr": "Kardiyak remodelling", "type": "effect", "high_yield": true, "description_tr": "Kronik AT1 aktivasyonu ventrikül hipertrofisi ve fibrozise yol açar. ACEİ/ARB/ARNI bu süreci yavaşlatır." },
-    { "id": "e_cough", "label_tr": "Öksürük (bradykinin)", "type": "effect", "high_yield": true, "description_tr": "ACE inhibitörleri bradykinin yıkımını engeller → irritatif öksürük (%5–20). ARB'lerde bradykinin birikmez, öksürük daha az." },
-    { "id": "e_angioedema", "label_tr": "Anjiyoödem", "type": "effect", "high_yield": false, "description_tr": "ACEİ'ye bağlı bradykinin birikimi ile nadiren görülen, yaşamı tehdit edebilen doku ödemi. ARB'de daha nadir." },
-    { "id": "e_reno_protect", "label_tr": "Renoproteksiyon", "type": "effect", "high_yield": true, "description_tr": "Glomerüler basınç ve proteinüri azalır. Diyabetik nefropatide ACEİ/ARB birinci tercih (eGFR izlem)." }
+    {
+      "id": "med_angiotensinogen",
+      "label_tr": "Anjiyotensinojen",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Karaciğerde sentezlenen α2-globulin öncül protein. Renin enzimi C-terminalinden dekapeptit anjiyotensin I'i keser."
+    },
+    {
+      "id": "med_ang_i",
+      "label_tr": "Anjiyotensin I",
+      "type": "mediator",
+      "high_yield": false,
+      "description_tr": "Renin ile oluşan, biyolojik olarak zayıf dekapeptit. ACE (anjiyotensin dönüştürücü enzim) tarafından anjiyotensin II'ye dönüştürülür."
+    },
+    {
+      "id": "med_ang_ii",
+      "label_tr": "Anjiyotensin II",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "RAAS'ın ana efektör peptidi. AT1 reseptörü üzerinden güçlü vazokonstriksiyon, aldosteron salınımı, ADH salınımı ve sempatik aktivasyon yapar. Plazma yarı ömrü <1 dk."
+    },
+    {
+      "id": "med_aldosterone",
+      "label_tr": "Aldosteron",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Adrenal korteks zona glomerulosa'dan salınan mineralokortikoid. Distal tübül ve toplayıcı kanalda Na⁺ geri emilimini, K⁺ ve H⁺ atılımını artırır."
+    },
+    {
+      "id": "med_bradykinin",
+      "label_tr": "Bradykinin",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "ACE tarafından yıkılan vazodilatör peptid. ACE inhibitörleri bradykinin düzeyini artırır → öksürük ve nadiren anjiyoödem (TUS klasiği)."
+    },
+    {
+      "id": "med_anp",
+      "label_tr": "ANP / BNP",
+      "type": "mediator",
+      "high_yield": false,
+      "description_tr": "Natriüretik peptidler; RAAS'ın karşıt düzenleyicisi. Neprilysin (NEP) ile yıkılır. ARNI (sakubitril) NEP'i inhibe ederek natriürez ve vazodilatasyon sağlar."
+    },
+    {
+      "id": "r_at1",
+      "label_tr": "AT1 reseptörü",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Anjiyotensin II'nin Gq/Gi bağlı ana reseptörü. Vazokonstriksiyon, aldosteron salınımı, sempatik aktivasyon, kardiyak/hipertrofi ve fibrozis. ARB'ler burayı bloke eder."
+    },
+    {
+      "id": "r_at2",
+      "label_tr": "AT2 reseptörü",
+      "type": "receptor",
+      "high_yield": false,
+      "description_tr": "Anjiyotensin II'nin AT1'e zıt koruyucu reseptörü. Vasodilatasyon, natriürez, antiproliferatif etkiler. Erişkin dokularda AT1'den daha az yoğundur."
+    },
+    {
+      "id": "r_mr",
+      "label_tr": "Mineralokortikoid reseptör (MR)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Aldosteronun toplayıcı kanal epitelindeki hedefi. Na⁺ kanalları (ENaC) ve Na⁺/K⁺-ATPaz aktivitesini artırır. Spironolakton/eplerenon burayı bloke eder."
+    },
+    {
+      "id": "o_jga",
+      "label_tr": "Juxtaglomerüler aparat",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Afferent arteriolde granüler hücreler. Böbrek perfüzyon basıncı ↓, sempatik β1 uyarısı ↑ veya NaCl (makula densa) ↓ olunca renin salgılar."
+    },
+    {
+      "id": "o_renin",
+      "label_tr": "Renin (enzim)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Aspartil proteaz; anjiyotensinojeni anjiyotensin I'e keser. RAAS kaskadının hız kısıtlayıcı basamağı. β-blokerler renin salınımını azaltır (dolaylı RAAS baskılama)."
+    },
+    {
+      "id": "o_ace",
+      "label_tr": "ACE (endotel / akciğer)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Anjiyotensin dönüştürücü enzim; anjiyotensin I → II dönüşümü ve bradykinin yıkımı. Akciğer kapillerleri ve böbrek endotelinde yoğundur."
+    },
+    {
+      "id": "o_vascular",
+      "label_tr": "Vasküler düz kas",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "AT1 uyarısı ile arteriyel vazokonstriksiyon → periferik direnç ve kan basıncı artışı."
+    },
+    {
+      "id": "o_adrenal_zg",
+      "label_tr": "Adrenal korteks (ZG)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Zona glomerulosa. Anjiyotensin II AT1 uyarısı ile aldosteron sentezi ve salınımı artar."
+    },
+    {
+      "id": "o_collecting_duct",
+      "label_tr": "Toplayıcı kanal",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Aldosteron/MR etkisi ile principal hücrelerde ENaC ve Na⁺/K⁺-ATPaz artar → Na⁺ geri emilimi, K⁺ sekresyonu. RAAS inhibitörlerinin renal koruyucu etkisinin hedefi."
+    },
+    {
+      "id": "o_heart",
+      "label_tr": "Kalp (miyokard)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Kronik AT1 aktivasyonu hipertrofi, fibrozis ve remodelleme yapar. ACEİ/ARB kalp yetmezliğinde mortaliteyi azaltır."
+    },
+    {
+      "id": "o_neprilysin",
+      "label_tr": "Neprilysin (NEP)",
+      "type": "organ",
+      "high_yield": false,
+      "description_tr": "ANP/BNP ve bradykinin yıkımında rol oynayan endopeptidaz. Sakubitril ile inhibe edilir (ARNI)."
+    },
+    {
+      "id": "e_vasocon",
+      "label_tr": "Vazokonstriksiyon",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Anjiyotensin II → AT1 aracılı arteriyol kasılması. Sistemik vasküler direnç artar."
+    },
+    {
+      "id": "e_bp_up",
+      "label_tr": "Kan basıncı ↑",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Vazokonstriksiyon + hacim genişlemesinin birleşik sonucu. Kronik RAAS aktivasyonu hipertansiyon ve kalp yetmezliğini kötüleştirir."
+    },
+    {
+      "id": "e_na_retention",
+      "label_tr": "Na⁺ & su tutulumu",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Aldosteron/MR → toplayıcı kanalda Na⁺ geri emilimi → osmotik su tutulumu → preload artışı."
+    },
+    {
+      "id": "e_k_loss",
+      "label_tr": "K⁺ atılımı ↑ (hipokalemi riski)",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Aldosteron/MR ile toplayıcı kanalda K⁺ sekresyonu artar. Loop/tiazid diüretiklerle birlikte hipokalemi riski yükselir."
+    },
+    {
+      "id": "e_hyperkalemia",
+      "label_tr": "Hiperkalemi riski",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "ACEİ, ARB, MRA ve ARNI aldosteron etkisini baskılayınca K⁺ atılımı azalır. Böbrek yetmezliğinde dikkat."
+    },
+    {
+      "id": "e_remodel",
+      "label_tr": "Kardiyak remodelling",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Kronik AT1 aktivasyonu ventrikül hipertrofisi ve fibrozise yol açar. ACEİ/ARB/ARNI bu süreci yavaşlatır."
+    },
+    {
+      "id": "e_cough",
+      "label_tr": "Öksürük (bradykinin)",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "ACE inhibitörleri bradykinin yıkımını engeller → irritatif öksürük (%5–20). ARB'lerde bradykinin birikmez, öksürük daha az."
+    },
+    {
+      "id": "e_angioedema",
+      "label_tr": "Anjiyoödem",
+      "type": "effect",
+      "high_yield": false,
+      "description_tr": "ACEİ'ye bağlı bradykinin birikimi ile nadiren görülen, yaşamı tehdit edebilen doku ödemi. ARB'de daha nadir."
+    },
+    {
+      "id": "e_reno_protect",
+      "label_tr": "Renoproteksiyon",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Glomerüler basınç ve proteinüri azalır. Diyabetik nefropatide ACEİ/ARB birinci tercih (eGFR izlem)."
+    }
   ],
   "edges": [
-    { "source": "o_jga", "target": "o_renin", "relation": "activates", "effect_tr": "Perfüzyon ↓ / β1 sempatik → renin salınımı" },
-    { "source": "o_renin", "target": "med_angiotensinogen", "relation": "activates", "effect_tr": "Anjiyotensinojen → Anjiyotensin I" },
-    { "source": "med_angiotensinogen", "target": "med_ang_i", "relation": "activates", "effect_tr": "Renin kesimi" },
-    { "source": "o_ace", "target": "med_ang_i", "relation": "activates", "effect_tr": "ACE: Ang I → Ang II" },
-    { "source": "med_ang_i", "target": "med_ang_ii", "relation": "activates", "effect_tr": "Dekapeptit → oktapeptit (aktif)" },
-    { "source": "o_ace", "target": "med_bradykinin", "relation": "inhibits", "effect_tr": "ACE bradykinini yıkar" },
-
-    { "source": "med_ang_ii", "target": "r_at1", "relation": "agonist", "effect_tr": "Ana efektör reseptör" },
-    { "source": "med_ang_ii", "target": "r_at2", "relation": "agonist", "effect_tr": "Koruyucu / zıt etkiler" },
-    { "source": "med_ang_ii", "target": "o_adrenal_zg", "relation": "activates", "effect_tr": "Aldosteron sentezi ↑" },
-    { "source": "o_adrenal_zg", "target": "med_aldosterone", "relation": "activates", "effect_tr": "Zona glomerulosa salgısı" },
-    { "source": "med_aldosterone", "target": "r_mr", "relation": "agonist", "effect_tr": "Mineralokortikoid reseptör uyarısı" },
-
-    { "source": "r_at1", "target": "o_vascular", "relation": "activates", "effect_tr": "Vazokonstriksiyon" },
-    { "source": "r_at1", "target": "o_heart", "relation": "activates", "effect_tr": "Hipertrofi & fibrozis" },
-    { "source": "r_mr", "target": "o_collecting_duct", "relation": "activates", "effect_tr": "ENaC & Na⁺/K⁺-ATPaz ↑" },
-
-    { "source": "o_vascular", "target": "e_vasocon", "relation": "activates", "effect_tr": "Arteriyol kasılması" },
-    { "source": "e_vasocon", "target": "e_bp_up", "relation": "activates", "effect_tr": "Periferik direnç ↑" },
-    { "source": "o_collecting_duct", "target": "e_na_retention", "relation": "activates", "effect_tr": "Na⁺ & su geri emilimi" },
-    { "source": "e_na_retention", "target": "e_bp_up", "relation": "activates", "effect_tr": "Hacim genişlemesi → KB ↑" },
-    { "source": "o_collecting_duct", "target": "e_k_loss", "relation": "activates", "effect_tr": "K⁺ sekresyonu artar" },
-    { "source": "o_heart", "target": "e_remodel", "relation": "activates", "effect_tr": "Kronik AT1 → remodelleme" },
-
-    { "source": "med_anp", "target": "o_neprilysin", "relation": "inhibits", "effect_tr": "NEP ile yıkım (fizyolojik)" },
-    { "source": "r_at2", "target": "e_vasocon", "relation": "inhibits", "effect_tr": "AT2 vasodilatasyon (fizyolojik denge)" }
+    {
+      "source": "o_jga",
+      "target": "o_renin",
+      "relation": "activates",
+      "effect_tr": "Perfüzyon ↓ / β1 sempatik → renin salınımı"
+    },
+    {
+      "source": "o_renin",
+      "target": "med_angiotensinogen",
+      "relation": "activates",
+      "effect_tr": "Anjiyotensinojen → Anjiyotensin I"
+    },
+    {
+      "source": "med_angiotensinogen",
+      "target": "med_ang_i",
+      "relation": "activates",
+      "effect_tr": "Renin kesimi"
+    },
+    {
+      "source": "o_ace",
+      "target": "med_ang_i",
+      "relation": "activates",
+      "effect_tr": "ACE: Ang I → Ang II"
+    },
+    {
+      "source": "med_ang_i",
+      "target": "med_ang_ii",
+      "relation": "activates",
+      "effect_tr": "Dekapeptit → oktapeptit (aktif)"
+    },
+    {
+      "source": "o_ace",
+      "target": "med_bradykinin",
+      "relation": "inhibits",
+      "effect_tr": "ACE bradykinini yıkar"
+    },
+    {
+      "source": "med_ang_ii",
+      "target": "r_at1",
+      "relation": "agonist",
+      "effect_tr": "Ana efektör reseptör"
+    },
+    {
+      "source": "med_ang_ii",
+      "target": "r_at2",
+      "relation": "agonist",
+      "effect_tr": "Koruyucu / zıt etkiler"
+    },
+    {
+      "source": "med_ang_ii",
+      "target": "o_adrenal_zg",
+      "relation": "activates",
+      "effect_tr": "Aldosteron sentezi ↑"
+    },
+    {
+      "source": "o_adrenal_zg",
+      "target": "med_aldosterone",
+      "relation": "activates",
+      "effect_tr": "Zona glomerulosa salgısı"
+    },
+    {
+      "source": "med_aldosterone",
+      "target": "r_mr",
+      "relation": "agonist",
+      "effect_tr": "Mineralokortikoid reseptör uyarısı"
+    },
+    {
+      "source": "r_at1",
+      "target": "o_vascular",
+      "relation": "activates",
+      "effect_tr": "Vazokonstriksiyon"
+    },
+    {
+      "source": "r_at1",
+      "target": "o_heart",
+      "relation": "activates",
+      "effect_tr": "Hipertrofi & fibrozis"
+    },
+    {
+      "source": "r_mr",
+      "target": "o_collecting_duct",
+      "relation": "activates",
+      "effect_tr": "ENaC & Na⁺/K⁺-ATPaz ↑"
+    },
+    {
+      "source": "o_vascular",
+      "target": "e_vasocon",
+      "relation": "activates",
+      "effect_tr": "Arteriyol kasılması"
+    },
+    {
+      "source": "e_vasocon",
+      "target": "e_bp_up",
+      "relation": "activates",
+      "effect_tr": "Periferik direnç ↑"
+    },
+    {
+      "source": "o_collecting_duct",
+      "target": "e_na_retention",
+      "relation": "activates",
+      "effect_tr": "Na⁺ & su geri emilimi"
+    },
+    {
+      "source": "e_na_retention",
+      "target": "e_bp_up",
+      "relation": "activates",
+      "effect_tr": "Hacim genişlemesi → KB ↑"
+    },
+    {
+      "source": "o_collecting_duct",
+      "target": "e_k_loss",
+      "relation": "activates",
+      "effect_tr": "K⁺ sekresyonu artar"
+    },
+    {
+      "source": "o_heart",
+      "target": "e_remodel",
+      "relation": "activates",
+      "effect_tr": "Kronik AT1 → remodelleme"
+    },
+    {
+      "source": "med_anp",
+      "target": "o_neprilysin",
+      "relation": "inhibits",
+      "effect_tr": "NEP ile yıkım (fizyolojik)"
+    },
+    {
+      "source": "r_at2",
+      "target": "e_vasocon",
+      "relation": "inhibits",
+      "effect_tr": "AT2 vasodilatasyon (fizyolojik denge)"
+    }
   ],
   "interventions": [
     {
       "drug_class": "ace_inhibitor",
       "label_tr": "ACE inhibitörü (enalapril / ramipril)",
-      "targets": ["o_ace"],
+      "targets": [
+        "o_ace"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "med_ang_ii", "effect_tr": "Anjiyotensin II sentezi ↓" },
-        { "nodeId": "med_bradykinin", "effect_tr": "Bradykinin yıkımı ↓ → birikim" },
-        { "nodeId": "e_bp_up", "effect_tr": "KB ↓ (vazodilatasyon + aldosteron ↓)" },
-        { "nodeId": "e_remodel", "effect_tr": "Kardiyak remodelling yavaşlar" },
-        { "nodeId": "e_reno_protect", "effect_tr": "Proteinüri ↓, GFR koruma" },
-        { "nodeId": "e_cough", "effect_tr": "Öksürük riski (bradykinin)" },
-        { "nodeId": "e_hyperkalemia", "effect_tr": "Hiperkalemi riski" }
+        {
+          "nodeId": "med_ang_ii",
+          "effect_tr": "Anjiyotensin II sentezi ↓"
+        },
+        {
+          "nodeId": "med_bradykinin",
+          "effect_tr": "Bradykinin yıkımı ↓ → birikim"
+        },
+        {
+          "nodeId": "e_bp_up",
+          "effect_tr": "KB ↓ (vazodilatasyon + aldosteron ↓)"
+        },
+        {
+          "nodeId": "e_remodel",
+          "effect_tr": "Kardiyak remodelling yavaşlar"
+        },
+        {
+          "nodeId": "e_reno_protect",
+          "effect_tr": "Proteinüri ↓, GFR koruma"
+        },
+        {
+          "nodeId": "e_cough",
+          "effect_tr": "Öksürük riski (bradykinin)"
+        },
+        {
+          "nodeId": "e_hyperkalemia",
+          "effect_tr": "Hiperkalemi riski"
+        }
       ],
-      "tr_products_atc": ["C09AA02", "C09AA05", "C09AA16"]
+      "tr_products_atc": [
+        "C09AA02",
+        "C09AA05",
+        "C09AA16"
+      ]
     },
     {
       "drug_class": "arb",
       "label_tr": "ARB (losartan / valsartan)",
-      "targets": ["r_at1"],
+      "targets": [
+        "r_at1"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "o_vascular", "effect_tr": "Vazokonstriksiyon bloke" },
-        { "nodeId": "e_bp_up", "effect_tr": "KB ↓" },
-        { "nodeId": "med_aldosterone", "effect_tr": "Aldosteron ↓ (AT1 aracılı)" },
-        { "nodeId": "e_reno_protect", "effect_tr": "Diyabetik nefropati: renoprotektif" },
-        { "nodeId": "e_hyperkalemia", "effect_tr": "Hiperkalemi riski (ACEİ'den benzer)" }
+        {
+          "nodeId": "o_vascular",
+          "effect_tr": "Vazokonstriksiyon bloke"
+        },
+        {
+          "nodeId": "e_bp_up",
+          "effect_tr": "KB ↓"
+        },
+        {
+          "nodeId": "med_aldosterone",
+          "effect_tr": "Aldosteron ↓ (AT1 aracılı)"
+        },
+        {
+          "nodeId": "e_reno_protect",
+          "effect_tr": "Diyabetik nefropati: renoprotektif"
+        },
+        {
+          "nodeId": "e_hyperkalemia",
+          "effect_tr": "Hiperkalemi riski (ACEİ'den benzer)"
+        }
       ],
-      "tr_products_atc": ["C09CA01", "C09CA03", "C09CA06"]
+      "tr_products_atc": [
+        "C09CA01",
+        "C09CA03",
+        "C09CA06"
+      ]
     },
     {
       "drug_class": "direct_renin_inhibitor",
       "label_tr": "Direkt renin inhibitörü (aliskiren)",
-      "targets": ["o_renin"],
+      "targets": [
+        "o_renin"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "med_ang_i", "effect_tr": "Anjiyotensin I oluşumu ↓" },
-        { "nodeId": "med_ang_ii", "effect_tr": "Tüm downstream Ang II ↓" },
-        { "nodeId": "e_bp_up", "effect_tr": "Antihipertansif" }
+        {
+          "nodeId": "med_ang_i",
+          "effect_tr": "Anjiyotensin I oluşumu ↓"
+        },
+        {
+          "nodeId": "med_ang_ii",
+          "effect_tr": "Tüm downstream Ang II ↓"
+        },
+        {
+          "nodeId": "e_bp_up",
+          "effect_tr": "Antihipertansif"
+        }
       ],
-      "tr_products_atc": ["C09XA02"]
+      "tr_products_atc": [
+        "C09XA02"
+      ]
     },
     {
       "drug_class": "mra",
       "label_tr": "Mineralokortikoid antagonist (spironolakton)",
-      "targets": ["r_mr"],
+      "targets": [
+        "r_mr"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "o_collecting_duct", "effect_tr": "Na⁺ geri emilimi ↓" },
-        { "nodeId": "e_na_retention", "effect_tr": "Natriürez, diüretik etki" },
-        { "nodeId": "e_k_loss", "effect_tr": "K⁺ tutulumu → hiperkalemi" },
-        { "nodeId": "e_hyperkalemia", "effect_tr": "Potasyum koruyucu diüretik" },
-        { "nodeId": "e_remodel", "effect_tr": "Kalp yetmezliğinde mortalite ↓ (RALES)" }
+        {
+          "nodeId": "o_collecting_duct",
+          "effect_tr": "Na⁺ geri emilimi ↓"
+        },
+        {
+          "nodeId": "e_na_retention",
+          "effect_tr": "Natriürez, diüretik etki"
+        },
+        {
+          "nodeId": "e_k_loss",
+          "effect_tr": "K⁺ tutulumu → hiperkalemi"
+        },
+        {
+          "nodeId": "e_hyperkalemia",
+          "effect_tr": "Potasyum koruyucu diüretik"
+        },
+        {
+          "nodeId": "e_remodel",
+          "effect_tr": "Kalp yetmezliğinde mortalite ↓ (RALES)"
+        }
       ],
-      "tr_products_atc": ["C03DA01", "C03DA04"]
+      "tr_products_atc": [
+        "C03DA01",
+        "C03DA04"
+      ]
     },
     {
       "drug_class": "arni",
       "label_tr": "ARNI (sakubitril/valsartan)",
-      "targets": ["o_neprilysin", "r_at1"],
+      "targets": [
+        "o_neprilysin",
+        "r_at1"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "med_anp", "effect_tr": "ANP/BNP yıkımı ↓ → natriürez & vazodilatasyon" },
-        { "nodeId": "med_ang_ii", "effect_tr": "Valsartan ile AT1 blokajı" },
-        { "nodeId": "e_remodel", "effect_tr": "HFrEF'de ACEİ'ye üstün mortalite azaltımı (PARADIGM-HF)" },
-        { "nodeId": "e_hyperkalemia", "effect_tr": "Hiperkalemi riski; ACEİ ile kombine EDİLMEZ" }
+        {
+          "nodeId": "med_anp",
+          "effect_tr": "ANP/BNP yıkımı ↓ → natriürez & vazodilatasyon"
+        },
+        {
+          "nodeId": "med_ang_ii",
+          "effect_tr": "Valsartan ile AT1 blokajı"
+        },
+        {
+          "nodeId": "e_remodel",
+          "effect_tr": "HFrEF'de ACEİ'ye üstün mortalite azaltımı (PARADIGM-HF)"
+        },
+        {
+          "nodeId": "e_hyperkalemia",
+          "effect_tr": "Hiperkalemi riski; ACEİ ile kombine EDİLMEZ"
+        }
       ],
-      "tr_products_atc": ["C09DX04"]
+      "tr_products_atc": [
+        "C09DX04"
+      ]
     },
     {
       "drug_class": "beta1_blocker_raas",
       "label_tr": "β1-bloker (metoprolol) — dolaylı RAAS",
-      "targets": ["o_jga"],
+      "targets": [
+        "o_jga"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "o_renin", "effect_tr": "β1 blokajı → renin salınımı ↓" },
-        { "nodeId": "med_ang_ii", "effect_tr": "RAAS kaskadı kısmen baskılanır" },
-        { "nodeId": "e_bp_up", "effect_tr": "Antihipertansif (çoklu mekanizma)" }
+        {
+          "nodeId": "o_renin",
+          "effect_tr": "β1 blokajı → renin salınımı ↓"
+        },
+        {
+          "nodeId": "med_ang_ii",
+          "effect_tr": "RAAS kaskadı kısmen baskılanır"
+        },
+        {
+          "nodeId": "e_bp_up",
+          "effect_tr": "Antihipertansif (çoklu mekanizma)"
+        }
       ],
-      "tr_products_atc": ["C07AB02"]
+      "tr_products_atc": [
+        "C07AB02"
+      ]
     }
   ],
   "quiz": [
     {
       "q_tr": "ACE inhibitörlerinin öksürük yapmasının en kabul edilen mekanizması nedir?",
-      "options_tr": ["AT1 reseptör blokajı", "Bradykinin yıkımının inhibisyonu", "Aldosteron artışı", "Renin inhibisyonu"],
+      "options_tr": [
+        "AT1 reseptör blokajı",
+        "Bradykinin yıkımının inhibisyonu",
+        "Aldosteron artışı",
+        "Renin inhibisyonu"
+      ],
       "answer_idx": 1,
       "explanation_tr": "ACE hem anjiyotensin I'i keser hem bradykinini yıkar. ACEİ bradykinin birikimine yol açar → öksürük. ARB bradykinini etkilemez.",
       "node_id": "med_bradykinin"
     },
     {
       "q_tr": "Diyabetik nefropatili hipertansif hastada proteinüriyi azaltmak için birinci tercih hangi sistem inhibitörüdür?",
-      "options_tr": ["Loop diüretik", "ACE inhibitörü veya ARB", "Kalsiyum kanal blokeri", "α1 bloker"],
+      "options_tr": [
+        "Loop diüretik",
+        "ACE inhibitörü veya ARB",
+        "Kalsiyum kanal blokeri",
+        "α1 bloker"
+      ],
       "answer_idx": 1,
       "explanation_tr": "ACEİ/ARB glomerüler basıncı ve proteinüriyi azaltır; diyabetik nefropatide renoprotektif kanıt en güçlü sınıflardır.",
       "node_id": "e_reno_protect"
     },
     {
       "q_tr": "Spironolaktonun diüretik etkisinin temel mekanizması nedir?",
-      "options_tr": ["NKCC2 inhibisyonu", "NCC inhibisyonu", "Mineralokortikoid reseptör antagonizması", "Karbonik anhidraz inhibisyonu"],
+      "options_tr": [
+        "NKCC2 inhibisyonu",
+        "NCC inhibisyonu",
+        "Mineralokortikoid reseptör antagonizması",
+        "Karbonik anhidraz inhibisyonu"
+      ],
       "answer_idx": 2,
       "explanation_tr": "Spironolakton aldosteronun MR üzerindeki etkisini bloke eder → toplayıcı kanalda Na⁺ geri emilimi ↓, K⁺ tutulur.",
       "node_id": "r_mr"
     },
     {
       "q_tr": "HFrEF tedavisinde sakubitril/valsartan (ARNI), valsartana ek olarak neyi inhibe eder?",
-      "options_tr": ["ACE", "Renin", "Neprilysin", "Mineralokortikoid reseptör"],
+      "options_tr": [
+        "ACE",
+        "Renin",
+        "Neprilysin",
+        "Mineralokortikoid reseptör"
+      ],
       "answer_idx": 2,
       "explanation_tr": "Sakubitril neprilysin (NEP) inhibitörüdür → ANP/BNP yıkımı azalır. Valsartan AT1'i bloke eder. Kombine ARNI kalp yetmezliğinde mortaliteyi azaltır.",
       "node_id": "o_neprilysin"
     },
     {
       "q_tr": "ACE inhibitörü + ARB + aliskiren üçlü kombinasyonu neden önerilmez?",
-      "options_tr": ["Etkisiz olduğu için", "Hiperkalemi ve renal hasar riski artar", "Öksürük yapar", "Hipokalemi yapar"],
+      "options_tr": [
+        "Etkisiz olduğu için",
+        "Hiperkalemi ve renal hasar riski artar",
+        "Öksürük yapar",
+        "Hipokalemi yapar"
+      ],
       "answer_idx": 1,
       "explanation_tr": "RAAS'ın çoklu ve tam blokajı hiperkalemi, hipotansiyon ve akut böbrek hasarı riskini artırır (ONTARGET/ALTITUDE verileri).",
       "node_id": "e_hyperkalemia"
     },
     {
       "q_tr": "Anjiyotensin II'nin kan basıncını artıran iki ana mekanizması nedir?",
-      "options_tr": ["Vazodilatasyon + natriürez", "Vazokonstriksiyon + Na/su tutulumu", "Bradikardi + bronkodilatasyon", "K⁺ tutulumu + diürez"],
+      "options_tr": [
+        "Vazodilatasyon + natriürez",
+        "Vazokonstriksiyon + Na/su tutulumu",
+        "Bradikardi + bronkodilatasyon",
+        "K⁺ tutulumu + diürez"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Ang II → AT1 ile vazokonstriksiyon (afterload ↑) ve aldosteron aracılı Na/su tutulumu (preload ↑) yapar.",
       "node_id": "med_ang_ii"
+    }
+  ],
+  "vignettes": [
+    {
+      "id": "v1_ace_cough",
+      "title_tr": "ACE inhibitörü öksürüğü",
+      "scenario_tr": "55 yaş hipertansif hasta, lisinopril başlandıktan sonra kuru öksürük gelişiyor. Potasyum normal, enfeksiyon bulgusu yok.",
+      "q_tr": "Öksürüğün en olası mekanizması hangisidir?",
+      "options_tr": [
+        "Bradikinin birikimi",
+        "Aldosteron artışı",
+        "Anjiyotensin II aşırı uyarısı",
+        "Renin inhibisyonu"
+      ],
+      "answer_idx": 0,
+      "explanation_tr": "ACE inhibitörleri anjiyotensin II oluşumunu azaltırken bradykinin yıkımını da engeller; bradykinin öksürük yapar.",
+      "node_id": "med_bradykinin"
+    },
+    {
+      "id": "v2_spiron_hyperk",
+      "title_tr": "Spironolakton hiperkalemi",
+      "scenario_tr": "Kalp yetmezliği nedeniyle spironolakton ve ACE inhibitörü kullanan hastada kas güçsüzlüğü ve EKG'de sivri T dalgaları saptanıyor.",
+      "q_tr": "Hiperkalemiye yol açan temel mekanizma nedir?",
+      "options_tr": [
+        "Aldosteron reseptör antagonizması",
+        "Renin inhibisyonu",
+        "Na-K-2Cl kotransporter blokajı",
+        "β1 blokajı"
+      ],
+      "answer_idx": 0,
+      "explanation_tr": "Spironolakton aldosteronu bloke ederek distal tübülde Na⁺ geri emilimini ve K⁺ atılımını azaltır.",
+      "node_id": "r_mr"
     }
   ]
 }

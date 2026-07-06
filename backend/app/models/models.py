@@ -1,9 +1,9 @@
-from datetime import datetime, timezone
+from datetime import datetime, date, timezone
 from typing import Optional, Any
 import uuid
 
 from sqlalchemy import (
-    Column, String, Integer, Float, Boolean, Text, DateTime,
+    Column, String, Integer, Float, Boolean, Text, DateTime, Date,
     ForeignKey, Enum as SAEnum, UniqueConstraint, Index,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID, ARRAY
@@ -70,6 +70,10 @@ class User(Base):
 
     sessions = relationship("SimulationSession", back_populates="user")
     emergency_mcq_reports = relationship("EmergencyMcqReport", back_populates="user")
+    mcq_review_cards = relationship("McqReviewCard", back_populates="user")
+    mcq_review_logs = relationship("McqReviewLog", back_populates="user")
+    study_settings = relationship("UserStudySettings", back_populates="user", uselist=False)
+    study_streak = relationship("UserStudyStreak", back_populates="user", uselist=False)
 
 
 class Case(Base):
@@ -298,6 +302,81 @@ class HistologyImage(Base):
     # Örn. epithelium, muscle_tissue, respiratory — filtre etiketi
     science_unit = Column(String, nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), default=now_utc)
+
+
+class McqReviewCard(Base):
+    """FSRS-5 ile MCQ tekrar kartı (kullanıcı × havuz × soru)."""
+    __tablename__ = "mcq_review_cards"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    pool = Column(String, nullable=False, index=True)  # emergency_tr | practice_usmle
+    mcq_id = Column(String, nullable=False, index=True)
+    topic_slug = Column(String, nullable=True, index=True)
+    stability = Column(Float, default=0.0, nullable=False)
+    difficulty = Column(Float, default=0.0, nullable=False)
+    due_at = Column(DateTime(timezone=True), nullable=False, index=True)
+    reps = Column(Integer, default=0, nullable=False)
+    lapses = Column(Integer, default=0, nullable=False)
+    state = Column(Integer, default=0, nullable=False)  # FSRS Card.state
+    elapsed_days = Column(Float, default=0.0, nullable=False)
+    scheduled_days = Column(Float, default=0.0, nullable=False)
+    last_review_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
+
+    user = relationship("User", back_populates="mcq_review_cards")
+    logs = relationship("McqReviewLog", back_populates="card")
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "pool", "mcq_id", name="uq_mcq_review_card"),
+        Index("ix_mcq_review_user_due", "user_id", "due_at"),
+    )
+
+
+class McqReviewLog(Base):
+    """MCQ cevap geçmişi (FSRS rating audit)."""
+    __tablename__ = "mcq_review_logs"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    card_id = Column(String, ForeignKey("mcq_review_cards.id", ondelete="CASCADE"), nullable=True)
+    pool = Column(String, nullable=False)
+    mcq_id = Column(String, nullable=False, index=True)
+    topic_slug = Column(String, nullable=True, index=True)
+    rating = Column(Integer, nullable=False)  # 1=Again … 4=Easy
+    was_correct = Column(Boolean, nullable=False)
+    elapsed_ms = Column(Integer, nullable=True)
+    reviewed_at = Column(DateTime(timezone=True), default=now_utc, index=True)
+
+    user = relationship("User", back_populates="mcq_review_logs")
+    card = relationship("McqReviewCard", back_populates="logs")
+
+
+class UserStudySettings(Base):
+    """Günlük çalışma tercihleri."""
+    __tablename__ = "user_study_settings"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), unique=True, nullable=False, index=True)
+    daily_goal = Column(Integer, default=10, nullable=False)
+    preferred_pool = Column(String, default="emergency_tr", nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=now_utc, onupdate=now_utc)
+
+    user = relationship("User", back_populates="study_settings")
+
+
+class UserStudyStreak(Base):
+    """Günlük çalışma serisi."""
+    __tablename__ = "user_study_streak"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), unique=True, nullable=False, index=True)
+    current_streak = Column(Integer, default=0, nullable=False)
+    longest_streak = Column(Integer, default=0, nullable=False)
+    last_study_date = Column(Date, nullable=True)
+    updated_at = Column(DateTime(timezone=True), default=now_utc, onupdate=now_utc)
+
+    user = relationship("User", back_populates="study_streak")
 
 
 class Annotation(Base):

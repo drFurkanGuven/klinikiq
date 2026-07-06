@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
 function postLoginPath(): string {
-  if (typeof window === "undefined") return "/dashboard";
+  if (typeof window === "undefined") return "/calis";
   const q = new URLSearchParams(window.location.search).get("next");
   if (q && q.startsWith("/") && !q.startsWith("//") && !q.includes("://")) return q;
-  return "/dashboard";
+  return "/calis";
 }
 
 export default function LoginPage() {

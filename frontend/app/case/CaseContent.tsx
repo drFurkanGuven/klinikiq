@@ -409,10 +409,9 @@ const SPECIALTY_LABELS: Record<string, string> = {
 };
 
 const DIFFICULTY_MAP: Record<string, { label: string; color: string; initialBudget: number }> = {
-  // Geniş tetkik menüsü (PET, MR, NGS vb.) ile uyumlu — kullanıcı şikayeti: bütçe yetmiyordu
-  easy: { label: "Kolay", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20", initialBudget: 4500 },
-  medium: { label: "Orta", color: "text-amber-400 bg-amber-500/10 border-amber-500/20", initialBudget: 9500 },
-  hard: { label: "Zor", color: "text-red-400 bg-red-500/10 border-red-500/20", initialBudget: 22000 },
+  easy: { label: "Kolay", color: "border border-border text-muted bg-surface-2", initialBudget: 4500 },
+  medium: { label: "Orta", color: "border border-border text-muted bg-surface-2", initialBudget: 9500 },
+  hard: { label: "Zor", color: "border border-border text-foreground bg-surface-2", initialBudget: 22000 },
 };
 
 interface Message { role: "user" | "assistant"; content: string; streaming?: boolean; isError?: boolean; }
@@ -464,15 +463,15 @@ function RenderMessage({ content }: { content: string }) {
           const headers = dataLines[0].split('|').map(x => x.trim()).filter(x => x);
           const rows = dataLines.slice(1).map(l => l.split('|').map(x => x.trim()).filter(x => x));
           return (
-            <div key={i} className="my-3 border shadow-xl rounded-[1.5rem] overflow-hidden font-mono text-[11px] sm:text-xs w-full transition-all" 
+            <div key={i} className="my-3 border rounded-lg overflow-hidden font-mono text-[11px] sm:text-xs w-full" 
               style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
               <div className="px-4 py-3 border-b flex justify-between items-center"
                 style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
                 <div className="flex items-center gap-2">
-                  <TestTube2 className="w-4 h-4" style={{ color: "var(--primary)" }} />
-                  <span className="font-black uppercase tracking-tight" style={{ color: "var(--text-navy)" }}>KlinikIQ LBS (Laboratuvar Bilgi Sistemi)</span>
+                  <TestTube2 className="w-4 h-4" style={{ color: "var(--foreground)" }} />
+                  <span className="font-semibold text-xs" style={{ color: "var(--text)" }}>KlinikIQ LBS</span>
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">✓ ONAYLANDI</span>
+                <span className="text-[10px] font-medium" style={{ color: "var(--muted)" }}>Onaylandı</span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
@@ -491,11 +490,11 @@ function RenderMessage({ content }: { content: string }) {
                             const isValueCell = cidx === 1;
                             return (
                               <td key={cidx} className="px-4 py-2.5">
-                                <span className={isValueCell && isHigh ? "text-red-600 dark:text-red-400 font-black" : isValueCell && isLow ? "text-blue-600 dark:text-blue-400 font-black" : "font-medium"}>
+                                <span className={isValueCell && isHigh ? "text-red-600 dark:text-red-400 font-semibold" : isValueCell && isLow ? "text-blue-600 dark:text-blue-400 font-semibold" : "font-medium"}>
                                   {cell.replace(/\([HL]\)/gi, '')}
                                 </span>
-                                {isHigh && isValueCell && <span className="ml-2 text-[9px] font-black uppercase tracking-tighter text-red-600 dark:text-red-400 opacity-80">( Yüksek )</span>}
-                                {isLow && isValueCell && <span className="ml-2 text-[9px] font-black uppercase tracking-tighter text-blue-600 dark:text-blue-400 opacity-80">( Düşük )</span>}
+                                {isHigh && isValueCell && <span className="ml-2 text-[9px] font-medium text-red-600 dark:text-red-400">(yüksek)</span>}
+                                {isLow && isValueCell && <span className="ml-2 text-[9px] font-medium text-blue-600 dark:text-blue-400">(düşük)</span>}
                               </td>
                             )
                           })}
@@ -711,33 +710,31 @@ export default function CasePageContent() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden relative transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
-      <nav className="glass border-b flex-shrink-0 transition-all font-sans" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+      <nav className="border-b flex-shrink-0" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2.5 text-xs font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95" style={{ color: "var(--text-muted)" }}>
-              <ArrowLeft className="w-4 h-4" /> <span className="hidden sm:inline">KlinikIQ UI</span>
+            <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 text-xs font-medium transition-colors hover:opacity-70" style={{ color: "var(--text-muted)" }}>
+              <ArrowLeft className="w-4 h-4" /> <span className="hidden sm:inline">Geri</span>
             </button>
             <div className="w-px h-4 bg-current opacity-10 hidden sm:block mx-1" />
             <button 
               onClick={() => setSidebarOpen(!sidebarOpen)} 
-              className="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all shadow-md border active:scale-95" 
-              style={{ background: "var(--surface-2)", color: "var(--primary)", borderColor: "var(--primary-light)" }}
+              className="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg border" 
+              style={{ background: "var(--surface-2)", color: "var(--text)", borderColor: "var(--border)" }}
             >
               {sidebarOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
-              <span className="text-[10px] font-black uppercase tracking-widest">Panel</span>
+              <span className="text-xs font-medium">Panel</span>
             </button>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
-            <button onClick={() => setLabOpen(true)} className="group flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold transition-all shadow-md border relative overflow-hidden" style={{ background: "var(--primary)", borderColor: "var(--primary-h)", color: "white" }}>
-               <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
-               <TestTube2 className="w-3.5 h-3.5 relative z-10" /> <span className="relative z-10 hidden xs:inline">Tetkik İste</span>
+            <button onClick={() => setLabOpen(true)} className="btn-primary flex items-center gap-2 px-3 py-2 rounded-lg text-xs">
+               <TestTube2 className="w-3.5 h-3.5" /> <span className="hidden xs:inline">Tetkik</span>
             </button>
-            <button onClick={() => setExamOpen(true)} className="group flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold transition-all shadow-md border relative overflow-hidden" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-navy)" }}>
-               <div className="absolute inset-0 bg-black/5 w-0 group-hover:w-full transition-all duration-300" />
-               <Stethoscope className="w-3.5 h-3.5 relative z-10" style={{ color: "var(--primary)" }} /> <span className="relative z-10 hidden xs:inline">Fizik Muayene</span>
+            <button onClick={() => setExamOpen(true)} className="btn-secondary flex items-center gap-2 px-3 py-2 rounded-lg text-xs">
+               <Stethoscope className="w-3.5 h-3.5" /> <span className="hidden xs:inline">Muayene</span>
             </button>
-            {caseInfo && <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border shadow-sm ${diff.color} hidden sm:inline-flex`}>{diff.label}</span>}
+            {caseInfo && <span className={`text-[10px] font-medium px-2.5 py-1 rounded-md hidden sm:inline-flex ${diff.color}`}>{diff.label}</span>}
           </div>
         </div>
       </nav>
@@ -746,31 +743,31 @@ export default function CasePageContent() {
         {sidebarOpen && <div className="md:hidden absolute inset-0 bg-black/60 z-20" onClick={() => setSidebarOpen(false)} />}
         <aside className={`w-72 flex-shrink-0 p-4 overflow-y-auto md:relative md:translate-x-0 md:block fixed top-0 left-0 h-full z-30 transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`} style={{ background: "var(--bg)", top: "auto" }}>
            <div className="flex flex-col gap-4 h-full overflow-y-auto pb-4">
-             <div className="glass rounded-2xl p-4 border flex items-center justify-between shadow-sm" style={{ background: "var(--primary-light)", borderColor: "var(--primary-light)" }}>
-               <div><p className="text-[10px] font-black uppercase tracking-widest opacity-60" style={{ color: "var(--primary)" }}>SGK BÜTÇESİ</p><p className="text-xl font-black" style={{ color: "var(--primary)" }}>{budget} ₺</p></div>
-               <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-inner" style={{ background: "white" }}><ShieldAlert className="w-5 h-5" style={{ color: "var(--primary)" }} /></div>
+             <div className="rounded-lg p-4 border flex items-center justify-between" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+               <div><p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--muted)" }}>SGK bütçesi</p><p className="text-xl font-semibold tabular-nums" style={{ color: "var(--text)" }}>{budget} ₺</p></div>
+               <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "var(--surface-2)" }}><ShieldAlert className="w-4 h-4" style={{ color: "var(--foreground)" }} /></div>
              </div>
-             <div className="glass rounded-2xl p-4 border transition-all shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+             <div className="rounded-lg p-4 border" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
                <div className="flex items-center gap-3 mb-4">
-                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-sm" style={{ background: "var(--surface-2)" }}>{patient?.gender === "kadın" ? "👩" : "👨"}</div>
-                 <div><p className="text-[10px] font-black uppercase tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>Hasta</p><p className="text-base font-black" style={{ color: "var(--text-navy)" }}>{loading ? "Yükleniyor..." : patient?.name ?? "—"}</p></div>
+                 <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl" style={{ background: "var(--surface-2)" }}>{patient?.gender === "kadın" ? "👩" : "👨"}</div>
+                 <div><p className="text-[10px] font-medium" style={{ color: "var(--muted)" }}>Hasta</p><p className="text-base font-semibold" style={{ color: "var(--text)" }}>{loading ? "Yükleniyor..." : patient?.name ?? "—"}</p></div>
                </div>
                {loading ? <div className="space-y-2"><div className="h-4 shimmer rounded" /><div className="h-4 shimmer rounded w-3/4" /></div> : patient ? (
                  <div className="space-y-2 text-sm">
                    <InfoRow label="Yaş" value={`${patient.age} Yaşında`} />
                    <InfoRow label="Cinsiyet" value={patient.gender} />
                    <div className="pt-2 border-t" style={{ borderColor: "var(--border)" }}>
-                     <p className="text-[10px] font-black uppercase tracking-wider opacity-50 mb-1" style={{ color: "var(--text-muted)" }}>Şikayet</p>
-                     <p className="text-xs leading-relaxed font-semibold italic" style={{ color: "var(--text-navy)" }}>&quot;{patient.chief_complaint}&quot;</p>
+                     <p className="text-[10px] font-medium mb-1" style={{ color: "var(--muted)" }}>Şikayet</p>
+                     <p className="text-xs leading-relaxed italic" style={{ color: "var(--text)" }}>&quot;{patient.chief_complaint}&quot;</p>
                    </div>
                    {patient.vitals && Object.keys(patient.vitals).length > 0 && (
                      <div className="pt-2 border-t" style={{ borderColor: "var(--border)" }}>
-                       <p className="text-[10px] font-black uppercase tracking-wider opacity-50 mb-2" style={{ color: "var(--text-muted)" }}>Vital Bulgular</p>
+                       <p className="text-[10px] font-medium mb-2" style={{ color: "var(--muted)" }}>Vital bulgular</p>
                        <div className="grid grid-cols-2 gap-1.5">
                          {Object.entries(patient.vitals as Record<string, string>).map(([key, val]) => (
-                           <div key={key} className="rounded-xl p-2 text-center" style={{ background: "var(--surface-2)" }}>
-                             <p className="text-[9px] font-black uppercase tracking-wider opacity-50 truncate">{key}</p>
-                             <p className="text-[11px] font-black truncate" style={{ color: "var(--text-navy)" }}>{val}</p>
+                           <div key={key} className="rounded-lg p-2 text-center border" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
+                             <p className="text-[9px] font-medium truncate" style={{ color: "var(--muted)" }}>{key}</p>
+                             <p className="text-[11px] font-semibold truncate" style={{ color: "var(--text)" }}>{val}</p>
                            </div>
                          ))}
                        </div>
@@ -782,39 +779,46 @@ export default function CasePageContent() {
             <button onClick={() => sendMessage("[KONSÜLTASYON İSTEĞİ]")} disabled={streaming} className="w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl border transition-all" style={{ background: "var(--surface)", borderColor: "var(--border-strong)", color: "var(--foreground)" }}>
               <Phone className="w-5 h-5" /> {streaming ? "İşleniyor..." : "Hocaya Danış"}
             </button>
-             <div className="glass rounded-2xl p-4 border transition-all shadow-sm space-y-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-               <button onClick={() => setShowDiagnosis(true)} className="w-full flex items-center gap-2 text-sm font-bold py-2.5 px-3 rounded-xl border transition-all" style={diagnosisSaved ? { background: "var(--accent-muted)", borderColor: "var(--foreground)", color: "var(--foreground)" } : { background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-navy)" }}>
+             <div className="rounded-lg p-4 border space-y-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+               <button onClick={() => setShowDiagnosis(true)} className="w-full flex items-center gap-2 text-sm font-medium py-2.5 px-3 rounded-lg border transition-colors" style={diagnosisSaved ? { background: "var(--surface-2)", borderColor: "var(--foreground)", color: "var(--foreground)" } : { background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}>
                  {diagnosisSaved ? <CheckCircle2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />} {diagnosisSaved ? "Tanılar Kaydedildi ✓" : "Klinik Tanı Gir"}
                </button>
-               <button onClick={handleComplete} disabled={completing || !diagnosisSaved} className="w-full flex items-center justify-center gap-2 text-sm font-bold py-2.5 rounded-xl transition-all disabled:opacity-40" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
+               <button onClick={handleComplete} disabled={completing || !diagnosisSaved} className="btn-primary w-full flex items-center justify-center gap-2 text-sm py-2.5 rounded-lg disabled:opacity-40">
                  {completing ? "Raporlanıyor..." : "Vakayı Bitir"}
                </button>
              </div>
            </div>
         </aside>
 
-        <main className="flex-1 flex flex-col overflow-hidden min-w-0 m-4 ml-0 md:ml-0 glass rounded-2xl border transition-all shadow-xl" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-          <div className="p-3 sm:p-5 border-b flex-shrink-0 space-y-2" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ background: "var(--primary-light)" }}><span className="text-xl">{patient?.gender === "kadın" ? "👩" : "🧑‍⚕️"}</span></div>
-              <div className="min-w-0 flex-1"><p className="text-sm font-black tracking-tight truncate" style={{ color: "var(--text-navy)" }}>{patient ? `${patient.name} ile Görüşme` : "Simülasyon"}</p></div>
+        <main className="flex-1 flex flex-col overflow-hidden min-w-0 m-3 md:m-4 rounded-lg border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+          <div className="p-3 sm:p-4 border-b flex-shrink-0 space-y-1" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "var(--surface)" }}><span className="text-lg">{patient?.gender === "kadın" ? "👩" : "🧑‍⚕️"}</span></div>
+              <div className="min-w-0 flex-1"><p className="text-sm font-semibold truncate" style={{ color: "var(--text)" }}>{patient ? `${patient.name} ile görüşme` : "Simülasyon"}</p></div>
             </div>
-            <p className="text-[10px] sm:text-[11px] leading-snug opacity-60 font-medium pl-0 sm:pl-14" style={{ color: "var(--text-muted)" }}>
+            <p className="text-[11px] leading-snug pl-0 sm:pl-12" style={{ color: "var(--text-muted)" }}>
               Eğitim simülasyonu; metinler AI ile üretilebilir. Tıbbi karar yerine geçmez.
             </p>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((msg, i) => (
               <div key={i} className={`flex w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed transition-all shadow-sm ${msg.role === "user" ? "rounded-tr-sm bg-primary-light text-primary" : "rounded-tl-sm border bg-surface text-text border-border"}`}>
-                  <div className="flex items-center gap-2 mb-1 opacity-50 text-[10px] font-bold uppercase tracking-wider">{msg.role === "user" ? "Siz" : speakerName}</div>
+                <div
+                  className="max-w-[85%] rounded-lg px-4 py-3 text-sm leading-relaxed border"
+                  style={{
+                    borderColor: "var(--border)",
+                    background: msg.role === "user" ? "var(--surface-2)" : "var(--surface)",
+                    color: "var(--text)",
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-1 text-[10px] font-medium" style={{ color: "var(--muted)" }}>{msg.role === "user" ? "Siz" : speakerName}</div>
                   {msg.role === "assistant" ? <RenderMessage content={msg.content} /> : msg.content}
                   {msg.isError && (
                     <button
                       onClick={retryLastMessage}
                       disabled={streaming}
-                      className="mt-2 flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all active:scale-95 disabled:opacity-50"
-                      style={{ background: "var(--primary-light)", color: "var(--primary)" }}
+                      className="mt-2 flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-50"
+                      style={{ borderColor: "var(--border)", color: "var(--text)" }}
                     >
                       <RefreshCw className="w-3 h-3" /> Yeniden Bağlan
                     </button>
@@ -825,9 +829,9 @@ export default function CasePageContent() {
             <div ref={bottomRef} />
           </div>
           <div className="p-3 sm:p-4 border-t" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
-            <div className="flex items-end gap-2 rounded-2xl px-3 py-2 transition-all shadow-inner border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+            <div className="flex items-end gap-2 rounded-lg px-3 py-2 border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
               <textarea ref={textareaRef} value={input} onChange={(e) => { setInput(e.target.value); if (textareaRef.current) { textareaRef.current.style.height = "auto"; textareaRef.current.style.height = textareaRef.current.scrollHeight + "px"; } }} placeholder="Sorunuzu yazın..." rows={1} disabled={streaming} className="flex-1 bg-transparent text-sm resize-none outline-none" style={{ color: "var(--text)" }} />
-              <button onClick={() => sendMessage()} disabled={!input.trim() || streaming} className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-95 disabled:opacity-50" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}><Send className="w-4 h-4" /></button>
+              <button onClick={() => sendMessage()} disabled={!input.trim() || streaming} className="btn-primary w-9 h-9 rounded-lg flex items-center justify-center disabled:opacity-50"><Send className="w-4 h-4" /></button>
             </div>
           </div>
         </main>
@@ -836,10 +840,10 @@ export default function CasePageContent() {
       {labOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setLabOpen(false)} />
-          <div className="relative w-full max-w-6xl h-[85vh] shadow-2xl rounded-[2.5rem] flex flex-col overflow-hidden border" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
+          <div className="relative w-full max-w-6xl h-[85vh] rounded-xl flex flex-col overflow-hidden border" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
             <div className="flex-col md:flex-row h-auto md:h-20 p-4 md:px-8 border-b flex md:items-center justify-between gap-4" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
               <div className="flex items-center justify-between">
-                <h2 className="text-lg md:text-xl font-black tracking-tight">Laboratuvar Paneli</h2>
+                <h2 className="text-lg md:text-xl font-semibold tracking-tight">Laboratuvar paneli</h2>
                 <button onClick={() => setLabOpen(false)} className="w-10 h-10 md:hidden rounded-xl border flex items-center justify-center transition-all hover:bg-black/5" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}><X className="w-5 h-5" /></button>
               </div>
               <input type="text" placeholder="Tetkik ara..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full md:flex-1 md:max-w-md h-11 px-4 rounded-xl border text-sm outline-none" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }} />
@@ -848,7 +852,7 @@ export default function CasePageContent() {
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
               <aside className="w-full md:w-56 lg:w-64 border-b md:border-b-0 md:border-r overflow-x-auto md:overflow-y-auto p-2 md:p-4 flex flex-row md:flex-col gap-2 md:gap-1 flex-shrink-0" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
                 {LAB_CATEGORIES.map(cat => (
-                  <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={`w-auto md:w-full flex-shrink-0 text-left px-4 py-2.5 md:py-3.5 rounded-full md:rounded-2xl font-bold text-xs md:text-sm whitespace-nowrap md:whitespace-normal transition-all ${selectedCategory === cat.id ? "shadow-md" : "opacity-60"}`} style={{ background: selectedCategory === cat.id ? "var(--surface)" : "transparent", color: selectedCategory === cat.id ? "var(--primary)" : "var(--text)" }}>{cat.label}</button>
+                  <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={`w-auto md:w-full flex-shrink-0 text-left px-4 py-2.5 md:py-3 rounded-lg font-medium text-xs md:text-sm whitespace-nowrap md:whitespace-normal transition-colors ${selectedCategory === cat.id ? "" : "opacity-60"}`} style={{ background: selectedCategory === cat.id ? "var(--surface)" : "transparent", color: selectedCategory === cat.id ? "var(--text)" : "var(--text-muted)", border: selectedCategory === cat.id ? "1px solid var(--border)" : "1px solid transparent" }}>{cat.label}</button>
                 ))}
               </aside>
               <main className="flex-1 overflow-y-auto p-4 md:p-8" style={{ background: "var(--surface)" }}>
@@ -856,26 +860,26 @@ export default function CasePageContent() {
                   {LAB_TESTS.filter(t => (searchQuery ? t.name.toLowerCase().includes(searchQuery.toLowerCase()) : t.category === selectedCategory)).map(test => {
                     const isSelected = selectedLabs.includes(test.id);
                     return (
-                      <button key={test.id} onClick={() => toggleLab(test.id, test.price)} className={`p-4 rounded-2xl md:rounded-3xl border transition-all text-left min-h-[5.5rem] md:min-h-[6.25rem] flex flex-col justify-between hover:scale-105 active:scale-95 shadow-sm`} style={{ background: isSelected ? "var(--primary-light)" : "var(--surface)", borderColor: isSelected ? "var(--primary)" : "var(--border)", color: "var(--text)" }}>
-                        <span className="text-xs md:text-sm font-black line-clamp-3 leading-tight pr-2">{test.name}</span>
-                        <span className="text-[10px] md:text-xs font-bold opacity-80" style={{ color: "var(--primary)" }}>{test.price} ₺</span>
+                      <button key={test.id} onClick={() => toggleLab(test.id, test.price)} className="p-4 rounded-lg border transition-colors text-left min-h-[5.5rem] md:min-h-[6.25rem] flex flex-col justify-between" style={{ background: isSelected ? "var(--surface-2)" : "var(--surface)", borderColor: isSelected ? "var(--foreground)" : "var(--border)", color: "var(--text)" }}>
+                        <span className="text-xs md:text-sm font-medium line-clamp-3 leading-tight pr-2">{test.name}</span>
+                        <span className="text-[10px] md:text-xs font-medium tabular-nums" style={{ color: "var(--muted)" }}>{test.price} ₺</span>
                       </button>
                     );
                   })}
                 </div>
               </main>
               <aside className="w-full md:w-72 lg:w-80 h-40 md:h-auto flex-shrink-0 border-t md:border-t-0 md:border-l flex flex-col" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
-                <div className="p-4 md:p-6 border-b font-black text-xs uppercase tracking-widest" style={{ borderColor: "var(--border)" }}>Sepet ({selectedLabs.length})</div>
+                <div className="p-4 md:p-6 border-b text-xs font-medium" style={{ borderColor: "var(--border)", color: "var(--muted)" }}>Sepet ({selectedLabs.length})</div>
                 <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-2">
                   {selectedLabs.map(id => (
-                    <div key={id} className="p-3 rounded-xl border flex justify-between items-center text-xs font-bold shadow-sm transition-all" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
+                    <div key={id} className="p-3 rounded-lg border flex justify-between items-center text-xs font-medium" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
                       <span className="truncate pr-2">{LAB_TESTS.find(t => t.id === id)?.name}</span>
                       <button onClick={() => toggleLab(id, 0)} className="text-danger hover:scale-110 active:scale-95 transition-transform"><Trash className="w-4 h-4" /></button>
                     </div>
                   ))}
                 </div>
                 <div className="p-4 md:p-6 border-t" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-                   <button onClick={orderLabs} disabled={selectedLabs.length === 0} className="w-full font-semibold py-3 md:py-4 rounded-2xl transition-all disabled:opacity-50 active:scale-95 flex justify-center items-center gap-2" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
+                   <button onClick={orderLabs} disabled={selectedLabs.length === 0} className="btn-primary w-full py-3 md:py-4 rounded-lg disabled:opacity-50 flex justify-center items-center gap-2">
                         Tetkikleri İste
                    </button>
                 </div>
@@ -888,23 +892,23 @@ export default function CasePageContent() {
       {examOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setExamOpen(false)} />
-          <div className="relative w-full max-w-6xl h-[85vh] shadow-2xl rounded-[2.5rem] flex flex-col overflow-hidden border" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
-            <div className="h-16 md:h-20 px-4 md:px-8 border-b flex items-center justify-between" style={{ background: "var(--surface)" }}>
-              <h2 className="text-lg md:text-xl font-black">Fizik Muayene</h2>
+          <div className="relative w-full max-w-6xl h-[85vh] rounded-xl flex flex-col overflow-hidden border" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}>
+            <div className="h-16 md:h-20 px-4 md:px-8 border-b flex items-center justify-between" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+              <h2 className="text-lg md:text-xl font-semibold">Fizik muayene</h2>
               <button onClick={() => setExamOpen(false)} className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl border flex items-center justify-center transition-all hover:bg-black/5" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}><X className="w-5 h-5 md:w-6 md:h-6" /></button>
             </div>
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
               <aside className="w-full md:w-56 lg:w-64 border-b md:border-b-0 md:border-r overflow-x-auto md:overflow-y-auto p-2 md:p-4 flex flex-row md:flex-col gap-2 md:gap-1 flex-shrink-0" style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
                 {EXAM_CATEGORIES.map(cat => (
-                  <button key={cat.id} onClick={() => setSelectedExamCategory(cat.id)} className={`w-auto md:w-full flex-shrink-0 text-left px-4 py-2.5 md:py-3 rounded-full md:rounded-2xl font-bold text-xs md:text-sm whitespace-nowrap md:whitespace-normal transition-all ${selectedExamCategory === cat.id ? "shadow-md" : "opacity-60"}`} style={{ background: selectedExamCategory === cat.id ? "var(--surface)" : "transparent", color: selectedExamCategory === cat.id ? "var(--primary)" : "var(--text)" }}>{cat.label}</button>
+                  <button key={cat.id} onClick={() => setSelectedExamCategory(cat.id)} className={`w-auto md:w-full flex-shrink-0 text-left px-4 py-2.5 md:py-3 rounded-lg font-medium text-xs md:text-sm whitespace-nowrap md:whitespace-normal transition-colors ${selectedExamCategory === cat.id ? "" : "opacity-60"}`} style={{ background: selectedExamCategory === cat.id ? "var(--surface)" : "transparent", color: selectedExamCategory === cat.id ? "var(--text)" : "var(--text-muted)", border: selectedExamCategory === cat.id ? "1px solid var(--border)" : "1px solid transparent" }}>{cat.label}</button>
                 ))}
               </aside>
               <main className="flex-1 overflow-y-auto p-4 md:p-8" style={{ background: "var(--surface)" }}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
                   {EXAM_ITEMS.filter(e => e.category === selectedExamCategory).map(exam => (
-                    <button key={exam.id} onClick={() => { sendMessage(exam.message); setExamOpen(false); }} className="p-4 rounded-2xl md:rounded-3xl border hover:-translate-y-1 transition-all text-left h-20 md:h-24 flex flex-col justify-between" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}>
-                      <span className="text-xs md:text-sm font-black line-clamp-2 leading-tight pr-2">{exam.name}</span>
-                      <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--primary)" }}>Uygula</span>
+                    <button key={exam.id} onClick={() => { sendMessage(exam.message); setExamOpen(false); }} className="p-4 rounded-lg border transition-colors text-left h-20 md:h-24 flex flex-col justify-between hover:bg-black/[0.02]" style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}>
+                      <span className="text-xs md:text-sm font-medium line-clamp-2 leading-tight pr-2">{exam.name}</span>
+                      <span className="text-[10px] font-medium" style={{ color: "var(--muted)" }}>Uygula</span>
                     </button>
                   ))}
                 </div>
@@ -922,8 +926,8 @@ export default function CasePageContent() {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between">
-      <span className="text-[10px] font-bold uppercase tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>{label}</span>
-      <span className="text-xs font-bold capitalize" style={{ color: "var(--text)" }}>{value}</span>
+      <span className="text-[10px] font-medium" style={{ color: "var(--muted)" }}>{label}</span>
+      <span className="text-xs font-medium capitalize" style={{ color: "var(--text)" }}>{value}</span>
     </div>
   );
 }

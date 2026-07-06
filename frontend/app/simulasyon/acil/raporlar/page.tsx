@@ -45,21 +45,21 @@ export default function AcilMcqReportListPage() {
   return (
     <div className="min-h-screen flex flex-col transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <nav
-        className="glass border-b sticky top-0 z-50 transition-all font-sans"
+        className="border-b sticky top-0 z-50"
         style={{ background: "var(--surface)", borderColor: "var(--border)" }}
       >
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4 min-w-0">
-            <Link href="/simulasyon/acil" className="p-2.5 rounded-xl transition-all hover:bg-black/5 shrink-0" style={{ color: "var(--text-muted)" }}>
+            <Link href="/simulasyon/acil" className="p-2 rounded-lg transition-colors hover:bg-black/5 shrink-0" style={{ color: "var(--text-muted)" }}>
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--accent)" }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--accent)" }}>
                 <Zap className="w-5 h-5" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <div className="min-w-0">
-                <span className="font-black text-lg tracking-tight block leading-tight truncate">Acil raporlar</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Oturum geçmişi</span>
+                <span className="font-semibold text-lg tracking-tight block leading-tight truncate">Acil raporlar</span>
+                <span className="text-[10px] font-medium uppercase tracking-widest opacity-50">Oturum geçmişi</span>
               </div>
             </div>
           </div>
@@ -68,7 +68,7 @@ export default function AcilMcqReportListPage() {
             <button
               type="button"
               onClick={logout}
-              className="group flex items-center gap-2 text-sm font-bold px-3 py-2.5 rounded-xl hover:bg-black/5"
+              className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg hover:bg-black/5"
               style={{ color: "var(--text-muted)" }}
             >
               <LogOut className="w-4 h-4" />
@@ -91,7 +91,7 @@ export default function AcilMcqReportListPage() {
 
         {items === null && (
           <div className="flex items-center justify-center gap-2 py-16">
-            <Loader2 className="w-6 h-6 animate-spin" style={{ color: "var(--primary)" }} />
+            <Loader2 className="w-6 h-6 animate-spin" style={{ color: "var(--foreground)" }} />
           </div>
         )}
 
@@ -105,13 +105,13 @@ export default function AcilMcqReportListPage() {
               <li key={r.id}>
                 <Link
                   href={`/simulasyon/acil/rapor/?id=${encodeURIComponent(r.id)}`}
-                  className="flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 transition hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
+                  className="card-hover flex items-center justify-between gap-3 rounded-lg border px-4 py-3"
                   style={{ borderColor: "var(--border)", background: "var(--surface)" }}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <FileText className="w-5 h-5 shrink-0 opacity-60" style={{ color: "var(--primary)" }} />
+                    <FileText className="w-5 h-5 shrink-0" style={{ color: "var(--foreground)" }} />
                     <div className="min-w-0">
-                      <p className="text-sm font-black truncate" style={{ color: "var(--text)" }}>
+                      <p className="text-sm font-semibold truncate" style={{ color: "var(--text)" }}>
                         Skor {Math.round(r.score)} · {r.correct_count}/{r.total_count} doğru
                       </p>
                       <p className="text-[11px] font-medium opacity-60">

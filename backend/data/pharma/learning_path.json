@@ -1,0 +1,97 @@
+{
+  "title_tr": "Farmakoloji öğrenme yolu",
+  "description_tr": "Temel reseptör mantığından sistem farmakolojisine sıralı ilerleyin. Her harita bir öncekini tamamladıktan sonra açılır.",
+  "items": [
+    {
+      "map_id": "autonomic_ns",
+      "order": 1,
+      "level": "temel",
+      "estimated_minutes": 25,
+      "prerequisites": []
+    },
+    {
+      "map_id": "gaba_benzodiazepine",
+      "order": 2,
+      "level": "temel",
+      "estimated_minutes": 20,
+      "prerequisites": ["autonomic_ns"]
+    },
+    {
+      "map_id": "histamine",
+      "order": 3,
+      "level": "temel",
+      "estimated_minutes": 18,
+      "prerequisites": ["autonomic_ns"]
+    },
+    {
+      "map_id": "raas",
+      "order": 4,
+      "level": "sistem",
+      "estimated_minutes": 22,
+      "prerequisites": ["autonomic_ns"]
+    },
+    {
+      "map_id": "nephron_diuretics",
+      "order": 5,
+      "level": "sistem",
+      "estimated_minutes": 20,
+      "prerequisites": ["raas"]
+    },
+    {
+      "map_id": "calcium_channel_blockers",
+      "order": 6,
+      "level": "sistem",
+      "estimated_minutes": 18,
+      "prerequisites": ["autonomic_ns"]
+    },
+    {
+      "map_id": "antiarrhythmics",
+      "order": 7,
+      "level": "sistem",
+      "estimated_minutes": 20,
+      "prerequisites": ["autonomic_ns", "calcium_channel_blockers"]
+    },
+    {
+      "map_id": "lipid_lowering",
+      "order": 8,
+      "level": "sistem",
+      "estimated_minutes": 18,
+      "prerequisites": []
+    },
+    {
+      "map_id": "coagulation",
+      "order": 9,
+      "level": "sistem",
+      "estimated_minutes": 22,
+      "prerequisites": []
+    },
+    {
+      "map_id": "nsaid_prostaglandin",
+      "order": 10,
+      "level": "sistem",
+      "estimated_minutes": 18,
+      "prerequisites": ["autonomic_ns"]
+    },
+    {
+      "map_id": "opioids",
+      "order": 11,
+      "level": "klinik",
+      "estimated_minutes": 20,
+      "prerequisites": ["gaba_benzodiazepine"]
+    },
+    {
+      "map_id": "antiepileptics",
+      "order": 12,
+      "level": "klinik",
+      "estimated_minutes": 22,
+      "prerequisites": ["gaba_benzodiazepine"]
+    },
+    {
+      "map_id": "insulin_diabetes",
+      "order": 13,
+      "level": "klinik",
+      "estimated_minutes": 22,
+      "prerequisites": []
+    }
+  ]
+}

@@ -4,169 +4,485 @@
   "description_tr": "Na⁺ kanal stabilizasyonu, GABA artışı, Ca²⁺ kanal blokajı ve sinaptik vezikül proteini (SV2A) hedefleri. Fenitoin, karbamazepin, valproat, lamotrijin, levetirasetam profilleri.",
   "source_attribution": "Antiepileptik farmakoloji StatPearls (Antiepileptic Drugs, Phenytoin, Valproic Acid, Carbamazepine) ve GtoPdb (CC BY-SA 4.0) temel alınarak derlenmiştir.",
   "nodes": [
-    { "id": "med_glu", "label_tr": "Glutamat", "type": "mediator", "high_yield": true, "description_tr": "Excitatory nörotransmitter. NMDA/AMPA reseptörleri üzerinden depolarizasyon ve nöbet yayılımı." },
-    { "id": "med_gaba", "label_tr": "GABA", "type": "mediator", "high_yield": true, "description_tr": "İnhibitory nörotransmitter. GABA-A aktivasyonu nöbet eşiğini yükseltir." },
-
-    { "id": "r_nav", "label_tr": "Voltage-gated Na⁺ kanalı", "type": "receptor", "high_yield": true, "description_tr": "Aksiyon potansiyeli faz 0. Fenitoin, karbamazepin, lamotrijin durum-bağımlı inaktif kanal stabilizasyonu → yüksek frekanslı deşarj baskılanır." },
-    { "id": "r_cav", "label_tr": "T-tip / N-tip Ca²⁺ kanalı", "type": "receptor", "high_yield": true, "description_tr": "T-tipe thalamik osilasyon (absans); N-tipe presinaptik Ca²⁺ → nörotransmitter salınımı. Etosüksimid T-tip; gabapentinoidler α2δ subunit." },
-    { "id": "r_gaba_a", "label_tr": "GABA-A reseptörü", "type": "receptor", "high_yield": true, "description_tr": "Valproat GABA sentezini artırır/GABA-T inhibisyonu; barbitürat/benzodiazepin allosterik modülasyon." },
-    { "id": "r_gaba_transaminase", "label_tr": "GABA-transaminaz (GABA-T)", "type": "receptor", "high_yield": true, "description_tr": "GABA katabolizması. Valproat ve vigabatrin inhibe eder → GABA ↑." },
-    { "id": "r_sv2a", "label_tr": "SV2A (sinaptik vezikül proteini)", "type": "receptor", "high_yield": true, "description_tr": "Levetirasetam bağlanma hedefi. Presinaptik nörotransmitter salınım modülasyonu (mekanizma tam çözülmemiş)." },
-    { "id": "r_alpha2delta", "label_tr": "α2δ subunit (Ca²⁺ kanal)", "type": "receptor", "high_yield": true, "description_tr": "Gabapentin ve pregabalin hedefi. Presinaptik Ca²⁺ kanal trafiği ↓ → excitatory salınım ↓." },
-
-    { "id": "o_cortex", "label_tr": "Serebral korteks", "type": "organ", "high_yield": true, "description_tr": "Fokal ve ikincil jeneralize nöbetlerin başlangıç odağı. Na⁺ kanal blokerleri etkili." },
-    { "id": "o_hippocampus", "label_tr": "Hipokampus (temporal lob)", "type": "organ", "high_yield": true, "description_tr": "Temporal lob epilepsisi. Karbamazepin, lamotrijin, levetirasetam." },
-    { "id": "o_thalamus", "label_tr": "Talamus (T-tip Ca²⁺)", "type": "organ", "high_yield": true, "description_tr": "Absans nöbetlerde talamokortikal osilasyon. Etosüksimid T-tip Ca²⁺ kanal bloker." },
-    { "id": "o_synapse", "label_tr": "Presinaptik terminal", "type": "organ", "high_yield": true, "description_tr": "Nörotransmitter salınımı. Levetirasetam (SV2A), gabapentin (α2δ) burada etkili." },
-
-    { "id": "e_seizure_suppress", "label_tr": "Nöbet baskılama", "type": "effect", "high_yield": true, "description_tr": "Excitability ↓ veya inhibisyon ↑ ile nöbet eşiği yükselir." },
-    { "id": "e_focal", "label_tr": "Fokal nöbet kontrolü", "type": "effect", "high_yield": true, "description_tr": "Na⁺ kanal blokerleri (fenitoin, karbamazepin, lamotrijin) fokal başlangıçlı nöbetlerde etkili." },
-    { "id": "e_absence", "label_tr": "Absans nöbet kontrolü", "type": "effect", "high_yield": true, "description_tr": "Etosüksimid/valproat absans için; karbamazepin absansı kötüleştirebilir (TUS klasiği)." },
-    { "id": "e_sedation", "label_tr": "Sedasyon / SSS yan etki", "type": "effect", "high_yield": true, "description_tr": "Barbitürat, benzodiazepin, topiramat, valproat ile görülür." },
-    { "id": "e_teratogenic", "label_tr": "Teratojenite (valproat)", "type": "effect", "high_yield": true, "description_tr": "Valproat nöral tüp defekti ve kognitif risk → gebelikte kontrendike (alternatif tercih)." },
-    { "id": "e_stevens_johnson", "label_tr": "Cilt reaksiyonu (SJS/TEN)", "type": "effect", "high_yield": true, "description_tr": "Lamotrijin, karbamazepin HLA-B*1502 (Asya) ile SJS riski. Yavaş titrasyon lamotrijinde." },
-    { "id": "e_gingival", "label_tr": "Diş eti hipertrofisi (fenitoin)", "type": "effect", "high_yield": true, "description_tr": "Fenitoin karakteristik yan etki; terapötik ilaç izlemi (serum düzeyi) gerekir." }
+    {
+      "id": "med_glu",
+      "label_tr": "Glutamat",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Excitatory nörotransmitter. NMDA/AMPA reseptörleri üzerinden depolarizasyon ve nöbet yayılımı."
+    },
+    {
+      "id": "med_gaba",
+      "label_tr": "GABA",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "İnhibitory nörotransmitter. GABA-A aktivasyonu nöbet eşiğini yükseltir."
+    },
+    {
+      "id": "r_nav",
+      "label_tr": "Voltage-gated Na⁺ kanalı",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Aksiyon potansiyeli faz 0. Fenitoin, karbamazepin, lamotrijin durum-bağımlı inaktif kanal stabilizasyonu → yüksek frekanslı deşarj baskılanır."
+    },
+    {
+      "id": "r_cav",
+      "label_tr": "T-tip / N-tip Ca²⁺ kanalı",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "T-tipe thalamik osilasyon (absans); N-tipe presinaptik Ca²⁺ → nörotransmitter salınımı. Etosüksimid T-tip; gabapentinoidler α2δ subunit."
+    },
+    {
+      "id": "r_gaba_a",
+      "label_tr": "GABA-A reseptörü",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Valproat GABA sentezini artırır/GABA-T inhibisyonu; barbitürat/benzodiazepin allosterik modülasyon."
+    },
+    {
+      "id": "r_gaba_transaminase",
+      "label_tr": "GABA-transaminaz (GABA-T)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "GABA katabolizması. Valproat ve vigabatrin inhibe eder → GABA ↑."
+    },
+    {
+      "id": "r_sv2a",
+      "label_tr": "SV2A (sinaptik vezikül proteini)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Levetirasetam bağlanma hedefi. Presinaptik nörotransmitter salınım modülasyonu (mekanizma tam çözülmemiş)."
+    },
+    {
+      "id": "r_alpha2delta",
+      "label_tr": "α2δ subunit (Ca²⁺ kanal)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Gabapentin ve pregabalin hedefi. Presinaptik Ca²⁺ kanal trafiği ↓ → excitatory salınım ↓."
+    },
+    {
+      "id": "o_cortex",
+      "label_tr": "Serebral korteks",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Fokal ve ikincil jeneralize nöbetlerin başlangıç odağı. Na⁺ kanal blokerleri etkili."
+    },
+    {
+      "id": "o_hippocampus",
+      "label_tr": "Hipokampus (temporal lob)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Temporal lob epilepsisi. Karbamazepin, lamotrijin, levetirasetam."
+    },
+    {
+      "id": "o_thalamus",
+      "label_tr": "Talamus (T-tip Ca²⁺)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Absans nöbetlerde talamokortikal osilasyon. Etosüksimid T-tip Ca²⁺ kanal bloker."
+    },
+    {
+      "id": "o_synapse",
+      "label_tr": "Presinaptik terminal",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Nörotransmitter salınımı. Levetirasetam (SV2A), gabapentin (α2δ) burada etkili."
+    },
+    {
+      "id": "e_seizure_suppress",
+      "label_tr": "Nöbet baskılama",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Excitability ↓ veya inhibisyon ↑ ile nöbet eşiği yükselir."
+    },
+    {
+      "id": "e_focal",
+      "label_tr": "Fokal nöbet kontrolü",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Na⁺ kanal blokerleri (fenitoin, karbamazepin, lamotrijin) fokal başlangıçlı nöbetlerde etkili."
+    },
+    {
+      "id": "e_absence",
+      "label_tr": "Absans nöbet kontrolü",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Etosüksimid/valproat absans için; karbamazepin absansı kötüleştirebilir (TUS klasiği)."
+    },
+    {
+      "id": "e_sedation",
+      "label_tr": "Sedasyon / SSS yan etki",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Barbitürat, benzodiazepin, topiramat, valproat ile görülür."
+    },
+    {
+      "id": "e_teratogenic",
+      "label_tr": "Teratojenite (valproat)",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Valproat nöral tüp defekti ve kognitif risk → gebelikte kontrendike (alternatif tercih)."
+    },
+    {
+      "id": "e_stevens_johnson",
+      "label_tr": "Cilt reaksiyonu (SJS/TEN)",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Lamotrijin, karbamazepin HLA-B*1502 (Asya) ile SJS riski. Yavaş titrasyon lamotrijinde."
+    },
+    {
+      "id": "e_gingival",
+      "label_tr": "Diş eti hipertrofisi (fenitoin)",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Fenitoin karakteristik yan etki; terapötik ilaç izlemi (serum düzeyi) gerekir."
+    }
   ],
   "edges": [
-    { "source": "med_glu", "target": "o_cortex", "relation": "activates", "effect_tr": "Excitatory ileti" },
-    { "source": "med_gaba", "target": "r_gaba_a", "relation": "agonist", "effect_tr": "İnhibisyon" },
-    { "source": "r_nav", "target": "o_cortex", "relation": "activates", "effect_tr": "Aksiyon potansiyeli" },
-    { "source": "r_nav", "target": "o_hippocampus", "relation": "activates", "effect_tr": "Temporal lob ileti" },
-    { "source": "r_cav", "target": "o_thalamus", "relation": "activates", "effect_tr": "T-tip osilasyon" },
-    { "source": "r_gaba_a", "target": "o_cortex", "relation": "inhibits", "effect_tr": "Nöbet eşiği ↑" },
-    { "source": "r_sv2a", "target": "o_synapse", "relation": "inhibits", "effect_tr": "Salınım modülasyonu" },
-    { "source": "r_alpha2delta", "target": "o_synapse", "relation": "inhibits", "effect_tr": "Ca²⁺ kanal trafiği ↓" },
-
-    { "source": "o_cortex", "target": "e_focal", "relation": "activates", "effect_tr": "Fokal nöbet odağı" },
-    { "source": "o_thalamus", "target": "e_absence", "relation": "activates", "effect_tr": "Absans mekanizması" },
-    { "source": "r_gaba_a", "target": "e_seizure_suppress", "relation": "activates", "effect_tr": "GABAergic baskılama" },
-    { "source": "r_nav", "target": "e_seizure_suppress", "relation": "inhibits", "effect_tr": "Na⁺ kanal stabilizasyonu" }
+    {
+      "source": "med_glu",
+      "target": "o_cortex",
+      "relation": "activates",
+      "effect_tr": "Excitatory ileti"
+    },
+    {
+      "source": "med_gaba",
+      "target": "r_gaba_a",
+      "relation": "agonist",
+      "effect_tr": "İnhibisyon"
+    },
+    {
+      "source": "r_nav",
+      "target": "o_cortex",
+      "relation": "activates",
+      "effect_tr": "Aksiyon potansiyeli"
+    },
+    {
+      "source": "r_nav",
+      "target": "o_hippocampus",
+      "relation": "activates",
+      "effect_tr": "Temporal lob ileti"
+    },
+    {
+      "source": "r_cav",
+      "target": "o_thalamus",
+      "relation": "activates",
+      "effect_tr": "T-tip osilasyon"
+    },
+    {
+      "source": "r_gaba_a",
+      "target": "o_cortex",
+      "relation": "inhibits",
+      "effect_tr": "Nöbet eşiği ↑"
+    },
+    {
+      "source": "r_sv2a",
+      "target": "o_synapse",
+      "relation": "inhibits",
+      "effect_tr": "Salınım modülasyonu"
+    },
+    {
+      "source": "r_alpha2delta",
+      "target": "o_synapse",
+      "relation": "inhibits",
+      "effect_tr": "Ca²⁺ kanal trafiği ↓"
+    },
+    {
+      "source": "o_cortex",
+      "target": "e_focal",
+      "relation": "activates",
+      "effect_tr": "Fokal nöbet odağı"
+    },
+    {
+      "source": "o_thalamus",
+      "target": "e_absence",
+      "relation": "activates",
+      "effect_tr": "Absans mekanizması"
+    },
+    {
+      "source": "r_gaba_a",
+      "target": "e_seizure_suppress",
+      "relation": "activates",
+      "effect_tr": "GABAergic baskılama"
+    },
+    {
+      "source": "r_nav",
+      "target": "e_seizure_suppress",
+      "relation": "inhibits",
+      "effect_tr": "Na⁺ kanal stabilizasyonu"
+    }
   ],
   "interventions": [
     {
       "drug_class": "phenytoin",
       "label_tr": "Fenitoin",
-      "targets": ["r_nav"],
+      "targets": [
+        "r_nav"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "e_focal", "effect_tr": "Fokal/partial nöbetler" },
-        { "nodeId": "e_gingival", "effect_tr": "Diş eti hipertrofisi, hirsutizm" },
-        { "nodeId": "e_seizure_suppress", "effect_tr": "Sıfır dereceli kinetik (enzim indüksiyonu)" }
+        {
+          "nodeId": "e_focal",
+          "effect_tr": "Fokal/partial nöbetler"
+        },
+        {
+          "nodeId": "e_gingival",
+          "effect_tr": "Diş eti hipertrofisi, hirsutizm"
+        },
+        {
+          "nodeId": "e_seizure_suppress",
+          "effect_tr": "Sıfır dereceli kinetik (enzim indüksiyonu)"
+        }
       ],
-      "tr_products_atc": ["N03AB02"]
+      "tr_products_atc": [
+        "N03AB02"
+      ]
     },
     {
       "drug_class": "carbamazepine",
       "label_tr": "Karbamazepin",
-      "targets": ["r_nav"],
+      "targets": [
+        "r_nav"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "e_focal", "effect_tr": "Temporal lob / fokal epilepsi" },
-        { "nodeId": "e_absence", "effect_tr": "Absans nöbetlerde KONTRENDIKE (kötüleştirir)" },
-        { "nodeId": "e_stevens_johnson", "effect_tr": "SJS riski (HLA-B*1502 tarama)" }
+        {
+          "nodeId": "e_focal",
+          "effect_tr": "Temporal lob / fokal epilepsi"
+        },
+        {
+          "nodeId": "e_absence",
+          "effect_tr": "Absans nöbetlerde KONTRENDIKE (kötüleştirir)"
+        },
+        {
+          "nodeId": "e_stevens_johnson",
+          "effect_tr": "SJS riski (HLA-B*1502 tarama)"
+        }
       ],
-      "tr_products_atc": ["N03AF01"]
+      "tr_products_atc": [
+        "N03AF01"
+      ]
     },
     {
       "drug_class": "valproate",
       "label_tr": "Valproik asit",
-      "targets": ["r_gaba_transaminase", "r_nav"],
+      "targets": [
+        "r_gaba_transaminase",
+        "r_nav"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "med_gaba", "effect_tr": "GABA ↑ (GABA-T inhibisyonu)" },
-        { "nodeId": "e_absence", "effect_tr": "Absans + geniş spektrum" },
-        { "nodeId": "e_teratogenic", "effect_tr": "Gebelikte kontrendike" },
-        { "nodeId": "e_sedation", "effect_tr": "Trombositopeni, hepatotoksisite" }
+        {
+          "nodeId": "med_gaba",
+          "effect_tr": "GABA ↑ (GABA-T inhibisyonu)"
+        },
+        {
+          "nodeId": "e_absence",
+          "effect_tr": "Absans + geniş spektrum"
+        },
+        {
+          "nodeId": "e_teratogenic",
+          "effect_tr": "Gebelikte kontrendike"
+        },
+        {
+          "nodeId": "e_sedation",
+          "effect_tr": "Trombositopeni, hepatotoksisite"
+        }
       ],
-      "tr_products_atc": ["N03AG01"]
+      "tr_products_atc": [
+        "N03AG01"
+      ]
     },
     {
       "drug_class": "lamotrigine",
       "label_tr": "Lamotrijin",
-      "targets": ["r_nav"],
+      "targets": [
+        "r_nav"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "e_focal", "effect_tr": "Fokal ve jeneralize nöbetler" },
-        { "nodeId": "e_stevens_johnson", "effect_tr": "Yavaş titrasyon SJS riskini azaltır" }
+        {
+          "nodeId": "e_focal",
+          "effect_tr": "Fokal ve jeneralize nöbetler"
+        },
+        {
+          "nodeId": "e_stevens_johnson",
+          "effect_tr": "Yavaş titrasyon SJS riskini azaltır"
+        }
       ],
-      "tr_products_atc": ["N03AX09"]
+      "tr_products_atc": [
+        "N03AX09"
+      ]
     },
     {
       "drug_class": "ethosuximide",
       "label_tr": "Etosüksimid",
-      "targets": ["r_cav"],
+      "targets": [
+        "r_cav"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "o_thalamus", "effect_tr": "T-tip Ca²⁺ kanal bloğu" },
-        { "nodeId": "e_absence", "effect_tr": "Absans nöbet birinci tercih" }
+        {
+          "nodeId": "o_thalamus",
+          "effect_tr": "T-tip Ca²⁺ kanal bloğu"
+        },
+        {
+          "nodeId": "e_absence",
+          "effect_tr": "Absans nöbet birinci tercih"
+        }
       ],
-      "tr_products_atc": ["N03AD01"]
+      "tr_products_atc": [
+        "N03AD01"
+      ]
     },
     {
       "drug_class": "levetiracetam",
       "label_tr": "Levetirasetam",
-      "targets": ["r_sv2a"],
+      "targets": [
+        "r_sv2a"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "o_synapse", "effect_tr": "SV2A bağlanması" },
-        { "nodeId": "e_seizure_suppress", "effect_tr": "Geniş spektrum; minimal enzim indüksiyonu" }
+        {
+          "nodeId": "o_synapse",
+          "effect_tr": "SV2A bağlanması"
+        },
+        {
+          "nodeId": "e_seizure_suppress",
+          "effect_tr": "Geniş spektrum; minimal enzim indüksiyonu"
+        }
       ],
-      "tr_products_atc": ["N03AX14"]
+      "tr_products_atc": [
+        "N03AX14"
+      ]
     },
     {
       "drug_class": "gabapentinoid",
       "label_tr": "Gabapentin / pregabalin",
-      "targets": ["r_alpha2delta"],
+      "targets": [
+        "r_alpha2delta"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "o_synapse", "effect_tr": "Excitatory salınım ↓" },
-        { "nodeId": "e_seizure_suppress", "effect_tr": "Adjuvan epilepsi; nöropatik ağrı" }
+        {
+          "nodeId": "o_synapse",
+          "effect_tr": "Excitatory salınım ↓"
+        },
+        {
+          "nodeId": "e_seizure_suppress",
+          "effect_tr": "Adjuvan epilepsi; nöropatik ağrı"
+        }
       ],
-      "tr_products_atc": ["N03AX12", "N03AX16"]
+      "tr_products_atc": [
+        "N03AX12",
+        "N03AX16"
+      ]
     }
   ],
   "quiz": [
     {
       "q_tr": "Absans nöbet tedavisinde birinci tercih hangisidir?",
-      "options_tr": ["Karbamazepin", "Etosüksimid", "Fenitoin", "Gabapentin"],
+      "options_tr": [
+        "Karbamazepin",
+        "Etosüksimid",
+        "Fenitoin",
+        "Gabapentin"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Etosüksimid T-tip Ca²⁺ kanal bloker; talamokortikal absans osilasyonunu baskılar. Karbamazepin absansı kötüleştirebilir.",
       "node_id": "e_absence"
     },
     {
       "q_tr": "Karbamazepin absans nöbetlerde neden kontrendikedir?",
-      "options_tr": ["GABA çok artırır", "T-tip Ca²⁺ kanallarını uyararak absansı artırabilir", "Sadece renal atılım bozuk", "SV2A bloke eder"],
+      "options_tr": [
+        "GABA çok artırır",
+        "T-tip Ca²⁺ kanallarını uyararak absansı artırabilir",
+        "Sadece renal atılım bozuk",
+        "SV2A bloke eder"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Na⁺ kanal blokerleri absans (T-tip Ca²⁺ aracılı) nöbetleri kötüleştirebilir. Absans için etosüksimid/valproat tercih edilir.",
       "node_id": "o_thalamus"
     },
     {
       "q_tr": "Valproatın epilepsi dışı en ciddi advers etkisi (gebelik) nedir?",
-      "options_tr": ["Diş eti hipertrofisi", "Nöral tüp defekti / teratojenite", "Aplastik anemi", "Steven-Johnson"],
+      "options_tr": [
+        "Diş eti hipertrofisi",
+        "Nöral tüp defekti / teratojenite",
+        "Aplastik anemi",
+        "Steven-Johnson"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Valproat gebelikte nöral tüp defekti ve nörogelişimsel bozukluk riski taşır → gebe/epileptik kadında alternatif tercih.",
       "node_id": "e_teratogenic"
     },
     {
       "q_tr": "Levetirasetamın bilinen hedefi nedir?",
-      "options_tr": ["Na⁺ kanalı", "SV2A sinaptik vezikül proteini", "GABA-T", "T-tip Ca²⁺ kanalı"],
+      "options_tr": [
+        "Na⁺ kanalı",
+        "SV2A sinaptik vezikül proteini",
+        "GABA-T",
+        "T-tip Ca²⁺ kanalı"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Levetirasetam SV2A'ya bağlanır; presinaptik salınım modülasyonu ile geniş spektrum antiepileptik etki.",
       "node_id": "r_sv2a"
     },
     {
       "q_tr": "Fenitoinin karakteristik kronik yan etkisi hangisidir?",
-      "options_tr": ["Ağız kuruluğu", "Diş eti hipertrofisi", "Hiperkalemi", "Bronkospazm"],
+      "options_tr": [
+        "Ağız kuruluğu",
+        "Diş eti hipertrofisi",
+        "Hiperkalemi",
+        "Bronkospazm"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Fenitoin gingival hipertrofi, hirsutizm ve ataksiye yol açabilir. Sıfır dereceli kinetik → doz titrasyonu zor.",
       "node_id": "e_gingival"
     },
     {
       "q_tr": "Gabapentin ve pregabalin hangi hedefe bağlanır?",
-      "options_tr": ["NMDA reseptörü", "α2δ Ca²⁺ kanal subunit", "GABA-A", "SV2A"],
+      "options_tr": [
+        "NMDA reseptörü",
+        "α2δ Ca²⁺ kanal subunit",
+        "GABA-A",
+        "SV2A"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Gabapentinoidler α2δ subunit'e bağlanarak presinaptik Ca²⁺ kanal trafiğini azaltır → excitatory salınım ↓.",
       "node_id": "r_alpha2delta"
+    }
+  ],
+  "vignettes": [
+    {
+      "id": "v_auto_1",
+      "title_tr": "Klinik senaryo 1",
+      "scenario_tr": "Absans nöbet tedavisinde birinci tercih hangisidir?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "Karbamazepin",
+        "Etosüksimid",
+        "Fenitoin",
+        "Gabapentin"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "Etosüksimid T-tip Ca²⁺ kanal bloker; talamokortikal absans osilasyonunu baskılar. Karbamazepin absansı kötüleştirebilir.",
+      "node_id": "e_absence"
+    },
+    {
+      "id": "v_auto_2",
+      "title_tr": "Klinik senaryo 2",
+      "scenario_tr": "Karbamazepin absans nöbetlerde neden kontrendikedir?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "GABA çok artırır",
+        "T-tip Ca²⁺ kanallarını uyararak absansı artırabilir",
+        "Sadece renal atılım bozuk",
+        "SV2A bloke eder"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "Na⁺ kanal blokerleri absans (T-tip Ca²⁺ aracılı) nöbetleri kötüleştirebilir. Absans için etosüksimid/valproat tercih edilir.",
+      "node_id": "o_thalamus"
     }
   ]
 }

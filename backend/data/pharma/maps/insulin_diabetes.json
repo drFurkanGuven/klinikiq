@@ -4,183 +4,562 @@
   "description_tr": "Glukoz homeostazı: pankreas β hücresi, karaciğer, kas ve böbrek hedefleri. İnsülin, metformin, sulfonilüre, GLP-1 RA, DPP-4 inhibitörü, SGLT2 inhibitörü ve TZD mekanizmaları.",
   "source_attribution": "Diyabet farmakolojisi StatPearls (Diabetes Pharmacology, Metformin, SGLT2 inhibitors, GLP-1 agonists) ve GtoPdb (CC BY-SA 4.0) temel alınarak derlenmiştir.",
   "nodes": [
-    { "id": "med_glucose", "label_tr": "Glukoz", "type": "mediator", "high_yield": true, "description_tr": "Ana enerji substratı. Postprandial yükseliş insülin salınımını uyarır; açlıkta glukagon ve glukoneogenez devreye girer." },
-    { "id": "med_insulin", "label_tr": "İnsülin", "type": "mediator", "high_yield": true, "description_tr": "Pankreas β hücresinden salınan anabolik hormon. Kas ve yağda glukoz uptake, karaciğerde glukoneogenez/glikojenoliz inhibisyonu." },
-    { "id": "med_glucagon", "label_tr": "Glukagon", "type": "mediator", "high_yield": true, "description_tr": "α hücresi ürünü. Karaciğerde glikojenoliz ve glukoneogenez artırır → kan glukozu ↑. İnsülinle zıt etki." },
-    { "id": "med_glp1", "label_tr": "GLP-1 (incretin)", "type": "mediator", "high_yield": true, "description_tr": "L hücrelerinden postprandial salınır. Glukoz-bağımlı insülin salınımı, glukagon baskılama, mide emptying yavaşlatma, tokluk." },
-
-    { "id": "r_insulin_receptor", "label_tr": "İnsülin reseptörü (tirozin kinaz)", "type": "receptor", "high_yield": true, "description_tr": "α2β2 heterotetramer. İnsülin bağlanınca otofosforilasyon → IRS/PI3K/Akt yolu → GLUT4 translokasyonu (kas/yağ)." },
-    { "id": "r_glp1r", "label_tr": "GLP-1 reseptörü", "type": "receptor", "high_yield": true, "description_tr": "Gs bağlı reseptör. β hücrede cAMP ↑ → insülin salınımı (glukoz-bağımlı). GLP-1 RA ve DPP-4 inhibitörü yolu." },
-    { "id": "r_katp", "label_tr": "KATP kanalı (β hücre)", "type": "receptor", "high_yield": true, "description_tr": "Glukoz metabolizması ATP artırınca kapanır → membran depolarizasyonu → Ca²⁺ girişi → insülin salınımı. Sulfonilüreler burayı bloke eder." },
-    { "id": "r_sglt2", "label_tr": "SGLT2 (böbrek)", "type": "receptor", "high_yield": true, "description_tr": "Proksimal tübülde glukoz geri emilim taşıyıcısı. İnhibitörler glukozüri yaparak kan glukozunu düşürür." },
-    { "id": "r_ppar_gamma", "label_tr": "PPAR-γ", "type": "receptor", "high_yield": true, "description_tr": "Nükleer reseptör. Adiposit diferansiyasyonu ve insülin duyarlılığı. Pioglitazon/roziglitazon hedefi (TZD)." },
-    { "id": "r_dpp4", "label_tr": "DPP-4 enzimi", "type": "receptor", "high_yield": true, "description_tr": "GLP-1 ve GIP'i yıkar. DPP-4 inhibitörleri (sitagliptin) incretin düzeyini artırır." },
-
-    { "id": "o_beta_cell", "label_tr": "Pankreas β hücresi", "type": "organ", "high_yield": true, "description_tr": "Glukoz/KATP/Ca²⁺ yolu ile insülin salınımı. Tip 1 DM'de otoimmün yıkım; tip 2'de rezistans + relatif yetmezlik." },
-    { "id": "o_liver", "label_tr": "Karaciğer", "type": "organ", "high_yield": true, "description_tr": "Glukoneogenez ve glikojenoliz/glukojen sentez dengesi. Metformin'in birincil hedefi (AMPK aktivasyonu)." },
-    { "id": "o_muscle", "label_tr": "İskelet kası", "type": "organ", "high_yield": true, "description_tr": "GLUT4 aracılı glukoz uptake. İnsülin duyarlılığı tip 2 DM patogenezinde merkezi." },
-    { "id": "o_kidney_tubule", "label_tr": "Böbrek proksimal tübül", "type": "organ", "high_yield": true, "description_tr": "SGLT2 ile filtrat glukozunun ~90%'i geri emilir. SGLT2i burada etki eder." },
-    { "id": "o_adipose", "label_tr": "Adipoz doku", "type": "organ", "high_yield": false, "description_tr": "PPAR-γ aktivasyonu ile insülin duyarlılığı artar; sıvı retansiyonu ve kilo artışı yan etki." },
-
-    { "id": "e_hypoglycemia", "label_tr": "Hipoglisemi", "type": "effect", "high_yield": true, "description_tr": "İnsülin/sulfonilüre/GLP-1 RA (nadiren) ile kan glukozu <70 mg/dL. Terleme, taşikardi, bilinç değişikliği; şeker/glukagon antidot." },
-    { "id": "e_hyperglycemia", "label_tr": "Hiperglisemi / HbA1c ↑", "type": "effect", "high_yield": true, "description_tr": "Yetersiz insülin veya insülin direnci. Kronik mikrovasküler (retinopati, nefropati) ve makrovasküler komplikasyonlar." },
-    { "id": "e_dka", "label_tr": "DKA riski", "type": "effect", "high_yield": true, "description_tr": "Mutlak insülin eksikliğinde (tip 1) keton cisimcikleri, asidoz. SGLT2i ile euglycemic DKA nadiren görülür." },
-    { "id": "e_weight_loss", "label_tr": "Kilo kaybı", "type": "effect", "high_yield": false, "description_tr": "Metformin, GLP-1 RA ve SGLT2i ile görülebilir. Sulfonilüre ve insülin kilo artırabilir." },
-    { "id": "e_gi_nausea", "label_tr": "Bulantı / GI yan etki", "type": "effect", "high_yield": false, "description_tr": "Metformin (başlangıç) ve GLP-1 RA'da sık. Metformin B12 malabsorpsiyonu uzun dönemde." },
-    { "id": "e_cv_benefit", "label_tr": "Kardiyovasküler koruma", "type": "effect", "high_yield": true, "description_tr": "SGLT2i (empagliflozin, dapagliflozin) ve bazı GLP-1 RA (liraglutid, semaglutid) CV mortalite/MACE azaltımı kanıtı." },
-    { "id": "e_lactic_acidosis", "label_tr": "Laktik asidoz (metformin)", "type": "effect", "high_yield": true, "description_tr": "Böbrek yetmezliği, kontrast, ciddi hipoksi/perioperatif dönemde metformin birikimi → nadiren laktik asidoz." }
+    {
+      "id": "med_glucose",
+      "label_tr": "Glukoz",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Ana enerji substratı. Postprandial yükseliş insülin salınımını uyarır; açlıkta glukagon ve glukoneogenez devreye girer."
+    },
+    {
+      "id": "med_insulin",
+      "label_tr": "İnsülin",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Pankreas β hücresinden salınan anabolik hormon. Kas ve yağda glukoz uptake, karaciğerde glukoneogenez/glikojenoliz inhibisyonu."
+    },
+    {
+      "id": "med_glucagon",
+      "label_tr": "Glukagon",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "α hücresi ürünü. Karaciğerde glikojenoliz ve glukoneogenez artırır → kan glukozu ↑. İnsülinle zıt etki."
+    },
+    {
+      "id": "med_glp1",
+      "label_tr": "GLP-1 (incretin)",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "L hücrelerinden postprandial salınır. Glukoz-bağımlı insülin salınımı, glukagon baskılama, mide emptying yavaşlatma, tokluk."
+    },
+    {
+      "id": "r_insulin_receptor",
+      "label_tr": "İnsülin reseptörü (tirozin kinaz)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "α2β2 heterotetramer. İnsülin bağlanınca otofosforilasyon → IRS/PI3K/Akt yolu → GLUT4 translokasyonu (kas/yağ)."
+    },
+    {
+      "id": "r_glp1r",
+      "label_tr": "GLP-1 reseptörü",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Gs bağlı reseptör. β hücrede cAMP ↑ → insülin salınımı (glukoz-bağımlı). GLP-1 RA ve DPP-4 inhibitörü yolu."
+    },
+    {
+      "id": "r_katp",
+      "label_tr": "KATP kanalı (β hücre)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Glukoz metabolizması ATP artırınca kapanır → membran depolarizasyonu → Ca²⁺ girişi → insülin salınımı. Sulfonilüreler burayı bloke eder."
+    },
+    {
+      "id": "r_sglt2",
+      "label_tr": "SGLT2 (böbrek)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Proksimal tübülde glukoz geri emilim taşıyıcısı. İnhibitörler glukozüri yaparak kan glukozunu düşürür."
+    },
+    {
+      "id": "r_ppar_gamma",
+      "label_tr": "PPAR-γ",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Nükleer reseptör. Adiposit diferansiyasyonu ve insülin duyarlılığı. Pioglitazon/roziglitazon hedefi (TZD)."
+    },
+    {
+      "id": "r_dpp4",
+      "label_tr": "DPP-4 enzimi",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "GLP-1 ve GIP'i yıkar. DPP-4 inhibitörleri (sitagliptin) incretin düzeyini artırır."
+    },
+    {
+      "id": "o_beta_cell",
+      "label_tr": "Pankreas β hücresi",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Glukoz/KATP/Ca²⁺ yolu ile insülin salınımı. Tip 1 DM'de otoimmün yıkım; tip 2'de rezistans + relatif yetmezlik."
+    },
+    {
+      "id": "o_liver",
+      "label_tr": "Karaciğer",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Glukoneogenez ve glikojenoliz/glukojen sentez dengesi. Metformin'in birincil hedefi (AMPK aktivasyonu)."
+    },
+    {
+      "id": "o_muscle",
+      "label_tr": "İskelet kası",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "GLUT4 aracılı glukoz uptake. İnsülin duyarlılığı tip 2 DM patogenezinde merkezi."
+    },
+    {
+      "id": "o_kidney_tubule",
+      "label_tr": "Böbrek proksimal tübül",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "SGLT2 ile filtrat glukozunun ~90%'i geri emilir. SGLT2i burada etki eder."
+    },
+    {
+      "id": "o_adipose",
+      "label_tr": "Adipoz doku",
+      "type": "organ",
+      "high_yield": false,
+      "description_tr": "PPAR-γ aktivasyonu ile insülin duyarlılığı artar; sıvı retansiyonu ve kilo artışı yan etki."
+    },
+    {
+      "id": "e_hypoglycemia",
+      "label_tr": "Hipoglisemi",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "İnsülin/sulfonilüre/GLP-1 RA (nadiren) ile kan glukozu <70 mg/dL. Terleme, taşikardi, bilinç değişikliği; şeker/glukagon antidot."
+    },
+    {
+      "id": "e_hyperglycemia",
+      "label_tr": "Hiperglisemi / HbA1c ↑",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Yetersiz insülin veya insülin direnci. Kronik mikrovasküler (retinopati, nefropati) ve makrovasküler komplikasyonlar."
+    },
+    {
+      "id": "e_dka",
+      "label_tr": "DKA riski",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Mutlak insülin eksikliğinde (tip 1) keton cisimcikleri, asidoz. SGLT2i ile euglycemic DKA nadiren görülür."
+    },
+    {
+      "id": "e_weight_loss",
+      "label_tr": "Kilo kaybı",
+      "type": "effect",
+      "high_yield": false,
+      "description_tr": "Metformin, GLP-1 RA ve SGLT2i ile görülebilir. Sulfonilüre ve insülin kilo artırabilir."
+    },
+    {
+      "id": "e_gi_nausea",
+      "label_tr": "Bulantı / GI yan etki",
+      "type": "effect",
+      "high_yield": false,
+      "description_tr": "Metformin (başlangıç) ve GLP-1 RA'da sık. Metformin B12 malabsorpsiyonu uzun dönemde."
+    },
+    {
+      "id": "e_cv_benefit",
+      "label_tr": "Kardiyovasküler koruma",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "SGLT2i (empagliflozin, dapagliflozin) ve bazı GLP-1 RA (liraglutid, semaglutid) CV mortalite/MACE azaltımı kanıtı."
+    },
+    {
+      "id": "e_lactic_acidosis",
+      "label_tr": "Laktik asidoz (metformin)",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Böbrek yetmezliği, kontrast, ciddi hipoksi/perioperatif dönemde metformin birikimi → nadiren laktik asidoz."
+    }
   ],
   "edges": [
-    { "source": "med_glucose", "target": "o_beta_cell", "relation": "activates", "effect_tr": "Glukoz → ATP → KATP kapanır" },
-    { "source": "o_beta_cell", "target": "r_katp", "relation": "inhibits", "effect_tr": "Depolarizasyon yolu" },
-    { "source": "r_katp", "target": "med_insulin", "relation": "activates", "effect_tr": "Ca²⁺ → insülin salınımı" },
-    { "source": "med_glp1", "target": "r_glp1r", "relation": "agonist", "effect_tr": "İncretin etkisi" },
-    { "source": "r_glp1r", "target": "med_insulin", "relation": "activates", "effect_tr": "Glukoz-bağımlı insülin ↑" },
-    { "source": "med_insulin", "target": "r_insulin_receptor", "relation": "agonist", "effect_tr": "Periferik hedefler" },
-    { "source": "r_insulin_receptor", "target": "o_liver", "relation": "inhibits", "effect_tr": "Glukoneogenez ↓" },
-    { "source": "r_insulin_receptor", "target": "o_muscle", "relation": "activates", "effect_tr": "GLUT4 → glukoz uptake ↑" },
-    { "source": "med_glucagon", "target": "o_liver", "relation": "activates", "effect_tr": "Glikojenoliz & glukoneogenez ↑" },
-    { "source": "o_liver", "target": "e_hyperglycemia", "relation": "activates", "effect_tr": "Kan glukozu ↑" },
-    { "source": "r_sglt2", "target": "o_kidney_tubule", "relation": "activates", "effect_tr": "Glukoz geri emilimi" },
-    { "source": "r_ppar_gamma", "target": "o_adipose", "relation": "activates", "effect_tr": "İnsülin duyarlılığı ↑" },
-    { "source": "r_dpp4", "target": "med_glp1", "relation": "inhibits", "effect_tr": "GLP-1 yıkımı" },
-    { "source": "med_insulin", "target": "e_hypoglycemia", "relation": "activates", "effect_tr": "Aşırı doz / yemek atlama" },
-    { "source": "med_insulin", "target": "e_dka", "relation": "inhibits", "effect_tr": "Yeterli insülin DKA'yı önler" }
+    {
+      "source": "med_glucose",
+      "target": "o_beta_cell",
+      "relation": "activates",
+      "effect_tr": "Glukoz → ATP → KATP kapanır"
+    },
+    {
+      "source": "o_beta_cell",
+      "target": "r_katp",
+      "relation": "inhibits",
+      "effect_tr": "Depolarizasyon yolu"
+    },
+    {
+      "source": "r_katp",
+      "target": "med_insulin",
+      "relation": "activates",
+      "effect_tr": "Ca²⁺ → insülin salınımı"
+    },
+    {
+      "source": "med_glp1",
+      "target": "r_glp1r",
+      "relation": "agonist",
+      "effect_tr": "İncretin etkisi"
+    },
+    {
+      "source": "r_glp1r",
+      "target": "med_insulin",
+      "relation": "activates",
+      "effect_tr": "Glukoz-bağımlı insülin ↑"
+    },
+    {
+      "source": "med_insulin",
+      "target": "r_insulin_receptor",
+      "relation": "agonist",
+      "effect_tr": "Periferik hedefler"
+    },
+    {
+      "source": "r_insulin_receptor",
+      "target": "o_liver",
+      "relation": "inhibits",
+      "effect_tr": "Glukoneogenez ↓"
+    },
+    {
+      "source": "r_insulin_receptor",
+      "target": "o_muscle",
+      "relation": "activates",
+      "effect_tr": "GLUT4 → glukoz uptake ↑"
+    },
+    {
+      "source": "med_glucagon",
+      "target": "o_liver",
+      "relation": "activates",
+      "effect_tr": "Glikojenoliz & glukoneogenez ↑"
+    },
+    {
+      "source": "o_liver",
+      "target": "e_hyperglycemia",
+      "relation": "activates",
+      "effect_tr": "Kan glukozu ↑"
+    },
+    {
+      "source": "r_sglt2",
+      "target": "o_kidney_tubule",
+      "relation": "activates",
+      "effect_tr": "Glukoz geri emilimi"
+    },
+    {
+      "source": "r_ppar_gamma",
+      "target": "o_adipose",
+      "relation": "activates",
+      "effect_tr": "İnsülin duyarlılığı ↑"
+    },
+    {
+      "source": "r_dpp4",
+      "target": "med_glp1",
+      "relation": "inhibits",
+      "effect_tr": "GLP-1 yıkımı"
+    },
+    {
+      "source": "med_insulin",
+      "target": "e_hypoglycemia",
+      "relation": "activates",
+      "effect_tr": "Aşırı doz / yemek atlama"
+    },
+    {
+      "source": "med_insulin",
+      "target": "e_dka",
+      "relation": "inhibits",
+      "effect_tr": "Yeterli insülin DKA'yı önler"
+    }
   ],
   "interventions": [
     {
       "drug_class": "insulin",
       "label_tr": "İnsülin (regüler / glargine)",
-      "targets": ["r_insulin_receptor"],
+      "targets": [
+        "r_insulin_receptor"
+      ],
       "relation": "agonist",
       "downstream_effects": [
-        { "nodeId": "o_liver", "effect_tr": "Glukoneogenez ↓" },
-        { "nodeId": "o_muscle", "effect_tr": "Glukoz uptake ↑" },
-        { "nodeId": "e_hypoglycemia", "effect_tr": "Ana advers etki" },
-        { "nodeId": "e_dka", "effect_tr": "Tip 1 DM'de hayat kurtarıcı" }
+        {
+          "nodeId": "o_liver",
+          "effect_tr": "Glukoneogenez ↓"
+        },
+        {
+          "nodeId": "o_muscle",
+          "effect_tr": "Glukoz uptake ↑"
+        },
+        {
+          "nodeId": "e_hypoglycemia",
+          "effect_tr": "Ana advers etki"
+        },
+        {
+          "nodeId": "e_dka",
+          "effect_tr": "Tip 1 DM'de hayat kurtarıcı"
+        }
       ],
-      "tr_products_atc": ["A10AB01", "A10AE04"]
+      "tr_products_atc": [
+        "A10AB01",
+        "A10AE04"
+      ]
     },
     {
       "drug_class": "metformin",
       "label_tr": "Metformin (biguanid)",
-      "targets": ["o_liver"],
+      "targets": [
+        "o_liver"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "e_hyperglycemia", "effect_tr": "Hepatik glukoneogenez ↓ (AMPK)" },
-        { "nodeId": "e_weight_loss", "effect_tr": "Hafif kilo kaybı veya nötr" },
-        { "nodeId": "e_gi_nausea", "effect_tr": "GI yan etkiler (başlangıç)" },
-        { "nodeId": "e_lactic_acidosis", "effect_tr": "Böbrek yetmezliğinde risk" }
+        {
+          "nodeId": "e_hyperglycemia",
+          "effect_tr": "Hepatik glukoneogenez ↓ (AMPK)"
+        },
+        {
+          "nodeId": "e_weight_loss",
+          "effect_tr": "Hafif kilo kaybı veya nötr"
+        },
+        {
+          "nodeId": "e_gi_nausea",
+          "effect_tr": "GI yan etkiler (başlangıç)"
+        },
+        {
+          "nodeId": "e_lactic_acidosis",
+          "effect_tr": "Böbrek yetmezliğinde risk"
+        }
       ],
-      "tr_products_atc": ["A10BA02"]
+      "tr_products_atc": [
+        "A10BA02"
+      ]
     },
     {
       "drug_class": "sulfonylurea",
       "label_tr": "Sulfonilüre (glibenklamid / gliclazid)",
-      "targets": ["r_katp"],
+      "targets": [
+        "r_katp"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "med_insulin", "effect_tr": "β hücre insülin salınımı ↑ (glukozdan bağımsız risk)" },
-        { "nodeId": "e_hypoglycemia", "effect_tr": "En sık advers etki" },
-        { "nodeId": "e_weight_loss", "effect_tr": "Kilo artışı eğilimi" }
+        {
+          "nodeId": "med_insulin",
+          "effect_tr": "β hücre insülin salınımı ↑ (glukozdan bağımsız risk)"
+        },
+        {
+          "nodeId": "e_hypoglycemia",
+          "effect_tr": "En sık advers etki"
+        },
+        {
+          "nodeId": "e_weight_loss",
+          "effect_tr": "Kilo artışı eğilimi"
+        }
       ],
-      "tr_products_atc": ["A10BB01", "A10BB09"]
+      "tr_products_atc": [
+        "A10BB01",
+        "A10BB09"
+      ]
     },
     {
       "drug_class": "glp1_agonist",
       "label_tr": "GLP-1 RA (semaglutid / liraglutid)",
-      "targets": ["r_glp1r"],
+      "targets": [
+        "r_glp1r"
+      ],
       "relation": "agonist",
       "downstream_effects": [
-        { "nodeId": "med_insulin", "effect_tr": "Glukoz-bağımlı insülin ↑" },
-        { "nodeId": "med_glucagon", "effect_tr": "Glukagon ↓" },
-        { "nodeId": "e_weight_loss", "effect_tr": "Belirgin kilo kaybı" },
-        { "nodeId": "e_cv_benefit", "effect_tr": "CV outcome çalışmaları olumlu" },
-        { "nodeId": "e_gi_nausea", "effect_tr": "Bulantı (başlangıç)" }
+        {
+          "nodeId": "med_insulin",
+          "effect_tr": "Glukoz-bağımlı insülin ↑"
+        },
+        {
+          "nodeId": "med_glucagon",
+          "effect_tr": "Glukagon ↓"
+        },
+        {
+          "nodeId": "e_weight_loss",
+          "effect_tr": "Belirgin kilo kaybı"
+        },
+        {
+          "nodeId": "e_cv_benefit",
+          "effect_tr": "CV outcome çalışmaları olumlu"
+        },
+        {
+          "nodeId": "e_gi_nausea",
+          "effect_tr": "Bulantı (başlangıç)"
+        }
       ],
-      "tr_products_atc": ["A10BJ01", "A10BJ06"]
+      "tr_products_atc": [
+        "A10BJ01",
+        "A10BJ06"
+      ]
     },
     {
       "drug_class": "dpp4_inhibitor",
       "label_tr": "DPP-4 inhibitörü (sitagliptin)",
-      "targets": ["r_dpp4"],
+      "targets": [
+        "r_dpp4"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "med_glp1", "effect_tr": "Endojen GLP-1 yıkımı ↓" },
-        { "nodeId": "med_insulin", "effect_tr": "İncretin aracılı insülin ↑" },
-        { "nodeId": "e_hypoglycemia", "effect_tr": "Monoterapide düşük risk" }
+        {
+          "nodeId": "med_glp1",
+          "effect_tr": "Endojen GLP-1 yıkımı ↓"
+        },
+        {
+          "nodeId": "med_insulin",
+          "effect_tr": "İncretin aracılı insülin ↑"
+        },
+        {
+          "nodeId": "e_hypoglycemia",
+          "effect_tr": "Monoterapide düşük risk"
+        }
       ],
-      "tr_products_atc": ["A10BH01"]
+      "tr_products_atc": [
+        "A10BH01"
+      ]
     },
     {
       "drug_class": "sglt2_inhibitor",
       "label_tr": "SGLT2 inhibitörü (empagliflozin)",
-      "targets": ["r_sglt2"],
+      "targets": [
+        "r_sglt2"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "o_kidney_tubule", "effect_tr": "Glukoz geri emilimi ↓ → glukozüri" },
-        { "nodeId": "e_hyperglycemia", "effect_tr": "HbA1c ↓" },
-        { "nodeId": "e_weight_loss", "effect_tr": "Kalori kaybı ile kilo ↓" },
-        { "nodeId": "e_cv_benefit", "effect_tr": "HF ve CKD'de ek fayda" },
-        { "nodeId": "e_dka", "effect_tr": "Euglycemic DKA riski (nadir)" }
+        {
+          "nodeId": "o_kidney_tubule",
+          "effect_tr": "Glukoz geri emilimi ↓ → glukozüri"
+        },
+        {
+          "nodeId": "e_hyperglycemia",
+          "effect_tr": "HbA1c ↓"
+        },
+        {
+          "nodeId": "e_weight_loss",
+          "effect_tr": "Kalori kaybı ile kilo ↓"
+        },
+        {
+          "nodeId": "e_cv_benefit",
+          "effect_tr": "HF ve CKD'de ek fayda"
+        },
+        {
+          "nodeId": "e_dka",
+          "effect_tr": "Euglycemic DKA riski (nadir)"
+        }
       ],
-      "tr_products_atc": ["A10BK03", "A10BK01"]
+      "tr_products_atc": [
+        "A10BK03",
+        "A10BK01"
+      ]
     },
     {
       "drug_class": "tzd",
       "label_tr": "TZD (pioglitazon)",
-      "targets": ["r_ppar_gamma"],
+      "targets": [
+        "r_ppar_gamma"
+      ],
       "relation": "agonist",
       "downstream_effects": [
-        { "nodeId": "o_adipose", "effect_tr": "İnsülin duyarlılığı ↑" },
-        { "nodeId": "o_muscle", "effect_tr": "Periferik glukoz kullanımı ↑" },
-        { "nodeId": "e_weight_loss", "effect_tr": "Sıvı retansiyonu → kilo ↑, ödem" }
+        {
+          "nodeId": "o_adipose",
+          "effect_tr": "İnsülin duyarlılığı ↑"
+        },
+        {
+          "nodeId": "o_muscle",
+          "effect_tr": "Periferik glukoz kullanımı ↑"
+        },
+        {
+          "nodeId": "e_weight_loss",
+          "effect_tr": "Sıvı retansiyonu → kilo ↑, ödem"
+        }
       ],
-      "tr_products_atc": ["A10BG03"]
+      "tr_products_atc": [
+        "A10BG03"
+      ]
     }
   ],
   "quiz": [
     {
       "q_tr": "Metforminin birincil antihiperglisemik mekanizması nedir?",
-      "options_tr": ["Pankreastan insülin salınımını artırmak", "Hepatik glukoneogenezi azaltmak", "SGLT2'yi inhibe etmek", "DPP-4'ü inhibe etmek"],
+      "options_tr": [
+        "Pankreastan insülin salınımını artırmak",
+        "Hepatik glukoneogenezi azaltmak",
+        "SGLT2'yi inhibe etmek",
+        "DPP-4'ü inhibe etmek"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Metformin esas olarak karaciğerde AMPK aktivasyonu ile glukoneogenezi baskılar. İnsülin salınımını doğrudan artırmaz → monoterapide hipoglisemi riski düşük.",
       "node_id": "o_liver"
     },
     {
       "q_tr": "Sulfonilürelerin hipoglisemi yapmasının mekanizması nedir?",
-      "options_tr": ["GLP-1 reseptör agonizması", "β hücre KATP kanalını kapatmak", "SGLT2 inhibisyonu", "Glukagon salınımını artırmak"],
+      "options_tr": [
+        "GLP-1 reseptör agonizması",
+        "β hücre KATP kanalını kapatmak",
+        "SGLT2 inhibisyonu",
+        "Glukagon salınımını artırmak"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Sulfonilüreler KATP kanalını bloke ederek insülin salınımını glukozdan bağımsız artırır → hipoglisemi riski.",
       "node_id": "r_katp"
     },
     {
       "q_tr": "SGLT2 inhibitörleri glukozu nasıl düşürür?",
-      "options_tr": ["İnsülin salınımını artırarak", "Böbrekte glukoz geri emilimini azaltarak", "Karaciğer glukoneogenezini artırarak", "Kas GLUT4'ü bloke ederek"],
+      "options_tr": [
+        "İnsülin salınımını artırarak",
+        "Böbrekte glukoz geri emilimini azaltarak",
+        "Karaciğer glukoneogenezini artırarak",
+        "Kas GLUT4'ü bloke ederek"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Empagliflozin vb. proksimal tübül SGLT2'yi inhibe eder → glukozüri → kan glukozu ↓. İnsülin salınımına bağlı değildir.",
       "node_id": "r_sglt2"
     },
     {
       "q_tr": "Tip 1 diyabetli bir hastada mutlak insülin eksikliği hangi acil komplikasyona yol açar?",
-      "options_tr": ["Hipoglisemi", "Diabetik ketoasidoz", "Hiperosmolar hiperglisemi", "Laktik asidoz"],
+      "options_tr": [
+        "Hipoglisemi",
+        "Diabetik ketoasidoz",
+        "Hiperosmolar hiperglisemi",
+        "Laktik asidoz"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Tip 1 DM'de insülin yokluğu → lipoliz + ketogenez → DKA. Hiperosmolar durum daha çok tip 2'de görülür.",
       "node_id": "e_dka"
     },
     {
       "q_tr": "GLP-1 reseptör agonistleri insülin salınımını nasıl artırır?",
-      "options_tr": ["Glukozdan bağımsız sürekli salınım", "Glukoz-bağımlı, artmış insülin salınımı", "Sadece glukagon artırarak", "SGLT2 inhibisyonu ile"],
+      "options_tr": [
+        "Glukozdan bağımsız sürekli salınım",
+        "Glukoz-bağımlı, artmış insülin salınımı",
+        "Sadece glukagon artırarak",
+        "SGLT2 inhibisyonu ile"
+      ],
       "answer_idx": 1,
       "explanation_tr": "GLP-1 RA glukoz yükseldiğinde insülin salınımını güçlendirir; açlıkta aşırı insülin riski sulfonilüreye göre daha düşüktür.",
       "node_id": "r_glp1r"
     },
     {
       "q_tr": "Metformin hangi durumda kontrendike / dikkatli kullanılmalıdır?",
-      "options_tr": ["Hafif hipertansiyon", "eGFR <30 mL/dk / ciddi hipoksi", "Hiperlipidemi", "Obezite"],
+      "options_tr": [
+        "Hafif hipertansiyon",
+        "eGFR <30 mL/dk / ciddi hipoksi",
+        "Hiperlipidemi",
+        "Obezite"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Böbrek yetmezliği, kontrast sonrası, sepsis/hipoksi gibi laktat birikimini artıran durumlarda metformin kesilir veya doz azaltılır.",
       "node_id": "e_lactic_acidosis"
+    }
+  ],
+  "vignettes": [
+    {
+      "id": "v_auto_1",
+      "title_tr": "Klinik senaryo 1",
+      "scenario_tr": "Metforminin birincil antihiperglisemik mekanizması nedir?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "Pankreastan insülin salınımını artırmak",
+        "Hepatik glukoneogenezi azaltmak",
+        "SGLT2'yi inhibe etmek",
+        "DPP-4'ü inhibe etmek"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "Metformin esas olarak karaciğerde AMPK aktivasyonu ile glukoneogenezi baskılar. İnsülin salınımını doğrudan artırmaz → monoterapide hipoglisemi riski düşük.",
+      "node_id": "o_liver"
+    },
+    {
+      "id": "v_auto_2",
+      "title_tr": "Klinik senaryo 2",
+      "scenario_tr": "Sulfonilürelerin hipoglisemi yapmasının mekanizması nedir?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "GLP-1 reseptör agonizması",
+        "β hücre KATP kanalını kapatmak",
+        "SGLT2 inhibisyonu",
+        "Glukagon salınımını artırmak"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "Sulfonilüreler KATP kanalını bloke ederek insülin salınımını glukozdan bağımsız artırır → hipoglisemi riski.",
+      "node_id": "r_katp"
     }
   ]
 }

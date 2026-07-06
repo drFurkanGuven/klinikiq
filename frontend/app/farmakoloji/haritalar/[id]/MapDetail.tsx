@@ -12,7 +12,10 @@ import {
   type PharmaMap,
   type PharmaIntervention,
   type PharmaNodeType,
+  type PharmaNode,
+  type PharmaVignette,
 } from "@/lib/api";
+import { markMapVisited, markQuizCompleted, markVignetteDone } from "@/lib/pharmaProgress";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Footer from "@/components/Footer";
 import {
@@ -25,6 +28,9 @@ import {
   Pill,
   HelpCircle,
   Info,
+  Lightbulb,
+  Stethoscope,
+  Zap,
 } from "lucide-react";
 import type { FlowNodeData } from "./MapCanvas";
 
@@ -70,6 +76,7 @@ export default function MapDetail({ id }: { id: string }) {
   const [error, setError] = useState("");
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [nodeDetailTab, setNodeDetailTab] = useState<"overview" | "mechanism">("overview");
   const [selectedDrug, setSelectedDrug] = useState<string | null>(null);
   const [focusNodeId, setFocusNodeId] = useState<string | null>(null);
 
@@ -90,6 +97,7 @@ export default function MapDetail({ id }: { id: string }) {
       try {
         const res = await pharmaApi.getMap(id);
         setMap(res.data);
+        markMapVisited(id);
       } catch {
         setError("Harita yüklenemedi.");
       } finally {
@@ -184,6 +192,7 @@ export default function MapDetail({ id }: { id: string }) {
 
   const handleNodeClick = (nodeId: string) => {
     setSelectedNodeId(nodeId);
+    setNodeDetailTab("overview");
   };
 
   const focusOnMap = (nodeId: string) => {
@@ -345,45 +354,13 @@ export default function MapDetail({ id }: { id: string }) {
                   </div>
                 )}
 
-                {/* Düğüm detay paneli (L1) */}
-                <div className="rounded-2xl border p-4" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-                  {selectedNode ? (
-                    <>
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <h3 className="font-black text-base leading-snug">{selectedNode.label_tr}</h3>
-                          {selectedNode.high_yield && <Star className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)", fill: "var(--foreground)" }} />}
-                        </div>
-                        <button type="button" onClick={() => setSelectedNodeId(null)} className="shrink-0 opacity-50 hover:opacity-100" aria-label="Kapat">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <span
-                        className="inline-block text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full mb-3"
-                        style={{ background: "var(--surface-hover)", color: "var(--foreground)" }}
-                      >
-                        {TYPE_LABEL[selectedNode.type]}
-                      </span>
-                      <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                        {selectedNode.description_tr}
-                      </p>
-                      {selectedNode.high_yield && (
-                        <div
-                          className="mt-3 rounded-xl border p-3 text-xs font-medium"
-                          style={{ borderColor: "var(--border-strong)", background: "var(--surface-hover)", color: "var(--text)" }}
-                        >
-                          <span className="font-black" style={{ color: "var(--foreground)" }}>Yüksek verimli (high-yield): </span>
-                          Bu kavram TUS&apos;ta sık sorulur.
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="flex items-start gap-2 text-sm" style={{ color: "var(--text-muted)" }}>
-                      <Info className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "var(--primary)" }} />
-                      Haritadaki bir düğüme tıklayın; açıklaması ve klinik ipucu burada görünecek.
-                    </div>
-                  )}
-                </div>
+                {/* Düğüm detay paneli */}
+                <NodeDetailPanel
+                  node={selectedNode}
+                  tab={nodeDetailTab}
+                  onTabChange={setNodeDetailTab}
+                  onClose={() => setSelectedNodeId(null)}
+                />
 
                 {/* Renk açıklaması */}
                 <div className="rounded-2xl border p-4 text-xs" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
@@ -397,8 +374,11 @@ export default function MapDetail({ id }: { id: string }) {
               </aside>
             </div>
 
+            {/* Klinik vignette */}
+            <VignetteSection mapId={id} vignettes={map.vignettes ?? []} onFocusNode={focusOnMap} />
+
             {/* Quiz */}
-            <QuizSection map={map} onFocusNode={focusOnMap} />
+            <QuizSection mapId={id} map={map} onFocusNode={focusOnMap} />
 
             {/* Attribution */}
             <div
@@ -416,8 +396,243 @@ export default function MapDetail({ id }: { id: string }) {
   );
 }
 
-// ── Quiz (sinir-lezyon gömülü quiz deseni) ──────────────────────────
-function QuizSection({ map, onFocusNode }: { map: PharmaMap; onFocusNode: (nodeId: string) => void }) {
+// ── Düğüm detay paneli (genel + mekanizma sekmesi) ─────────────────
+function NodeDetailPanel({
+  node,
+  tab,
+  onTabChange,
+  onClose,
+}: {
+  node: PharmaNode | null | undefined;
+  tab: "overview" | "mechanism";
+  onTabChange: (t: "overview" | "mechanism") => void;
+  onClose: () => void;
+}) {
+  const hasMechanism = node?.signaling && (node.signaling.pathway || node.signaling.second_messenger || node.signaling.clinical_hook_tr);
+
+  return (
+    <div className="rounded-2xl border p-4" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+      {!node ? (
+        <div className="flex items-start gap-2 text-sm" style={{ color: "var(--text-muted)" }}>
+          <Info className="w-4 h-4 shrink-0 mt-0.5" />
+          Haritadaki bir düğüme tıklayın; açıklama, mekanizma ve akılda kalıcı ipucu burada görünecek.
+        </div>
+      ) : (
+        <>
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h3 className="font-semibold text-base leading-snug">{node.label_tr}</h3>
+              {node.high_yield && <Star className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)", fill: "var(--foreground)" }} />}
+            </div>
+            <button type="button" onClick={onClose} className="shrink-0 opacity-50 hover:opacity-100" aria-label="Kapat">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <span
+            className="inline-block text-[10px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full mb-3"
+            style={{ background: "var(--surface-hover)", color: "var(--foreground)" }}
+          >
+            {TYPE_LABEL[node.type]}
+          </span>
+
+          <div className="flex gap-1 p-0.5 rounded-lg mb-3 border" style={{ borderColor: "var(--border)", background: "var(--surface-muted)" }}>
+            {(["overview", "mechanism"] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => onTabChange(t)}
+                className="flex-1 text-xs font-medium py-1.5 rounded-md transition-all"
+                style={
+                  tab === t
+                    ? { background: "var(--accent)", color: "var(--accent-foreground)" }
+                    : { color: "var(--muted)" }
+                }
+              >
+                {t === "overview" ? "Genel" : "Mekanizma"}
+              </button>
+            ))}
+          </div>
+
+          {tab === "overview" && (
+            <>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                {node.description_tr}
+              </p>
+              {node.memory_hook_tr && (
+                <div className="mt-3 rounded-lg border p-3 text-xs flex gap-2" style={{ borderColor: "var(--border)", background: "var(--surface-hover)" }}>
+                  <Lightbulb className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "var(--foreground)" }} />
+                  <div>
+                    <span className="font-semibold block mb-0.5">Akılda kalsın</span>
+                    {node.memory_hook_tr}
+                  </div>
+                </div>
+              )}
+              {node.high_yield && (
+                <div className="mt-3 rounded-lg border p-3 text-xs" style={{ borderColor: "var(--border-strong)", background: "var(--surface-hover)" }}>
+                  <span className="font-semibold">High-yield: </span>
+                  Bu kavram TUS&apos;ta sık sorulur.
+                </div>
+              )}
+            </>
+          )}
+
+          {tab === "mechanism" && (
+            hasMechanism ? (
+              <dl className="space-y-2 text-sm">
+                {node.signaling?.pathway && (
+                  <div>
+                    <dt className="text-xs font-medium uppercase tracking-wide mb-0.5" style={{ color: "var(--muted)" }}>Sinyal yolu</dt>
+                    <dd>{node.signaling.pathway}</dd>
+                  </div>
+                )}
+                {node.signaling?.second_messenger && (
+                  <div>
+                    <dt className="text-xs font-medium uppercase tracking-wide mb-0.5" style={{ color: "var(--muted)" }}>İkinci haberci</dt>
+                    <dd>{node.signaling.second_messenger}</dd>
+                  </div>
+                )}
+                {node.signaling?.clinical_hook_tr && (
+                  <div className="rounded-lg border p-3 mt-2" style={{ borderColor: "var(--border)", background: "var(--surface-muted)" }}>
+                    <dt className="text-xs font-medium flex items-center gap-1 mb-1" style={{ color: "var(--muted)" }}>
+                      <Zap className="w-3.5 h-3.5" /> Klinik bağlantı
+                    </dt>
+                    <dd className="text-sm leading-relaxed">{node.signaling.clinical_hook_tr}</dd>
+                  </div>
+                )}
+              </dl>
+            ) : (
+              <p className="text-sm" style={{ color: "var(--muted)" }}>
+                Bu düğüm için ayrıntılı mekanizma notu henüz eklenmedi. Genel sekmesindeki açıklamaya bakın.
+              </p>
+            )
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Klinik vignette ─────────────────────────────────────────────────
+function VignetteSection({
+  mapId,
+  vignettes,
+  onFocusNode,
+}: {
+  mapId: string;
+  vignettes: PharmaVignette[];
+  onFocusNode: (nodeId: string) => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const [answered, setAnswered] = useState(false);
+  const [selected, setSelected] = useState<number | null>(null);
+  const letters = ["A", "B", "C", "D", "E"];
+
+  if (!vignettes.length) return null;
+
+  const v = vignettes[idx];
+
+  const select = (i: number) => {
+    if (answered) return;
+    setAnswered(true);
+    setSelected(i);
+    markVignetteDone(mapId, v.id);
+  };
+
+  const next = () => {
+    if (idx + 1 >= vignettes.length) {
+      setIdx(0);
+      setAnswered(false);
+      setSelected(null);
+      return;
+    }
+    setIdx((i) => i + 1);
+    setAnswered(false);
+    setSelected(null);
+  };
+
+  return (
+    <section className="mt-10 max-w-2xl">
+      <h2 className="text-lg font-semibold tracking-tight mb-1 flex items-center gap-2">
+        <Stethoscope className="w-5 h-5" /> Klinik vignette
+      </h2>
+      <p className="text-sm mb-5" style={{ color: "var(--text-muted)" }}>
+        Kısa vaka senaryolarıyla mekanizmayı klinik bağlama oturtun.
+      </p>
+
+      <div className="rounded-xl border p-5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+        <p className="text-xs font-medium mb-2" style={{ color: "var(--muted)" }}>
+          Vaka {idx + 1} / {vignettes.length} · {v.title_tr}
+        </p>
+        <p className="text-sm leading-relaxed mb-4 p-3 rounded-lg border" style={{ borderColor: "var(--border)", background: "var(--surface-muted)", color: "var(--text)" }}>
+          {v.scenario_tr}
+        </p>
+        <p className="font-medium mb-3">{v.q_tr}</p>
+        <div className="space-y-2 mb-4">
+          {v.options_tr.map((opt, i) => {
+            let style: React.CSSProperties = { background: "var(--surface-muted)", borderColor: "var(--border)" };
+            if (answered) {
+              if (i === v.answer_idx) style = { background: "var(--success-muted)", borderColor: "var(--success)", color: "var(--success)" };
+              else if (i === selected) style = { background: "var(--destructive-muted)", borderColor: "var(--destructive)", color: "var(--destructive)" };
+              else style = { ...style, opacity: 0.5 };
+            }
+            return (
+              <button
+                key={i}
+                type="button"
+                className="w-full text-left px-4 py-3 rounded-lg border text-sm transition-all flex items-start gap-3 disabled:cursor-default"
+                style={style}
+                onClick={() => select(i)}
+                disabled={answered}
+              >
+                <span className="w-5 h-5 rounded-full border flex items-center justify-center text-xs font-medium shrink-0" style={{ borderColor: "currentColor" }}>
+                  {letters[i]}
+                </span>
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+        {answered && (
+          <div className="p-4 rounded-lg text-sm mb-4 border-l-2" style={{ background: "var(--surface-hover)", borderColor: "var(--foreground)" }}>
+            <p className="font-medium mb-1">Açıklama</p>
+            <p style={{ color: "var(--text-muted)" }}>{v.explanation_tr}</p>
+            {v.node_id && (
+              <button
+                type="button"
+                onClick={() => onFocusNode(v.node_id as string)}
+                className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
+                style={{ borderColor: "var(--border-strong)", color: "var(--foreground)" }}
+              >
+                <Waypoints className="w-3.5 h-3.5" /> Haritada göster
+              </button>
+            )}
+          </div>
+        )}
+        {answered && (
+          <button
+            type="button"
+            onClick={next}
+            className="px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90"
+            style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+          >
+            {idx + 1 < vignettes.length ? "Sonraki vaka →" : "Başa dön"}
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ── Quiz ──────────────────────────────────────────────────────────────
+function QuizSection({
+  mapId,
+  map,
+  onFocusNode,
+}: {
+  mapId: string;
+  map: PharmaMap;
+  onFocusNode: (nodeId: string) => void;
+}) {
   const [idx, setIdx] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
@@ -440,6 +655,8 @@ function QuizSection({ map, onFocusNode }: { map: PharmaMap; onFocusNode: (nodeI
 
   const next = () => {
     if (idx + 1 >= quiz.length) {
+      const pct = Math.round((score / quiz.length) * 100);
+      markQuizCompleted(mapId, pct);
       setDone(true);
       return;
     }

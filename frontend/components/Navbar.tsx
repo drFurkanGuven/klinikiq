@@ -79,8 +79,8 @@ export default function Navbar() {
           <ThemeToggle />
 
           {isLoggedIn ? (
-            <Link href="/dashboard" className="btn-primary text-sm px-4 py-2">
-              Dashboard
+            <Link href="/calis" className="btn-primary text-sm px-4 py-2">
+              Çalış
             </Link>
           ) : (
             <>
@@ -156,11 +156,11 @@ export default function Navbar() {
           <hr style={{ borderColor: "var(--border)" }} />
           {isLoggedIn ? (
             <Link
-              href="/dashboard"
+              href="/calis"
               className="btn-primary text-sm py-2.5 text-center"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Dashboard
+              Çalış
             </Link>
           ) : (
             <div className="flex flex-col gap-2">

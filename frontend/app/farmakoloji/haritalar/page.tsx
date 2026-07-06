@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { isAuthenticated, logout } from "@/lib/auth";
 import { pharmaApi, type PharmaMapSummary } from "@/lib/api";
+import {
+  getMapProgress,
+  getOverallProgress,
+  prerequisitesMet,
+  isMapCompleted,
+} from "@/lib/pharmaProgress";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Footer from "@/components/Footer";
 import {
@@ -14,7 +20,18 @@ import {
   ChevronRight,
   Loader2,
   Sparkles,
+  Lock,
+  CheckCircle2,
+  Clock,
+  Star,
+  BookOpen,
 } from "lucide-react";
+
+const LEVEL_LABEL: Record<string, string> = {
+  temel: "Temel",
+  sistem: "Sistem",
+  klinik: "Klinik",
+};
 
 export default function PharmaMapsListPage() {
   const router = useRouter();
@@ -22,6 +39,9 @@ export default function PharmaMapsListPage() {
   const [maps, setMaps] = useState<PharmaMapSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [pathDescription, setPathDescription] = useState("");
+  const [, tick] = useState(0);
+  const refreshProgress = useCallback(() => tick((n) => n + 1), []);
 
   useEffect(() => {
     setMounted(true);
@@ -36,8 +56,12 @@ export default function PharmaMapsListPage() {
     (async () => {
       setLoading(true);
       try {
-        const res = await pharmaApi.listMaps();
-        setMaps(res.data);
+        const [mapsRes, pathRes] = await Promise.all([
+          pharmaApi.listMaps(),
+          pharmaApi.getLearningPath(),
+        ]);
+        setMaps(mapsRes.data);
+        setPathDescription(pathRes.data.description_tr);
       } catch {
         setError("Haritalar yüklenemedi. Lütfen tekrar deneyin.");
       } finally {
@@ -46,7 +70,17 @@ export default function PharmaMapsListPage() {
     })();
   }, [mounted, router]);
 
+  useEffect(() => {
+    if (!mounted) return;
+    const onStorage = () => refreshProgress();
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [mounted, refreshProgress]);
+
   if (!mounted) return null;
+
+  const mapIds = maps.map((m) => m.id);
+  const overall = getOverallProgress(mapIds);
 
   return (
     <div className="min-h-screen flex flex-col transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -69,14 +103,14 @@ export default function PharmaMapsListPage() {
                 <Waypoints className="w-5 h-5" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <div className="min-w-0">
-                <span className="font-black text-lg tracking-tight block leading-tight truncate">Mantık Haritaları</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Farmakoloji · İnteraktif</span>
+                <span className="font-semibold text-lg tracking-tight block leading-tight truncate">Mantık Haritaları</span>
+                <span className="text-[10px] font-medium uppercase tracking-widest opacity-50">Farmakoloji · Öğrenme yolu</span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <ThemeToggle />
-            <button type="button" onClick={logout} className="group flex items-center gap-2 text-sm font-bold px-3 py-2.5 rounded-xl hover:bg-black/5" style={{ color: "var(--text-muted)" }}>
+            <button type="button" onClick={logout} className="flex items-center gap-2 text-sm font-medium px-3 py-2.5 rounded-xl hover:bg-black/5" style={{ color: "var(--text-muted)" }}>
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Çıkış</span>
             </button>
@@ -84,73 +118,155 @@ export default function PharmaMapsListPage() {
         </div>
       </nav>
 
-      <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-10 sm:py-14">
+      <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-10 sm:py-14">
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-2">İnteraktif farmakoloji mantık haritaları</h1>
-          <p className="text-sm sm:text-base font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
-            İlaçların mantığını reseptör → organ → etki zinciriyle görselleştirin. Bir ilaç sınıfı seçtiğinizde etkilediği
-            reseptörler ve aşağı yönlü sonuçlar haritada vurgulanır.
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-2">Farmakoloji öğrenme yolu</h1>
+          <p className="text-sm sm:text-base leading-relaxed" style={{ color: "var(--text-muted)" }}>
+            {pathDescription ||
+              "İlaçların mantığını reseptör → organ → etki zinciriyle öğrenin. Her modülü sırayla tamamlayın."}
           </p>
+
+          {!loading && maps.length > 0 && (
+            <div className="mt-6 rounded-xl border p-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="font-medium flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  Genel ilerleme
+                </span>
+                <span style={{ color: "var(--muted)" }}>
+                  {overall.completed} / {overall.total} harita
+                </span>
+              </div>
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${overall.pct}%`, background: "var(--accent)" }}
+                />
+              </div>
+              <p className="text-xs mt-2" style={{ color: "var(--muted)" }}>
+                Bir harita, quizde %70 ve üzeri skorla tamamlanır.
+              </p>
+            </div>
+          )}
+
           <div
-            className="mt-4 inline-flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl border"
-            style={{
-              borderColor: "var(--border)",
-              background: "color-mix(in srgb, var(--primary) 8%, transparent)",
-              color: "var(--primary)",
-            }}
+            className="mt-4 inline-flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-lg border"
+            style={{ borderColor: "var(--border)", color: "var(--muted)" }}
           >
-            <Sparkles className="w-4 h-4 shrink-0" />
-            İçerik curated (elle doğrulanmış) statik veridir — çalışma anında üretilmez.
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            Curated statik içerik — çalışma anında üretilmez.
           </div>
         </div>
 
         {loading && (
           <div className="flex justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--primary)" }} />
+            <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--foreground)" }} />
           </div>
         )}
 
         {error && !loading && (
-          <div className="rounded-2xl border px-5 py-4 text-sm font-medium" style={{ borderColor: "var(--danger)", color: "var(--danger)", background: "var(--error-light)" }}>
+          <div className="rounded-xl border px-5 py-4 text-sm" style={{ borderColor: "var(--destructive)", color: "var(--destructive)", background: "var(--destructive-muted)" }}>
             {error}
           </div>
         )}
 
-        {!loading && !error && maps.length === 0 && (
-          <p className="text-sm font-medium py-12 text-center" style={{ color: "var(--text-muted)" }}>
-            Henüz harita eklenmemiş.
-          </p>
-        )}
-
         {!loading && !error && maps.length > 0 && (
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {maps.map((m) => (
-              <li key={m.id}>
-                <Link
-                  href={`/farmakoloji/haritalar/${m.id}`}
-                  className="flex flex-col h-full rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg group"
-                  style={{ background: "var(--surface)", borderColor: "var(--border)" }}
-                >
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center border" style={{ borderColor: "var(--border)", background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)" }}>
-                      <Waypoints className="w-5 h-5" />
+          <ol className="space-y-3">
+            {maps.map((m) => {
+              const progress = getMapProgress(m.id);
+              const completed = isMapCompleted(m.id);
+              const unlocked = prerequisitesMet(m.prerequisites);
+              const levelLabel = LEVEL_LABEL[m.level] ?? m.level;
+
+              return (
+                <li key={m.id}>
+                  {unlocked ? (
+                    <Link
+                      href={`/farmakoloji/haritalar/${m.id}`}
+                      className="flex gap-4 rounded-xl border p-4 sm:p-5 transition-all hover:border-[var(--border-strong)] group"
+                      style={{ background: "var(--surface)", borderColor: completed ? "var(--foreground)" : "var(--border)" }}
+                    >
+                      <MapCardInner m={m} order={m.order} levelLabel={levelLabel} completed={completed} progress={progress} unlocked />
+                      <ChevronRight className="w-5 h-5 shrink-0 self-center opacity-40 group-hover:opacity-100" />
+                    </Link>
+                  ) : (
+                    <div
+                      className="flex gap-4 rounded-xl border p-4 sm:p-5 opacity-60"
+                      style={{ background: "var(--surface-muted)", borderColor: "var(--border)" }}
+                      title="Önce ön koşul haritalarını tamamlayın"
+                    >
+                      <MapCardInner m={m} order={m.order} levelLabel={levelLabel} completed={false} progress={progress} unlocked={false} />
+                      <Lock className="w-5 h-5 shrink-0 self-center" style={{ color: "var(--muted)" }} />
                     </div>
-                    <ChevronRight className="w-5 h-5 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" style={{ color: "var(--primary)" }} />
-                  </div>
-                  <h3 className="font-black text-base leading-snug mb-1" style={{ color: "var(--text)" }}>
-                    {m.title_tr}
-                  </h3>
-                  <p className="text-sm font-medium leading-relaxed line-clamp-3" style={{ color: "var(--text-muted)" }}>
-                    {m.description_tr}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
         )}
       </main>
 
       <Footer />
     </div>
+  );
+}
+
+function MapCardInner({
+  m,
+  order,
+  levelLabel,
+  completed,
+  progress,
+  unlocked,
+}: {
+  m: PharmaMapSummary;
+  order: number;
+  levelLabel: string;
+  completed: boolean;
+  progress: ReturnType<typeof getMapProgress>;
+  unlocked: boolean;
+}) {
+  return (
+    <>
+      <div
+        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-sm font-semibold border"
+        style={{
+          borderColor: completed ? "var(--foreground)" : "var(--border)",
+          background: completed ? "var(--accent)" : "var(--surface-muted)",
+          color: completed ? "var(--accent-foreground)" : "var(--foreground)",
+        }}
+      >
+        {completed ? <CheckCircle2 className="w-5 h-5" /> : order}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
+          <h3 className="font-semibold text-base leading-snug">{m.title_tr}</h3>
+          <span className="text-[10px] font-medium uppercase tracking-wide px-2 py-0.5 rounded-full border" style={{ borderColor: "var(--border)", color: "var(--muted)" }}>
+            {levelLabel}
+          </span>
+          {!unlocked && m.prerequisites.length > 0 && (
+            <span className="text-[10px]" style={{ color: "var(--muted)" }}>
+              Ön koşul: {m.prerequisites.join(", ")}
+            </span>
+          )}
+        </div>
+        <p className="text-sm leading-relaxed line-clamp-2 mb-2" style={{ color: "var(--text-muted)" }}>
+          {m.description_tr}
+        </p>
+        <div className="flex flex-wrap gap-3 text-xs" style={{ color: "var(--muted)" }}>
+          <span className="inline-flex items-center gap-1">
+            <Clock className="w-3.5 h-3.5" /> ~{m.estimated_minutes} dk
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Star className="w-3.5 h-3.5" /> {m.high_yield_count} high-yield
+          </span>
+          <span>{m.quiz_count} quiz</span>
+          {m.vignette_count > 0 && <span>{m.vignette_count} vaka</span>}
+          {progress.quizScorePct != null && (
+            <span>Quiz: %{progress.quizScorePct}</span>
+          )}
+        </div>
+      </div>
+    </>
   );
 }

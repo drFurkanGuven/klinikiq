@@ -51,28 +51,28 @@ function AcilMcqReportContent() {
   return (
     <div className="min-h-screen flex flex-col transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
       <nav
-        className="glass border-b sticky top-0 z-50 transition-all font-sans"
+        className="border-b sticky top-0 z-50"
         style={{ background: "var(--surface)", borderColor: "var(--border)" }}
       >
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4 min-w-0">
-            <Link href="/simulasyon/acil" className="p-2.5 rounded-xl transition-all hover:bg-black/5 shrink-0" style={{ color: "var(--text-muted)" }}>
+            <Link href="/simulasyon/acil" className="p-2 rounded-lg transition-colors hover:bg-black/5 shrink-0" style={{ color: "var(--text-muted)" }}>
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--accent)" }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--accent)" }}>
                 <Zap className="w-5 h-5" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <div className="min-w-0">
-                <span className="font-black text-lg tracking-tight block leading-tight truncate">Acil oturum raporu</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">MCQ pratik</span>
+                <span className="font-semibold text-lg tracking-tight block leading-tight truncate">Acil oturum raporu</span>
+                <span className="text-[10px] font-medium uppercase tracking-widest opacity-50">MCQ pratik</span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <Link
               href="/simulasyon/acil/raporlar"
-              className="text-xs font-bold uppercase tracking-wide opacity-70 hover:opacity-100 hidden sm:inline"
+              className="text-xs font-medium hidden sm:inline"
               style={{ color: "var(--text-muted)" }}
             >
               Tüm raporlar
@@ -81,7 +81,7 @@ function AcilMcqReportContent() {
             <button
               type="button"
               onClick={logout}
-              className="group flex items-center gap-2 text-sm font-bold px-3 py-2.5 rounded-xl hover:bg-black/5"
+              className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg hover:bg-black/5"
               style={{ color: "var(--text-muted)" }}
             >
               <LogOut className="w-4 h-4" />
@@ -95,7 +95,7 @@ function AcilMcqReportContent() {
         {!id && (
           <p className="text-sm font-medium mb-6 px-1" style={{ color: "var(--text-muted)" }}>
             Rapor kimliği yok.{" "}
-            <Link href="/simulasyon/acil/raporlar" className="underline font-bold" style={{ color: "var(--primary)" }}>
+            <Link href="/simulasyon/acil/raporlar" className="underline font-medium" style={{ color: "var(--foreground)" }}>
               Rapor listesinden
             </Link>{" "}
             bir kayıt seçin.
@@ -108,7 +108,7 @@ function AcilMcqReportContent() {
         )}
         {id && !report && !error && (
           <div className="flex items-center justify-center gap-2 py-20">
-            <Loader2 className="w-6 h-6 animate-spin" style={{ color: "var(--primary)" }} />
+            <Loader2 className="w-6 h-6 animate-spin" style={{ color: "var(--foreground)" }} />
             <span className="text-sm font-medium opacity-80">Yükleniyor…</span>
           </div>
         )}
@@ -117,14 +117,13 @@ function AcilMcqReportContent() {
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
             href="/simulasyon/acil"
-            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-black uppercase tracking-wide border"
-            style={{ borderColor: "var(--border)", background: "var(--surface)", color: "var(--text)" }}
+            className="btn-secondary inline-flex items-center justify-center px-4 py-2.5 text-sm rounded-lg"
           >
             Acil simülasyona dön
           </Link>
           <Link
             href="/simulasyon/acil/raporlar"
-            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-bold border opacity-90"
+            className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium border"
             style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
           >
             Rapor geçmişi
@@ -140,7 +139,7 @@ function AcilMcqReportContent() {
 function ReportFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg)", color: "var(--text)" }}>
-      <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--primary)" }} />
+      <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--foreground)" }} />
     </div>
   );
 }

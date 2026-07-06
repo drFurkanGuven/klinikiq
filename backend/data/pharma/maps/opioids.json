@@ -4,164 +4,488 @@
   "description_tr": "μ (mu), κ (kappa) ve δ (delta) opioid reseptörlerinin analjezi, solunum depresyonu, miyozis ve bağımlılık profilleri. Tam agonist, parsiyel agonist ve antagonist örnekleri.",
   "source_attribution": "Opioid farmakolojisi StatPearls (Opioid Analgesics, Naloxone) ve IUPHAR/BPS GtoPdb opioid receptor ligand verileri (CC BY-SA 4.0) temel alınarak derlenmiştir.",
   "nodes": [
-    { "id": "med_enkephalin", "label_tr": "Enkefalin / endorfin", "type": "mediator", "high_yield": false, "description_tr": "Endojen opioid peptidler. Ağrı yollarında (spinal dorsal horn, periakueduktal gri) presinaptik inhibisyon sağlar." },
-    { "id": "med_morphine", "label_tr": "Morfin (exogenous opioid)", "type": "mediator", "high_yield": true, "description_tr": "Altın standart μ agonist. Güçlü analjezi; solunum depresyonu, konstipasyon, miyozis, sedasyon ve bağımlılık potansiyeli." },
-
-    { "id": "r_mu", "label_tr": "μ (mu) opioid reseptör", "type": "receptor", "high_yield": true, "description_tr": "Gi/Go bağlı reseptör. Supraspinal ve spinal analjezi, öfori, solunum depresyonu, miyozis, fiziksel bağımlılık. Morfin, fentanil, kodein hedefi." },
-    { "id": "r_kappa", "label_tr": "κ (kappa) opioid reseptör", "type": "receptor", "high_yield": true, "description_tr": "Gi bağlı. Spinal analjezi, sedasyon, diürez; dysphoria (hoşnutsuzluk). Pentazosin, nalfurafin (parsiyel profil)." },
-    { "id": "r_delta", "label_tr": "δ (delta) opioid reseptör", "type": "receptor", "high_yield": false, "description_tr": "Gi bağlı. Analjezi ve duygusal modülasyon; klinik ilaç hedefi sınırlı." },
-    { "id": "r_nmda", "label_tr": "NMDA reseptörü", "type": "receptor", "high_yield": false, "description_tr": "Tramadol ve metadon gibi ajanların ek mekanizması. NMDA antagonizması opioid toleransı ve nöropatik ağrıda rol oynar." },
-
-    { "id": "o_spinal_dh", "label_tr": "Spinal dorsal horn", "type": "organ", "high_yield": true, "description_tr": "Primer nociceptif afferentlerin sinaps yaptığı bölge. μ/κ agonistler substans P ve glutamat salınımını presinaptik inhibe eder." },
-    { "id": "o_brainstem", "label_tr": "Beyin sapı (solunum merkezi)", "type": "organ", "high_yield": true, "description_tr": "μ agonist solunum merkezine duyarlılığı azaltır → solunum depresyonu. Overdozda ölüm nedeni." },
-    { "id": "o_eye", "label_tr": "Göz (Edinger-Westphal)", "type": "organ", "high_yield": true, "description_tr": "μ agonist parasempatik çekirdeği uyarır → miyozis (opioid pupil). Atropinle düzelmez (TUS ipucu)." },
-    { "id": "o_gi", "label_tr": "GİS (enterik pleksus)", "type": "organ", "high_yield": true, "description_tr": "μ agonist intestinal motilite ↓, sfinkter tonus ↑ → konstipasyon (tolerans gelişmez, laxatif gerekebilir)." },
-    { "id": "o_locus", "label_tr": "Locus coeruleus / ödül devresi", "type": "organ", "high_yield": true, "description_tr": "μ agonist dopamin salınımını artırarak öfori ve bağımlılık yapar. Yoksunlukta noradrenerjik hiperaktivite." },
-
-    { "id": "e_analgesia", "label_tr": "Analjezi", "type": "effect", "high_yield": true, "description_tr": "Noziseptif ve (kısmen) nöropatik ağrıda etkili. Tolerans gelişir; doz artışı gerekebilir." },
-    { "id": "e_resp_depression", "label_tr": "Solunum depresyonu", "type": "effect", "high_yield": true, "description_tr": "CO2 chemoreseptör duyarlılığı ↓. Overdozda pin-point pupil + solunum sayısı ↓ → nalokson acil." },
-    { "id": "e_miosis", "label_tr": "Miyozis", "type": "effect", "high_yield": true, "description_tr": "μ agonist Edinger-Westphal uyarısı. Opioid overdoz bulgusu; meperidin gibi bazı ajanlarda daha az belirgin." },
-    { "id": "e_constipation", "label_tr": "Konstipasyon", "type": "effect", "high_yield": true, "description_tr": "μ agonist enterik motilite ↓. Tolerans gelmez; kronik opioidlerde dışkı yumuşatıcı rutin." },
-    { "id": "e_euphoria", "label_tr": "Öfori & bağımlılık", "type": "effect", "high_yield": true, "description_tr": "Ödül devresi aktivasyonu → psikolojik bağımlılık. Fiziksel bağımlılıkta yoksunluk sendromu (yawning, myalgia, piloereksiyon)." },
-    { "id": "e_withdrawal", "label_tr": "Yoksunluk sendromu", "type": "effect", "high_yield": true, "description_tr": "Kronik μ agonist sonrası kesilince: lacrimation, diare, piloereksiyon, myalgia. Nalokson yoksunluğu tetikler (tam antagonist)." },
-    { "id": "e_ceiling", "label_tr": "Tavan etkisi (parsiyel agonist)", "type": "effect", "high_yield": true, "description_tr": "Buprenorfin gibi parsiyel μ agonist/antagonistler analjezi ve solunum depresyonunda tavan etkisi gösterir." }
+    {
+      "id": "med_enkephalin",
+      "label_tr": "Enkefalin / endorfin",
+      "type": "mediator",
+      "high_yield": false,
+      "description_tr": "Endojen opioid peptidler. Ağrı yollarında (spinal dorsal horn, periakueduktal gri) presinaptik inhibisyon sağlar."
+    },
+    {
+      "id": "med_morphine",
+      "label_tr": "Morfin (exogenous opioid)",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Altın standart μ agonist. Güçlü analjezi; solunum depresyonu, konstipasyon, miyozis, sedasyon ve bağımlılık potansiyeli."
+    },
+    {
+      "id": "r_mu",
+      "label_tr": "μ (mu) opioid reseptör",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Gi/Go bağlı reseptör. Supraspinal ve spinal analjezi, öfori, solunum depresyonu, miyozis, fiziksel bağımlılık. Morfin, fentanil, kodein hedefi."
+    },
+    {
+      "id": "r_kappa",
+      "label_tr": "κ (kappa) opioid reseptör",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Gi bağlı. Spinal analjezi, sedasyon, diürez; dysphoria (hoşnutsuzluk). Pentazosin, nalfurafin (parsiyel profil)."
+    },
+    {
+      "id": "r_delta",
+      "label_tr": "δ (delta) opioid reseptör",
+      "type": "receptor",
+      "high_yield": false,
+      "description_tr": "Gi bağlı. Analjezi ve duygusal modülasyon; klinik ilaç hedefi sınırlı."
+    },
+    {
+      "id": "r_nmda",
+      "label_tr": "NMDA reseptörü",
+      "type": "receptor",
+      "high_yield": false,
+      "description_tr": "Tramadol ve metadon gibi ajanların ek mekanizması. NMDA antagonizması opioid toleransı ve nöropatik ağrıda rol oynar."
+    },
+    {
+      "id": "o_spinal_dh",
+      "label_tr": "Spinal dorsal horn",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Primer nociceptif afferentlerin sinaps yaptığı bölge. μ/κ agonistler substans P ve glutamat salınımını presinaptik inhibe eder."
+    },
+    {
+      "id": "o_brainstem",
+      "label_tr": "Beyin sapı (solunum merkezi)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "μ agonist solunum merkezine duyarlılığı azaltır → solunum depresyonu. Overdozda ölüm nedeni."
+    },
+    {
+      "id": "o_eye",
+      "label_tr": "Göz (Edinger-Westphal)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "μ agonist parasempatik çekirdeği uyarır → miyozis (opioid pupil). Atropinle düzelmez (TUS ipucu)."
+    },
+    {
+      "id": "o_gi",
+      "label_tr": "GİS (enterik pleksus)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "μ agonist intestinal motilite ↓, sfinkter tonus ↑ → konstipasyon (tolerans gelişmez, laxatif gerekebilir)."
+    },
+    {
+      "id": "o_locus",
+      "label_tr": "Locus coeruleus / ödül devresi",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "μ agonist dopamin salınımını artırarak öfori ve bağımlılık yapar. Yoksunlukta noradrenerjik hiperaktivite."
+    },
+    {
+      "id": "e_analgesia",
+      "label_tr": "Analjezi",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Noziseptif ve (kısmen) nöropatik ağrıda etkili. Tolerans gelişir; doz artışı gerekebilir."
+    },
+    {
+      "id": "e_resp_depression",
+      "label_tr": "Solunum depresyonu",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "CO2 chemoreseptör duyarlılığı ↓. Overdozda pin-point pupil + solunum sayısı ↓ → nalokson acil."
+    },
+    {
+      "id": "e_miosis",
+      "label_tr": "Miyozis",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "μ agonist Edinger-Westphal uyarısı. Opioid overdoz bulgusu; meperidin gibi bazı ajanlarda daha az belirgin."
+    },
+    {
+      "id": "e_constipation",
+      "label_tr": "Konstipasyon",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "μ agonist enterik motilite ↓. Tolerans gelmez; kronik opioidlerde dışkı yumuşatıcı rutin."
+    },
+    {
+      "id": "e_euphoria",
+      "label_tr": "Öfori & bağımlılık",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Ödül devresi aktivasyonu → psikolojik bağımlılık. Fiziksel bağımlılıkta yoksunluk sendromu (yawning, myalgia, piloereksiyon)."
+    },
+    {
+      "id": "e_withdrawal",
+      "label_tr": "Yoksunluk sendromu",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Kronik μ agonist sonrası kesilince: lacrimation, diare, piloereksiyon, myalgia. Nalokson yoksunluğu tetikler (tam antagonist)."
+    },
+    {
+      "id": "e_ceiling",
+      "label_tr": "Tavan etkisi (parsiyel agonist)",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Buprenorfin gibi parsiyel μ agonist/antagonistler analjezi ve solunum depresyonunda tavan etkisi gösterir."
+    }
   ],
   "edges": [
-    { "source": "med_morphine", "target": "r_mu", "relation": "agonist", "effect_tr": "Tam μ agonist" },
-    { "source": "med_enkephalin", "target": "r_mu", "relation": "agonist", "effect_tr": "Endojen ligand" },
-    { "source": "med_enkephalin", "target": "r_delta", "relation": "agonist", "effect_tr": "Endojen ligand" },
-    { "source": "med_morphine", "target": "r_kappa", "relation": "agonist", "effect_tr": "Düşük afinite" },
-
-    { "source": "r_mu", "target": "o_spinal_dh", "relation": "inhibits", "effect_tr": "Presinaptik nociceptif inhibisyon" },
-    { "source": "r_mu", "target": "o_brainstem", "relation": "inhibits", "effect_tr": "Solunum merkezi baskılanır" },
-    { "source": "r_mu", "target": "o_eye", "relation": "activates", "effect_tr": "Parasempatik outflow → miyozis" },
-    { "source": "r_mu", "target": "o_gi", "relation": "inhibits", "effect_tr": "Motilite ↓" },
-    { "source": "r_mu", "target": "o_locus", "relation": "activates", "effect_tr": "Ödül / bağımlılık" },
-    { "source": "r_kappa", "target": "o_spinal_dh", "relation": "inhibits", "effect_tr": "Spinal analjezi" },
-
-    { "source": "o_spinal_dh", "target": "e_analgesia", "relation": "activates", "effect_tr": "Ağrı iletimi ↓" },
-    { "source": "o_brainstem", "target": "e_resp_depression", "relation": "activates", "effect_tr": "Solunum sayısı & derinlik ↓" },
-    { "source": "o_eye", "target": "e_miosis", "relation": "activates", "effect_tr": "Pin-point pupil" },
-    { "source": "o_gi", "target": "e_constipation", "relation": "activates", "effect_tr": "Kronik konstipasyon" },
-    { "source": "o_locus", "target": "e_euphoria", "relation": "activates", "effect_tr": "Bağımlılık potansiyeli" }
+    {
+      "source": "med_morphine",
+      "target": "r_mu",
+      "relation": "agonist",
+      "effect_tr": "Tam μ agonist"
+    },
+    {
+      "source": "med_enkephalin",
+      "target": "r_mu",
+      "relation": "agonist",
+      "effect_tr": "Endojen ligand"
+    },
+    {
+      "source": "med_enkephalin",
+      "target": "r_delta",
+      "relation": "agonist",
+      "effect_tr": "Endojen ligand"
+    },
+    {
+      "source": "med_morphine",
+      "target": "r_kappa",
+      "relation": "agonist",
+      "effect_tr": "Düşük afinite"
+    },
+    {
+      "source": "r_mu",
+      "target": "o_spinal_dh",
+      "relation": "inhibits",
+      "effect_tr": "Presinaptik nociceptif inhibisyon"
+    },
+    {
+      "source": "r_mu",
+      "target": "o_brainstem",
+      "relation": "inhibits",
+      "effect_tr": "Solunum merkezi baskılanır"
+    },
+    {
+      "source": "r_mu",
+      "target": "o_eye",
+      "relation": "activates",
+      "effect_tr": "Parasempatik outflow → miyozis"
+    },
+    {
+      "source": "r_mu",
+      "target": "o_gi",
+      "relation": "inhibits",
+      "effect_tr": "Motilite ↓"
+    },
+    {
+      "source": "r_mu",
+      "target": "o_locus",
+      "relation": "activates",
+      "effect_tr": "Ödül / bağımlılık"
+    },
+    {
+      "source": "r_kappa",
+      "target": "o_spinal_dh",
+      "relation": "inhibits",
+      "effect_tr": "Spinal analjezi"
+    },
+    {
+      "source": "o_spinal_dh",
+      "target": "e_analgesia",
+      "relation": "activates",
+      "effect_tr": "Ağrı iletimi ↓"
+    },
+    {
+      "source": "o_brainstem",
+      "target": "e_resp_depression",
+      "relation": "activates",
+      "effect_tr": "Solunum sayısı & derinlik ↓"
+    },
+    {
+      "source": "o_eye",
+      "target": "e_miosis",
+      "relation": "activates",
+      "effect_tr": "Pin-point pupil"
+    },
+    {
+      "source": "o_gi",
+      "target": "e_constipation",
+      "relation": "activates",
+      "effect_tr": "Kronik konstipasyon"
+    },
+    {
+      "source": "o_locus",
+      "target": "e_euphoria",
+      "relation": "activates",
+      "effect_tr": "Bağımlılık potansiyeli"
+    }
   ],
   "interventions": [
     {
       "drug_class": "mu_agonist_full",
       "label_tr": "Tam μ agonist (morfin / fentanil)",
-      "targets": ["r_mu"],
+      "targets": [
+        "r_mu"
+      ],
       "relation": "agonist",
       "downstream_effects": [
-        { "nodeId": "e_analgesia", "effect_tr": "Güçlü analjezi (orta-şiddetli ağrı)" },
-        { "nodeId": "e_resp_depression", "effect_tr": "Doz bağımlı solunum depresyonu" },
-        { "nodeId": "e_miosis", "effect_tr": "Miyozis" },
-        { "nodeId": "e_constipation", "effect_tr": "Konstipasyon" },
-        { "nodeId": "e_euphoria", "effect_tr": "Bağımlılık riski" }
+        {
+          "nodeId": "e_analgesia",
+          "effect_tr": "Güçlü analjezi (orta-şiddetli ağrı)"
+        },
+        {
+          "nodeId": "e_resp_depression",
+          "effect_tr": "Doz bağımlı solunum depresyonu"
+        },
+        {
+          "nodeId": "e_miosis",
+          "effect_tr": "Miyozis"
+        },
+        {
+          "nodeId": "e_constipation",
+          "effect_tr": "Konstipasyon"
+        },
+        {
+          "nodeId": "e_euphoria",
+          "effect_tr": "Bağımlılık riski"
+        }
       ],
-      "tr_products_atc": ["N02AA01", "N02AB03"]
+      "tr_products_atc": [
+        "N02AA01",
+        "N02AB03"
+      ]
     },
     {
       "drug_class": "mu_agonist_weak",
       "label_tr": "Zayıf μ agonist (kodein / tramadol)",
-      "targets": ["r_mu"],
+      "targets": [
+        "r_mu"
+      ],
       "relation": "agonist",
       "downstream_effects": [
-        { "nodeId": "e_analgesia", "effect_tr": "Hafif-orta ağrı" },
-        { "nodeId": "r_nmda", "effect_tr": "Tramadol: ek NMDA antagonizması" },
-        { "nodeId": "e_resp_depression", "effect_tr": "Morfin kadar güçlü değil (CYP2D6 varyantları kodeinde)" }
+        {
+          "nodeId": "e_analgesia",
+          "effect_tr": "Hafif-orta ağrı"
+        },
+        {
+          "nodeId": "r_nmda",
+          "effect_tr": "Tramadol: ek NMDA antagonizması"
+        },
+        {
+          "nodeId": "e_resp_depression",
+          "effect_tr": "Morfin kadar güçlü değil (CYP2D6 varyantları kodeinde)"
+        }
       ],
-      "tr_products_atc": ["N02AA59", "N02AX02"]
+      "tr_products_atc": [
+        "N02AA59",
+        "N02AX02"
+      ]
     },
     {
       "drug_class": "partial_mu_agonist",
       "label_tr": "Parsiyel μ agonist (buprenorfin)",
-      "targets": ["r_mu"],
+      "targets": [
+        "r_mu"
+      ],
       "relation": "agonist",
       "downstream_effects": [
-        { "nodeId": "e_analgesia", "effect_tr": "Analjezi (tavan etkili)" },
-        { "nodeId": "e_ceiling", "effect_tr": "Solunum depresyonunda tavan → overdozda daha güvenli profil" },
-        { "nodeId": "e_withdrawal", "effect_tr": "Opioid bağımlılığı tedavisinde kullanılır" }
+        {
+          "nodeId": "e_analgesia",
+          "effect_tr": "Analjezi (tavan etkili)"
+        },
+        {
+          "nodeId": "e_ceiling",
+          "effect_tr": "Solunum depresyonunda tavan → overdozda daha güvenli profil"
+        },
+        {
+          "nodeId": "e_withdrawal",
+          "effect_tr": "Opioid bağımlılığı tedavisinde kullanılır"
+        }
       ],
-      "tr_products_atc": ["N07BC01"]
+      "tr_products_atc": [
+        "N07BC01"
+      ]
     },
     {
       "drug_class": "mu_antagonist",
       "label_tr": "Opioid antagonist (nalokson)",
-      "targets": ["r_mu"],
+      "targets": [
+        "r_mu"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "e_resp_depression", "effect_tr": "Solunum depresyonu geri döner (kısa yarı ömür → tekrar doz)" },
-        { "nodeId": "e_analgesia", "effect_tr": "Analjezi ortadan kalkar" },
-        { "nodeId": "e_withdrawal", "effect_tr": "Akut yoksunluk tetiklenebilir" }
+        {
+          "nodeId": "e_resp_depression",
+          "effect_tr": "Solunum depresyonu geri döner (kısa yarı ömür → tekrar doz)"
+        },
+        {
+          "nodeId": "e_analgesia",
+          "effect_tr": "Analjezi ortadan kalkar"
+        },
+        {
+          "nodeId": "e_withdrawal",
+          "effect_tr": "Akut yoksunluk tetiklenebilir"
+        }
       ],
-      "tr_products_atc": ["V03AB15"]
+      "tr_products_atc": [
+        "V03AB15"
+      ]
     },
     {
       "drug_class": "mixed_agonist_antagonist",
       "label_tr": "Karma agonist-antagonist (pentazosin)",
-      "targets": ["r_mu", "r_kappa"],
+      "targets": [
+        "r_mu",
+        "r_kappa"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "r_mu", "effect_tr": "Zayıf μ agonist veya antagonist (doz bağımlı)" },
-        { "nodeId": "r_kappa", "effect_tr": "κ agonist → dysphoria riski" },
-        { "nodeId": "e_withdrawal", "effect_tr": "Tam agonist yoksunluğunu kısmen geri çevirebilir" }
+        {
+          "nodeId": "r_mu",
+          "effect_tr": "Zayıf μ agonist veya antagonist (doz bağımlı)"
+        },
+        {
+          "nodeId": "r_kappa",
+          "effect_tr": "κ agonist → dysphoria riski"
+        },
+        {
+          "nodeId": "e_withdrawal",
+          "effect_tr": "Tam agonist yoksunluğunu kısmen geri çevirebilir"
+        }
       ],
-      "tr_products_atc": ["N02AD01"]
+      "tr_products_atc": [
+        "N02AD01"
+      ]
     },
     {
       "drug_class": "opioid_antidiarrheal",
       "label_tr": "Antidiareal opioid (loperamid)",
-      "targets": ["r_mu"],
+      "targets": [
+        "r_mu"
+      ],
       "relation": "agonist",
       "downstream_effects": [
-        { "nodeId": "o_gi", "effect_tr": "Enterik motilite ↓ (periferik, SSS geçişi minimal)" },
-        { "nodeId": "e_constipation", "effect_tr": "İshal tedavisinde kullanılır" }
+        {
+          "nodeId": "o_gi",
+          "effect_tr": "Enterik motilite ↓ (periferik, SSS geçişi minimal)"
+        },
+        {
+          "nodeId": "e_constipation",
+          "effect_tr": "İshal tedavisinde kullanılır"
+        }
       ],
-      "tr_products_atc": ["A07DA03"]
+      "tr_products_atc": [
+        "A07DA03"
+      ]
     }
   ],
   "quiz": [
     {
       "q_tr": "Opioid overdozunda en hayati bulgu ve acil müdahale nedir?",
-      "options_tr": ["Hipertansiyon → β-bloker", "Solunum depresyonu + miyozis → nalokson", "Taşikardi → atropin", "Midriyazis → pilokarpin"],
+      "options_tr": [
+        "Hipertansiyon → β-bloker",
+        "Solunum depresyonu + miyozis → nalokson",
+        "Taşikardi → atropin",
+        "Midriyazis → pilokarpin"
+      ],
       "answer_idx": 1,
       "explanation_tr": "μ agonist overdozunda pin-point pupil ve solunum depresyonu görülür. Nalokson kısa etkili antagonisttir; solunum desteği şart.",
       "node_id": "e_resp_depression"
     },
     {
       "q_tr": "Opioidlerin tolerans gelişmeyen (kronik) yan etkisi hangisidir?",
-      "options_tr": ["Analjezi", "Sedasyon", "Konstipasyon", "Solunum depresyonu"],
+      "options_tr": [
+        "Analjezi",
+        "Sedasyon",
+        "Konstipasyon",
+        "Solunum depresyonu"
+      ],
       "answer_idx": 2,
       "explanation_tr": "Enterik μ agonizmine bağlı konstipasyon tolerans geliştirmez; kronik opioid kullananlarda rutin laxatif önerilir.",
       "node_id": "e_constipation"
     },
     {
       "q_tr": "Buprenorfinin tam μ agonistlere göre avantajı nedir?",
-      "options_tr": ["Daha güçlü analjezi", "Solunum depresyonunda tavan etkisi", "Daha kısa yarı ömür", "Antikolinerjik etki"],
+      "options_tr": [
+        "Daha güçlü analjezi",
+        "Solunum depresyonunda tavan etkisi",
+        "Daha kısa yarı ömür",
+        "Antikolinerjik etki"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Buprenorfin parsiyel μ agonisttir; yüksek dozlarda analjezi ve solunum depresyonu plato yapar → overdozda daha güvenli profil.",
       "node_id": "e_ceiling"
     },
     {
       "q_tr": "Morfinin analjezik etkisinin birincil reseptör hedefi hangisidir?",
-      "options_tr": ["κ (kappa)", "μ (mu)", "δ (delta)", "NMDA"],
+      "options_tr": [
+        "κ (kappa)",
+        "μ (mu)",
+        "δ (delta)",
+        "NMDA"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Morfin ve fentanil başlıca μ opioid reseptör agonistidir. Spinal ve supraspinal analjezi buradan gelir.",
       "node_id": "r_mu"
     },
     {
       "q_tr": "Nalokson verilen kronik opioid kullanıcısında ne beklenir?",
-      "options_tr": ["Derin sedasyon", "Akut yoksunluk sendromu", "Konstipasyon artışı", "Miyozis"],
+      "options_tr": [
+        "Derin sedasyon",
+        "Akut yoksunluk sendromu",
+        "Konstipasyon artışı",
+        "Miyozis"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Tam antagonist yoksunluk bulgularını (lacrimation, diare, piloereksiyon) hızla ortaya çıkarır; titrasyon tercih edilir.",
       "node_id": "e_withdrawal"
     },
     {
       "q_tr": "Loperamidin antidiareal etkisi hangi mekanizmayla olur?",
-      "options_tr": ["Sadece santral μ agonizmi", "Periferik enterik μ agonizmi (SSS geçişi minimal)", "κ antagonizması", "AChE inhibisyonu"],
+      "options_tr": [
+        "Sadece santral μ agonizmi",
+        "Periferik enterik μ agonizmi (SSS geçişi minimal)",
+        "κ antagonizması",
+        "AChE inhibisyonu"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Loperamid enterik pleksusta μ agonist; kan-beyin bariyerini zayıf geçer → sistemik opioid etkileri minimal (normal dozda).",
       "node_id": "o_gi"
+    }
+  ],
+  "vignettes": [
+    {
+      "id": "v_auto_1",
+      "title_tr": "Klinik senaryo 1",
+      "scenario_tr": "Opioid overdozunda en hayati bulgu ve acil müdahale nedir?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "Hipertansiyon → β-bloker",
+        "Solunum depresyonu + miyozis → nalokson",
+        "Taşikardi → atropin",
+        "Midriyazis → pilokarpin"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "μ agonist overdozunda pin-point pupil ve solunum depresyonu görülür. Nalokson kısa etkili antagonisttir; solunum desteği şart.",
+      "node_id": "e_resp_depression"
+    },
+    {
+      "id": "v_auto_2",
+      "title_tr": "Klinik senaryo 2",
+      "scenario_tr": "Opioidlerin tolerans gelişmeyen (kronik) yan etkisi hangisidir?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "Analjezi",
+        "Sedasyon",
+        "Konstipasyon",
+        "Solunum depresyonu"
+      ],
+      "answer_idx": 2,
+      "explanation_tr": "Enterik μ agonizmine bağlı konstipasyon tolerans geliştirmez; kronik opioid kullananlarda rutin laxatif önerilir.",
+      "node_id": "e_constipation"
     }
   ]
 }

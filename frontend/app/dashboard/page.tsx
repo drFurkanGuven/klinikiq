@@ -331,7 +331,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* Navbar */}
-      <nav className="glass border-b sticky top-0 z-[100] transition-all" style={{ borderColor: "var(--border)" }}>
+      <nav className="border-b sticky top-0 z-[100]" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">
             <div className="w-8 h-8 rounded-md flex items-center justify-center transition-opacity group-hover:opacity-90"
@@ -348,17 +348,17 @@ export default function DashboardPage() {
                 nativeClient.impact();
                 setOpenNavMenu((m) => (m === "study" ? null : "study"));
               }}
-              className="flex items-center gap-0.5 sm:gap-1 transition-all text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-2 rounded-xl border shadow-sm"
+              className="flex items-center gap-0.5 sm:gap-1 transition-all text-[10px] sm:text-xs font-medium px-2 sm:px-2.5 py-2 rounded-lg border"
               style={{
-                background: openNavMenu === "study" ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--surface-2)",
-                borderColor: openNavMenu === "study" ? "var(--primary)" : "var(--border)",
+                background: openNavMenu === "study" ? "var(--surface-2)" : "transparent",
+                borderColor: openNavMenu === "study" ? "var(--foreground)" : "var(--border)",
                 color: "var(--text)",
               }}
               aria-expanded={openNavMenu === "study"}
               aria-haspopup="true"
               title="Öğren — histoloji, atlas, sorular"
             >
-              <BookOpen className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--primary)" }} />
+              <BookOpen className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--foreground)" }} />
               <span className="max-[360px]:hidden">Öğren</span>
               <ChevronDown className={`w-3 h-3 shrink-0 opacity-70 transition-transform ${openNavMenu === "study" ? "rotate-180" : ""}`} />
             </button>
@@ -368,17 +368,17 @@ export default function DashboardPage() {
                 nativeClient.impact();
                 setOpenNavMenu((m) => (m === "account" ? null : "account"));
               }}
-              className="flex items-center gap-0.5 sm:gap-1 transition-all text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-2 rounded-xl border shadow-sm"
+              className="flex items-center gap-0.5 sm:gap-1 transition-all text-[10px] sm:text-xs font-medium px-2 sm:px-2.5 py-2 rounded-lg border"
               style={{
-                background: openNavMenu === "account" ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--surface-2)",
-                borderColor: openNavMenu === "account" ? "var(--primary)" : "var(--border)",
+                background: openNavMenu === "account" ? "var(--surface-2)" : "transparent",
+                borderColor: openNavMenu === "account" ? "var(--foreground)" : "var(--border)",
                 color: "var(--text)",
               }}
               aria-expanded={openNavMenu === "account"}
               aria-haspopup="true"
               title="Hesap — ayarlar ve çıkış"
             >
-              <User className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--primary)" }} />
+              <User className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--foreground)" }} />
               <span className="max-[360px]:hidden">Hesap</span>
               <ChevronDown className={`w-3 h-3 shrink-0 opacity-70 transition-transform ${openNavMenu === "account" ? "rotate-180" : ""}`} />
             </button>
@@ -401,20 +401,32 @@ export default function DashboardPage() {
                 ? "Öğren menüsü"
                 : "Hesap menüsü"
             }
-            className="fixed left-3 right-3 top-[4.25rem] z-[110] sm:left-auto sm:right-6 sm:w-[min(100vw-3rem,22rem)] rounded-2xl border shadow-2xl max-h-[min(72vh,440px)] overflow-y-auto"
+            className="fixed left-3 right-3 top-[4.25rem] z-[110] sm:left-auto sm:right-6 sm:w-[min(100vw-3rem,22rem)] rounded-lg border shadow-lg max-h-[min(72vh,440px)] overflow-y-auto"
             style={{ background: "var(--surface)", borderColor: "var(--border)" }}
           >
             <div className="p-2 space-y-0.5">
               {openNavMenu === "study" && (
                 <>
-                  <p className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest opacity-40">Öğren ve pratik</p>
+                  <p className="px-3 pt-2 pb-1 text-[10px] font-medium uppercase tracking-widest" style={{ color: "var(--muted)" }}>Öğren ve pratik</p>
+                  <Link
+                    href="/calis"
+                    onClick={() => {
+                      nativeClient.impact();
+                      setOpenNavMenu(null);
+                    }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    style={{ color: "var(--text)" }}
+                  >
+                    <BookOpen className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    Günlük çalışma
+                  </Link>
                   <Link
                     href="/ogrenme"
                     onClick={() => {
                       nativeClient.impact();
                       setOpenNavMenu(null);
                     }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     style={{ color: "var(--text)" }}
                   >
                     <Sparkles className="w-4 h-4 shrink-0" style={{ color: "var(--accent)" }} />
@@ -426,10 +438,10 @@ export default function DashboardPage() {
                       nativeClient.impact();
                       setOpenNavMenu(null);
                     }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     style={{ color: "var(--text)" }}
                   >
-                    <PenLine className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    <PenLine className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
                     Kişisel özetler
                   </Link>
                   <Link
@@ -438,10 +450,10 @@ export default function DashboardPage() {
                       nativeClient.impact();
                       setOpenNavMenu(null);
                     }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     style={{ color: "var(--text)" }}
                   >
-                    <Microscope className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    <Microscope className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
                     Histoloji
                   </Link>
                   <Link
@@ -450,23 +462,23 @@ export default function DashboardPage() {
                       nativeClient.impact();
                       setOpenNavMenu(null);
                     }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     style={{ color: "var(--text)" }}
                   >
-                    <Brain className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    <Brain className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
                     Nöro lezyon atlası
                   </Link>
                   <Link
-                    href="/questions"
+                    href="/calis/oturum?mode=usmle"
                     onClick={() => {
                       nativeClient.impact();
                       setOpenNavMenu(null);
                     }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     style={{ color: "var(--text)" }}
                   >
-                    <GraduationCap className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
-                    Sorular
+                    <GraduationCap className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
+                    USMLE (gelişmiş)
                   </Link>
                   <Link
                     href="/simulasyon"
@@ -474,10 +486,10 @@ export default function DashboardPage() {
                       nativeClient.impact();
                       setOpenNavMenu(null);
                     }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     style={{ color: "var(--text)" }}
                   >
-                    <Zap className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    <Zap className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
                     Simülasyon (acil)
                   </Link>
                   <Link
@@ -486,10 +498,10 @@ export default function DashboardPage() {
                       nativeClient.impact();
                       setOpenNavMenu(null);
                     }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     style={{ color: "var(--text)" }}
                   >
-                    <Pill className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    <Pill className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
                     Farmakoloji
                   </Link>
                   <Link
@@ -498,7 +510,7 @@ export default function DashboardPage() {
                       nativeClient.impact();
                       setOpenNavMenu(null);
                     }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     style={{ color: "var(--text)" }}
                   >
                     <Trophy className="w-4 h-4 shrink-0" style={{ color: "var(--warning)" }} />
@@ -508,7 +520,7 @@ export default function DashboardPage() {
               )}
               {openNavMenu === "account" && (
                 <>
-                  <p className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest opacity-40">Hesap</p>
+                  <p className="px-3 pt-2 pb-1 text-[10px] font-medium uppercase tracking-widest" style={{ color: "var(--muted)" }}>Hesap</p>
                   {userProfile?.is_admin && (
                     <Link
                       href="/admin"
@@ -537,7 +549,7 @@ export default function DashboardPage() {
                     className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-left transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     style={{ color: "var(--text)" }}
                   >
-                    <Settings className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
+                    <Settings className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
                     Ayarlar
                   </button>
                   <button
@@ -562,29 +574,29 @@ export default function DashboardPage() {
       <main className="relative z-0 flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8">
         {/* AI Disclaimer & Limit Banner */}
         <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6">
-            <div className="flex-1 flex items-center gap-2.5 border rounded-2xl px-4 py-3 text-[10px] sm:text-xs shadow-sm"
-              style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
-              <Bot className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--primary)" }} />
+            <div className="flex-1 flex items-center gap-2.5 border rounded-lg px-4 py-3 text-[10px] sm:text-xs"
+              style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
+              <Bot className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--foreground)" }} />
               <span className="leading-tight">
-                  <span style={{ color: "var(--primary)", fontWeight: 800 }}>AI SİMÜLASYON</span>
+                  <span className="font-medium" style={{ color: "var(--text)" }}>AI simülasyon</span>
                   {" "}— Yanıtlar yapay zekadır. Klinik karar için kullanmayın.
               </span>
             </div>
             
             {userProfile && (
-                <div className={`flex items-center gap-3 border rounded-2xl px-4 py-3 text-xs sm:text-sm font-bold shadow-sm transition-all`}
+                <div className="flex items-center gap-3 border rounded-lg px-4 py-3 text-xs sm:text-sm font-medium"
                   style={{ 
-                    background: userProfile.is_admin ? "color-mix(in srgb, var(--primary) 10%, transparent)" : isLimitReached ? "color-mix(in srgb, var(--danger) 10%, transparent)" : "color-mix(in srgb, var(--success) 10%, transparent)",
-                    borderColor: userProfile.is_admin ? "var(--primary)" : isLimitReached ? "var(--danger)" : "var(--success)",
-                    color: userProfile.is_admin ? "var(--primary)" : isLimitReached ? "var(--danger)" : "var(--success)"
+                    background: "var(--surface)",
+                    borderColor: isLimitReached ? "var(--destructive)" : "var(--border)",
+                    color: isLimitReached ? "var(--destructive)" : "var(--text-muted)"
                   }}>
                     <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                     {userProfile.is_admin ? (
-                        <span>Sınırsız Vaka (Admin)</span>
+                        <span style={{ color: "var(--text)" }}>Sınırsız vaka (admin)</span>
                     ) : (
                         <div className="flex items-center gap-2 justify-between w-full sm:w-auto">
                             <span>Limit: {Math.max(0, dailyLimit - todaySessions)} / {dailyLimit}</span>
-                            <a href="mailto:drguevenfurkan@icloud.com" className="opacity-60 underline decoration-dotted underline-offset-4">Artır</a>
+                            <a href="mailto:drguevenfurkan@icloud.com" className="underline decoration-dotted underline-offset-4 opacity-70">Artır</a>
                         </div>
                     )}
                 </div>
@@ -593,51 +605,45 @@ export default function DashboardPage() {
 
         {/* Stats Section */}
         <div className="flex justify-center mb-6 sm:mb-10">
-          <div className="grid grid-cols-3 gap-2 sm:gap-6 w-full max-w-4xl">
-            {/* Vakalar */}
-            <div className="glass-card p-3 sm:p-5 border relative overflow-hidden group" 
-                 style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 mb-1 sm:mb-2">
-                <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner"
-                  style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}>
-                  <BookOpen className="w-3.5 h-3.5 sm:w-5 sm:h-5" style={{ color: "var(--primary)" }} />
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full max-w-4xl">
+            <div className="card p-3 sm:p-5 border" style={{ borderColor: "var(--border)" }}>
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3">
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: "var(--surface-2)" }}>
+                  <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: "var(--foreground)" }} />
                 </div>
                 <div className="flex flex-col items-center sm:items-start">
-                    <span className="text-[8px] sm:text-xs font-black uppercase tracking-tighter sm:tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>Vakalar</span>
-                    <p className="text-lg sm:text-3xl font-black mt-[-2px] sm:mt-0" style={{ color: "var(--text-navy)" }}>{uniqueTotalCount}</p>
+                    <span className="text-[10px] sm:text-xs font-medium" style={{ color: "var(--muted)" }}>Vakalar</span>
+                    <p className="text-lg sm:text-2xl font-semibold tabular-nums mt-[-2px] sm:mt-0" style={{ color: "var(--text)" }}>{uniqueTotalCount}</p>
                 </div>
               </div>
             </div>
 
-            {/* Ort. Skor */}
-            <div className="glass-card p-3 sm:p-5 border relative overflow-hidden group border-t-2" 
-                 style={{ background: "var(--surface)", borderColor: "var(--border)", borderTopColor: "var(--success)" }}>
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 mb-1 sm:mb-2">
-                <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner"
-                  style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)" }}>
-                  <Trophy className="w-3.5 h-3.5 sm:w-5 sm:h-5" style={{ color: "var(--success)" }} />
+            <div className="card p-3 sm:p-5 border" style={{ borderColor: "var(--border)" }}>
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3">
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: "var(--surface-2)" }}>
+                  <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: "var(--foreground)" }} />
                 </div>
                 <div className="flex flex-col items-center sm:items-start">
-                    <span className="text-[8px] sm:text-xs font-black uppercase tracking-tighter sm:tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>Ort. Skor</span>
+                    <span className="text-[10px] sm:text-xs font-medium" style={{ color: "var(--muted)" }}>Ort. skor</span>
                     <div className="flex items-baseline gap-0.5">
-                        <p className="text-lg sm:text-3xl font-black mt-[-2px] sm:mt-0" style={{ color: "var(--text-navy)" }}>{avgScore != null ? avgScore : "—"}</p>
-                        {avgScore != null && <span className="text-[8px] sm:text-xs font-bold opacity-30">/100</span>}
+                        <p className="text-lg sm:text-2xl font-semibold tabular-nums mt-[-2px] sm:mt-0" style={{ color: "var(--text)" }}>{avgScore != null ? avgScore : "—"}</p>
+                        {avgScore != null && <span className="text-[10px] font-medium" style={{ color: "var(--muted)" }}>/100</span>}
                     </div>
                 </div>
               </div>
             </div>
 
-            {/* Tamamlanan */}
-            <div className="glass-card p-3 sm:p-5 border relative overflow-hidden group" 
-                 style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 mb-1 sm:mb-2">
-                <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner"
-                  style={{ background: "color-mix(in srgb, var(--accent) 20%, transparent)" }}>
-                  <BarChart3 className="w-3.5 h-3.5 sm:w-5 sm:h-5" style={{ color: "var(--accent)" }} />
+            <div className="card p-3 sm:p-5 border" style={{ borderColor: "var(--border)" }}>
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3">
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: "var(--surface-2)" }}>
+                  <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: "var(--foreground)" }} />
                 </div>
                 <div className="flex flex-col items-center sm:items-start">
-                    <span className="text-[8px] sm:text-xs font-black uppercase tracking-tighter sm:tracking-wider opacity-50" style={{ color: "var(--text-muted)" }}>Biten</span>
-                    <p className="text-lg sm:text-3xl font-black mt-[-2px] sm:mt-0" style={{ color: "var(--text-navy)" }}>{uniqueCompletedCount}</p>
+                    <span className="text-[10px] sm:text-xs font-medium" style={{ color: "var(--muted)" }}>Tamamlanan</span>
+                    <p className="text-lg sm:text-2xl font-semibold tabular-nums mt-[-2px] sm:mt-0" style={{ color: "var(--text)" }}>{uniqueCompletedCount}</p>
                 </div>
               </div>
             </div>
@@ -646,47 +652,41 @@ export default function DashboardPage() {
 
         {/* Acil MCQ + oturum raporu — doğrudan erişim (Öğren menüsünde de var) */}
         <div
-          className="mb-5 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-2xl px-5 py-4 border shadow-md"
+          className="mb-5 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-lg px-5 py-4 border"
           style={{ background: "var(--surface)", borderColor: "var(--border)" }}
         >
           <div className="flex items-center gap-3 min-w-0">
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
-              style={{ background: "color-mix(in srgb, var(--warning) 18%, transparent)" }}
+              className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: "var(--surface-2)" }}
             >
-              <Zap className="w-5 h-5" style={{ color: "var(--warning)" }} />
+              <Zap className="w-5 h-5" style={{ color: "var(--foreground)" }} />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-black tracking-tight" style={{ color: "var(--text)" }}>
+              <p className="text-sm font-semibold tracking-tight" style={{ color: "var(--text)" }}>
                 Acil simülasyon (MCQ)
               </p>
-              <p className="text-[11px] font-medium opacity-60 leading-snug" style={{ color: "var(--text-muted)" }}>
+              <p className="text-xs leading-snug mt-0.5" style={{ color: "var(--text-muted)" }}>
                 Süre baskılı sorular, AI asistan ve kayıtlı oturum raporu. Klasik vaka limitinden bağımsız pratik.
               </p>
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:shrink-0">
             <Link
-              href="/simulasyon/acil"
-              className="text-center px-5 py-2.5 rounded-xl text-xs font-black border transition-all active:scale-[0.98]"
-              style={{
-                borderColor: "var(--primary)",
-                color: "var(--primary)",
-                background: "color-mix(in srgb, var(--primary) 8%, transparent)",
-              }}
+              href="/calis/oturum?mode=acil"
+              className="btn-primary text-center px-5 py-2.5 text-xs rounded-lg"
             >
               Başla
             </Link>
             <Link
               href="/simulasyon/acil/raporlar"
-              className="text-center px-5 py-2.5 rounded-xl text-xs font-black border transition-all"
-              style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+              className="btn-secondary text-center px-5 py-2.5 text-xs rounded-lg"
             >
               Raporlarım
             </Link>
             <Link
               href="/simulasyon"
-              className="text-center px-5 py-2.5 rounded-xl text-xs font-black border transition-all opacity-90"
+              className="text-center px-5 py-2.5 rounded-lg text-xs font-medium border transition-colors hover:bg-black/[0.03]"
               style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
             >
               Simülasyon hub
@@ -700,41 +700,41 @@ export default function DashboardPage() {
           if (!activeSession) return null;
           return (
             <div
-              className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl px-5 py-4 border shadow-md animate-fade-in-up"
+              className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-lg px-5 py-4 border animate-fade-in-up"
               style={{
-                background: "color-mix(in srgb, var(--primary) 8%, var(--surface))",
-                borderColor: "var(--primary)",
+                background: "var(--surface)",
+                borderColor: "var(--border)",
               }}
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                   style={{ background: "var(--accent)" }}>
                   <Play className="w-4 h-4" style={{ color: "var(--accent-foreground)" }} />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-black uppercase tracking-widest mb-0.5" style={{ color: "var(--primary)" }}>
-                    Devam eden vakan var
+                  <p className="text-xs font-medium mb-0.5" style={{ color: "var(--muted)" }}>
+                    Devam eden vaka
                   </p>
-                  <p className="text-sm font-bold truncate" style={{ color: "var(--text)" }}>
+                  <p className="text-sm font-semibold truncate" style={{ color: "var(--text)" }}>
                     {activeSession.case_title}
                   </p>
-                  <p className="text-[10px] font-medium opacity-60 mt-0.5" style={{ color: "var(--text-muted)" }}>
+                  <p className="text-[10px] mt-0.5" style={{ color: "var(--text-muted)" }}>
                     {activeSession.specialty} · {activeSession.difficulty} · {timeAgo(activeSession.started_at)}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => { nativeClient.impact(); router.push(`/case?id=${activeSession.session_id}`); }}
-                className="btn-primary shrink-0 px-5 py-2.5 text-sm rounded-xl active:scale-95 w-full sm:w-auto"
+                className="btn-primary shrink-0 px-5 py-2.5 text-sm rounded-lg w-full sm:w-auto"
               >
-                Devam Et →
+                Devam et
               </button>
             </div>
           );
         })()}
 
         {/* Tab navigasyon */}
-        <div className="flex gap-1 p-1 rounded-xl w-fit mb-6 border shadow-inner"
+        <div className="flex gap-1 p-1 rounded-lg w-fit mb-6 border"
           style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
           {(["randomizer", "history"] as const).map((tab) => {
             const incompleteCount = history.filter(h => h.status === "active" || h.status === "abandoned").length;
@@ -750,8 +750,8 @@ export default function DashboardPage() {
               >
                 {tab === "randomizer" ? "Yepyeni Vaka Çöz" : "Geçmişim"}
                 {tab === "history" && incompleteCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center text-white"
-                    style={{ background: "var(--warning)" }}>
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-semibold flex items-center justify-center"
+                    style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
                     {incompleteCount}
                   </span>
                 )}
@@ -765,24 +765,24 @@ export default function DashboardPage() {
                 <div className="md:col-span-12">
                     <div className="card p-5 sm:p-10 relative overflow-hidden">
                         <div className="mb-6 sm:mb-10 relative">
-                            <h2 className="text-xl sm:text-3xl font-semibold flex items-center gap-3 mb-2" style={{ color: "var(--text-navy)" }}>
+                            <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-3 mb-2" style={{ color: "var(--text)" }}>
                                 <Dna className="w-5 h-5 sm:w-7 sm:h-7" style={{ color: "var(--foreground)" }} />
                                 Vaka Oluşturucu
                             </h2>
                             <p className="text-xs sm:text-base opacity-60 font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                                Seçtiğiniz branşlardan, daha önce karşılaşmadığınız <b style={{ color: "var(--text-navy)" }}>eşsiz</b> bir vaka hazırlayalım.
+                                Seçtiğiniz branşlardan, daha önce karşılaşmadığınız <b>eşsiz</b> bir vaka hazırlayalım.
                             </p>
                         </div>
                         
                         <div className="mb-6">
-                            <label className="block text-[10px] sm:text-sm font-black uppercase tracking-widest mb-3 opacity-50" style={{ color: "var(--text-muted)" }}>Branş Seçimi</label>
+                            <label className="block text-xs sm:text-sm font-medium mb-3" style={{ color: "var(--muted)" }}>Branş seçimi</label>
                             <div className="flex flex-wrap gap-2">
                                 <button
                                     onClick={() => setSelectedSpecs([])}
-                                    className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all border shadow-sm ${
+                                    className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all border ${
                                         selectedSpecs.length === 0 
                                             ? "" 
-                                            : "hover:border-slate-400"
+                                            : "hover:border-[var(--foreground)]"
                                     }`}
                                     style={{ 
                                       background: selectedSpecs.length === 0 ? "var(--accent)" : "var(--surface-2)", 
@@ -796,10 +796,10 @@ export default function DashboardPage() {
                                     <button
                                         key={s.value}
                                         onClick={() => toggleSpecialty(s.value)}
-                                        className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all border flex items-center gap-2 shadow-sm ${
+                                        className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all border flex items-center gap-2 ${
                                             selectedSpecs.includes(s.value)
                                                 ? "" 
-                                                : "hover:border-slate-400"
+                                                : "hover:border-[var(--foreground)]"
                                         }`}
                                         style={{ 
                                           background: selectedSpecs.includes(s.value) ? "var(--accent)" : "var(--surface-2)", 
@@ -815,21 +815,17 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="mb-8">
-                            <label className="block text-[10px] sm:text-sm font-black uppercase tracking-widest mb-3 opacity-50" style={{ color: "var(--text-muted)" }}>Zorluk</label>
-                            <div className="flex gap-1.5 p-1 rounded-2xl border shadow-inner w-fit" 
+                            <label className="block text-xs sm:text-sm font-medium mb-3" style={{ color: "var(--muted)" }}>Zorluk</label>
+                            <div className="flex gap-1 p-1 rounded-lg border w-fit" 
                               style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}>
                                 {DIFFICULTIES.map(d => (
                                     <button
                                         key={d.value}
                                         onClick={() => setDifficulty(d.value)}
-                                        className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all ${
-                                            difficulty === d.value
-                                                ? "shadow-md"
-                                                : ""
-                                        }`}
+                                        className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-md text-xs sm:text-sm font-medium transition-all"
                                         style={{ 
                                           background: difficulty === d.value ? "var(--surface)" : "transparent",
-                                          color: difficulty === d.value ? "var(--primary)" : "var(--text-muted)",
+                                          color: difficulty === d.value ? "var(--text)" : "var(--text-muted)",
                                           borderColor: difficulty === d.value ? "var(--border)" : "transparent",
                                           borderWidth: 1
                                         }}
@@ -842,8 +838,8 @@ export default function DashboardPage() {
 
                         {errorMsg && (
                             <div className="mb-4 space-y-2">
-                              <div className="p-4 rounded-2xl flex items-center gap-3 text-xs font-bold border"
-                                style={{ background: "var(--error-light)", borderColor: "var(--error-light)", color: "var(--danger)" }}>
+                              <div className="p-4 rounded-lg flex items-center gap-3 text-xs font-medium border"
+                                style={{ background: "var(--destructive-muted)", borderColor: "var(--destructive)", color: "var(--destructive)" }}>
                                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                   {errorMsg}
                               </div>
@@ -856,8 +852,8 @@ export default function DashboardPage() {
                                     setFilterSuggestion(null);
                                     setErrorMsg("");
                                   }}
-                                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all hover:opacity-80 active:scale-95"
-                                  style={{ borderColor: "var(--primary)", color: "var(--primary)", background: "var(--primary-light)" }}
+                                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium border transition-colors hover:bg-black/[0.03]"
+                                  style={{ borderColor: "var(--border)", color: "var(--text)" }}
                                 >
                                   <Filter className="w-3.5 h-3.5" />
                                   {filterSuggestion.label}
@@ -870,7 +866,7 @@ export default function DashboardPage() {
                           <button
                             onClick={handleStartRandomCase}
                             disabled={isStarting || isRecommending || isLimitReached}
-                            className={`btn-primary flex-1 py-4 text-base rounded-2xl active:scale-95 ${
+                            className={`btn-primary flex-1 py-4 text-base rounded-lg ${
                               isStarting || isLimitReached ? "opacity-50 cursor-not-allowed" : ""
                             }`}
                           >
@@ -880,7 +876,7 @@ export default function DashboardPage() {
                           <button
                             onClick={handleRecommendedCase}
                             disabled={isStarting || isRecommending || isLimitReached}
-                            className={`btn-secondary px-6 py-4 text-base rounded-2xl active:scale-95 flex items-center justify-center gap-2 ${
+                            className={`btn-secondary px-6 py-4 text-base rounded-lg flex items-center justify-center gap-2 ${
                               isRecommending || isLimitReached ? "opacity-50 cursor-not-allowed" : ""
                             }`}
                           >
@@ -895,7 +891,7 @@ export default function DashboardPage() {
                             <button
                               onClick={() => setActiveTab("history")}
                               className="underline underline-offset-2 opacity-100 transition-opacity hover:opacity-70"
-                              style={{ color: "var(--primary)" }}
+                              style={{ color: "var(--foreground)" }}
                             >
                               Geçmişim
                             </button>
@@ -910,7 +906,7 @@ export default function DashboardPage() {
         {activeTab === "history" && (
           <div className="space-y-4">
             {history.length === 0 ? (
-              <div className="text-center py-20 rounded-3xl border border-dashed" 
+              <div className="text-center py-20 rounded-xl border border-dashed" 
                 style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
                 <Clock className="w-16 h-16 mx-auto mb-4 opacity-20" />
                 <p className="text-lg font-medium opacity-60">Henüz hiç vaka çalışmadın.</p>
@@ -919,27 +915,23 @@ export default function DashboardPage() {
               history.map((item) => (
                 <div
                   key={item.session_id}
-                  className="glass-card p-4 sm:p-5 border flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all"
-                  style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+                  className="card p-4 sm:p-5 border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  style={{ borderColor: "var(--border)" }}
                 >
                   <div className="flex-1">
-                    <p className="font-black text-base sm:text-lg mb-1" style={{ color: "var(--text-navy)" }}>{item.case_title}</p>
-                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-wider opacity-60" style={{ color: "var(--text-muted)" }}>
+                    <p className="font-semibold text-base sm:text-lg mb-1" style={{ color: "var(--text)" }}>{item.case_title}</p>
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>
                       <span className="px-2 py-0.5 rounded-lg" style={{ background: "var(--surface-2)" }}>{item.specialty}</span>
                       <span className="px-2 py-0.5 rounded-lg" style={{ background: "var(--surface-2)" }}>{item.difficulty}</span>
                       <span
-                        className="px-2 py-0.5 rounded-lg"
+                        className="px-2 py-0.5 rounded-md border text-[10px] font-medium"
                         style={{
-                          background: item.status === "active"
-                            ? "color-mix(in srgb, var(--warning) 15%, transparent)"
-                            : item.status === "abandoned"
-                              ? "color-mix(in srgb, var(--danger) 15%, transparent)"
-                              : "color-mix(in srgb, var(--success) 15%, transparent)",
+                          borderColor: "var(--border)",
                           color: item.status === "active"
-                            ? "var(--warning)"
+                            ? "var(--text)"
                             : item.status === "abandoned"
-                              ? "var(--danger)"
-                              : "var(--success)",
+                              ? "var(--destructive)"
+                              : "var(--muted)",
                         }}
                       >
                         {item.status === "active"
@@ -955,9 +947,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-4 sm:pl-4 transition-all" style={{ borderColor: "var(--border)" }}>
                     {item.score != null && (
-                      <div className="text-lg sm:text-xl font-black" style={{ 
-                        color: item.score >= 70 ? "var(--success)" : item.score >= 50 ? "var(--warning)" : "var(--danger)" 
-                      }}>
+                      <div className="text-lg sm:text-xl font-semibold tabular-nums" style={{ color: "var(--text)" }}>
                         {item.score}/100
                       </div>
                     )}
@@ -981,8 +971,7 @@ export default function DashboardPage() {
                       <button
                         onClick={() => handleRestartCase(item.session_id)}
                         disabled={restartingSessionId === item.session_id}
-                        className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-2xl border transition-all active:scale-95 disabled:opacity-50"
-                        style={{ borderColor: "var(--primary)", color: "var(--primary)", background: "var(--primary-light)" }}
+                        className="btn-secondary flex items-center gap-1.5 px-4 py-2.5 text-xs rounded-lg disabled:opacity-50"
                       >
                         {restartingSessionId === item.session_id ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1005,9 +994,9 @@ export default function DashboardPage() {
         {showSettings && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowSettings(false); setIsEditingProfile(false); setProfileSaveMsg(null); setPasswordMsg(null); }} />
-                <div className="relative w-full max-w-md glass-card p-6 sm:p-8 animate-fade-in-up max-h-[90vh] overflow-y-auto" style={{ background: "var(--surface)" }}>
+                <div className="relative w-full max-w-md card p-6 sm:p-8 animate-fade-in-up max-h-[90vh] overflow-y-auto rounded-lg border" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
                     <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-xl font-black tracking-tight">Ayarlar</h3>
+                        <h3 className="text-xl font-semibold tracking-tight">Ayarlar</h3>
                         <button onClick={() => { setShowSettings(false); setIsEditingProfile(false); setProfileSaveMsg(null); setPasswordMsg(null); }} className="opacity-40 hover:opacity-100 p-1"><X className="w-6 h-6" /></button>
                     </div>
 
@@ -1015,12 +1004,12 @@ export default function DashboardPage() {
                         {/* Profile Section */}
                         <div>
                             <div className="flex items-center justify-between mb-4">
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Profil Bilgileri</p>
+                                <p className="text-[10px] font-medium uppercase tracking-widest mb-4" style={{ color: "var(--muted)" }}>Profil bilgileri</p>
                                 {!isEditingProfile ? (
                                     <button
                                         onClick={() => { nativeClient.impact(); setIsEditingProfile(true); setProfileSaveMsg(null); }}
-                                        className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl border transition-all"
-                                        style={{ borderColor: "var(--primary)", color: "var(--primary)", background: "color-mix(in srgb, var(--primary) 8%, transparent)" }}
+                                        className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors"
+                                        style={{ borderColor: "var(--border)", color: "var(--text)" }}
                                     >
                                         <Edit2 className="w-3 h-3" /> Düzenle
                                     </button>
@@ -1028,7 +1017,7 @@ export default function DashboardPage() {
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => { setIsEditingProfile(false); setProfileName(userProfile?.name || ""); setProfileSchool(userProfile?.school || ""); setProfileYear(userProfile?.year ? String(userProfile.year) : ""); }}
-                                            className="text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl border transition-all"
+                                            className="text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors"
                                             style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
                                         >
                                             İptal
@@ -1036,8 +1025,7 @@ export default function DashboardPage() {
                                         <button
                                             onClick={saveProfile}
                                             disabled={profileSaving}
-                                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl transition-all"
-                                            style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                                            className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors btn-primary"
                                         >
                                             {profileSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
                                             Kaydet
@@ -1059,12 +1047,12 @@ export default function DashboardPage() {
                                 </div>
                             )}
 
-                            <div className="rounded-2xl border p-4 space-y-3" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+                            <div className="rounded-lg border p-4 space-y-3" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
                                 {/* Email — sadece göster */}
                                 <div className="flex items-center gap-3">
                                     <User className="w-4 h-4 shrink-0 opacity-40" />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-0.5">E-posta</p>
+                                        <p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--muted)" }}>E-posta</p>
                                         <p className="text-xs font-bold truncate" style={{ color: "var(--text-muted)" }}>{userProfile?.email}</p>
                                     </div>
                                 </div>
@@ -1073,13 +1061,13 @@ export default function DashboardPage() {
                                 <div className="flex items-center gap-3">
                                     <div className="w-4 h-4 shrink-0" />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-0.5">Ad Soyad</p>
+                                        <p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--muted)" }}>Ad soyad</p>
                                         {isEditingProfile ? (
                                             <input
                                                 value={profileName}
                                                 onChange={(e) => setProfileName(e.target.value)}
                                                 className="w-full bg-transparent text-xs font-bold outline-none border-b pb-0.5 transition-colors"
-                                                style={{ borderColor: "var(--primary)", color: "var(--text)" }}
+                                                style={{ borderColor: "var(--border)", color: "var(--text)" }}
                                                 placeholder="Adınız Soyadınız"
                                             />
                                         ) : (
@@ -1092,13 +1080,13 @@ export default function DashboardPage() {
                                 <div className="flex items-center gap-3">
                                     <div className="w-4 h-4 shrink-0" />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-0.5">Okul</p>
+                                        <p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--muted)" }}>Okul</p>
                                         {isEditingProfile ? (
                                             <input
                                                 value={profileSchool}
                                                 onChange={(e) => setProfileSchool(e.target.value)}
                                                 className="w-full bg-transparent text-xs font-bold outline-none border-b pb-0.5 transition-colors"
-                                                style={{ borderColor: "var(--primary)", color: "var(--text)" }}
+                                                style={{ borderColor: "var(--border)", color: "var(--text)" }}
                                                 placeholder="Tıp Fakültesi"
                                             />
                                         ) : (
@@ -1111,7 +1099,7 @@ export default function DashboardPage() {
                                 <div className="flex items-center gap-3">
                                     <div className="w-4 h-4 shrink-0" />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-0.5">Sınıf</p>
+                                        <p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--muted)" }}>Sınıf</p>
                                         {isEditingProfile ? (
                                             <input
                                                 type="number"
@@ -1120,7 +1108,7 @@ export default function DashboardPage() {
                                                 value={profileYear}
                                                 onChange={(e) => setProfileYear(e.target.value)}
                                                 className="w-full bg-transparent text-xs font-bold outline-none border-b pb-0.5 transition-colors"
-                                                style={{ borderColor: "var(--primary)", color: "var(--text)" }}
+                                                style={{ borderColor: "var(--border)", color: "var(--text)" }}
                                                 placeholder="1–6"
                                             />
                                         ) : (
@@ -1133,8 +1121,8 @@ export default function DashboardPage() {
 
                         {/* Password Section */}
                         <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 opacity-40">Şifre Değiştir</p>
-                            <div className="rounded-2xl border p-4 space-y-3" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+                            <p className="text-[10px] font-medium uppercase tracking-widest mb-4" style={{ color: "var(--muted)" }}>Şifre değiştir</p>
+                            <div className="rounded-lg border p-4 space-y-3" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
                                 <div className="flex items-center gap-2 text-[11px] font-bold opacity-70" style={{ color: "var(--text-muted)" }}>
                                     <KeyRound className="w-3.5 h-3.5" />
                                     Güvenlik için mevcut şifreniz doğrulanır.
@@ -1166,8 +1154,7 @@ export default function DashboardPage() {
                                 <button
                                     onClick={changePassword}
                                     disabled={passwordSaving}
-                                    className="w-full flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-wider px-3 py-2.5 rounded-xl transition-all"
-                                    style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                                    className="w-full btn-primary flex items-center justify-center gap-2 text-xs py-2.5 rounded-lg"
                                 >
                                     {passwordSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <KeyRound className="w-3.5 h-3.5" />}
                                     Şifreyi Güncelle
@@ -1187,7 +1174,7 @@ export default function DashboardPage() {
 
                         {/* Biometric Toggle */}
                         {biometricsAvailable && (
-                            <div className="flex items-center justify-between p-4 rounded-2xl border" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+                            <div className="flex items-center justify-between p-4 rounded-lg border" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
                                 <div className="flex items-center gap-3">
                                     <Fingerprint className="w-5 h-5" style={{ color: "var(--foreground)" }} />
                                     <div>
@@ -1211,7 +1198,7 @@ export default function DashboardPage() {
                         {/* Theme Toggle Button */}
                         <button
                             onClick={() => { nativeClient.impact(); toggleTheme(); }}
-                            className="w-full flex items-center justify-between p-4 rounded-2xl border"
+                            className="w-full flex items-center justify-between p-4 rounded-lg border"
                             style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
                         >
                             <div className="flex items-center gap-3">
@@ -1223,7 +1210,7 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="mt-10 pt-6 border-t" style={{ borderColor: "var(--border)" }}>
-                        <button onClick={logout} className="w-full py-4 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2" style={{ color: "var(--destructive)" }}>
+                        <button onClick={logout} className="w-full py-4 text-xs font-medium flex items-center justify-center gap-2" style={{ color: "var(--destructive)" }}>
                             <LogOut className="w-4 h-4" /> Oturumu Kapat
                         </button>
                     </div>

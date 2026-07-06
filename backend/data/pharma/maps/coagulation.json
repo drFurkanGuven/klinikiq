@@ -4,194 +4,580 @@
   "description_tr": "Extrinsic, intrinsic ve ortak yolak üzerinden trombin → fibrin kaskadı. Heparin, warfarin, DOAC, antiplatelet ve fibrinolitik ajanların hedef basamakları ve kanama riski profili.",
   "source_attribution": "Koagülasyon kaskadı ve antikoagülant farmakolojisi StatPearls (Hemostasis, Warfarin, DOAC, Heparin) ve IUPHAR/BPS GtoPdb (CC BY-SA 4.0) temel alınarak derlenmiştir.",
   "nodes": [
-    { "id": "med_tf", "label_tr": "Doku faktörü (TF)", "type": "mediator", "high_yield": true, "description_tr": "Vasküler yaralanmada eksprese olan transmembran protein. Faktör VIIa ile kompleks oluşturarak extrinsic yolu başlatır." },
-    { "id": "med_fibrinogen", "label_tr": "Fibrinojen", "type": "mediator", "high_yield": true, "description_tr": "Trombin tarafından fibrin monomerlerine kesilir; faktör XIIIa ile çapraz bağlanarak stabil pıhtı oluşturur." },
-    { "id": "med_fibrin", "label_tr": "Fibrin pıhtısı", "type": "mediator", "high_yield": true, "description_tr": "Koagülasyonun son ürünü. tPA/streptokinaz ile plazminojen → plazmin yoluyla lizis edilir." },
-    { "id": "med_thrombin", "label_tr": "Trombin (F IIa)", "type": "mediator", "high_yield": true, "description_tr": "Protrombin (F II) aktivasyonu ile oluşur. Fibrinojeni keser, F V/VIII/XI/XIII'ü aktive eder, trombosit agregasyonunu güçlendirir, antikoagülant protein C yolunu da uyarır." },
-    { "id": "med_plasmin", "label_tr": "Plazmin", "type": "mediator", "high_yield": true, "description_tr": "Plazminojen aktivasyonu ile oluşan fibrinolitik enzim. Fibrin pıhtısını parçalar." },
-
-    { "id": "r_p2y12", "label_tr": "Trombosit P2Y12", "type": "receptor", "high_yield": true, "description_tr": "ADP reseptörü. Aktivasyon trombosit agregasyonunu sürdürür. Klopidogrel/tikagrelor hedefidir." },
-    { "id": "r_gp2b3a", "label_tr": "GP IIb/IIIa", "type": "receptor", "high_yield": false, "description_tr": "Fibrinojen bağlanma reseptörü; trombosit agregasyonunun son ortak basamağı. Abciximab/tirofiban hedefidir." },
-    { "id": "r_atiii", "label_tr": "Antitrombin III", "type": "receptor", "high_yield": true, "description_tr": "Serin proteaz inhibitörü. Heparin ATIII aktivitesini ~1000 kat artırarak IIa ve Xa'yı inhibe eder." },
-
-    { "id": "o_extrinsic", "label_tr": "Extrinsic yol (TF–VIIa)", "type": "organ", "high_yield": true, "description_tr": "Doku faktörü + F VIIa → F X aktivasyonu. PT/INR ile izlenen yolak; warfarin ve FXa inhibitörlerinin hedef basamağı." },
-    { "id": "o_intrinsic", "label_tr": "Intrinsic yol (XII–XI–IX–VIII)", "type": "organ", "high_yield": true, "description_tr": "Kontakt aktivasyonu ile başlar. Hemofili A (VIII eksik) ve B (IX eksik) bu yolda. aPTT ile izlenir." },
-    { "id": "o_common", "label_tr": "Ortak yol (X–V → protrombin)", "type": "organ", "high_yield": true, "description_tr": "F Xa + F Va → protrombinaz kompleksi → trombin. DOAC'ların (dabigatran, rivaroxaban) ana hedefleri burada." },
-    { "id": "o_liver_vitk", "label_tr": "Karaciğer (K vitamini bağımlı faktörler)", "type": "organ", "high_yield": true, "description_tr": "II, VII, IX, X ve protein C/S sentezi K vitamini (epoksit redüktaz) gerektirir. Warfarin bu sentezi bloke eder." },
-    { "id": "o_platelet", "label_tr": "Trombosit", "type": "organ", "high_yield": true, "description_tr": "COX-1 → TXA2, ADP/P2Y12 ve GP IIb/IIIa ile agregasyon. Antiplatelet ajanların hedefi." },
-    { "id": "o_cox1", "label_tr": "COX-1 (trombosit)", "type": "organ", "high_yield": true, "description_tr": "Aspirinin hedefi. Tromboksan A2 sentezini kalıcı inhibe eder → trombosit agregasyonu ↓." },
-
-    { "id": "e_clot", "label_tr": "Pıhtı oluşumu", "type": "effect", "high_yield": true, "description_tr": "Fibrin ağı + trombosit plug. Hemostaz ve tromboembolizm patofizyolojisi." },
-    { "id": "e_bleeding", "label_tr": "Kanama riski", "type": "effect", "high_yield": true, "description_tr": "Antikoagülant/antiplatelet/fibrinolitik tedavinin ana advers etkisi. INR/aPTT/anti-Xa ile izlem." },
-    { "id": "e_thrombosis_prevent", "label_tr": "Tromboz önleme", "type": "effect", "high_yield": true, "description_tr": "AF, DVT/PE, mekanik kapak ve koroner arter hastalığında antitrombotik endikasyon." },
-    { "id": "e_fibrinolysis", "label_tr": "Fibrinoliz (pıhtı eritme)", "type": "effect", "high_yield": true, "description_tr": "tPA/streptokinaz ile plazminojen aktivasyonu. Akut MI, iskemik inme (uygun seçilmiş), masif PE." },
-    { "id": "e_heparin_induced", "label_tr": "HIT (heparin ilişkili trombositopeni)", "type": "effect", "high_yield": true, "description_tr": "UFH/LMWH'ye bağlı antikor aracılı trombosit aktivasyonu → paradoks tromboz + trombositopeni. Warfarin tek başına kontrendike." },
-    { "id": "e_warfarin_skin", "label_tr": "Warfarin deri nekrozu", "type": "effect", "high_yield": false, "description_tr": "Protein C eksikliğinde veya yüksek doz warfarin başlangıcında nadiren. Protektif heparin ile başlangıç önerilir." }
+    {
+      "id": "med_tf",
+      "label_tr": "Doku faktörü (TF)",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Vasküler yaralanmada eksprese olan transmembran protein. Faktör VIIa ile kompleks oluşturarak extrinsic yolu başlatır."
+    },
+    {
+      "id": "med_fibrinogen",
+      "label_tr": "Fibrinojen",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Trombin tarafından fibrin monomerlerine kesilir; faktör XIIIa ile çapraz bağlanarak stabil pıhtı oluşturur."
+    },
+    {
+      "id": "med_fibrin",
+      "label_tr": "Fibrin pıhtısı",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Koagülasyonun son ürünü. tPA/streptokinaz ile plazminojen → plazmin yoluyla lizis edilir."
+    },
+    {
+      "id": "med_thrombin",
+      "label_tr": "Trombin (F IIa)",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Protrombin (F II) aktivasyonu ile oluşur. Fibrinojeni keser, F V/VIII/XI/XIII'ü aktive eder, trombosit agregasyonunu güçlendirir, antikoagülant protein C yolunu da uyarır."
+    },
+    {
+      "id": "med_plasmin",
+      "label_tr": "Plazmin",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Plazminojen aktivasyonu ile oluşan fibrinolitik enzim. Fibrin pıhtısını parçalar."
+    },
+    {
+      "id": "r_p2y12",
+      "label_tr": "Trombosit P2Y12",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "ADP reseptörü. Aktivasyon trombosit agregasyonunu sürdürür. Klopidogrel/tikagrelor hedefidir."
+    },
+    {
+      "id": "r_gp2b3a",
+      "label_tr": "GP IIb/IIIa",
+      "type": "receptor",
+      "high_yield": false,
+      "description_tr": "Fibrinojen bağlanma reseptörü; trombosit agregasyonunun son ortak basamağı. Abciximab/tirofiban hedefidir."
+    },
+    {
+      "id": "r_atiii",
+      "label_tr": "Antitrombin III",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Serin proteaz inhibitörü. Heparin ATIII aktivitesini ~1000 kat artırarak IIa ve Xa'yı inhibe eder."
+    },
+    {
+      "id": "o_extrinsic",
+      "label_tr": "Extrinsic yol (TF–VIIa)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Doku faktörü + F VIIa → F X aktivasyonu. PT/INR ile izlenen yolak; warfarin ve FXa inhibitörlerinin hedef basamağı."
+    },
+    {
+      "id": "o_intrinsic",
+      "label_tr": "Intrinsic yol (XII–XI–IX–VIII)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Kontakt aktivasyonu ile başlar. Hemofili A (VIII eksik) ve B (IX eksik) bu yolda. aPTT ile izlenir."
+    },
+    {
+      "id": "o_common",
+      "label_tr": "Ortak yol (X–V → protrombin)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "F Xa + F Va → protrombinaz kompleksi → trombin. DOAC'ların (dabigatran, rivaroxaban) ana hedefleri burada."
+    },
+    {
+      "id": "o_liver_vitk",
+      "label_tr": "Karaciğer (K vitamini bağımlı faktörler)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "II, VII, IX, X ve protein C/S sentezi K vitamini (epoksit redüktaz) gerektirir. Warfarin bu sentezi bloke eder."
+    },
+    {
+      "id": "o_platelet",
+      "label_tr": "Trombosit",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "COX-1 → TXA2, ADP/P2Y12 ve GP IIb/IIIa ile agregasyon. Antiplatelet ajanların hedefi."
+    },
+    {
+      "id": "o_cox1",
+      "label_tr": "COX-1 (trombosit)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Aspirinin hedefi. Tromboksan A2 sentezini kalıcı inhibe eder → trombosit agregasyonu ↓."
+    },
+    {
+      "id": "e_clot",
+      "label_tr": "Pıhtı oluşumu",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Fibrin ağı + trombosit plug. Hemostaz ve tromboembolizm patofizyolojisi."
+    },
+    {
+      "id": "e_bleeding",
+      "label_tr": "Kanama riski",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Antikoagülant/antiplatelet/fibrinolitik tedavinin ana advers etkisi. INR/aPTT/anti-Xa ile izlem."
+    },
+    {
+      "id": "e_thrombosis_prevent",
+      "label_tr": "Tromboz önleme",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "AF, DVT/PE, mekanik kapak ve koroner arter hastalığında antitrombotik endikasyon."
+    },
+    {
+      "id": "e_fibrinolysis",
+      "label_tr": "Fibrinoliz (pıhtı eritme)",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "tPA/streptokinaz ile plazminojen aktivasyonu. Akut MI, iskemik inme (uygun seçilmiş), masif PE."
+    },
+    {
+      "id": "e_heparin_induced",
+      "label_tr": "HIT (heparin ilişkili trombositopeni)",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "UFH/LMWH'ye bağlı antikor aracılı trombosit aktivasyonu → paradoks tromboz + trombositopeni. Warfarin tek başına kontrendike."
+    },
+    {
+      "id": "e_warfarin_skin",
+      "label_tr": "Warfarin deri nekrozu",
+      "type": "effect",
+      "high_yield": false,
+      "description_tr": "Protein C eksikliğinde veya yüksek doz warfarin başlangıcında nadiren. Protektif heparin ile başlangıç önerilir."
+    }
   ],
   "edges": [
-    { "source": "med_tf", "target": "o_extrinsic", "relation": "activates", "effect_tr": "TF–VIIa kompleksi" },
-    { "source": "o_extrinsic", "target": "o_common", "relation": "activates", "effect_tr": "F X aktivasyonu" },
-    { "source": "o_intrinsic", "target": "o_common", "relation": "activates", "effect_tr": "F IXa–VIIIa → F X" },
-    { "source": "o_common", "target": "med_thrombin", "relation": "activates", "effect_tr": "Protrombin → trombin" },
-    { "source": "med_thrombin", "target": "med_fibrinogen", "relation": "activates", "effect_tr": "Fibrinojen → fibrin monomer" },
-    { "source": "med_fibrinogen", "target": "med_fibrin", "relation": "activates", "effect_tr": "Fibrin ağı oluşumu" },
-    { "source": "med_fibrin", "target": "e_clot", "relation": "activates", "effect_tr": "Stabil pıhtı" },
-    { "source": "med_thrombin", "target": "o_platelet", "relation": "activates", "effect_tr": "Trombosit aktivasyonu" },
-    { "source": "o_cox1", "target": "o_platelet", "relation": "activates", "effect_tr": "TXA2 → agregasyon" },
-    { "source": "r_p2y12", "target": "o_platelet", "relation": "activates", "effect_tr": "ADP aracılı agregasyon" },
-    { "source": "o_liver_vitk", "target": "o_extrinsic", "relation": "activates", "effect_tr": "F VII sentezi" },
-    { "source": "o_liver_vitk", "target": "o_intrinsic", "relation": "activates", "effect_tr": "F IX sentezi" },
-    { "source": "o_liver_vitk", "target": "o_common", "relation": "activates", "effect_tr": "F II, X sentezi" },
-    { "source": "med_plasmin", "target": "med_fibrin", "relation": "inhibits", "effect_tr": "Fibrin degradasyonu" },
-    { "source": "med_plasmin", "target": "e_fibrinolysis", "relation": "activates", "effect_tr": "Pıhtı lizisi" },
-    { "source": "r_atiii", "target": "med_thrombin", "relation": "inhibits", "effect_tr": "Heparin potansiyasyonu ile IIa inhibisyonu" },
-    { "source": "r_atiii", "target": "o_common", "relation": "inhibits", "effect_tr": "Heparin potansiyasyonu ile Xa inhibisyonu" }
+    {
+      "source": "med_tf",
+      "target": "o_extrinsic",
+      "relation": "activates",
+      "effect_tr": "TF–VIIa kompleksi"
+    },
+    {
+      "source": "o_extrinsic",
+      "target": "o_common",
+      "relation": "activates",
+      "effect_tr": "F X aktivasyonu"
+    },
+    {
+      "source": "o_intrinsic",
+      "target": "o_common",
+      "relation": "activates",
+      "effect_tr": "F IXa–VIIIa → F X"
+    },
+    {
+      "source": "o_common",
+      "target": "med_thrombin",
+      "relation": "activates",
+      "effect_tr": "Protrombin → trombin"
+    },
+    {
+      "source": "med_thrombin",
+      "target": "med_fibrinogen",
+      "relation": "activates",
+      "effect_tr": "Fibrinojen → fibrin monomer"
+    },
+    {
+      "source": "med_fibrinogen",
+      "target": "med_fibrin",
+      "relation": "activates",
+      "effect_tr": "Fibrin ağı oluşumu"
+    },
+    {
+      "source": "med_fibrin",
+      "target": "e_clot",
+      "relation": "activates",
+      "effect_tr": "Stabil pıhtı"
+    },
+    {
+      "source": "med_thrombin",
+      "target": "o_platelet",
+      "relation": "activates",
+      "effect_tr": "Trombosit aktivasyonu"
+    },
+    {
+      "source": "o_cox1",
+      "target": "o_platelet",
+      "relation": "activates",
+      "effect_tr": "TXA2 → agregasyon"
+    },
+    {
+      "source": "r_p2y12",
+      "target": "o_platelet",
+      "relation": "activates",
+      "effect_tr": "ADP aracılı agregasyon"
+    },
+    {
+      "source": "o_liver_vitk",
+      "target": "o_extrinsic",
+      "relation": "activates",
+      "effect_tr": "F VII sentezi"
+    },
+    {
+      "source": "o_liver_vitk",
+      "target": "o_intrinsic",
+      "relation": "activates",
+      "effect_tr": "F IX sentezi"
+    },
+    {
+      "source": "o_liver_vitk",
+      "target": "o_common",
+      "relation": "activates",
+      "effect_tr": "F II, X sentezi"
+    },
+    {
+      "source": "med_plasmin",
+      "target": "med_fibrin",
+      "relation": "inhibits",
+      "effect_tr": "Fibrin degradasyonu"
+    },
+    {
+      "source": "med_plasmin",
+      "target": "e_fibrinolysis",
+      "relation": "activates",
+      "effect_tr": "Pıhtı lizisi"
+    },
+    {
+      "source": "r_atiii",
+      "target": "med_thrombin",
+      "relation": "inhibits",
+      "effect_tr": "Heparin potansiyasyonu ile IIa inhibisyonu"
+    },
+    {
+      "source": "r_atiii",
+      "target": "o_common",
+      "relation": "inhibits",
+      "effect_tr": "Heparin potansiyasyonu ile Xa inhibisyonu"
+    }
   ],
   "interventions": [
     {
       "drug_class": "unfractionated_heparin",
       "label_tr": "UFH (heparin)",
-      "targets": ["r_atiii"],
+      "targets": [
+        "r_atiii"
+      ],
       "relation": "activates",
       "downstream_effects": [
-        { "nodeId": "med_thrombin", "effect_tr": "IIa inhibisyonu (aPTT ile izlem)" },
-        { "nodeId": "o_common", "effect_tr": "Xa inhibisyonu" },
-        { "nodeId": "e_thrombosis_prevent", "effect_tr": "Akut DVT/PE, ACS" },
-        { "nodeId": "e_bleeding", "effect_tr": "Kanama; protamin antidot" },
-        { "nodeId": "e_heparin_induced", "effect_tr": "HIT riski" }
+        {
+          "nodeId": "med_thrombin",
+          "effect_tr": "IIa inhibisyonu (aPTT ile izlem)"
+        },
+        {
+          "nodeId": "o_common",
+          "effect_tr": "Xa inhibisyonu"
+        },
+        {
+          "nodeId": "e_thrombosis_prevent",
+          "effect_tr": "Akut DVT/PE, ACS"
+        },
+        {
+          "nodeId": "e_bleeding",
+          "effect_tr": "Kanama; protamin antidot"
+        },
+        {
+          "nodeId": "e_heparin_induced",
+          "effect_tr": "HIT riski"
+        }
       ],
-      "tr_products_atc": ["B01AB01"]
+      "tr_products_atc": [
+        "B01AB01"
+      ]
     },
     {
       "drug_class": "lmwh",
       "label_tr": "Düşük molekül ağırlıklı heparin (enoksaparin)",
-      "targets": ["r_atiii"],
+      "targets": [
+        "r_atiii"
+      ],
       "relation": "activates",
       "downstream_effects": [
-        { "nodeId": "o_common", "effect_tr": "Başlıca Xa inhibisyonu (IIa'ya zayıf)" },
-        { "nodeId": "e_thrombosis_prevent", "effect_tr": "DVT profilaksi/tedavi" },
-        { "nodeId": "e_bleeding", "effect_tr": "Kanama riski (protamin kısmen etkili)" },
-        { "nodeId": "e_heparin_induced", "effect_tr": "HIT riski (daha düşük)" }
+        {
+          "nodeId": "o_common",
+          "effect_tr": "Başlıca Xa inhibisyonu (IIa'ya zayıf)"
+        },
+        {
+          "nodeId": "e_thrombosis_prevent",
+          "effect_tr": "DVT profilaksi/tedavi"
+        },
+        {
+          "nodeId": "e_bleeding",
+          "effect_tr": "Kanama riski (protamin kısmen etkili)"
+        },
+        {
+          "nodeId": "e_heparin_induced",
+          "effect_tr": "HIT riski (daha düşük)"
+        }
       ],
-      "tr_products_atc": ["B01AB05"]
+      "tr_products_atc": [
+        "B01AB05"
+      ]
     },
     {
       "drug_class": "warfarin",
       "label_tr": "Warfarin (K vitamini antagonisti)",
-      "targets": ["o_liver_vitk"],
+      "targets": [
+        "o_liver_vitk"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "o_extrinsic", "effect_tr": "F VII ↓ (PT/INR erken artar)" },
-        { "nodeId": "o_common", "effect_tr": "F II, X ↓" },
-        { "nodeId": "e_thrombosis_prevent", "effect_tr": "AF, mekanik kapak, VTE" },
-        { "nodeId": "e_bleeding", "effect_tr": "Kanama; K vitamini / FFP antidot" },
-        { "nodeId": "e_warfarin_skin", "effect_tr": "Nadir deri nekrozu" }
+        {
+          "nodeId": "o_extrinsic",
+          "effect_tr": "F VII ↓ (PT/INR erken artar)"
+        },
+        {
+          "nodeId": "o_common",
+          "effect_tr": "F II, X ↓"
+        },
+        {
+          "nodeId": "e_thrombosis_prevent",
+          "effect_tr": "AF, mekanik kapak, VTE"
+        },
+        {
+          "nodeId": "e_bleeding",
+          "effect_tr": "Kanama; K vitamini / FFP antidot"
+        },
+        {
+          "nodeId": "e_warfarin_skin",
+          "effect_tr": "Nadir deri nekrozu"
+        }
       ],
-      "tr_products_atc": ["B01AA03"]
+      "tr_products_atc": [
+        "B01AA03"
+      ]
     },
     {
       "drug_class": "doac_fxa",
       "label_tr": "DOAC — FXa inhibitörü (rivaroksaban)",
-      "targets": ["o_common"],
+      "targets": [
+        "o_common"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "med_thrombin", "effect_tr": "Xa ↓ → trombin ↓" },
-        { "nodeId": "e_thrombosis_prevent", "effect_tr": "AF, DVT/PE (INR gerekmez)" },
-        { "nodeId": "e_bleeding", "effect_tr": "Kanama; andeksanet (spesifik antidot)" }
+        {
+          "nodeId": "med_thrombin",
+          "effect_tr": "Xa ↓ → trombin ↓"
+        },
+        {
+          "nodeId": "e_thrombosis_prevent",
+          "effect_tr": "AF, DVT/PE (INR gerekmez)"
+        },
+        {
+          "nodeId": "e_bleeding",
+          "effect_tr": "Kanama; andeksanet (spesifik antidot)"
+        }
       ],
-      "tr_products_atc": ["B01AF01", "B01AF02"]
+      "tr_products_atc": [
+        "B01AF01",
+        "B01AF02"
+      ]
     },
     {
       "drug_class": "doac_fiia",
       "label_tr": "DOAC — IIa inhibitörü (dabigatran)",
-      "targets": ["med_thrombin"],
+      "targets": [
+        "med_thrombin"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "med_fibrin", "effect_tr": "Doğrudan trombin inhibisyonu" },
-        { "nodeId": "e_thrombosis_prevent", "effect_tr": "AF, VTE" },
-        { "nodeId": "e_bleeding", "effect_tr": "Kanama; idarucizumab antidot" }
+        {
+          "nodeId": "med_fibrin",
+          "effect_tr": "Doğrudan trombin inhibisyonu"
+        },
+        {
+          "nodeId": "e_thrombosis_prevent",
+          "effect_tr": "AF, VTE"
+        },
+        {
+          "nodeId": "e_bleeding",
+          "effect_tr": "Kanama; idarucizumab antidot"
+        }
       ],
-      "tr_products_atc": ["B01AE07"]
+      "tr_products_atc": [
+        "B01AE07"
+      ]
     },
     {
       "drug_class": "aspirin",
       "label_tr": "Aspirin (COX-1 inhibitörü)",
-      "targets": ["o_cox1"],
+      "targets": [
+        "o_cox1"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "o_platelet", "effect_tr": "TXA2 ↓ → agregasyon ↓ (irreversibl)" },
-        { "nodeId": "e_thrombosis_prevent", "effect_tr": "Koroner/KB hastalığı profilaksi" },
-        { "nodeId": "e_bleeding", "effect_tr": "GI kanama riski" }
+        {
+          "nodeId": "o_platelet",
+          "effect_tr": "TXA2 ↓ → agregasyon ↓ (irreversibl)"
+        },
+        {
+          "nodeId": "e_thrombosis_prevent",
+          "effect_tr": "Koroner/KB hastalığı profilaksi"
+        },
+        {
+          "nodeId": "e_bleeding",
+          "effect_tr": "GI kanama riski"
+        }
       ],
-      "tr_products_atc": ["B01AC06", "N02BA01"]
+      "tr_products_atc": [
+        "B01AC06",
+        "N02BA01"
+      ]
     },
     {
       "drug_class": "p2y12_inhibitor",
       "label_tr": "P2Y12 inhibitörü (klopidogrel)",
-      "targets": ["r_p2y12"],
+      "targets": [
+        "r_p2y12"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "o_platelet", "effect_tr": "ADP aracılı agregasyon ↓" },
-        { "nodeId": "e_thrombosis_prevent", "effect_tr": "ACS, stent (aspirin ile dual)" },
-        { "nodeId": "e_bleeding", "effect_tr": "Kanama riski" }
+        {
+          "nodeId": "o_platelet",
+          "effect_tr": "ADP aracılı agregasyon ↓"
+        },
+        {
+          "nodeId": "e_thrombosis_prevent",
+          "effect_tr": "ACS, stent (aspirin ile dual)"
+        },
+        {
+          "nodeId": "e_bleeding",
+          "effect_tr": "Kanama riski"
+        }
       ],
-      "tr_products_atc": ["B01AC04", "B01AC24"]
+      "tr_products_atc": [
+        "B01AC04",
+        "B01AC24"
+      ]
     },
     {
       "drug_class": "fibrinolytic",
       "label_tr": "Fibrinolitik (alteplaz / tPA)",
-      "targets": ["med_plasmin"],
+      "targets": [
+        "med_plasmin"
+      ],
       "relation": "activates",
       "downstream_effects": [
-        { "nodeId": "med_fibrin", "effect_tr": "Fibrin pıhtısı parçalanır" },
-        { "nodeId": "e_fibrinolysis", "effect_tr": "Akut STEMI, iskemik inme (seçilmiş)" },
-        { "nodeId": "e_bleeding", "effect_tr": "İntrakraniyal kanama riski" }
+        {
+          "nodeId": "med_fibrin",
+          "effect_tr": "Fibrin pıhtısı parçalanır"
+        },
+        {
+          "nodeId": "e_fibrinolysis",
+          "effect_tr": "Akut STEMI, iskemik inme (seçilmiş)"
+        },
+        {
+          "nodeId": "e_bleeding",
+          "effect_tr": "İntrakraniyal kanama riski"
+        }
       ],
-      "tr_products_atc": ["B01AD02"]
+      "tr_products_atc": [
+        "B01AD02"
+      ]
     }
   ],
   "quiz": [
     {
       "q_tr": "Warfarinin antikoagülan etkisinin temel mekanizması nedir?",
-      "options_tr": ["Trombin inhibisyonu", "K vitamini epoksit redüktaz inhibisyonu", "Antitrombin III aktivasyonu", "Plazminojen aktivasyonu"],
+      "options_tr": [
+        "Trombin inhibisyonu",
+        "K vitamini epoksit redüktaz inhibisyonu",
+        "Antitrombin III aktivasyonu",
+        "Plazminojen aktivasyonu"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Warfarin K vitamini döngüsünü bloke eder → karaciğerde II, VII, IX, X sentezi azalır. PT/INR ile izlenir.",
       "node_id": "o_liver_vitk"
     },
     {
       "q_tr": "Heparinin antikoagülan etkisini nasıl potansiyalize eder?",
-      "options_tr": ["Doğrudan trombin inhibisyonu", "Antitrombin III aktivitesini artırarak", "K vitamini antagonizması", "P2Y12 blokajı"],
+      "options_tr": [
+        "Doğrudan trombin inhibisyonu",
+        "Antitrombin III aktivitesini artırarak",
+        "K vitamini antagonizması",
+        "P2Y12 blokajı"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Heparin ATIII'ye bağlanarak serin proteaz (IIa, Xa) inhibisyonunu ~1000 kat artırır.",
       "node_id": "r_atiii"
     },
     {
       "q_tr": "Rivaroksaban hangi faktörü doğrudan inhibe eder?",
-      "options_tr": ["F IIa (trombin)", "F Xa", "F VIIa", "Plazmin"],
+      "options_tr": [
+        "F IIa (trombin)",
+        "F Xa",
+        "F VIIa",
+        "Plazmin"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Rivaroksaban, apiksaban ve edoksaban FXa inhibitörü DOAC'lardır. Dabigatran ise doğrudan trombin inhibitörüdür.",
       "node_id": "o_common"
     },
     {
       "q_tr": "Aspirinin antiplatelet etkisi hangi enzim üzerinden gerçekleşir?",
-      "options_tr": ["COX-2", "COX-1", "Fosfodiesteraz", "Adenilat siklaz"],
+      "options_tr": [
+        "COX-2",
+        "COX-1",
+        "Fosfodiesteraz",
+        "Adenilat siklaz"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Aspirin trombosit COX-1'i irreversibl asetile eder → TXA2 sentezi kalıcı ↓.",
       "node_id": "o_cox1"
     },
     {
       "q_tr": "HIT (heparin ilişkili trombositopeni) tablosunda ne beklenir?",
-      "options_tr": ["Sadece kanama", "Trombositopeni + paradoks tromboz", "INR artışı", "Hipofibrinogenemi olmadan fibrinoliz"],
+      "options_tr": [
+        "Sadece kanama",
+        "Trombositopeni + paradoks tromboz",
+        "INR artışı",
+        "Hipofibrinogenemi olmadan fibrinoliz"
+      ],
       "answer_idx": 1,
       "explanation_tr": "HIT antikor aracılı trombosit aktivasyonu yapar → trombosit sayısı ↓ ama tromboz riski ↑. Heparin kesilir, alternatif antikoagülana geçilir.",
       "node_id": "e_heparin_induced"
     },
     {
       "q_tr": "Dabigatran zehirlenmesinde spesifik antidot nedir?",
-      "options_tr": ["Protamin", "İdarucizumab", "Andeksanet alfa", "K vitamini"],
+      "options_tr": [
+        "Protamin",
+        "İdarucizumab",
+        "Andeksanet alfa",
+        "K vitamini"
+      ],
       "answer_idx": 1,
       "explanation_tr": "İdarucizumab dabigatran için spesifik antidottur. Andeksanet alfa FXa inhibitörleri için kullanılır.",
       "node_id": "med_thrombin"
+    }
+  ],
+  "vignettes": [
+    {
+      "id": "v_auto_1",
+      "title_tr": "Klinik senaryo 1",
+      "scenario_tr": "Warfarinin antikoagülan etkisinin temel mekanizması nedir?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "Trombin inhibisyonu",
+        "K vitamini epoksit redüktaz inhibisyonu",
+        "Antitrombin III aktivasyonu",
+        "Plazminojen aktivasyonu"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "Warfarin K vitamini döngüsünü bloke eder → karaciğerde II, VII, IX, X sentezi azalır. PT/INR ile izlenir.",
+      "node_id": "o_liver_vitk"
+    },
+    {
+      "id": "v_auto_2",
+      "title_tr": "Klinik senaryo 2",
+      "scenario_tr": "Heparinin antikoagülan etkisini nasıl potansiyalize eder?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "Doğrudan trombin inhibisyonu",
+        "Antitrombin III aktivitesini artırarak",
+        "K vitamini antagonizması",
+        "P2Y12 blokajı"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "Heparin ATIII'ye bağlanarak serin proteaz (IIa, Xa) inhibisyonunu ~1000 kat artırır.",
+      "node_id": "r_atiii"
     }
   ]
 }

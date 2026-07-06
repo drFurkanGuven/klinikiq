@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, emergency_mcq, learning, pharma
+from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, emergency_mcq, learning, pharma, study
 from app.api.practice_mcq import router as practice_mcq_router
 
 
@@ -82,6 +82,7 @@ app.include_router(emergency_mcq.router, prefix="/api/emergency-mcq", tags=["Eme
 app.include_router(practice_mcq_router, prefix="/api/practice-mcq", tags=["practice-mcq"])
 app.include_router(learning.router, prefix="/api/learning", tags=["Learning"])
 app.include_router(pharma.router, prefix="/api/pharma", tags=["Pharma"])
+app.include_router(study.router, prefix="/api/study", tags=["Study"])
 
 if not os.path.exists(settings.TILES_DIR):
     os.makedirs(settings.TILES_DIR, exist_ok=True)

@@ -4,159 +4,470 @@
   "description_tr": "Histaminin H1, H2, H3 ve H4 reseptörleri üzerinden alerji, asit sekresyonu, santral uyarı ve immün hücre migrasyonu. Antihistaminikler, H2 blokerleri ve antiemetikler (5-HT3 bağlantısı).",
   "source_attribution": "Histamin reseptör farmakolojisi StatPearls (Antihistamines, H2 Blockers) ve IUPHAR/BPS GtoPdb histamine receptor ligand verileri (CC BY-SA 4.0) temel alınarak derlenmiştir.",
   "nodes": [
-    { "id": "med_histamine", "label_tr": "Histamin", "type": "mediator", "high_yield": true, "description_tr": "Mast hücre ve bazofilden IgE aracılı (tip I) veya mekanik irritasyonla salınır. Doku damarları, bronş, mide ve SSS'te reseptörleri uyarır." },
-    { "id": "med_ach_gi", "label_tr": "Asetilkolin (parasempatik)", "type": "mediator", "high_yield": false, "description_tr": "Mide asit sekresyonunda histamin ile sinerjik. H2 blokerleri bazal ve yemekle uyarılmış asit sekresyonunu azaltır." },
-
-    { "id": "r_h1", "label_tr": "H1 reseptörü", "type": "receptor", "high_yield": true, "description_tr": "Gq bağlı. Düz kas kasılması (bronş, GI), vazodilatasyon + permeabilite artışı (ürtiker), prurit ve santral sedasyon." },
-    { "id": "r_h2", "label_tr": "H2 reseptörü", "type": "receptor", "high_yield": true, "description_tr": "Gs bağlı. Mide paryetal hücrelerinde cAMP ↑ → H⁺/K⁺-ATPaz (proton pompası) aktivasyonu → asit sekresyonu." },
-    { "id": "r_h3", "label_tr": "H3 reseptörü", "type": "receptor", "high_yield": false, "description_tr": "Santral presinaptik ototransmitter. Histamin salınımını ve diğer nörotransmitterleri (ACh, monoaminler) modüle eder." },
-    { "id": "r_h4", "label_tr": "H4 reseptörü", "type": "receptor", "high_yield": false, "description_tr": "İmmün hücrelerde (eozinofil, mast hücre, T hücre). Kemotaksis ve inflamasyon; klinik ilaç hedefi gelişmekte." },
-    { "id": "r_5ht3", "label_tr": "5-HT3 reseptörü", "type": "receptor", "high_yield": true, "description_tr": "Serotonin iyon kanalı. Area postrema ve intestinal vagal afferentlerde bulunur. Ondansetron/granisetron hedefi (histamin yolak ile klinik bağlantı: antiemetik)." },
-
-    { "id": "o_mast_cell", "label_tr": "Mast hücre / bazofil", "type": "organ", "high_yield": true, "description_tr": "IgE-FcεRI çapraz bağlanması → degranülasyon → histamin, triptaz, LTC4 salınımı (anafilaksi)." },
-    { "id": "o_vessel", "label_tr": "Damar (postkapiller venül)", "type": "organ", "high_yield": true, "description_tr": "H1 aracılı vazodilatasyon ve endotelyal gap → plazma ekstravazasyonu (ürtiker, anjiyoödem)." },
-    { "id": "o_bronchi", "label_tr": "Bronş düz kası", "type": "organ", "high_yield": true, "description_tr": "H1 uyarısı bronkokonstriksiyon (alerjik astım/atopi). Antihistaminikler kısmen antagonize eder." },
-    { "id": "o_parietal", "label_tr": "Mide paryetal hücre", "type": "organ", "high_yield": true, "description_tr": "H2 reseptör uyarısı proton pompasını aktive eder. PPI > H2 bloker > antacid etkinlik sıralaması." },
-    { "id": "o_cns", "label_tr": "SSS (tuberomamiller çekirdek)", "type": "organ", "high_yield": true, "description_tr": "Santral histamin uyanıklık ve arousal sağlar. Birinci nesil H1 blokerleri kan-beyin bariyerini geçerek sedasyon yapar." },
-    { "id": "o_chemoreceptor", "label_tr": "Area postrema / CTZ", "type": "organ", "high_yield": true, "description_tr": "Kusma tetik bölgesi. Kemoterapi → 5-HT3 uyarısı → ondansetron etkili. Histamin de katkıda bulunabilir (H1)." },
-
-    { "id": "e_urticaria", "label_tr": "Ürtiker / prurit", "type": "effect", "high_yield": true, "description_tr": "H1 aracılı vazodilatasyon + permeabilite → kızarık, kaşıntılı plak. Antihistaminikler birinci basamak." },
-    { "id": "e_bronchospasm", "label_tr": "Bronkospazm", "type": "effect", "high_yield": true, "description_tr": "Alerjik reaksiyonda H1 + LTC4 birlikte. Anafilakside adrenalin birinci; antihistaminik destek." },
-    { "id": "e_sedation", "label_tr": "Sedasyon", "type": "effect", "high_yield": true, "description_tr": "Birinci nesil H1 blokerleri (difenhidramin, klorfeniramin) santral H1 antagonizması ile sedasyon ve antikolinerjik yan etkiler." },
-    { "id": "e_acid_down", "label_tr": "Gastrik asit ↓", "type": "effect", "high_yield": true, "description_tr": "H2 blokerleri (famotidin) ve PPI (omeprazol) asit sekresyonunu azaltır. PUD, GERD, stress ülser profilaksisi." },
-    { "id": "e_anticholinergic", "label_tr": "Antikolinerjik yan etkiler", "type": "effect", "high_yield": true, "description_tr": "Birinci nesil H1 blokerleri: ağız kuruluğu, idrar retansiyonu, konfüzyon (yaşlıda deliryum riski)." },
-    { "id": "e_antiemetic", "label_tr": "Antiemetik etki", "type": "effect", "high_yield": true, "description_tr": "5-HT3 antagonistleri (ondansetron) kemoterapi bulantısında altın standart. Birinci nesil H1 blokerleri hafif antiemetik (vestibüler)." }
+    {
+      "id": "med_histamine",
+      "label_tr": "Histamin",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Mast hücre ve bazofilden IgE aracılı (tip I) veya mekanik irritasyonla salınır. Doku damarları, bronş, mide ve SSS'te reseptörleri uyarır."
+    },
+    {
+      "id": "med_ach_gi",
+      "label_tr": "Asetilkolin (parasempatik)",
+      "type": "mediator",
+      "high_yield": false,
+      "description_tr": "Mide asit sekresyonunda histamin ile sinerjik. H2 blokerleri bazal ve yemekle uyarılmış asit sekresyonunu azaltır."
+    },
+    {
+      "id": "r_h1",
+      "label_tr": "H1 reseptörü",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Gq bağlı. Düz kas kasılması (bronş, GI), vazodilatasyon + permeabilite artışı (ürtiker), prurit ve santral sedasyon."
+    },
+    {
+      "id": "r_h2",
+      "label_tr": "H2 reseptörü",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Gs bağlı. Mide paryetal hücrelerinde cAMP ↑ → H⁺/K⁺-ATPaz (proton pompası) aktivasyonu → asit sekresyonu."
+    },
+    {
+      "id": "r_h3",
+      "label_tr": "H3 reseptörü",
+      "type": "receptor",
+      "high_yield": false,
+      "description_tr": "Santral presinaptik ototransmitter. Histamin salınımını ve diğer nörotransmitterleri (ACh, monoaminler) modüle eder."
+    },
+    {
+      "id": "r_h4",
+      "label_tr": "H4 reseptörü",
+      "type": "receptor",
+      "high_yield": false,
+      "description_tr": "İmmün hücrelerde (eozinofil, mast hücre, T hücre). Kemotaksis ve inflamasyon; klinik ilaç hedefi gelişmekte."
+    },
+    {
+      "id": "r_5ht3",
+      "label_tr": "5-HT3 reseptörü",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Serotonin iyon kanalı. Area postrema ve intestinal vagal afferentlerde bulunur. Ondansetron/granisetron hedefi (histamin yolak ile klinik bağlantı: antiemetik)."
+    },
+    {
+      "id": "o_mast_cell",
+      "label_tr": "Mast hücre / bazofil",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "IgE-FcεRI çapraz bağlanması → degranülasyon → histamin, triptaz, LTC4 salınımı (anafilaksi)."
+    },
+    {
+      "id": "o_vessel",
+      "label_tr": "Damar (postkapiller venül)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "H1 aracılı vazodilatasyon ve endotelyal gap → plazma ekstravazasyonu (ürtiker, anjiyoödem)."
+    },
+    {
+      "id": "o_bronchi",
+      "label_tr": "Bronş düz kası",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "H1 uyarısı bronkokonstriksiyon (alerjik astım/atopi). Antihistaminikler kısmen antagonize eder."
+    },
+    {
+      "id": "o_parietal",
+      "label_tr": "Mide paryetal hücre",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "H2 reseptör uyarısı proton pompasını aktive eder. PPI > H2 bloker > antacid etkinlik sıralaması."
+    },
+    {
+      "id": "o_cns",
+      "label_tr": "SSS (tuberomamiller çekirdek)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Santral histamin uyanıklık ve arousal sağlar. Birinci nesil H1 blokerleri kan-beyin bariyerini geçerek sedasyon yapar."
+    },
+    {
+      "id": "o_chemoreceptor",
+      "label_tr": "Area postrema / CTZ",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "Kusma tetik bölgesi. Kemoterapi → 5-HT3 uyarısı → ondansetron etkili. Histamin de katkıda bulunabilir (H1)."
+    },
+    {
+      "id": "e_urticaria",
+      "label_tr": "Ürtiker / prurit",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "H1 aracılı vazodilatasyon + permeabilite → kızarık, kaşıntılı plak. Antihistaminikler birinci basamak."
+    },
+    {
+      "id": "e_bronchospasm",
+      "label_tr": "Bronkospazm",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Alerjik reaksiyonda H1 + LTC4 birlikte. Anafilakside adrenalin birinci; antihistaminik destek."
+    },
+    {
+      "id": "e_sedation",
+      "label_tr": "Sedasyon",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Birinci nesil H1 blokerleri (difenhidramin, klorfeniramin) santral H1 antagonizması ile sedasyon ve antikolinerjik yan etkiler."
+    },
+    {
+      "id": "e_acid_down",
+      "label_tr": "Gastrik asit ↓",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "H2 blokerleri (famotidin) ve PPI (omeprazol) asit sekresyonunu azaltır. PUD, GERD, stress ülser profilaksisi."
+    },
+    {
+      "id": "e_anticholinergic",
+      "label_tr": "Antikolinerjik yan etkiler",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Birinci nesil H1 blokerleri: ağız kuruluğu, idrar retansiyonu, konfüzyon (yaşlıda deliryum riski)."
+    },
+    {
+      "id": "e_antiemetic",
+      "label_tr": "Antiemetik etki",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "5-HT3 antagonistleri (ondansetron) kemoterapi bulantısında altın standart. Birinci nesil H1 blokerleri hafif antiemetik (vestibüler)."
+    }
   ],
   "edges": [
-    { "source": "o_mast_cell", "target": "med_histamine", "relation": "activates", "effect_tr": "Degranülasyon" },
-    { "source": "med_histamine", "target": "r_h1", "relation": "agonist", "effect_tr": "H1 uyarısı" },
-    { "source": "med_histamine", "target": "r_h2", "relation": "agonist", "effect_tr": "H2 uyarısı" },
-    { "source": "med_histamine", "target": "r_h3", "relation": "agonist", "effect_tr": "Santral modülasyon" },
-    { "source": "med_ach_gi", "target": "o_parietal", "relation": "activates", "effect_tr": "M3 ile asit sekresyonu (paralel yol)" },
-
-    { "source": "r_h1", "target": "o_vessel", "relation": "activates", "effect_tr": "Vazodilatasyon + permeabilite" },
-    { "source": "r_h1", "target": "o_bronchi", "relation": "activates", "effect_tr": "Bronkokonstriksiyon" },
-    { "source": "r_h1", "target": "o_cns", "relation": "activates", "effect_tr": "Santral H1 (sedasyon antagonizması hedefi)" },
-    { "source": "r_h2", "target": "o_parietal", "relation": "activates", "effect_tr": "cAMP → proton pompası" },
-    { "source": "r_5ht3", "target": "o_chemoreceptor", "relation": "activates", "effect_tr": "Kusma refleksi" },
-
-    { "source": "o_vessel", "target": "e_urticaria", "relation": "activates", "effect_tr": "Ürtiker plakları" },
-    { "source": "o_bronchi", "target": "e_bronchospasm", "relation": "activates", "effect_tr": "H1 aracılı bronş spazmı" },
-    { "source": "o_parietal", "target": "e_acid_down", "relation": "activates", "effect_tr": "Asit sekresyonu (H2/PPI ile ↓)" },
-    { "source": "o_chemoreceptor", "target": "e_antiemetic", "relation": "activates", "effect_tr": "5-HT3 antagonist hedefi" }
+    {
+      "source": "o_mast_cell",
+      "target": "med_histamine",
+      "relation": "activates",
+      "effect_tr": "Degranülasyon"
+    },
+    {
+      "source": "med_histamine",
+      "target": "r_h1",
+      "relation": "agonist",
+      "effect_tr": "H1 uyarısı"
+    },
+    {
+      "source": "med_histamine",
+      "target": "r_h2",
+      "relation": "agonist",
+      "effect_tr": "H2 uyarısı"
+    },
+    {
+      "source": "med_histamine",
+      "target": "r_h3",
+      "relation": "agonist",
+      "effect_tr": "Santral modülasyon"
+    },
+    {
+      "source": "med_ach_gi",
+      "target": "o_parietal",
+      "relation": "activates",
+      "effect_tr": "M3 ile asit sekresyonu (paralel yol)"
+    },
+    {
+      "source": "r_h1",
+      "target": "o_vessel",
+      "relation": "activates",
+      "effect_tr": "Vazodilatasyon + permeabilite"
+    },
+    {
+      "source": "r_h1",
+      "target": "o_bronchi",
+      "relation": "activates",
+      "effect_tr": "Bronkokonstriksiyon"
+    },
+    {
+      "source": "r_h1",
+      "target": "o_cns",
+      "relation": "activates",
+      "effect_tr": "Santral H1 (sedasyon antagonizması hedefi)"
+    },
+    {
+      "source": "r_h2",
+      "target": "o_parietal",
+      "relation": "activates",
+      "effect_tr": "cAMP → proton pompası"
+    },
+    {
+      "source": "r_5ht3",
+      "target": "o_chemoreceptor",
+      "relation": "activates",
+      "effect_tr": "Kusma refleksi"
+    },
+    {
+      "source": "o_vessel",
+      "target": "e_urticaria",
+      "relation": "activates",
+      "effect_tr": "Ürtiker plakları"
+    },
+    {
+      "source": "o_bronchi",
+      "target": "e_bronchospasm",
+      "relation": "activates",
+      "effect_tr": "H1 aracılı bronş spazmı"
+    },
+    {
+      "source": "o_parietal",
+      "target": "e_acid_down",
+      "relation": "activates",
+      "effect_tr": "Asit sekresyonu (H2/PPI ile ↓)"
+    },
+    {
+      "source": "o_chemoreceptor",
+      "target": "e_antiemetic",
+      "relation": "activates",
+      "effect_tr": "5-HT3 antagonist hedefi"
+    }
   ],
   "interventions": [
     {
       "drug_class": "h1_antagonist_1gen",
       "label_tr": "1. nesil H1 antagonist (difenhidramin / klorfeniramin)",
-      "targets": ["r_h1"],
+      "targets": [
+        "r_h1"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "e_urticaria", "effect_tr": "Ürtiker & alerji semptomları ↓" },
-        { "nodeId": "e_sedation", "effect_tr": "Belirgin sedasyon (BBB geçişi)" },
-        { "nodeId": "e_anticholinergic", "effect_tr": "Ağız kuruluğu, idrar retansiyonu" },
-        { "nodeId": "e_antiemetic", "effect_tr": "Hafif antiemetik (vestibüler)" }
+        {
+          "nodeId": "e_urticaria",
+          "effect_tr": "Ürtiker & alerji semptomları ↓"
+        },
+        {
+          "nodeId": "e_sedation",
+          "effect_tr": "Belirgin sedasyon (BBB geçişi)"
+        },
+        {
+          "nodeId": "e_anticholinergic",
+          "effect_tr": "Ağız kuruluğu, idrar retansiyonu"
+        },
+        {
+          "nodeId": "e_antiemetic",
+          "effect_tr": "Hafif antiemetik (vestibüler)"
+        }
       ],
-      "tr_products_atc": ["R06AC03", "R06AB04"]
+      "tr_products_atc": [
+        "R06AC03",
+        "R06AB04"
+      ]
     },
     {
       "drug_class": "h1_antagonist_2gen",
       "label_tr": "2. nesil H1 antagonist (loratadin / setirizin)",
-      "targets": ["r_h1"],
+      "targets": [
+        "r_h1"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "e_urticaria", "effect_tr": "Alerjik rinit/ürtiker (gündüz kullanım)" },
-        { "nodeId": "e_sedation", "effect_tr": "Minimal sedasyon (BBB geçişi düşük)" }
+        {
+          "nodeId": "e_urticaria",
+          "effect_tr": "Alerjik rinit/ürtiker (gündüz kullanım)"
+        },
+        {
+          "nodeId": "e_sedation",
+          "effect_tr": "Minimal sedasyon (BBB geçişi düşük)"
+        }
       ],
-      "tr_products_atc": ["R06AX13", "R06AE07"]
+      "tr_products_atc": [
+        "R06AX13",
+        "R06AE07"
+      ]
     },
     {
       "drug_class": "h2_antagonist",
       "label_tr": "H2 bloker (famotidin / ranitidin*)",
-      "targets": ["r_h2"],
+      "targets": [
+        "r_h2"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "o_parietal", "effect_tr": "cAMP ↓ → asit sekresyonu ↓" },
-        { "nodeId": "e_acid_down", "effect_tr": "PUD, GERD (PPI'den zayıf)" }
+        {
+          "nodeId": "o_parietal",
+          "effect_tr": "cAMP ↓ → asit sekresyonu ↓"
+        },
+        {
+          "nodeId": "e_acid_down",
+          "effect_tr": "PUD, GERD (PPI'den zayıf)"
+        }
       ],
-      "tr_products_atc": ["A02BA03", "A02BA01"]
+      "tr_products_atc": [
+        "A02BA03",
+        "A02BA01"
+      ]
     },
     {
       "drug_class": "ppi",
       "label_tr": "PPI (omeprazol) — asit yolak",
-      "targets": ["o_parietal"],
+      "targets": [
+        "o_parietal"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "e_acid_down", "effect_tr": "Proton pompası irreversibl inhibisyon → en güçlü asit baskılama" }
+        {
+          "nodeId": "e_acid_down",
+          "effect_tr": "Proton pompası irreversibl inhibisyon → en güçlü asit baskılama"
+        }
       ],
-      "tr_products_atc": ["A02BC01"]
+      "tr_products_atc": [
+        "A02BC01"
+      ]
     },
     {
       "drug_class": "5ht3_antagonist",
       "label_tr": "5-HT3 antagonist (ondansetron)",
-      "targets": ["r_5ht3"],
+      "targets": [
+        "r_5ht3"
+      ],
       "relation": "antagonist",
       "downstream_effects": [
-        { "nodeId": "o_chemoreceptor", "effect_tr": "CTZ ve vagal afferent inhibisyonu" },
-        { "nodeId": "e_antiemetic", "effect_tr": "Kemoterapi/radyoterapi bulantısı" }
+        {
+          "nodeId": "o_chemoreceptor",
+          "effect_tr": "CTZ ve vagal afferent inhibisyonu"
+        },
+        {
+          "nodeId": "e_antiemetic",
+          "effect_tr": "Kemoterapi/radyoterapi bulantısı"
+        }
       ],
-      "tr_products_atc": ["A04AA01"]
+      "tr_products_atc": [
+        "A04AA01"
+      ]
     },
     {
       "drug_class": "epinephrine_anaphylaxis",
       "label_tr": "Adrenalin (anafilaksi)",
-      "targets": ["o_bronchi"],
+      "targets": [
+        "o_bronchi"
+      ],
       "relation": "activates",
       "downstream_effects": [
-        { "nodeId": "e_bronchospasm", "effect_tr": "β2 aracılı bronkodilatasyon (ANS haritası ile bağlantı)" },
-        { "nodeId": "o_vessel", "effect_tr": "α1 vazokonstriksiyon → hipotansiyon düzelir" },
-        { "nodeId": "e_urticaria", "effect_tr": "Mast hücre stabilizasyonu (kısmi)" }
+        {
+          "nodeId": "e_bronchospasm",
+          "effect_tr": "β2 aracılı bronkodilatasyon (ANS haritası ile bağlantı)"
+        },
+        {
+          "nodeId": "o_vessel",
+          "effect_tr": "α1 vazokonstriksiyon → hipotansiyon düzelir"
+        },
+        {
+          "nodeId": "e_urticaria",
+          "effect_tr": "Mast hücre stabilizasyonu (kısmi)"
+        }
       ],
-      "tr_products_atc": ["C01CA24", "R03AA01"]
+      "tr_products_atc": [
+        "C01CA24",
+        "R03AA01"
+      ]
     }
   ],
   "quiz": [
     {
       "q_tr": "Mide asit sekresyonunda histamin hangi reseptör üzerinden etki eder?",
-      "options_tr": ["H1", "H2", "H3", "M3 (tek başına)"],
+      "options_tr": [
+        "H1",
+        "H2",
+        "H3",
+        "M3 (tek başına)"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Paryetal hücre H2 (Gs) → cAMP ↑ → proton pompası aktivasyonu. Famotidin bu basamağı bloke eder.",
       "node_id": "r_h2"
     },
     {
       "q_tr": "Birinci nesil antihistaminiklerin (difenhidramin) en belirgin yan etkisi nedir?",
-      "options_tr": ["Hipokalemi", "Santral sedasyon", "Bronkodilatasyon", "Hiperglisemi"],
+      "options_tr": [
+        "Hipokalemi",
+        "Santral sedasyon",
+        "Bronkodilatasyon",
+        "Hiperglisemi"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Lipofilik 1. nesil H1 blokerleri BBB geçer → santral H1 antagonizması ile sedasyon ve antikolinerjik etkiler.",
       "node_id": "e_sedation"
     },
     {
       "q_tr": "Ürtiker ve alerjik rinitte gündüz kullanım için hangi antihistaminik tercih edilir?",
-      "options_tr": ["Difenhidramin", "Klorfeniramin", "Loratadin (2. nesil)", "Famotidin"],
+      "options_tr": [
+        "Difenhidramin",
+        "Klorfeniramin",
+        "Loratadin (2. nesil)",
+        "Famotidin"
+      ],
       "answer_idx": 2,
       "explanation_tr": "2. nesil H1 antagonistleri (loratadin, setirizin, fexofenadin) minimal sedasyon yapar; gündüz alerji tedavisinde tercih edilir.",
       "node_id": "r_h1"
     },
     {
       "q_tr": "Kemoterapiye bağlı bulantıda birinci tercih antiemetik sınıfı hangisidir?",
-      "options_tr": ["H1 antagonist", "H2 antagonist", "5-HT3 antagonist (ondansetron)", "Dopamin D2 antagonist"],
+      "options_tr": [
+        "H1 antagonist",
+        "H2 antagonist",
+        "5-HT3 antagonist (ondansetron)",
+        "Dopamin D2 antagonist"
+      ],
       "answer_idx": 2,
       "explanation_tr": "5-HT3 reseptör antagonistleri area postrema ve vagal afferentleri bloke ederek kemoterapi bulantısını en etkili önler.",
       "node_id": "r_5ht3"
     },
     {
       "q_tr": "Anafilakside antihistaminik yerine adrenalin tercih edilmesinin nedeni nedir?",
-      "options_tr": ["Antihistaminikler H2'yi bloke eder", "Adrenalin hızla bronkodilatasyon ve vazokonstriksiyon sağlar", "Adrenalin sadece H1 bloke eder", "Antihistaminikler anafilaksiyi kötüleştirir"],
+      "options_tr": [
+        "Antihistaminikler H2'yi bloke eder",
+        "Adrenalin hızla bronkodilatasyon ve vazokonstriksiyon sağlar",
+        "Adrenalin sadece H1 bloke eder",
+        "Antihistaminikler anafilaksiyi kötüleştirir"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Anafilaksi yaşamı tehdit eder (bronkospazm, hipotansiyon). Adrenalin α1 + β1/β2 etkisi ile hemodinamik ve solunum desteği sağlar; antihistaminik adjuvandır.",
       "node_id": "e_bronchospasm"
     },
     {
       "q_tr": "H2 blokerler ile PPI arasındaki temel fark nedir?",
-      "options_tr": ["H2 blokerleri proton pompasını irreversibl inhibe eder", "PPI proton pompasını irreversibl inhibe eder → daha güçlü asit baskılama", "H2 blokerleri sadece M3 bloke eder", "PPI sadece H1 bloke eder"],
+      "options_tr": [
+        "H2 blokerleri proton pompasını irreversibl inhibe eder",
+        "PPI proton pompasını irreversibl inhibe eder → daha güçlü asit baskılama",
+        "H2 blokerleri sadece M3 bloke eder",
+        "PPI sadece H1 bloke eder"
+      ],
       "answer_idx": 1,
       "explanation_tr": "PPI (omeprazol) H⁺/K⁺-ATPazı irreversibl inhibe eder. H2 blokerleri cAMP yolunu bloke eder; etkinlik PPI'den düşüktür.",
       "node_id": "o_parietal"
+    }
+  ],
+  "vignettes": [
+    {
+      "id": "v_auto_1",
+      "title_tr": "Klinik senaryo 1",
+      "scenario_tr": "Mide asit sekresyonunda histamin hangi reseptör üzerinden etki eder?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "H1",
+        "H2",
+        "H3",
+        "M3 (tek başına)"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "Paryetal hücre H2 (Gs) → cAMP ↑ → proton pompası aktivasyonu. Famotidin bu basamağı bloke eder.",
+      "node_id": "r_h2"
+    },
+    {
+      "id": "v_auto_2",
+      "title_tr": "Klinik senaryo 2",
+      "scenario_tr": "Birinci nesil antihistaminiklerin (difenhidramin) en belirgin yan etkisi nedir?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "Hipokalemi",
+        "Santral sedasyon",
+        "Bronkodilatasyon",
+        "Hiperglisemi"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "Lipofilik 1. nesil H1 blokerleri BBB geçer → santral H1 antagonizması ile sedasyon ve antikolinerjik etkiler.",
+      "node_id": "e_sedation"
     }
   ]
 }

@@ -1,0 +1,981 @@
+"use client";
+
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { isAuthenticated, logout } from "@/lib/auth";
+import Footer from "@/components/Footer";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  emergencyMcqApi,
+  getBaseUrl,
+  type EmergencyMcqRandom,
+  type EmergencyMcqStats,
+  type EmergencyMcqReportCreateItem,
+} from "@/lib/api";
+import { storage } from "@/lib/storage";
+import {
+  ArrowLeft,
+  LogOut,
+  Loader2,
+  AlertCircle,
+  Zap,
+  RefreshCw,
+  Bot,
+  Send,
+  Timer,
+  HeartPulse,
+  FileText,
+} from "lucide-react";
+
+/** Simüle acil süre baskısı (dakika); anamnez/tetkik olmadan tek MCQ için kısa tutuldu */
+const QUESTION_TIME_LIMIT_SEC = 4 * 60;
+
+function fmtMmSs(totalSec: number) {
+  const m = Math.floor(totalSec / 60);
+  const s = Math.max(0, totalSec % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+type AiMsg = { role: "user" | "assistant"; content: string };
+type PatientUrgeLine = { phase: "120" | "60"; text: string };
+
+/** Bu sayfa oturumunda çözülen sorular — çok soruluk rapor için */
+type SessionMcqItem = EmergencyMcqReportCreateItem;
+
+export default function AcilSession() {
+  const router = useRouter();
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const questionStartRef = useRef<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [stats, setStats] = useState<EmergencyMcqStats | null>(null);
+  const [statsError, setStatsError] = useState<string | null>(null);
+  const [q, setQ] = useState<EmergencyMcqRandom | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{ correct: boolean; correct_label: string | null; correct_answer_text: string | null } | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
+  const [aiMessages, setAiMessages] = useState<AiMsg[]>([]);
+  const [aiInput, setAiInput] = useState("");
+  const [aiStreaming, setAiStreaming] = useState(false);
+  /** 1 sn'de bir yenileme (süre göstergesi) */
+  const [timerTick, setTimerTick] = useState(0);
+  /** Şık işaretlenince dondurulan süre (saniye) */
+  const [frozenElapsedSec, setFrozenElapsedSec] = useState<number | null>(null);
+  /** Süre azalınca otomatik hasta çıkışları (AI) */
+  const [patientUrges, setPatientUrges] = useState<PatientUrgeLine[]>([]);
+  const prevRemRef = useRef<number | null>(null);
+  const urgeSentRef = useRef({ p120: false, p60: false });
+  /** Yeni soruya geçerken AI sohbeti buraya eklenir; raporda tüm oturum kullanılır */
+  const [sessionAiTranscript, setSessionAiTranscript] = useState<AiMsg[]>([]);
+  const [sessionItems, setSessionItems] = useState<SessionMcqItem[]>([]);
+  const [sessionPatientUrges, setSessionPatientUrges] = useState<string[]>([]);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
+  /** API random(lang): veri setinde question_tr yoksa backend yine İngilizce döner */
+  const [mcqLang, setMcqLang] = useState<"en" | "tr">("tr");
+  const [explanation, setExplanation] = useState<string | null>(null);
+  const [explanationLoading, setExplanationLoading] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [sessionTarget, setSessionTarget] = useState<5 | 10 | 20 | null>(null);
+  const [reviewMode, setReviewMode] = useState(false);
+  const [reviewQueue, setReviewQueue] = useState<SessionMcqItem[]>([]);
+  const [reviewIndex, setReviewIndex] = useState(0);
+
+  const submitAnswerRef = useRef<(label: string) => Promise<void>>(async () => {});
+  const reviewQueueRef = useRef<SessionMcqItem[]>([]);
+  const sessionItemsRef = useRef<SessionMcqItem[]>([]);
+  const sessionAiTranscriptRef = useRef<AiMsg[]>([]);
+  const aiMessagesRef = useRef<AiMsg[]>([]);
+  const sessionPatientUrgesRef = useRef<string[]>([]);
+  const createSessionReportRef = useRef<() => Promise<void>>(async () => {});
+
+  sessionItemsRef.current = sessionItems;
+  sessionAiTranscriptRef.current = sessionAiTranscript;
+  aiMessagesRef.current = aiMessages;
+  sessionPatientUrgesRef.current = sessionPatientUrges;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || typeof window === "undefined") return;
+    try {
+      const s = localStorage.getItem("emergency_mcq_lang");
+      if (s === "en" || s === "tr") setMcqLang(s);
+    } catch {
+      /* ignore */
+    }
+  }, [mounted]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem("emergency_mcq_lang", mcqLang);
+    } catch {
+      /* ignore */
+    }
+  }, [mcqLang]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    if (!isAuthenticated()) {
+      router.replace("/login?next=/simulasyon/acil");
+    }
+  }, [mounted, router]);
+
+  useEffect(() => {
+    if (!mounted || !isAuthenticated()) return;
+    void (async () => {
+      try {
+        const res = await emergencyMcqApi.stats();
+        setStats(res.data);
+        setStatsError(null);
+      } catch (e: unknown) {
+        const d = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+        setStatsError(typeof d === "string" ? d : "Veri dosyası bulunamadı veya sunucu yapılandırması eksik.");
+      }
+    })();
+  }, [mounted]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [aiMessages, aiStreaming]);
+
+  useEffect(() => {
+    setAiMessages([]);
+    setAiInput("");
+    setFrozenElapsedSec(null);
+    setPatientUrges([]);
+    prevRemRef.current = null;
+    urgeSentRef.current = { p120: false, p60: false };
+    setExplanation(null);
+    setExplanationLoading(false);
+    if (q?.id) {
+      questionStartRef.current = Date.now();
+    } else {
+      questionStartRef.current = null;
+    }
+  }, [q?.id]);
+
+  useEffect(() => {
+    if (!q?.id || result) return;
+    const id = setInterval(() => setTimerTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, [q?.id, result]);
+
+  function clearSessionProgress() {
+    setSessionItems([]);
+    setSessionAiTranscript([]);
+    setSessionPatientUrges([]);
+    setReportError(null);
+    setStreak(0);
+    setBestStreak(0);
+  }
+
+  async function loadQuestionById(questionId: string) {
+    setLoading(true);
+    setResult(null);
+    setPicked(null);
+    setExplanation(null);
+    setExplanationLoading(false);
+    setQ(null);
+    try {
+      const res = await emergencyMcqApi.byId(questionId, mcqLang);
+      setQ(res.data);
+    } catch {
+      setStatsError("Soru yüklenemedi.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadQuestion() {
+    setReviewMode(false);
+    setReviewQueue([]);
+    reviewQueueRef.current = [];
+    setLoading(true);
+    setSessionAiTranscript((prev) => [...prev, ...aiMessages]);
+    setAiMessages([]);
+    setAiInput("");
+    setResult(null);
+    setPicked(null);
+    setFrozenElapsedSec(null);
+    setQ(null);
+    try {
+      const res = await emergencyMcqApi.random(mcqLang);
+      setQ(res.data);
+    } catch (e: unknown) {
+      const d = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setStatsError(typeof d === "string" ? d : "Soru yüklenemedi.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function submitAnswer(label: string) {
+    if (!q || result) return;
+    setPicked(label);
+    const elapsedForRow =
+      questionStartRef.current != null ? Math.floor((Date.now() - questionStartRef.current) / 1000) : null;
+    if (questionStartRef.current) {
+      setFrozenElapsedSec(elapsedForRow ?? 0);
+    }
+    try {
+      const res = await emergencyMcqApi.verify(q.id, label);
+      setResult(res.data);
+      setSessionItems((prev) => [
+        ...prev,
+        {
+          question_id: q.id,
+          question_preview: q.question.slice(0, 2000),
+          correct: res.data.correct,
+          elapsed_sec: elapsedForRow,
+          selected_label: label,
+        },
+      ]);
+      const newCount = sessionItemsRef.current.length + 1;
+      if (sessionTarget !== null && newCount >= sessionTarget) {
+        setTimeout(() => void createSessionReportRef.current(), 1500);
+      }
+      if (res.data.correct) {
+        setStreak((s) => {
+          const next = s + 1;
+          setBestStreak((b) => Math.max(b, next));
+          return next;
+        });
+      } else {
+        setStreak(0);
+      }
+      setExplanation(null);
+      setExplanationLoading(true);
+      try {
+        const expRes = await emergencyMcqApi.explanation(q.id, label, mcqLang);
+        setExplanation(expRes.data.explanation);
+      } catch {
+        setExplanation(null);
+      } finally {
+        setExplanationLoading(false);
+      }
+      if (reviewMode) {
+        const queue = reviewQueueRef.current;
+        const nextIndex = reviewIndex + 1;
+        if (nextIndex < queue.length) {
+          setTimeout(() => {
+            setReviewIndex(nextIndex);
+            void loadQuestionById(queue[nextIndex].question_id);
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            setReviewMode(false);
+            setReviewQueue([]);
+            reviewQueueRef.current = [];
+            setStatsError(null);
+          }, 2000);
+        }
+      }
+    } catch {
+      setResult({ correct: false, correct_label: null, correct_answer_text: null });
+      setSessionItems((prev) => [
+        ...prev,
+        {
+          question_id: q.id,
+          question_preview: q.question.slice(0, 2000),
+          correct: false,
+          elapsed_sec: elapsedForRow,
+          selected_label: label,
+        },
+      ]);
+      const newCount = sessionItemsRef.current.length + 1;
+      if (sessionTarget !== null && newCount >= sessionTarget) {
+        setTimeout(() => void createSessionReportRef.current(), 1500);
+      }
+      setStreak(0);
+      if (reviewMode) {
+        const queue = reviewQueueRef.current;
+        const nextIndex = reviewIndex + 1;
+        if (nextIndex < queue.length) {
+          setTimeout(() => {
+            setReviewIndex(nextIndex);
+            void loadQuestionById(queue[nextIndex].question_id);
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            setReviewMode(false);
+            setReviewQueue([]);
+            reviewQueueRef.current = [];
+            setStatsError(null);
+          }, 2000);
+        }
+      }
+    }
+  }
+
+  submitAnswerRef.current = submitAnswer;
+
+  useEffect(() => {
+    if (!q || result) return;
+    function handleKey(e: KeyboardEvent) {
+      if (e.target instanceof HTMLTextAreaElement) return;
+      if (e.target instanceof HTMLInputElement) return;
+      const map: Record<string, string> = { a: "A", b: "B", c: "C", d: "D" };
+      const lbl = map[e.key.toLowerCase()];
+      if (lbl) void submitAnswerRef.current(lbl);
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [q, result]);
+
+  async function createSessionReport() {
+    const items = sessionItemsRef.current;
+    if (items.length === 0) {
+      setReportError("Önce en az bir soruyu çözün.");
+      return;
+    }
+    setReportLoading(true);
+    setReportError(null);
+    try {
+      const allAi: AiMsg[] = [...sessionAiTranscriptRef.current, ...aiMessagesRef.current];
+      const res = await emergencyMcqApi.createReport({
+        items,
+        ai_messages: allAi,
+        patient_urges: sessionPatientUrgesRef.current,
+      });
+      clearSessionProgress();
+      router.push(`/simulasyon/acil/rapor/?id=${encodeURIComponent(res.data.id)}`);
+    } catch {
+      setReportError("Rapor oluşturulamadı. Bağlantı veya sunucu yapılandırmasını kontrol edin.");
+    } finally {
+      setReportLoading(false);
+    }
+  }
+
+  createSessionReportRef.current = createSessionReport;
+
+  async function sendAiMessage() {
+    const text = aiInput.trim();
+    if (!q || !text || aiStreaming) return;
+    const nextMessages: AiMsg[] = [...aiMessages, { role: "user", content: text }];
+    setAiMessages(nextMessages);
+    setAiInput("");
+    setAiStreaming(true);
+
+    try {
+      await storage.waitForInit();
+      const token = storage.getItem("access_token");
+      const res = await fetch(`${getBaseUrl()}/emergency-mcq/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ id: q.id, messages: nextMessages }),
+      });
+
+      if (!res.ok || !res.body) {
+        setAiMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: "Yanıt alınamadı. API anahtarı veya bağlantıyı kontrol edin." },
+        ]);
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        for (const line of chunk.split("\n")) {
+          if (line.startsWith("data: ")) {
+            const data = line.slice(6).trim();
+            if (data === "[DONE]") break;
+            try {
+              const parsed = JSON.parse(data) as { content?: string };
+              if (parsed.content) accumulated += parsed.content;
+            } catch {
+              /* ignore */
+            }
+          }
+        }
+      }
+
+      setAiMessages((prev) => [...prev, { role: "assistant", content: accumulated || "—" }]);
+    } catch {
+      setAiMessages((prev) => [...prev, { role: "assistant", content: "Bağlantı hatası." }]);
+    } finally {
+      setAiStreaming(false);
+    }
+  }
+
+  const requestPatientUrge = useCallback(
+    async (phase: "120" | "60", rem: number, el: number) => {
+      const qid = q?.id;
+      if (!qid) return;
+      if (stats?.openai_configured === false) return;
+      try {
+        await storage.waitForInit();
+        const token = storage.getItem("access_token");
+        const res = await fetch(`${getBaseUrl()}/emergency-mcq/patient-urge`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            id: qid,
+            remaining_sec: rem,
+            elapsed_sec: el,
+            phase,
+          }),
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as { message?: string; skipped?: boolean };
+        if (data.skipped || !data.message?.trim()) return;
+        const line = data.message!.trim();
+        setPatientUrges((prev) => [...prev, { phase, text: line }]);
+        setSessionPatientUrges((prev) => [...prev, line]);
+      } catch {
+        /* sessiz */
+      }
+    },
+    [q?.id, stats?.openai_configured]
+  );
+
+  useEffect(() => {
+    if (!q?.id || result) return;
+
+    const liveElapsed =
+      questionStartRef.current != null
+        ? Math.floor((Date.now() - questionStartRef.current) / 1000)
+        : 0;
+    const rem = Math.max(0, QUESTION_TIME_LIMIT_SEC - liveElapsed);
+    const el = liveElapsed;
+
+    const prev = prevRemRef.current;
+    if (prev === null) {
+      prevRemRef.current = rem;
+      return;
+    }
+
+    if (!urgeSentRef.current.p120 && prev > 120 && rem <= 120) {
+      urgeSentRef.current.p120 = true;
+      void requestPatientUrge("120", rem, el);
+    }
+    if (!urgeSentRef.current.p60 && prev > 60 && rem <= 60) {
+      urgeSentRef.current.p60 = true;
+      void requestPatientUrge("60", rem, el);
+    }
+
+    prevRemRef.current = rem;
+  }, [q?.id, result, timerTick, requestPatientUrge]);
+
+  if (!mounted) return null;
+
+  void timerTick;
+  const liveElapsedSec =
+    questionStartRef.current && q && !result
+      ? Math.floor((Date.now() - questionStartRef.current) / 1000)
+      : 0;
+  const elapsedSec = result && frozenElapsedSec !== null ? frozenElapsedSec : liveElapsedSec;
+  const remainingSec = Math.max(0, QUESTION_TIME_LIMIT_SEC - elapsedSec);
+  const remainingRatio = QUESTION_TIME_LIMIT_SEC > 0 ? remainingSec / QUESTION_TIME_LIMIT_SEC : 0;
+
+  return (
+    <div className="min-h-screen flex flex-col transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
+      <nav
+        className="border-b sticky top-0 z-50"
+        style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+      >
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4 min-w-0">
+            <Link href="/calis" className="p-2 rounded-lg transition-colors hover:bg-black/5 shrink-0" style={{ color: "var(--text-muted)" }}>
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--accent)" }}>
+                <Zap className="w-5 h-5" style={{ color: "var(--accent-foreground)" }} />
+              </div>
+              <div className="min-w-0">
+                <span className="font-semibold text-lg tracking-tight block leading-tight truncate flex flex-wrap items-center gap-2">
+                  Acil simülasyon
+                  {reviewMode && (
+                    <span
+                      className="text-xs font-medium px-2 py-0.5 rounded-md border shrink-0"
+                      style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+                    >
+                      Tekrar: {reviewIndex + 1}/{reviewQueue.length}
+                    </span>
+                  )}
+                </span>
+                <span className="text-[10px] font-medium uppercase tracking-widest opacity-50">MCQ pratik · veri altyapısı</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={logout}
+              className="flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg hover:bg-black/5"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Çıkış</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-10">
+        <p className="text-xs font-medium mb-6 px-1 leading-relaxed" style={{ color: "var(--text-muted)" }}>
+          Her soruda <strong style={{ color: "var(--text)" }}>{QUESTION_TIME_LIMIT_SEC / 60} dakikalık</strong> simüle süre hedefi (geri sayım); tetkik menüsü ve triyaj skoru sonraki adımlar. Birden fazla soru çözdükten sonra{" "}
+          <strong style={{ color: "var(--text)" }}>Oturum raporu</strong> ile vaka simülasyonuna benzer AI özeti kaydedebilirsiniz (skor, öneriler, süre ve AI sohbeti).
+        </p>
+
+        {stats && (
+          <p className="text-xs font-medium mb-6 px-1" style={{ color: "var(--text-muted)" }}>
+            Havuzda <strong style={{ color: "var(--text)" }}>{stats.mcq_count}</strong> çoktan seçmeli soru (acil filtresi; kaynak: MedQA-USMLE).
+            {stats.openai_configured === false ? (
+              <span className="block mt-2" style={{ color: "var(--warning, #b45309)" }}>
+                OPENAI_API_KEY yapılandırılmamış — AI asistan devre dışı.
+              </span>
+            ) : null}
+          </p>
+        )}
+
+        {statsError && (
+          <div
+            className="flex items-start gap-2 text-sm font-medium px-4 py-3 rounded-lg border mb-6"
+            style={{
+              borderColor: "var(--border)",
+              color: "var(--text-muted)",
+              background: "var(--surface)",
+            }}
+          >
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <span>{statsError}</span>
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-2 mb-4 items-center">
+          <div
+            className="inline-flex rounded-lg border p-0.5 text-xs font-medium"
+            style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
+            title="Çeviri JSONL’de yoksa soru İngilizce gelir"
+          >
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => setMcqLang("tr")}
+              className="px-3 py-2 rounded-lg transition-all"
+              style={{
+                background: mcqLang === "tr" ? "var(--accent)" : "transparent",
+                color: mcqLang === "tr" ? "var(--accent-foreground)" : "var(--text-muted)",
+              }}
+            >
+              TR
+            </button>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => setMcqLang("en")}
+              className="px-3 py-2 rounded-lg transition-all"
+              style={{
+                background: mcqLang === "en" ? "var(--accent)" : "transparent",
+                color: mcqLang === "en" ? "var(--accent-foreground)" : "var(--text-muted)",
+              }}
+            >
+              EN
+            </button>
+          </div>
+          <div
+            className="inline-flex rounded-lg border p-0.5 text-xs font-medium"
+            style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
+          >
+            {([null, 5, 10, 20] as const).map((t) => (
+              <button
+                key={String(t)}
+                type="button"
+                disabled={loading}
+                onClick={() => setSessionTarget(t)}
+                className="px-3 py-2 rounded-lg transition-all"
+                style={{
+                  background: sessionTarget === t ? "var(--accent)" : "transparent",
+                  color: sessionTarget === t ? "var(--accent-foreground)" : "var(--text-muted)",
+                }}
+              >
+                {t === null ? "∞" : `${t}`}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            disabled={loading || !!statsError}
+            onClick={() => void loadQuestion()}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border disabled:opacity-50"
+            style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            Yeni soru
+          </button>
+          <Link
+            href="/simulasyon/acil/raporlar"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border"
+            style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+          >
+            <FileText className="w-4 h-4" />
+            Rapor geçmişi
+          </Link>
+        </div>
+
+        {reportError && (
+          <div
+            className="flex items-start gap-2 text-sm font-medium px-4 py-3 rounded-lg border mb-4"
+            style={{
+              borderColor: "var(--destructive)",
+              color: "var(--destructive)",
+              background: "var(--destructive-muted)",
+            }}
+          >
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <span>{reportError}</span>
+          </div>
+        )}
+
+        <div
+          className="rounded-lg border px-4 py-3 mb-8 flex flex-wrap items-center justify-between gap-3"
+          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <FileText className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
+            <span className="text-xs font-medium flex flex-wrap items-center gap-2" style={{ color: "var(--text-muted)" }}>
+              Bu oturumda {sessionItems.length} soru çözüldü
+              {sessionItems.length > 0 ? (
+                <span className="opacity-90">
+                  {" "}
+                  ({sessionItems.filter((x) => x.correct).length} doğru)
+                </span>
+              ) : null}
+              {streak >= 2 && (
+                <span
+                  className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md border"
+                  style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                >
+                  <Zap className="w-3 h-3" />
+                  {streak} seri
+                </span>
+              )}
+              {bestStreak > 0 ? (
+                <span className="text-[10px] font-bold opacity-60 normal-case">En iyi: {bestStreak}</span>
+              ) : null}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {sessionItems.filter((x) => !x.correct).length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  const wrongs = sessionItems.filter((x) => !x.correct);
+                  setReviewQueue(wrongs);
+                  reviewQueueRef.current = wrongs;
+                  setReviewIndex(0);
+                  setReviewMode(true);
+                  void loadQuestionById(wrongs[0].question_id);
+                }}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border"
+                style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                Yanlışları tekrar çöz ({sessionItems.filter((x) => !x.correct).length})
+              </button>
+            )}
+            <button
+              type="button"
+              disabled={reportLoading || sessionItems.length === 0 || !!statsError}
+              onClick={() => void createSessionReport()}
+              className="btn-primary inline-flex items-center gap-2 px-3 py-2 text-xs rounded-lg disabled:opacity-50"
+            >
+              {reportLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
+              Oturum raporu
+            </button>
+            <button
+              type="button"
+              disabled={
+                sessionItems.length === 0 &&
+                sessionAiTranscript.length === 0 &&
+                sessionPatientUrges.length === 0
+              }
+              onClick={clearSessionProgress}
+              className="text-xs font-medium px-3 py-2 rounded-lg opacity-80 hover:opacity-100 disabled:opacity-30"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Oturum verisini sıfırla
+            </button>
+          </div>
+        </div>
+
+        {loading && !q && (
+          <div className="flex items-center gap-2 text-sm font-medium justify-center py-16 opacity-80">
+            <Loader2 className="w-5 h-5 animate-spin" style={{ color: "var(--foreground)" }} />
+            Soru yükleniyor…
+          </div>
+        )}
+
+        {q && (
+          <div
+            className="mb-4 rounded-lg border overflow-hidden"
+            style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+          >
+            <div className="flex items-center justify-between gap-3 px-4 py-2.5">
+              <div className="flex items-center gap-2 min-w-0">
+                <Timer className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
+                <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>
+                  Simüle süre
+                </span>
+              </div>
+              <div className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm font-semibold tabular-nums shrink-0">
+                <span style={{ color: "var(--text-muted)" }}>
+                  Geçen <span style={{ color: "var(--text)" }}>{fmtMmSs(elapsedSec)}</span>
+                </span>
+                <span style={{ color: remainingSec < 60 ? "var(--destructive)" : "var(--text-muted)" }}>
+                  Kalan <span style={{ color: remainingSec < 60 ? "var(--destructive)" : "var(--text)" }}>{fmtMmSs(remainingSec)}</span>
+                </span>
+              </div>
+            </div>
+            <div className="h-1 w-full" style={{ background: "var(--border)" }}>
+              <div
+                className="h-full transition-[width] duration-1000 ease-linear"
+                style={{
+                  width: `${remainingRatio * 100}%`,
+                  background:
+                    remainingSec === 0
+                      ? "var(--destructive)"
+                      : remainingSec < 60
+                        ? "var(--muted)"
+                        : "var(--accent)",
+                }}
+              />
+            </div>
+            {remainingSec === 0 && !result && (
+              <p className="px-4 py-2 text-xs font-medium leading-snug border-t" style={{ color: "var(--text-muted)", borderColor: "var(--border)" }}>
+                Süre doldu. Şık seçmeye veya AI ile çalışmaya devam edebilirsiniz; tam simülatörde bu aşamada skor kuralları sıkılaştırılabilir.
+              </p>
+            )}
+          </div>
+        )}
+
+        {q && patientUrges.length > 0 && (
+          <div
+            className="mb-4 rounded-lg border p-4 space-y-2"
+            style={{
+              borderColor: "var(--border)",
+              background: "var(--surface-2)",
+            }}
+          >
+            <div
+              className="flex items-center gap-2 text-xs font-medium"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <HeartPulse className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
+              Hasta (simüle · süre baskısı)
+            </div>
+            <ul className="space-y-2 list-none m-0 p-0">
+              {patientUrges.map((u, i) => (
+                <li
+                  key={`${u.phase}-${i}`}
+                  className="text-sm font-medium leading-relaxed rounded-lg px-3 py-2 border"
+                  style={{
+                    borderColor: "var(--border)",
+                    background: "var(--surface)",
+                    color: "var(--text)",
+                  }}
+                >
+                  {u.text}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {q && (
+          <div className="rounded-lg border p-6 sm:p-8 space-y-6" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+            <p className="text-sm sm:text-base font-medium leading-relaxed whitespace-pre-wrap" style={{ color: "var(--text)" }}>
+              {q.question}
+            </p>
+            <ul className="space-y-2">
+              {q.options.map((o) => {
+                const disabled = !!result;
+                const isPicked = picked === o.label;
+                const showCorrect = result && result.correct_label === o.label.toUpperCase();
+                const showWrong = result && isPicked && !result.correct;
+                return (
+                  <li key={o.label}>
+                    <button
+                      type="button"
+                      disabled={disabled}
+                      onClick={() => void submitAnswer(o.label)}
+                      className="w-full text-left rounded-lg border px-4 py-3 text-sm font-medium transition hover:bg-black/[0.04] dark:hover:bg-white/[0.06] disabled:opacity-90"
+                      style={{
+                        borderColor: showCorrect ? "var(--foreground)" : showWrong ? "var(--destructive)" : "var(--border)",
+                        background: showCorrect
+                          ? "var(--surface-2)"
+                          : showWrong
+                            ? "var(--destructive-muted)"
+                            : "var(--bg)",
+                        color: "var(--text)",
+                      }}
+                    >
+                      <span className="opacity-30 mr-2 font-mono text-xs">[{o.label}]</span>
+                      <span className="opacity-60 mr-2">{o.label}.</span>
+                      {o.text}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {result && (
+              <div
+                className="rounded-lg border px-4 py-3 text-sm font-medium"
+                style={{
+                  borderColor: "var(--border)",
+                  color: result.correct ? "var(--text)" : "var(--destructive)",
+                  background: "var(--surface-2)",
+                }}
+              >
+                {result.correct ? "Doğru." : "Yanlış."}
+                {result.correct_label ? (
+                  <span className="block mt-1 opacity-90" style={{ color: "var(--text)" }}>
+                    Doğru şık: <strong>{result.correct_label}</strong>
+                    {result.correct_answer_text ? ` (${result.correct_answer_text})` : ""}
+                  </span>
+                ) : null}
+                {frozenElapsedSec !== null ? (
+                  <span className="block mt-2 text-[11px] font-bold opacity-80" style={{ color: "var(--text-muted)" }}>
+                    Cevaba kadar geçen süre: {fmtMmSs(frozenElapsedSec)} (limit {fmtMmSs(QUESTION_TIME_LIMIT_SEC)})
+                  </span>
+                ) : null}
+              </div>
+            )}
+
+            {result && (explanationLoading || explanation) && (
+              <div
+                className="rounded-lg border px-4 py-4 space-y-2"
+                style={{
+                  borderColor: "var(--border)",
+                  background: "var(--surface-2)",
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Bot className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)" }} />
+                  <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>
+                    Açıklama
+                  </span>
+                </div>
+                {explanationLoading ? (
+                  <div className="flex items-center gap-2 text-xs opacity-70">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Açıklama üretiliyor…
+                  </div>
+                ) : (
+                  <p
+                    className="text-sm font-medium leading-relaxed whitespace-pre-wrap"
+                    style={{ color: "var(--text)" }}
+                  >
+                    {explanation}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {q && (
+          <div
+            className="mt-8 rounded-lg border p-5 sm:p-6 space-y-4"
+            style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+          >
+            <div className="flex items-center gap-2">
+              <Bot className="w-5 h-5 shrink-0" style={{ color: "var(--foreground)" }} />
+              <h2 className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+                AI asistan (acil)
+              </h2>
+            </div>
+            <p className="text-xs font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
+              Normal vaka sohbetinden ayrı uç nokta. Şıkkı doğrudan söyletmez; akıl yürütme ve acil öncelik üzerinden yönlendirir.{" "}
+              <strong style={{ color: "var(--text)" }}>Paneldeki klasik vaka akışı değişmez.</strong>
+            </p>
+
+            <div
+              className="max-h-64 overflow-y-auto rounded-lg border px-3 py-3 space-y-3 text-sm"
+              style={{ borderColor: "var(--border)", background: "var(--bg)" }}
+            >
+              {aiMessages.length === 0 && !aiStreaming && (
+                <p className="text-xs font-medium opacity-60">Örn: &quot;Red flag nedir?&quot; veya &quot;Triyajda önce neye bakarım?&quot;</p>
+              )}
+              {aiMessages.map((m, i) => (
+                <div
+                  key={i}
+                  className={`rounded-lg px-3 py-2 ${m.role === "user" ? "ml-4" : "mr-4"}`}
+                  style={{
+                    background: m.role === "user" ? "var(--surface-2)" : "var(--bg)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  <span className="text-[10px] font-medium block mb-0.5" style={{ color: "var(--muted)" }}>
+                    {m.role === "user" ? "Siz" : "Asistan"}
+                  </span>
+                  <p className="whitespace-pre-wrap font-medium leading-relaxed">{m.content}</p>
+                </div>
+              ))}
+              {aiStreaming && (
+                <div className="flex items-center gap-2 text-xs font-medium opacity-70 px-2 py-1">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Yanıt yazılıyor…
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            <div className="flex gap-2">
+              <textarea
+                value={aiInput}
+                onChange={(e) => setAiInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void sendAiMessage();
+                  }
+                }}
+                disabled={aiStreaming}
+                placeholder="Sorunuzu yazın… (Enter gönderir)"
+                rows={2}
+                className="flex-1 rounded-lg border px-3 py-2.5 text-sm font-medium resize-none disabled:opacity-50"
+                style={{ background: "var(--bg)", borderColor: "var(--border)", color: "var(--text)" }}
+              />
+              <button
+                type="button"
+                disabled={aiStreaming || !aiInput.trim()}
+                onClick={() => void sendAiMessage()}
+                className="btn-primary shrink-0 w-11 h-11 rounded-lg flex items-center justify-center disabled:opacity-40"
+                aria-label="Gönder"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        <p className="mt-10 text-xs font-medium leading-relaxed px-1" style={{ color: "var(--text-muted)" }}>
+          Veri: Jin et al. MedQA-USMLE (lisans: backend <code className="text-[11px]">data/medical_qa/licenses</code>). Tıbbi karar vermez.
+        </p>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

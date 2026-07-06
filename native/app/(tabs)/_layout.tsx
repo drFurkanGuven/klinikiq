@@ -1,10 +1,9 @@
 import { Tabs } from "expo-router";
 import {
   Activity,
+  BookOpen,
   FlaskConical,
-  House,
   User,
-  Zap,
 } from "lucide-react-native";
 import { Platform, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -35,8 +34,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Dashboard",
-          tabBarIcon: ({ color }) => <House size={22} color={color} />,
+          title: "Çalış",
+          tabBarIcon: ({ color }) => <BookOpen size={22} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -56,8 +55,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="acil"
         options={{
-          title: "Acil",
-          tabBarIcon: ({ color }) => <Zap size={22} color={color} />,
+          href: null,
         }}
       />
       <Tabs.Screen

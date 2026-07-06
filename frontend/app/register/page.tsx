@@ -36,7 +36,7 @@ export default function RegisterPage() {
         ...form,
         year: form.year ? parseInt(form.year) : undefined,
       });
-      router.push("/dashboard");
+      router.push("/calis");
     } catch (err: any) {
       setError(err.response?.data?.detail || "Kayıt oluşturulamadı");
     } finally {

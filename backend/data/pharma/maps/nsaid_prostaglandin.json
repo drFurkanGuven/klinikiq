@@ -4,150 +4,455 @@
   "description_tr": "Arachidonik asit → COX-1/COX-2 → prostaglandin/tromboksan sentezi. NSAID, aspirin ve selektif COX-2 inhibitörlerinin analjezi, inflamasyon, gastropati ve kardiyovasküler risk profili.",
   "source_attribution": "NSAID ve prostaglandin farmakolojisi StatPearls (NSAIDs, COX-2 inhibitors, Aspirin) ve GtoPdb (CC BY-SA 4.0) temel alınarak derlenmiştir.",
   "nodes": [
-    { "id": "med_arachidonic", "label_tr": "Arachidonik asit", "type": "mediator", "high_yield": true, "description_tr": "Membran fosfolipidlerinden fosfolipaz A2 ile salınır. COX ve lipoksijenaz yollarının ortak substratı." },
-    { "id": "med_pgg2", "label_tr": "PGG₂ / PGH₂", "type": "mediator", "high_yield": false, "description_tr": "COX enziminin ara ürünleri. Downstream sentazlar PGE2, PGI2 (prostacyclin), TXA2 üretir." },
-    { "id": "med_pge2", "label_tr": "PGE₂", "type": "mediator", "high_yield": true, "description_tr": "Ağrı duyarlılığı artırır, inflamasyon, ateş (hipotalamusta), gastrik mukoza koruma, renal kan akımı." },
-    { "id": "med_pgi2", "label_tr": "PGI₂ (prostacyclin)", "type": "mediator", "high_yield": true, "description_tr": "Endotel kaynaklı vazodilatör ve antiplatelet. COX-2 indüksiyonu ile inflamasyonda artar." },
-    { "id": "med_txa2", "label_tr": "TXA₂ (tromboksan)", "type": "mediator", "high_yield": true, "description_tr": "Trombosit COX-1 ürünü. Vazokonstriksiyon ve trombosit agregasyonu. Aspirin TXA2 sentezini kalıcı inhibe eder." },
-
-    { "id": "r_cox1", "label_tr": "COX-1 (konstitutif)", "type": "receptor", "high_yield": true, "description_tr": "Sürekli eksprese: mide mukozası, trombosit, böbrek. Fizyolojik prostaglandin üretimi. Non-selektif NSAID'ler inhibe eder → gastropati." },
-    { "id": "r_cox2", "label_tr": "COX-2 (indüksible)", "type": "receptor", "high_yield": true, "description_tr": "İnflamasyon, ateş, ağrıda indüklenir. Selektif COX-2 inhibitörleri (celekoksib) analjezi/antiinflamasyon; daha az GI yan etki ama CV risk tartışması." },
-
-    { "id": "o_gastric_mucosa", "label_tr": "Gastrik mukoza", "type": "organ", "high_yield": true, "description_tr": "COX-1 → PGE2/PGI2 mukoza koruyucu (asit sekresyonu baskılama, kan akımı, bikarbonat/mukus). NSAID hasarı buradan." },
-    { "id": "o_platelet", "label_tr": "Trombosit", "type": "organ", "high_yield": true, "description_tr": "COX-1 → TXA2. Aspirin trombosit COX-1'i irreversibl inhibe eder (7–10 gün)." },
-    { "id": "o_kidney", "label_tr": "Böbrek (aferent arteriol)", "type": "organ", "high_yield": true, "description_tr": "PGE2/PGI2 vazodilatör → GFR koruma. NSAID prostaglandin ↓ → renal ischemi (özellikle RAAS/ diüretik kullananlarda)." },
-    { "id": "o_hypothalamus", "label_tr": "Hipotalamus (termoregülasyon)", "type": "organ", "high_yield": true, "description_tr": "COX-2 indüksiyonu → PGE2 → set point ↑ → ateş. NSAID antipiretik etki." },
-    { "id": "o_inflamed_tissue", "label_tr": "İnflame doku", "type": "organ", "high_yield": true, "description_tr": "COX-2 indüksiyonu → PGE2 → nociceptif duyarlılık ↑, inflamasyon, ödem." },
-
-    { "id": "e_analgesia", "label_tr": "Analjezi & antiinflamasyon", "type": "effect", "high_yield": true, "description_tr": "Periferik ve santral prostaglandin ↓ ile ağrı ve inflamasyon baskılanır." },
-    { "id": "e_antipyresis", "label_tr": "Antipirezi", "type": "effect", "high_yield": true, "description_tr": "Hipotalamik PGE2 ↓ → ateş düşer. NSAID fizyolojik termoregülasyonu bozmaz (normal vücut ısısını düşürmez)." },
-    { "id": "e_gi_ulcer", "label_tr": "Gastropati / ülser", "type": "effect", "high_yield": true, "description_tr": "COX-1 inhibisyonu → mukoza koruyucu PG ↓. Aspirin + klopidogrel dual terapi riski ↑. PPI profilaksi." },
-    { "id": "e_cv_thrombosis", "label_tr": "Tromboz riski (CV)", "type": "effect", "high_yield": true, "description_tr": "COX-2 selektif inhibisyon PGI2/TXA2 dengesini bozabilir → MI/inme riski (özellikle yüksek riskli hastalarda)." },
-    { "id": "e_renal_impair", "label_tr": "Renal yetmezlik / Na tutulumu", "type": "effect", "high_yield": true, "description_tr": "Prostaglandin ↓ → aferent vazokonstriksiyon → GFR ↓, ödem, hipertansiyon." },
-    { "id": "e_aspirin_reye", "label_tr": "Reye sendromu (çocuk)", "type": "effect", "high_yield": false, "description_tr": "Viral enfeksiyonda aspirin → hepatik ensefalopati riski. <18 yaş viral hastalıkta aspirin kontrendike." }
+    {
+      "id": "med_arachidonic",
+      "label_tr": "Arachidonik asit",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Membran fosfolipidlerinden fosfolipaz A2 ile salınır. COX ve lipoksijenaz yollarının ortak substratı."
+    },
+    {
+      "id": "med_pgg2",
+      "label_tr": "PGG₂ / PGH₂",
+      "type": "mediator",
+      "high_yield": false,
+      "description_tr": "COX enziminin ara ürünleri. Downstream sentazlar PGE2, PGI2 (prostacyclin), TXA2 üretir."
+    },
+    {
+      "id": "med_pge2",
+      "label_tr": "PGE₂",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Ağrı duyarlılığı artırır, inflamasyon, ateş (hipotalamusta), gastrik mukoza koruma, renal kan akımı."
+    },
+    {
+      "id": "med_pgi2",
+      "label_tr": "PGI₂ (prostacyclin)",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Endotel kaynaklı vazodilatör ve antiplatelet. COX-2 indüksiyonu ile inflamasyonda artar."
+    },
+    {
+      "id": "med_txa2",
+      "label_tr": "TXA₂ (tromboksan)",
+      "type": "mediator",
+      "high_yield": true,
+      "description_tr": "Trombosit COX-1 ürünü. Vazokonstriksiyon ve trombosit agregasyonu. Aspirin TXA2 sentezini kalıcı inhibe eder."
+    },
+    {
+      "id": "r_cox1",
+      "label_tr": "COX-1 (konstitutif)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "Sürekli eksprese: mide mukozası, trombosit, böbrek. Fizyolojik prostaglandin üretimi. Non-selektif NSAID'ler inhibe eder → gastropati."
+    },
+    {
+      "id": "r_cox2",
+      "label_tr": "COX-2 (indüksible)",
+      "type": "receptor",
+      "high_yield": true,
+      "description_tr": "İnflamasyon, ateş, ağrıda indüklenir. Selektif COX-2 inhibitörleri (celekoksib) analjezi/antiinflamasyon; daha az GI yan etki ama CV risk tartışması."
+    },
+    {
+      "id": "o_gastric_mucosa",
+      "label_tr": "Gastrik mukoza",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "COX-1 → PGE2/PGI2 mukoza koruyucu (asit sekresyonu baskılama, kan akımı, bikarbonat/mukus). NSAID hasarı buradan."
+    },
+    {
+      "id": "o_platelet",
+      "label_tr": "Trombosit",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "COX-1 → TXA2. Aspirin trombosit COX-1'i irreversibl inhibe eder (7–10 gün)."
+    },
+    {
+      "id": "o_kidney",
+      "label_tr": "Böbrek (aferent arteriol)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "PGE2/PGI2 vazodilatör → GFR koruma. NSAID prostaglandin ↓ → renal ischemi (özellikle RAAS/ diüretik kullananlarda)."
+    },
+    {
+      "id": "o_hypothalamus",
+      "label_tr": "Hipotalamus (termoregülasyon)",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "COX-2 indüksiyonu → PGE2 → set point ↑ → ateş. NSAID antipiretik etki."
+    },
+    {
+      "id": "o_inflamed_tissue",
+      "label_tr": "İnflame doku",
+      "type": "organ",
+      "high_yield": true,
+      "description_tr": "COX-2 indüksiyonu → PGE2 → nociceptif duyarlılık ↑, inflamasyon, ödem."
+    },
+    {
+      "id": "e_analgesia",
+      "label_tr": "Analjezi & antiinflamasyon",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Periferik ve santral prostaglandin ↓ ile ağrı ve inflamasyon baskılanır."
+    },
+    {
+      "id": "e_antipyresis",
+      "label_tr": "Antipirezi",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Hipotalamik PGE2 ↓ → ateş düşer. NSAID fizyolojik termoregülasyonu bozmaz (normal vücut ısısını düşürmez)."
+    },
+    {
+      "id": "e_gi_ulcer",
+      "label_tr": "Gastropati / ülser",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "COX-1 inhibisyonu → mukoza koruyucu PG ↓. Aspirin + klopidogrel dual terapi riski ↑. PPI profilaksi."
+    },
+    {
+      "id": "e_cv_thrombosis",
+      "label_tr": "Tromboz riski (CV)",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "COX-2 selektif inhibisyon PGI2/TXA2 dengesini bozabilir → MI/inme riski (özellikle yüksek riskli hastalarda)."
+    },
+    {
+      "id": "e_renal_impair",
+      "label_tr": "Renal yetmezlik / Na tutulumu",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "Prostaglandin ↓ → aferent vazokonstriksiyon → GFR ↓, ödem, hipertansiyon."
+    },
+    {
+      "id": "e_aspirin_reye",
+      "label_tr": "Reye sendromu (çocuk)",
+      "type": "effect",
+      "high_yield": false,
+      "description_tr": "Viral enfeksiyonda aspirin → hepatik ensefalopati riski. <18 yaş viral hastalıkta aspirin kontrendike."
+    }
   ],
   "edges": [
-    { "source": "med_arachidonic", "target": "r_cox1", "relation": "activates", "effect_tr": "COX-1 metabolizması" },
-    { "source": "med_arachidonic", "target": "r_cox2", "relation": "activates", "effect_tr": "COX-2 metabolizması (indüklenmiş)" },
-    { "source": "r_cox1", "target": "med_pgg2", "relation": "activates", "effect_tr": "Konstitutif PG/TX sentezi" },
-    { "source": "r_cox2", "target": "med_pgg2", "relation": "activates", "effect_tr": "İndüklenmiş PG sentezi" },
-    { "source": "med_pgg2", "target": "med_pge2", "relation": "activates", "effect_tr": "PGE2 sentaz" },
-    { "source": "med_pgg2", "target": "med_pgi2", "relation": "activates", "effect_tr": "Prostacyclin sentaz (endotel)" },
-    { "source": "med_pgg2", "target": "med_txa2", "relation": "activates", "effect_tr": "Tromboksan sentaz (trombosit)" },
-
-    { "source": "med_pge2", "target": "o_gastric_mucosa", "relation": "activates", "effect_tr": "Mukoza koruma" },
-    { "source": "med_pge2", "target": "o_hypothalamus", "relation": "activates", "effect_tr": "Ateş" },
-    { "source": "med_pge2", "target": "o_inflamed_tissue", "relation": "activates", "effect_tr": "Ağrı & inflamasyon" },
-    { "source": "med_pgi2", "target": "o_kidney", "relation": "activates", "effect_tr": "Renal vazodilatasyon" },
-    { "source": "med_txa2", "target": "o_platelet", "relation": "activates", "effect_tr": "Agregasyon" },
-
-    { "source": "o_inflamed_tissue", "target": "e_analgesia", "relation": "activates", "effect_tr": "NSAID hedef etki" },
-    { "source": "o_hypothalamus", "target": "e_antipyresis", "relation": "activates", "effect_tr": "Antipiretik" },
-    { "source": "o_gastric_mucosa", "target": "e_gi_ulcer", "relation": "inhibits", "effect_tr": "PG ↓ → ülser" }
+    {
+      "source": "med_arachidonic",
+      "target": "r_cox1",
+      "relation": "activates",
+      "effect_tr": "COX-1 metabolizması"
+    },
+    {
+      "source": "med_arachidonic",
+      "target": "r_cox2",
+      "relation": "activates",
+      "effect_tr": "COX-2 metabolizması (indüklenmiş)"
+    },
+    {
+      "source": "r_cox1",
+      "target": "med_pgg2",
+      "relation": "activates",
+      "effect_tr": "Konstitutif PG/TX sentezi"
+    },
+    {
+      "source": "r_cox2",
+      "target": "med_pgg2",
+      "relation": "activates",
+      "effect_tr": "İndüklenmiş PG sentezi"
+    },
+    {
+      "source": "med_pgg2",
+      "target": "med_pge2",
+      "relation": "activates",
+      "effect_tr": "PGE2 sentaz"
+    },
+    {
+      "source": "med_pgg2",
+      "target": "med_pgi2",
+      "relation": "activates",
+      "effect_tr": "Prostacyclin sentaz (endotel)"
+    },
+    {
+      "source": "med_pgg2",
+      "target": "med_txa2",
+      "relation": "activates",
+      "effect_tr": "Tromboksan sentaz (trombosit)"
+    },
+    {
+      "source": "med_pge2",
+      "target": "o_gastric_mucosa",
+      "relation": "activates",
+      "effect_tr": "Mukoza koruma"
+    },
+    {
+      "source": "med_pge2",
+      "target": "o_hypothalamus",
+      "relation": "activates",
+      "effect_tr": "Ateş"
+    },
+    {
+      "source": "med_pge2",
+      "target": "o_inflamed_tissue",
+      "relation": "activates",
+      "effect_tr": "Ağrı & inflamasyon"
+    },
+    {
+      "source": "med_pgi2",
+      "target": "o_kidney",
+      "relation": "activates",
+      "effect_tr": "Renal vazodilatasyon"
+    },
+    {
+      "source": "med_txa2",
+      "target": "o_platelet",
+      "relation": "activates",
+      "effect_tr": "Agregasyon"
+    },
+    {
+      "source": "o_inflamed_tissue",
+      "target": "e_analgesia",
+      "relation": "activates",
+      "effect_tr": "NSAID hedef etki"
+    },
+    {
+      "source": "o_hypothalamus",
+      "target": "e_antipyresis",
+      "relation": "activates",
+      "effect_tr": "Antipiretik"
+    },
+    {
+      "source": "o_gastric_mucosa",
+      "target": "e_gi_ulcer",
+      "relation": "inhibits",
+      "effect_tr": "PG ↓ → ülser"
+    }
   ],
   "interventions": [
     {
       "drug_class": "aspirin_low_dose",
       "label_tr": "Düşük doz aspirin",
-      "targets": ["r_cox1"],
+      "targets": [
+        "r_cox1"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "med_txa2", "effect_tr": "Trombosit TXA2 kalıcı ↓" },
-        { "nodeId": "e_cv_thrombosis", "effect_tr": "Koroner/KB profilaksi (irreversibl COX-1)" },
-        { "nodeId": "e_gi_ulcer", "effect_tr": "GI kanama riski" }
+        {
+          "nodeId": "med_txa2",
+          "effect_tr": "Trombosit TXA2 kalıcı ↓"
+        },
+        {
+          "nodeId": "e_cv_thrombosis",
+          "effect_tr": "Koroner/KB profilaksi (irreversibl COX-1)"
+        },
+        {
+          "nodeId": "e_gi_ulcer",
+          "effect_tr": "GI kanama riski"
+        }
       ],
-      "tr_products_atc": ["B01AC06", "N02BA01"]
+      "tr_products_atc": [
+        "B01AC06",
+        "N02BA01"
+      ]
     },
     {
       "drug_class": "nsaid_nonselective",
       "label_tr": "Non-selektif NSAID (ibuprofen / naproksen)",
-      "targets": ["r_cox1", "r_cox2"],
+      "targets": [
+        "r_cox1",
+        "r_cox2"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "e_analgesia", "effect_tr": "Analjezi & antiinflamasyon" },
-        { "nodeId": "e_antipyresis", "effect_tr": "Antipiretik" },
-        { "nodeId": "e_gi_ulcer", "effect_tr": "COX-1 → gastropati" },
-        { "nodeId": "e_renal_impair", "effect_tr": "Böbrek riski (yaşlı, RAAS kullanan)" }
+        {
+          "nodeId": "e_analgesia",
+          "effect_tr": "Analjezi & antiinflamasyon"
+        },
+        {
+          "nodeId": "e_antipyresis",
+          "effect_tr": "Antipiretik"
+        },
+        {
+          "nodeId": "e_gi_ulcer",
+          "effect_tr": "COX-1 → gastropati"
+        },
+        {
+          "nodeId": "e_renal_impair",
+          "effect_tr": "Böbrek riski (yaşlı, RAAS kullanan)"
+        }
       ],
-      "tr_products_atc": ["M01AE01", "M01AE02"]
+      "tr_products_atc": [
+        "M01AE01",
+        "M01AE02"
+      ]
     },
     {
       "drug_class": "cox2_selective",
       "label_tr": "Selektif COX-2 inhibitörü (celekoksib)",
-      "targets": ["r_cox2"],
+      "targets": [
+        "r_cox2"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "e_analgesia", "effect_tr": "Antiinflamasyon & analjezi" },
-        { "nodeId": "e_gi_ulcer", "effect_tr": "Daha az GI yan etki (COX-1 korunur)" },
-        { "nodeId": "e_cv_thrombosis", "effect_tr": "PGI2/TXA2 dengesi → CV risk (yüksek riskli hastada dikkat)" }
+        {
+          "nodeId": "e_analgesia",
+          "effect_tr": "Antiinflamasyon & analjezi"
+        },
+        {
+          "nodeId": "e_gi_ulcer",
+          "effect_tr": "Daha az GI yan etki (COX-1 korunur)"
+        },
+        {
+          "nodeId": "e_cv_thrombosis",
+          "effect_tr": "PGI2/TXA2 dengesi → CV risk (yüksek riskli hastada dikkat)"
+        }
       ],
-      "tr_products_atc": ["M01AH01"]
+      "tr_products_atc": [
+        "M01AH01"
+      ]
     },
     {
       "drug_class": "ppi_gi_prophylaxis",
       "label_tr": "PPI (NSAID gastropati profilaksisi)",
-      "targets": ["o_gastric_mucosa"],
+      "targets": [
+        "o_gastric_mucosa"
+      ],
       "relation": "activates",
       "downstream_effects": [
-        { "nodeId": "e_gi_ulcer", "effect_tr": "Asit ↓ → ülser riski azalır (aspirin/NSAID ile)" }
+        {
+          "nodeId": "e_gi_ulcer",
+          "effect_tr": "Asit ↓ → ülser riski azalır (aspirin/NSAID ile)"
+        }
       ],
-      "tr_products_atc": ["A02BC01"]
+      "tr_products_atc": [
+        "A02BC01"
+      ]
     },
     {
       "drug_class": "acetaminophen",
       "label_tr": "Parasetamol (asetaminofen)",
-      "targets": ["o_hypothalamus"],
+      "targets": [
+        "o_hypothalamus"
+      ],
       "relation": "inhibits",
       "downstream_effects": [
-        { "nodeId": "e_antipyresis", "effect_tr": "Santral COX (düşük periferik antiinflamasyon)" },
-        { "nodeId": "e_analgesia", "effect_tr": "Hafif-orta analjezi" },
-        { "nodeId": "e_gi_ulcer", "effect_tr": "Minimal GI yan etki (terapötik dozda)" }
+        {
+          "nodeId": "e_antipyresis",
+          "effect_tr": "Santral COX (düşük periferik antiinflamasyon)"
+        },
+        {
+          "nodeId": "e_analgesia",
+          "effect_tr": "Hafif-orta analjezi"
+        },
+        {
+          "nodeId": "e_gi_ulcer",
+          "effect_tr": "Minimal GI yan etki (terapötik dozda)"
+        }
       ],
-      "tr_products_atc": ["N02BE01"]
+      "tr_products_atc": [
+        "N02BE01"
+      ]
     }
   ],
   "quiz": [
     {
       "q_tr": "Aspirinin antiplatelet etkisi hangi mekanizmayla kalıcı olur?",
-      "options_tr": ["COX-2 reversibl inhibisyon", "COX-1 irreversibl asetilasyon", "Tromboksan sentaz inhibisyonu", "P2Y12 blokajı"],
+      "options_tr": [
+        "COX-2 reversibl inhibisyon",
+        "COX-1 irreversibl asetilasyon",
+        "Tromboksan sentaz inhibisyonu",
+        "P2Y12 blokajı"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Aspirin trombosit COX-1'i irreversibl asetile eder → TXA2 sentezi trombosit ömrü boyunca (7–10 gün) baskılanır.",
       "node_id": "med_txa2"
     },
     {
       "q_tr": "NSAID gastropatisinin temel nedeni nedir?",
-      "options_tr": ["COX-2 selektif inhibisyon", "COX-1 inhibisyonu → koruyucu PGE2 ↓", "Prostacyclin artışı", "Histamin salınımı"],
+      "options_tr": [
+        "COX-2 selektif inhibisyon",
+        "COX-1 inhibisyonu → koruyucu PGE2 ↓",
+        "Prostacyclin artışı",
+        "Histamin salınımı"
+      ],
       "answer_idx": 1,
       "explanation_tr": "COX-1 mide mukozasında koruyucu prostaglandin üretir. Non-selektif NSAID bu korumayı azaltır → ülser/kanama.",
       "node_id": "r_cox1"
     },
     {
       "q_tr": "Selektif COX-2 inhibitörlerinin avantajı ve potansiyel dezavantajı nedir?",
-      "options_tr": ["Daha fazla GI yan etki / daha az CV risk", "Daha az GI yan etki / potansiyel CV tromboz riski", "Antiplatelet etki / gastropati", "Sadece antipiretik / hepatotoksisite"],
+      "options_tr": [
+        "Daha fazla GI yan etki / daha az CV risk",
+        "Daha az GI yan etki / potansiyel CV tromboz riski",
+        "Antiplatelet etki / gastropati",
+        "Sadece antipiretik / hepatotoksisite"
+      ],
       "answer_idx": 1,
       "explanation_tr": "COX-2 selektivitesi GI koruma sağlar; ancak endotel PGI2/trombosit TXA2 dengesi bozulabilir → CV olay riski.",
       "node_id": "r_cox2"
     },
     {
       "q_tr": "RAAS inhibitörü + NSAID + diüretik üçlüsünde en çok hangi risk artar?",
-      "options_tr": ["Hipoglisemi", "Akut böbrek hasarı", "Hiperkalemi tek başına", "Bronkospazm"],
+      "options_tr": [
+        "Hipoglisemi",
+        "Akut böbrek hasarı",
+        "Hiperkalemi tek başına",
+        "Bronkospazm"
+      ],
       "answer_idx": 1,
       "explanation_tr": "'Triple whammy': prostaglandin ↓ + GFR düşüşü → akut böbrek hasarı riski. Yaşlılarda özellikle dikkat.",
       "node_id": "e_renal_impair"
     },
     {
       "q_tr": "NSAID antipiretik etkisi nasıl gerçekleşir?",
-      "options_tr": ["Hipotalamik COX-2 → PGE2 ↓", "Periferik vazodilatasyon", "Terleme artışı", "T3/T4 inhibisyonu"],
+      "options_tr": [
+        "Hipotalamik COX-2 → PGE2 ↓",
+        "Periferik vazodilatasyon",
+        "Terleme artışı",
+        "T3/T4 inhibisyonu"
+      ],
       "answer_idx": 0,
       "explanation_tr": "Ateşte indüklenen COX-2 hipotalamusta PGE2 üretir; NSAID bunu inhibe ederek set point'ı düşürür.",
       "node_id": "o_hypothalamus"
     },
     {
       "q_tr": "Çocukta viral enfeksiyonda aspirin neden kontrendikedir?",
-      "options_tr": ["Hepatotoksisite", "Reye sendromu riski", "Aplastik anemi", "Stevens-Johnson"],
+      "options_tr": [
+        "Hepatotoksisite",
+        "Reye sendromu riski",
+        "Aplastik anemi",
+        "Stevens-Johnson"
+      ],
       "answer_idx": 1,
       "explanation_tr": "Varicella/grip benzeri viral hastalıklarda aspirin → Reye sendromu (hepatik ensefalopati). Parasetamol tercih edilir.",
       "node_id": "e_aspirin_reye"
+    }
+  ],
+  "vignettes": [
+    {
+      "id": "v_auto_1",
+      "title_tr": "Klinik senaryo 1",
+      "scenario_tr": "Aspirinin antiplatelet etkisi hangi mekanizmayla kalıcı olur?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "COX-2 reversibl inhibisyon",
+        "COX-1 irreversibl asetilasyon",
+        "Tromboksan sentaz inhibisyonu",
+        "P2Y12 blokajı"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "Aspirin trombosit COX-1'i irreversibl asetile eder → TXA2 sentezi trombosit ömrü boyunca (7–10 gün) baskılanır.",
+      "node_id": "med_txa2"
+    },
+    {
+      "id": "v_auto_2",
+      "title_tr": "Klinik senaryo 2",
+      "scenario_tr": "NSAID gastropatisinin temel nedeni nedir?",
+      "q_tr": "Doğru cevap hangisidir?",
+      "options_tr": [
+        "COX-2 selektif inhibisyon",
+        "COX-1 inhibisyonu → koruyucu PGE2 ↓",
+        "Prostacyclin artışı",
+        "Histamin salınımı"
+      ],
+      "answer_idx": 1,
+      "explanation_tr": "COX-1 mide mukozasında koruyucu prostaglandin üretir. Non-selektif NSAID bu korumayı azaltır → ülser/kanama.",
+      "node_id": "r_cox1"
     }
   ]
 }

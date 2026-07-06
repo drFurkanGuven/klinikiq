@@ -338,6 +338,68 @@ export const emergencyMcqApi = {
     api.get<EmergencyMcqReportOut>(`/emergency-mcq/reports/${encodeURIComponent(id)}`),
 };
 
+export interface StudyDashboard {
+  daily_goal: number;
+  answered_today: number;
+  due_count: number;
+  current_streak: number;
+  longest_streak: number;
+  pool_mcq_count: number;
+  weak_topics: {
+    topic_slug: string;
+    topic_label: string;
+    wrong_count: number;
+    total_count: number;
+  }[];
+}
+
+export interface StudyQuestion {
+  mcq_id: string;
+  pool: string;
+  question: string;
+  options: { label: string; text: string }[];
+  is_review: boolean;
+  topic_slug: string | null;
+  topic_label: string | null;
+}
+
+export interface StudySessionStart {
+  session_id: string;
+  mode: "daily" | "acil" | "usmle";
+  goal: number;
+  questions: StudyQuestion[];
+}
+
+export interface StudyAnswerResult {
+  correct: boolean;
+  correct_label: string | null;
+  correct_answer_text: string | null;
+  remediation: {
+    topic_slug: string;
+    topic_label: string;
+    map_href?: string | null;
+  } | null;
+  due_count: number;
+  answered_today: number;
+}
+
+export const studyApi = {
+  dashboard: () => api.get<StudyDashboard>("/study/dashboard"),
+  patchSettings: (daily_goal: number) =>
+    api.patch<{ daily_goal: number; preferred_pool: string }>("/study/settings", {
+      daily_goal,
+    }),
+  startSession: (goal: number, mode: "daily" | "acil" | "usmle" = "daily") =>
+    api.post<StudySessionStart>("/study/session/start", { goal, mode }),
+  answer: (body: {
+    mcq_id: string;
+    pool: string;
+    selected_label: string;
+    session_id?: string;
+    elapsed_ms?: number;
+  }) => api.post<StudyAnswerResult>("/study/session/answer", body),
+};
+
 export const leaderboardApi = {
   list: () => api.get<LeaderboardItem[]>("/users/leaderboard"),
 };
