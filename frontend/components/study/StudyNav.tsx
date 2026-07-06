@@ -1,18 +1,52 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { BookOpen, Activity, Stethoscope } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { BookOpen, GraduationCap, Stethoscope } from "lucide-react";
 import { nativeClient } from "@/lib/native";
 
+const OGREN_PATHS = [
+  "/histology",
+  "/ogrenme",
+  "/farmakoloji",
+  "/sinir-lezyon",
+  "/study-notes",
+  "/leaderboard",
+];
+
+function isOgrenPath(pathname: string, tab: string | null) {
+  if (OGREN_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return true;
+  if (pathname === "/calis" && tab === "ogren") return true;
+  return false;
+}
+
 const LINKS = [
-  { href: "/calis", label: "Çalış", icon: BookOpen, match: (p: string) => p === "/calis" || p.startsWith("/calis/") },
-  { href: "/vaka", label: "Vaka", icon: Stethoscope, match: (p: string) => p === "/vaka" || p.startsWith("/case") || p.startsWith("/report") },
-  { href: "/simulasyon", label: "Simülasyon", icon: Activity, match: (p: string) => p.startsWith("/simulasyon") },
+  {
+    href: "/calis",
+    label: "Çalış",
+    icon: BookOpen,
+    match: (p: string, tab: string | null) =>
+      (p === "/calis" || p.startsWith("/calis/")) && tab !== "ogren",
+  },
+  {
+    href: "/vaka",
+    label: "Vaka",
+    icon: Stethoscope,
+    match: (p: string) => p === "/vaka" || p.startsWith("/case") || p.startsWith("/report"),
+  },
+  {
+    href: "/calis?tab=ogren",
+    label: "Öğren",
+    icon: GraduationCap,
+    match: (p: string, tab: string | null) => isOgrenPath(p, tab),
+  },
 ] as const;
 
-export function StudyNav() {
+function StudyNavInner() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
 
   return (
     <header
@@ -31,7 +65,7 @@ export function StudyNav() {
         </Link>
         <nav className="flex items-center gap-1 overflow-x-auto">
           {LINKS.map(({ href, label, icon: Icon, match }) => {
-            const active = match(pathname);
+            const active = match(pathname, tab);
             return (
               <Link
                 key={href}
@@ -51,5 +85,20 @@ export function StudyNav() {
         </nav>
       </div>
     </header>
+  );
+}
+
+export function StudyNav() {
+  return (
+    <Suspense
+      fallback={
+        <header
+          className="sticky top-0 z-50 border-b h-14"
+          style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+        />
+      }
+    >
+      <StudyNavInner />
+    </Suspense>
   );
 }

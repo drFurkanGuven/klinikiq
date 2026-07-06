@@ -14,10 +14,10 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { StudyNav } from "@/components/study/StudyNav";
-import { TopicRing } from "@/components/study/TopicRing";
 import { CalisIlerlemeTab } from "@/components/calis/CalisIlerlemeTab";
 import { CalisOgrenTab } from "@/components/calis/CalisOgrenTab";
-import { studyApi, type StudyDashboard, type StudyTopicMastery } from "@/lib/api";
+import { CalisProfilTab } from "@/components/calis/CalisProfilTab";
+import { studyApi, type StudyDashboard } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import { nativeClient } from "@/lib/native";
@@ -27,6 +27,7 @@ const TABS = [
   { id: "bugun", label: "Bugün" },
   { id: "ilerleme", label: "İlerleme" },
   { id: "ogren", label: "Öğren" },
+  { id: "profil", label: "Profil" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -36,12 +37,11 @@ function CalisPageContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const activeTab: TabId =
-    tabParam === "ilerleme" || tabParam === "ogren" ? tabParam : "bugun";
+    tabParam === "ilerleme" || tabParam === "ogren" || tabParam === "profil" ? tabParam : "bugun";
 
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dash, setDash] = useState<StudyDashboard | null>(null);
-  const [topics, setTopics] = useState<StudyTopicMastery[]>([]);
   const [goal, setGoal] = useState<5 | 10 | 20>(10);
   const [error, setError] = useState<string | null>(null);
   const [savingGoal, setSavingGoal] = useState(false);
@@ -56,11 +56,10 @@ function CalisPageContent() {
       setLoading(false);
       return;
     }
-    Promise.all([studyApi.dashboard(), studyApi.topics()])
-      .then(([d, t]) => {
+    Promise.all([studyApi.dashboard()])
+      .then(([d]) => {
         setDash(d.data);
         setGoal((d.data.daily_goal as 5 | 10 | 20) || 10);
-        setTopics(t.data.filter((x) => x.seen > 0).slice(0, 6));
       })
       .catch(() => setError("Çalışma verileri yüklenemedi."))
       .finally(() => setLoading(false));
@@ -100,18 +99,19 @@ function CalisPageContent() {
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Çalış</h1>
           <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
             {activeTab === "bugun" && "Türkçe acil MCQ + akıllı tekrar"}
-            {activeTab === "ilerleme" && "Vaka istatistikleri ve hesap ayarları"}
+            {activeTab === "ilerleme" && "Tüm ders ve modül ilerlemelerin"}
             {activeTab === "ogren" && "Histoloji, farmako, atlas ve daha fazlası"}
+            {activeTab === "profil" && "Hesap bilgileri ve uygulama ayarları"}
           </p>
         </div>
 
-        <div className="flex gap-1 p-1 rounded-lg border w-full" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+        <div className="flex gap-1 p-1 rounded-lg border w-full overflow-x-auto" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
           {TABS.map(({ id, label }) => (
             <button
               key={id}
               type="button"
               onClick={() => setTab(id)}
-              className="flex-1 py-2.5 rounded-md text-sm font-medium transition-colors"
+              className="flex-1 min-w-[4.5rem] py-2.5 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap"
               style={{
                 background: activeTab === id ? "var(--accent)" : "transparent",
                 color: activeTab === id ? "var(--accent-foreground)" : "var(--text-muted)",
@@ -124,6 +124,7 @@ function CalisPageContent() {
 
         {activeTab === "ilerleme" && <CalisIlerlemeTab />}
         {activeTab === "ogren" && <CalisOgrenTab />}
+        {activeTab === "profil" && <CalisProfilTab />}
 
         {activeTab === "bugun" && loading && (
           <div className="flex justify-center py-16">
@@ -184,36 +185,6 @@ function CalisPageContent() {
               <Play className="w-5 h-5" />
               Oturumu başlat
             </button>
-
-            {topics.length > 0 && (
-              <div className="space-y-3">
-                <p className="text-xs font-medium" style={{ color: "var(--muted)" }}>Konu ilerlemesi</p>
-                <div className="flex gap-4 overflow-x-auto pb-2">
-                  {topics.map((t) => (
-                    <TopicRing
-                      key={t.topic_slug}
-                      label={t.topic_label}
-                      masteryPct={t.mastery_pct}
-                      seen={t.seen}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {dash.weak_topics.length > 0 && (
-              <div className="rounded-lg border p-4 space-y-2" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-                <p className="text-xs font-medium" style={{ color: "var(--muted)" }}>Zayıf konular</p>
-                {dash.weak_topics.slice(0, 3).map((w) => (
-                  <p key={w.topic_slug} className="text-sm font-medium">
-                    {w.topic_label}{" "}
-                    <span style={{ color: "var(--muted)" }}>
-                      ({w.wrong_count}/{w.total_count} yanlış)
-                    </span>
-                  </p>
-                ))}
-              </div>
-            )}
 
             <div className="space-y-2 pt-4 border-t" style={{ borderColor: "var(--border)" }}>
               <p className="text-xs font-medium" style={{ color: "var(--muted)" }}>İkincil modlar</p>
