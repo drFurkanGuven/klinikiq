@@ -1,0 +1,108 @@
+networks:
+  klinikiq_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  frontend_next:
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: klinikiq_postgres
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      POSTGRES_USER: klinikiq
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: klinikiq
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - klinikiq_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U klinikiq"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: klinikiq_redis
+    restart: unless-stopped
+    logging: *default-logging
+    volumes:
+      - redis_data:/data
+    networks:
+      - klinikiq_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: klinikiq_backend
+    restart: unless-stopped
+    logging: *default-logging
+    env_file:
+      - .env
+    environment:
+      - BACKEND_CORS_ORIGINS=["https://klinikiq.furkanguven.space", "http://localhost:3000"]
+    volumes:
+      # Prod modunda reload'a gerek yok, sadece gerekli veriler mount edilir
+      - ./tiles:/tiles
+      - ./backend/data:/app/data
+    networks:
+      - klinikiq_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://klinikiq.furkanguven.space/api
+    container_name: klinikiq_frontend
+    restart: unless-stopped
+    logging: *default-logging
+    env_file:
+      - .env
+    environment:
+      - NEXT_PUBLIC_API_URL=https://klinikiq.furkanguven.space/api
+    networks:
+      - klinikiq_net
+    depends_on:
+      - backend
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: klinikiq_nginx
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./tiles:/tiles:ro
+    networks:
+      - klinikiq_net
+    depends_on:
+      - backend
+      - frontend

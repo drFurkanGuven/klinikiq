@@ -1,0 +1,50 @@
+.env
+.env.local
+.env.production
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+dist/
+build/
+.next/
+*.egg-info/
+postgres_data/
+redis_data/
+# Local Storage
+tiles/
+uploads/
+backend/data/community_uploads/
+
+# AI Tools
+.aider*
+.claude/
+.gemini/
+
+# OS
+.DS_Store
+
+# Mobile
+frontend/android/
+frontend/ios/
+frontend/capacitor.config.ts
+
+# SQL & Data
+drugbank_clean.csv
+card-data/
+card-ontology/
+*.sql
+!backend/scripts/*.sql
+*.jsonl
+# Tıp Atlası: ham export çok büyük; DB oluşturup backend/data kullanın (JSON veya SQL aynı tablo)
+ilac.json
+ilac.sql
+backend/data/ilac_atlas.db
+
+# MedQA / PubMedQA script çıktıları (büyük jsonl; script ile yeniden üretilir)
+backend/data/medical_qa/
+postgres_data/
+redis_data/
