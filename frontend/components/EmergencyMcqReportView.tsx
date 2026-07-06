@@ -45,10 +45,10 @@ function ScoreCircle({ score }: { score: number }) {
 export default function EmergencyMcqReportView({ report }: Props) {
   const label =
     report.score >= 70
-      ? { text: "İyi", color: "text-emerald-500", bg: "var(--success-light)", borderColor: "var(--success-light)" }
+      ? { text: "İyi", color: "text-success", bg: "var(--success-light)", borderColor: "var(--success-light)" }
       : report.score >= 50
-        ? { text: "Geliştirilmeli", color: "text-amber-500", bg: "var(--warning-light)", borderColor: "var(--warning-light)" }
-        : { text: "Tekrar önerilir", color: "text-red-500", bg: "var(--error-light)", borderColor: "var(--error-light)" };
+        ? { text: "Geliştirilmeli", color: "text-warning", bg: "var(--warning-light)", borderColor: "var(--warning-light)" }
+        : { text: "Tekrar önerilir", color: "text-destructive", bg: "var(--error-light)", borderColor: "var(--error-light)" };
 
   return (
     <div className="space-y-6">
@@ -97,7 +97,7 @@ export default function EmergencyMcqReportView({ report }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="glass rounded-3xl p-6 border shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center border" style={{ background: "var(--surface-hover)", color: "var(--foreground)", borderColor: "var(--border)" }}>
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <h3 className="font-bold text-lg" style={{ color: "var(--text)" }}>
@@ -110,7 +110,7 @@ export default function EmergencyMcqReportView({ report }: Props) {
             <ul className="space-y-2">
               {report.strengths.map((s, i) => (
                 <li key={i} className="text-sm font-medium leading-relaxed flex gap-2" style={{ color: "var(--text)" }}>
-                  <span className="text-emerald-500 shrink-0">•</span>
+                  <span className="shrink-0" style={{ color: "var(--foreground)" }}>•</span>
                   {s}
                 </li>
               ))}
@@ -120,7 +120,7 @@ export default function EmergencyMcqReportView({ report }: Props) {
 
         <div className="glass rounded-3xl p-6 border shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-rose-500/10 text-rose-500 border border-rose-500/20">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center border" style={{ background: "var(--surface-hover)", color: "var(--foreground)", borderColor: "var(--border)" }}>
               <XCircle className="w-5 h-5" />
             </div>
             <h3 className="font-bold text-lg" style={{ color: "var(--text)" }}>
@@ -133,7 +133,7 @@ export default function EmergencyMcqReportView({ report }: Props) {
             <ul className="space-y-2">
               {report.gaps.map((s, i) => (
                 <li key={i} className="text-sm font-medium leading-relaxed flex gap-2" style={{ color: "var(--text)" }}>
-                  <span className="text-rose-500 shrink-0">•</span>
+                  <span className="shrink-0" style={{ color: "var(--foreground)" }}>•</span>
                   {s}
                 </li>
               ))}
@@ -174,7 +174,7 @@ export default function EmergencyMcqReportView({ report }: Props) {
       {report.tus_reference ? (
         <div className="glass rounded-3xl p-6 border shadow-sm" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-violet-500/10 text-violet-600 border border-violet-500/20">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center border" style={{ background: "var(--surface-hover)", color: "var(--foreground)", borderColor: "var(--border)" }}>
               <BookOpen className="w-5 h-5" />
             </div>
             <h3 className="font-bold text-lg" style={{ color: "var(--text)" }}>

@@ -779,15 +779,14 @@ export default function CasePageContent() {
                  </div>
                ) : null}
              </div>
-             <button onClick={() => sendMessage("[KONSÜLTASYON İSTEĞİ]")} disabled={streaming} className="w-full flex items-center justify-center gap-2 text-white font-black py-3 rounded-xl transition-all shadow-lg group relative overflow-hidden" style={{ background: "linear-gradient(135deg, #e11d48 0%, #f43f5e 100%)" }}>
-               <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
-               <Phone className="w-5 h-5" /> {streaming ? "İşleniyor..." : "Hocaya Danış"}
-             </button>
+            <button onClick={() => sendMessage("[KONSÜLTASYON İSTEĞİ]")} disabled={streaming} className="w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl border transition-all" style={{ background: "var(--surface)", borderColor: "var(--border-strong)", color: "var(--foreground)" }}>
+              <Phone className="w-5 h-5" /> {streaming ? "İşleniyor..." : "Hocaya Danış"}
+            </button>
              <div className="glass rounded-2xl p-4 border transition-all shadow-sm space-y-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-               <button onClick={() => setShowDiagnosis(true)} className={`w-full flex items-center gap-2 text-sm font-bold py-2.5 px-3 rounded-xl border transition-all ${diagnosisSaved ? "bg-primary-light border-primary text-primary" : "bg-surface-2 border-border text-text-navy"}`}>
+               <button onClick={() => setShowDiagnosis(true)} className="w-full flex items-center gap-2 text-sm font-bold py-2.5 px-3 rounded-xl border transition-all" style={diagnosisSaved ? { background: "var(--accent-muted)", borderColor: "var(--foreground)", color: "var(--foreground)" } : { background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text-navy)" }}>
                  {diagnosisSaved ? <CheckCircle2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />} {diagnosisSaved ? "Tanılar Kaydedildi ✓" : "Klinik Tanı Gir"}
                </button>
-               <button onClick={handleComplete} disabled={completing || !diagnosisSaved} className="w-full flex items-center justify-center gap-2 text-white text-sm font-bold py-2.5 rounded-xl transition-all shadow-lg disabled:opacity-40" style={{ background: "var(--text-navy)" }}>
+               <button onClick={handleComplete} disabled={completing || !diagnosisSaved} className="w-full flex items-center justify-center gap-2 text-sm font-bold py-2.5 rounded-xl transition-all disabled:opacity-40" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
                  {completing ? "Raporlanıyor..." : "Vakayı Bitir"}
                </button>
              </div>
@@ -828,7 +827,7 @@ export default function CasePageContent() {
           <div className="p-3 sm:p-4 border-t" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
             <div className="flex items-end gap-2 rounded-2xl px-3 py-2 transition-all shadow-inner border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
               <textarea ref={textareaRef} value={input} onChange={(e) => { setInput(e.target.value); if (textareaRef.current) { textareaRef.current.style.height = "auto"; textareaRef.current.style.height = textareaRef.current.scrollHeight + "px"; } }} placeholder="Sorunuzu yazın..." rows={1} disabled={streaming} className="flex-1 bg-transparent text-sm resize-none outline-none" style={{ color: "var(--text)" }} />
-              <button onClick={() => sendMessage()} disabled={!input.trim() || streaming} className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md transition-all active:scale-95 disabled:opacity-50" style={{ background: "var(--primary)" }}><Send className="w-4 h-4" /></button>
+              <button onClick={() => sendMessage()} disabled={!input.trim() || streaming} className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-95 disabled:opacity-50" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}><Send className="w-4 h-4" /></button>
             </div>
           </div>
         </main>
@@ -876,8 +875,7 @@ export default function CasePageContent() {
                   ))}
                 </div>
                 <div className="p-4 md:p-6 border-t" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-                   <button onClick={orderLabs} disabled={selectedLabs.length === 0} className="w-full text-white font-black py-3 md:py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 flex justify-center items-center gap-2 group relative overflow-hidden" style={{ background: "var(--primary)" }}>
-                        <div className="absolute inset-0 bg-white/20 w-0 group-hover:w-full transition-all duration-300" />
+                   <button onClick={orderLabs} disabled={selectedLabs.length === 0} className="w-full font-semibold py-3 md:py-4 rounded-2xl transition-all disabled:opacity-50 active:scale-95 flex justify-center items-center gap-2" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
                         Tetkikleri İste
                    </button>
                 </div>

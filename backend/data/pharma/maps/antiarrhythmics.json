@@ -1,0 +1,183 @@
+{
+  "id": "antiarrhythmics",
+  "title_tr": "Antiarrhythmikler — Vaughan Williams Sınıfları",
+  "description_tr": "Sınıf I (Na⁺ kanal), II (β-bloker), III (K⁺ kanal), IV (Ca²⁺ kanal) ve digoksin/amiodaron gibi karma ajanların hedef iyon kanalları ve EKG etkileri (PR, QRS, QT).",
+  "source_attribution": "Antiarrhythmik farmakolojisi StatPearls (Antiarrhythmic Medications, Amiodarone, Lidocaine) ve GtoPdb iyon kanalı ligand verileri (CC BY-SA 4.0) temel alınarak derlenmiştir.",
+  "nodes": [
+    { "id": "med_ach", "label_tr": "Asetilkolin (vagal)", "type": "mediator", "high_yield": true, "description_tr": "Vagal uyarı SA/AV düğümde M2 reseptörü üzerinden K⁺ kanal açılımı → yavaşlatıcı etki. Digoksin vagal tonusu artırır." },
+
+    { "id": "r_nav15", "label_tr": "Na⁺ kanalı (Nav1.5, hızlı)", "type": "receptor", "high_yield": true, "description_tr": "Miyokard depolarizasyon fazı 0. Sınıf I ajanlar (lidokain, flekainid, prokainamid) durum-bağımlı bloke eder → QRS genişlemesi." },
+    { "id": "r_herg", "label_tr": "K⁺ kanalı (hERG / IKr)", "type": "receptor", "high_yield": true, "description_tr": "Repolarizasyon (faz 3). Sınıf III (amiodaron, sotalol) ve bazı ilaçlar IKr bloke eder → QT uzaması → torsades de pointes riski." },
+    { "id": "r_cav12", "label_tr": "L-tip Ca²⁺ kanalı (Cav1.2)", "type": "receptor", "high_yield": true, "description_tr": "SA/AV düğümde yavaş inward Ca²⁺ akımı (faz 0). Sınıf IV (verapamil, diltiazem) ve dihidropiridinler hedefi." },
+    { "id": "r_beta1", "label_tr": "β1 adrenerjik reseptör", "type": "receptor", "high_yield": true, "description_tr": "Sempatik uyarı → cAMP ↑ → SA/AV hızlanır, otomatisite artar. Sınıf II (β-bloker) burayı bloke eder." },
+    { "id": "r_na_k_atpase", "label_tr": "Na⁺/K⁺-ATPaz (digoksin hedefi)", "type": "receptor", "high_yield": true, "description_tr": "Digoksin inhibe eder → intraselüler Na⁺ ↑ → Na⁺/Ca²⁺ exchanger ile Ca²⁺ ↑ → pozitif inotropi; vagal tonus ↑ → AV ileti yavaşlar." },
+
+    { "id": "o_sa_node", "label_tr": "SA düğüm", "type": "organ", "high_yield": true, "description_tr": "Kardiyak pacemaker. β1 uyarı hızlandırır; Ca²⁺ kanal blokerleri ve β-bloker yavaşlatır." },
+    { "id": "o_av_node", "label_tr": "AV düğüm", "type": "organ", "high_yield": true, "description_tr": "İleti gecikmesi (PR interval). Verapamil, diltiazem, digoksin ve β-bloker PR'yi uzatır." },
+    { "id": "o_ventricle", "label_tr": "Ventrikül miyokard", "type": "organ", "high_yield": true, "description_tr": "Na⁺ kanal aracılı hızlı depolarizasyon (QRS). Ventriküler aritmilerde sınıf IB (lidokain) etkili." },
+    { "id": "o_repol", "label_tr": "Repolarizasyon (faz 3)", "type": "organ", "high_yield": true, "description_tr": "K⁺ kanal çıkış akımı action potential süresini belirler. Sınıf III AP süresini uzatır → QT ↑." },
+
+    { "id": "e_hr_down", "label_tr": "Kalp hızı ↓", "type": "effect", "high_yield": true, "description_tr": "β-bloker, Ca²⁺ kanal blokeri (non-DHP), digoksin ile SA/AV yavaşlaması." },
+    { "id": "e_pr_prolong", "label_tr": "PR interval ↑", "type": "effect", "high_yield": true, "description_tr": "AV nodal ileti gecikmesi. Verapamil, diltiazem, β-bloker, digoksin." },
+    { "id": "e_qrs_wide", "label_tr": "QRS genişlemesi", "type": "effect", "high_yield": true, "description_tr": "Sınıf I (özellikle IC flekainid) Na⁺ kanal bloğu → ventriküler depolarizasyon yavaşlar." },
+    { "id": "e_qt_prolong", "label_tr": "QT uzaması", "type": "effect", "high_yield": true, "description_tr": "Sınıf III (sotalol, amiodaron, dofetilid) IKr bloğu → torsades de pointes riski." },
+    { "id": "e_inotropy_up", "label_tr": "İnotropi ↑ (digoksin)", "type": "effect", "high_yield": true, "description_tr": "Digoksin miyokard Ca²⁺'yi artırır; hipokalemi toksisiteyi artırır." },
+    { "id": "e_arrhythmia_suppress", "label_tr": "Aritmi baskılama", "type": "effect", "high_yield": true, "description_tr": "Reentrant ve otomatik odakların baskılanması; sınıf ve aritmi tipine göre seçim kritik." }
+  ],
+  "edges": [
+    { "source": "r_beta1", "target": "o_sa_node", "relation": "activates", "effect_tr": "Kronotropi ↑" },
+    { "source": "r_beta1", "target": "o_av_node", "relation": "activates", "effect_tr": "AV ileti hızlanır" },
+    { "source": "r_cav12", "target": "o_sa_node", "relation": "activates", "effect_tr": "Ca²⁺ inward akım → depolarizasyon" },
+    { "source": "r_cav12", "target": "o_av_node", "relation": "activates", "effect_tr": "AV nodal ileti" },
+    { "source": "r_nav15", "target": "o_ventricle", "relation": "activates", "effect_tr": "Faz 0 depolarizasyon" },
+    { "source": "r_herg", "target": "o_repol", "relation": "activates", "effect_tr": "IKr repolarizasyon" },
+    { "source": "med_ach", "target": "o_av_node", "relation": "inhibits", "effect_tr": "Vagal yavaşlatma" },
+    { "source": "r_na_k_atpase", "target": "o_ventricle", "relation": "activates", "effect_tr": "Digoksin: Ca²⁺ loading" },
+
+    { "source": "o_sa_node", "target": "e_hr_down", "relation": "activates", "effect_tr": "Bradikardi (β/Ca blok)" },
+    { "source": "o_av_node", "target": "e_pr_prolong", "relation": "activates", "effect_tr": "PR uzaması" },
+    { "source": "o_ventricle", "target": "e_qrs_wide", "relation": "activates", "effect_tr": "Na⁺ kanal bloğu" },
+    { "source": "o_repol", "target": "e_qt_prolong", "relation": "activates", "effect_tr": "K⁺ kanal bloğu" },
+    { "source": "r_na_k_atpase", "target": "e_inotropy_up", "relation": "activates", "effect_tr": "Digoksin inotropi" }
+  ],
+  "interventions": [
+    {
+      "drug_class": "class_ia",
+      "label_tr": "Sınıf IA (prokainamid / kinidin)",
+      "targets": ["r_nav15", "r_herg"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_qrs_wide", "effect_tr": "Na⁺ kanal bloğu → QRS ↑" },
+        { "nodeId": "e_qt_prolong", "effect_tr": "K⁺ kanal bloğu → QT ↑" },
+        { "nodeId": "e_arrhythmia_suppress", "effect_tr": "Atrial & ventricular aritmiler" }
+      ],
+      "tr_products_atc": ["C01BA02", "C01BA01"]
+    },
+    {
+      "drug_class": "class_ib",
+      "label_tr": "Sınıf IB (lidokain / meksiletin)",
+      "targets": ["r_nav15"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "o_ventricle", "effect_tr": "İskemik dokuda durum-bağımlı Na⁺ bloğu" },
+        { "nodeId": "e_qrs_wide", "effect_tr": "Minimal QRS etkisi (normal dokuda az)" },
+        { "nodeId": "e_arrhythmia_suppress", "effect_tr": "Akut ventriküler aritmi (post-MI)" }
+      ],
+      "tr_products_atc": ["C01BB01", "C01BB02"]
+    },
+    {
+      "drug_class": "class_ic",
+      "label_tr": "Sınıf IC (flekainid / propafenon)",
+      "targets": ["r_nav15"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_qrs_wide", "effect_tr": "Belirgin QRS genişlemesi" },
+        { "nodeId": "e_arrhythmia_suppress", "effect_tr": "Supraventriküler aritmi (yapısal kalp hastalığında dikkat)" }
+      ],
+      "tr_products_atc": ["C01BC04", "C01BC03"]
+    },
+    {
+      "drug_class": "class_ii",
+      "label_tr": "Sınıf II (propranolol / metoprolol)",
+      "targets": ["r_beta1"],
+      "relation": "antagonist",
+      "downstream_effects": [
+        { "nodeId": "e_hr_down", "effect_tr": "Bradikardi" },
+        { "nodeId": "e_pr_prolong", "effect_tr": "AV ileti yavaşlar" },
+        { "nodeId": "e_arrhythmia_suppress", "effect_tr": "SVT, AF hız kontrolü, VT profilaksisi" }
+      ],
+      "tr_products_atc": ["C07AA05", "C07AB02"]
+    },
+    {
+      "drug_class": "class_iii",
+      "label_tr": "Sınıf III (amiodaron / sotalol)",
+      "targets": ["r_herg"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_qt_prolong", "effect_tr": "QT uzaması → torsades riski" },
+        { "nodeId": "e_arrhythmia_suppress", "effect_tr": "Geniş spektrum (VF, AF, VT)" },
+        { "nodeId": "r_nav15", "effect_tr": "Amiodaron ek Na⁺/Ca²⁺/α/β etkileri (karma)" }
+      ],
+      "tr_products_atc": ["C01BD01", "C07AA07"]
+    },
+    {
+      "drug_class": "class_iv",
+      "label_tr": "Sınıf IV (verapamil / diltiazem)",
+      "targets": ["r_cav12"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_hr_down", "effect_tr": "SA/AV yavaşlaması" },
+        { "nodeId": "e_pr_prolong", "effect_tr": "PR uzaması" },
+        { "nodeId": "e_arrhythmia_suppress", "effect_tr": "AV nodal reentrant taşikardi (AVNRT)" }
+      ],
+      "tr_products_atc": ["C08DA01", "C08DB01"]
+    },
+    {
+      "drug_class": "digoxin",
+      "label_tr": "Digoksin (kardiyak glikozit)",
+      "targets": ["r_na_k_atpase"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_inotropy_up", "effect_tr": "Pozitif inotropi (HF)" },
+        { "nodeId": "e_pr_prolong", "effect_tr": "Vagal tonus ↑ → AV blok" },
+        { "nodeId": "e_hr_down", "effect_tr": "AF hız kontrolü" }
+      ],
+      "tr_products_atc": ["C01AA05"]
+    },
+    {
+      "drug_class": "adenosine",
+      "label_tr": "Adenozin",
+      "targets": ["o_av_node"],
+      "relation": "activates",
+      "downstream_effects": [
+        { "nodeId": "e_arrhythmia_suppress", "effect_tr": "AVNRT/SVT acil terminasyon (yarı ömür saniyeler)" },
+        { "nodeId": "e_hr_down", "effect_tr": "Geçici asistoli" }
+      ],
+      "tr_products_atc": ["C01EB10"]
+    }
+  ],
+  "quiz": [
+    {
+      "q_tr": "Flekainid (sınıf IC) EKG'de en belirgin hangi değişikliği yapar?",
+      "options_tr": ["QT kısalması", "QRS genişlemesi", "PR kısalması", "U dalgası kaybı"],
+      "answer_idx": 1,
+      "explanation_tr": "Sınıf IC ajanlar güçlü Na⁺ kanal bloğu yapar → ventriküler depolarizasyon yavaşlar → QRS genişler.",
+      "node_id": "e_qrs_wide"
+    },
+    {
+      "q_tr": "AV nodal reentrant taşikardi (AVNRT) acil tedavisinde hangi sınıf tercih edilir?",
+      "options_tr": ["Sınıf IB (lidokain)", "Sınıf IV (verapamil) veya adenozin", "Sınıf IC (flekainid)", "Digoksin tek başına"],
+      "answer_idx": 1,
+      "explanation_tr": "AV nodal iletiyi yavaşlatan sınıf IV veya adenozin reentrant devreyi keser. Adenozin yarı ömrü çok kısadır.",
+      "node_id": "r_cav12"
+    },
+    {
+      "q_tr": "Sotalol hangi iki Vaughan Williams sınıfının özelliklerini taşır?",
+      "options_tr": ["I ve II", "II ve III", "III ve IV", "I ve IV"],
+      "answer_idx": 1,
+      "explanation_tr": "Sotalol racemik: D-isomeri β-bloker (II), L-isomeri K⁺ kanal bloker (III). QT uzaması riski taşır.",
+      "node_id": "r_herg"
+    },
+    {
+      "q_tr": "Digoksin toksisitesi hangi elektrolit bozukluğunda belirginleşir?",
+      "options_tr": ["Hiperkalemi", "Hipokalemi", "Hipernatremi", "Hipomagnezemi olmadan hiç etkilenmez"],
+      "answer_idx": 1,
+      "explanation_tr": "Hipokalemi Na⁺/K⁺-ATPaz inhibisyonunu güçlendirir → digoksin toksisitesi (aritmi, bulantı, görme haleleri).",
+      "node_id": "r_na_k_atpase"
+    },
+    {
+      "q_tr": "Post-MI ventriküler aritmide tercih edilen sınıf IB ajan hangisidir?",
+      "options_tr": ["Kinidin", "Lidokain", "Amiodaron (ilk tercih değil)", "Verapamil"],
+      "answer_idx": 1,
+      "explanation_tr": "Lidokain iskemik/depolarize dokuda durum-bağımlı Na⁺ kanal bloğu yapar; akut VT/VF profilaksisinde kullanılmıştır.",
+      "node_id": "r_nav15"
+    },
+    {
+      "q_tr": "Torsades de pointes riski en çok hangi antiarrhythmik sınıfla ilişkilidir?",
+      "options_tr": ["Sınıf II (β-bloker)", "Sınıf III (K⁺ kanal bloker)", "Sınıf IV (Ca²⁺ bloker)", "Adenozin"],
+      "answer_idx": 1,
+      "explanation_tr": "IKr (hERG) bloğu repolarizasyonu uzatır → QT ↑ → torsades. Sotalol, dofetilid, amiodaron risk taşır.",
+      "node_id": "e_qt_prolong"
+    }
+  ]
+}

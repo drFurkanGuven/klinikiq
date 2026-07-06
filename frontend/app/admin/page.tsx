@@ -268,8 +268,8 @@ export default function AdminDashboardPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-danger">
-                <ShieldAlert className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-accent">
+                <ShieldAlert className="w-5 h-5 text-accent-foreground" />
               </div>
               <div className="hidden sm:block">
                 <span className="font-black text-lg tracking-tight block leading-tight">Yönetim Paneli</span>
@@ -370,7 +370,7 @@ export default function AdminDashboardPage() {
                                             const val = (document.getElementById(`limit-${user.id}`) as HTMLInputElement).value;
                                             handleUpdateLimit(user.id, parseInt(val));
                                         }}
-                                        className="p-2.5 rounded-xl bg-primary text-white shadow-lg hover:scale-110 active:scale-95 transition-all"
+                                        className="p-2.5 rounded-xl bg-accent text-accent-foreground hover:opacity-90 active:scale-95 transition-all"
                                     >
                                         <Save className="w-4 h-4" />
                                     </button>
@@ -410,7 +410,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setIsUploadModalOpen(true)}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-white bg-primary shadow-lg hover:opacity-95 transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-accent-foreground bg-accent hover:opacity-90 transition-all"
                 >
                   <Plus className="w-5 h-5" />
                   TIFF / görüntü yükle
@@ -511,7 +511,7 @@ export default function AdminDashboardPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteImage(img.id)}
-                                  className="p-2.5 rounded-xl bg-danger/10 text-danger hover:bg-danger hover:text-white transition-all"
+                                  className="p-2.5 rounded-xl bg-[var(--destructive-muted)] text-destructive hover:bg-destructive hover:text-white transition-all"
                                   title="Veritabanı ve sunucudan sil"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -586,7 +586,7 @@ export default function AdminDashboardPage() {
                             <button
                               type="button"
                               onClick={() => handleRegisterOrphan(o.relative_path)}
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wide bg-primary text-white hover:opacity-95 transition-all"
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wide bg-accent text-accent-foreground hover:opacity-90 transition-all"
                             >
                               <Link2 className="w-3.5 h-3.5" />
                               Veritabanına ekle
@@ -665,7 +665,7 @@ export default function AdminDashboardPage() {
               <button
                 type="submit"
                 disabled={editSaving}
-                className="px-5 py-2.5 rounded-xl text-sm font-black bg-primary text-white hover:opacity-95 disabled:opacity-50 flex items-center gap-2"
+                className="px-5 py-2.5 rounded-xl text-sm font-black bg-accent text-accent-foreground hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
               >
                 {editSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Kaydet
@@ -742,7 +742,7 @@ export default function AdminDashboardPage() {
               <button
                 type="submit"
                 disabled={hfImporting}
-                className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-xs font-black uppercase tracking-widest bg-violet-600 text-white hover:bg-violet-500 disabled:opacity-50 transition-all"
+                className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-xs font-black uppercase tracking-widest bg-accent text-accent-foreground hover:opacity-90 disabled:opacity-50 transition-all"
               >
                 {hfImporting ? (
                   <>

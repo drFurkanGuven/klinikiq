@@ -54,9 +54,9 @@ export default function SimulasyonHubPage() {
             <div className="flex items-center gap-3 min-w-0">
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shrink-0"
-                style={{ background: "var(--primary)" }}
+                style={{ background: "var(--accent)" }}
               >
-                <Stethoscope className="w-5 h-5 text-white" />
+                <Stethoscope className="w-5 h-5" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <div className="min-w-0">
                 <span className="font-black text-lg tracking-tight block leading-tight truncate">

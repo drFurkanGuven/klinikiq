@@ -122,44 +122,6 @@ export interface LeaderboardItem {
   emergency_correct: number;
 }
 
-export interface DrugSummary {
-  drugbank_id: string;
-  name: string;
-  drug_type: string | null;
-  groups: string | null;
-  atc_codes: string | null;
-  indication: string | null;
-}
-
-export interface DrugDetail {
-  drugbank_id: string;
-  name: string;
-  drug_type: string | null;
-  groups: string | null;
-  description: string | null;
-  indication: string | null;
-  mechanism: string | null;
-  pharmacodynamics: string | null;
-  toxicity: string | null;
-  metabolism: string | null;
-  absorption: string | null;
-  half_life: string | null;
-  protein_binding: string | null;
-  route_of_elimination: string | null;
-  volume_of_distribution: string | null;
-  drug_interactions: string | null;
-  food_interactions: string | null;
-  targets: string | null;
-  atc_codes: string | null;
-  average_mass: string | null;
-}
-
-export interface DrugSearchResponse {
-  total: number;
-  page: number;
-  results: DrugSummary[];
-}
-
 export interface EmergencyMcqStats {
   path: string;
   mcq_count: number;
@@ -376,22 +338,6 @@ export const emergencyMcqApi = {
     api.get<EmergencyMcqReportOut>(`/emergency-mcq/reports/${encodeURIComponent(id)}`),
 };
 
-export const drugsApi = {
-  search: (q: string, page = 1, limit = 25, atc_class?: string) =>
-    api.get<DrugSearchResponse>("/drugs/search", {
-      params: { q, page, limit, ...(atc_class ? { atc_class } : {}) },
-    }),
-  detail: (drugbank_id: string) =>
-    api.get<DrugDetail>(`/drugs/${encodeURIComponent(drugbank_id)}`),
-  compare: (ids: string[]) =>
-    api.get<{ drugs: DrugDetail[] }>("/drugs/compare", {
-      params: { ids: ids.join(",") },
-    }),
-  atcTree: () => api.get<{ categories: string[] }>("/drugs/atc-tree"),
-  byAtc: (category: string) =>
-    api.get<{ results: DrugSummary[] }>("/drugs/by-atc", { params: { category } }),
-};
-
 export const leaderboardApi = {
   list: () => api.get<LeaderboardItem[]>("/users/leaderboard"),
 };
@@ -515,35 +461,6 @@ export const microscopyApi = {
   }) => api.get<HistologyImage[]>("/microscope/images", { params }),
   getImage: (id: string) =>
     api.get<HistologyImage>(`/microscope/images/${encodeURIComponent(id)}`),
-};
-
-// ── Antibiyotik veri tabanı ─────────────────────────────────────────────────
-
-export interface AntibioticByDrugClass {
-  drug_class: string;
-  total: number;
-  resistance_mechanisms: {
-    resistance_mechanism: string;
-    count: number;
-    gene_families: string[];
-    entries: {
-      antibiotic_name: string;
-      organism: string | null;
-      resistance_mechanism: string | null;
-      aro_accession: string | null;
-      amr_gene_family: string | null;
-      drug_class: string | null;
-      description: string | null;
-    }[];
-  }[];
-}
-
-export const antibioticsApi = {
-  drugClasses: () => api.get<{ classes: string[] }>("/antibiotics/drug-classes"),
-  byDrugClass: (drug_class: string) =>
-    api.get<AntibioticByDrugClass>("/antibiotics/by-drug-class", {
-      params: { drug_class },
-    }),
 };
 
 /** Dashboard vb. için (frontend usersApi ile aynı uç) */

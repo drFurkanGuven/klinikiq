@@ -23,7 +23,6 @@ import {
   Star,
   X,
   Pill,
-  ExternalLink,
   HelpCircle,
   Info,
 } from "lucide-react";
@@ -57,7 +56,7 @@ const TYPE_LABEL: Record<PharmaNodeType, string> = {
 };
 
 function relationColor(relation: string): string {
-  return relation === "antagonist" || relation === "inhibits" ? "#dc2626" : "var(--primary)";
+  return relation === "antagonist" || relation === "inhibits" ? "var(--muted)" : "var(--foreground)";
 }
 
 export default function MapDetail({ id }: { id: string }) {
@@ -212,8 +211,8 @@ export default function MapDetail({ id }: { id: string }) {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shrink-0" style={{ background: "var(--primary)" }}>
-                <Waypoints className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--accent)" }}>
+                <Waypoints className="w-5 h-5" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <div className="min-w-0">
                 <span className="font-black text-base sm:text-lg tracking-tight block leading-tight truncate">
@@ -268,7 +267,7 @@ export default function MapDetail({ id }: { id: string }) {
                       className="px-3 py-2 rounded-xl text-xs font-bold border transition-all"
                       style={
                         active
-                          ? { background: "var(--primary)", color: "#fff", borderColor: "var(--primary)" }
+                          ? { background: "var(--accent)", color: "var(--accent-foreground)", borderColor: "var(--accent)" }
                           : { background: "var(--surface)", color: "var(--text)", borderColor: "var(--border)" }
                       }
                     >
@@ -331,15 +330,14 @@ export default function MapDetail({ id }: { id: string }) {
                         </p>
                         <div className="flex flex-wrap gap-1.5">
                           {intervention.tr_products_atc.map((atc) => (
-                            <Link
+                            <span
                               key={atc}
-                              href={`/farmakoloji/ilaclar?q=${encodeURIComponent(atc)}`}
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-mono font-bold border transition-all hover:bg-black/5"
-                              style={{ borderColor: "var(--border)", color: "var(--primary)" }}
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-mono font-bold border"
+                              style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+                              title="ATC kodu (TİTCK sınıflandırması)"
                             >
                               {atc}
-                              <ExternalLink className="w-3 h-3" />
-                            </Link>
+                            </span>
                           ))}
                         </div>
                       </>
@@ -354,7 +352,7 @@ export default function MapDetail({ id }: { id: string }) {
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <h3 className="font-black text-base leading-snug">{selectedNode.label_tr}</h3>
-                          {selectedNode.high_yield && <Star className="w-4 h-4 shrink-0" style={{ color: "#eab308", fill: "#eab308" }} />}
+                          {selectedNode.high_yield && <Star className="w-4 h-4 shrink-0" style={{ color: "var(--foreground)", fill: "var(--foreground)" }} />}
                         </div>
                         <button type="button" onClick={() => setSelectedNodeId(null)} className="shrink-0 opacity-50 hover:opacity-100" aria-label="Kapat">
                           <X className="w-4 h-4" />
@@ -362,7 +360,7 @@ export default function MapDetail({ id }: { id: string }) {
                       </div>
                       <span
                         className="inline-block text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full mb-3"
-                        style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", color: "var(--primary)" }}
+                        style={{ background: "var(--surface-hover)", color: "var(--foreground)" }}
                       >
                         {TYPE_LABEL[selectedNode.type]}
                       </span>
@@ -372,9 +370,9 @@ export default function MapDetail({ id }: { id: string }) {
                       {selectedNode.high_yield && (
                         <div
                           className="mt-3 rounded-xl border p-3 text-xs font-medium"
-                          style={{ borderColor: "#eab308", background: "color-mix(in srgb, #eab308 12%, transparent)", color: "var(--text)" }}
+                          style={{ borderColor: "var(--border-strong)", background: "var(--surface-hover)", color: "var(--text)" }}
                         >
-                          <span className="font-black" style={{ color: "#a16207" }}>Yüksek verimli (high-yield): </span>
+                          <span className="font-black" style={{ color: "var(--foreground)" }}>Yüksek verimli (high-yield): </span>
                           Bu kavram TUS&apos;ta sık sorulur.
                         </div>
                       )}
@@ -391,9 +389,9 @@ export default function MapDetail({ id }: { id: string }) {
                 <div className="rounded-2xl border p-4 text-xs" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
                   <p className="font-black uppercase tracking-wide mb-2" style={{ color: "var(--text-muted)" }}>Gösterim</p>
                   <ul className="space-y-1.5" style={{ color: "var(--text-muted)" }}>
-                    <li className="flex items-center gap-2"><span className="w-6 h-0.5 rounded" style={{ background: "var(--primary)" }} /> Uyarı / agonist</li>
-                    <li className="flex items-center gap-2"><span className="w-6 h-0.5 rounded" style={{ background: "#dc2626", borderTop: "2px dashed #dc2626" }} /> İnhibisyon / antagonist</li>
-                    <li className="flex items-center gap-2"><Star className="w-3.5 h-3.5" style={{ color: "#eab308", fill: "#eab308" }} /> Yüksek verimli konu</li>
+                    <li className="flex items-center gap-2"><span className="w-6 h-0.5 rounded" style={{ background: "var(--foreground)" }} /> Uyarı / agonist</li>
+                    <li className="flex items-center gap-2"><span className="w-6 border-t-2 border-dashed" style={{ borderColor: "var(--muted)" }} /> İnhibisyon / antagonist</li>
+                    <li className="flex items-center gap-2"><Star className="w-3.5 h-3.5" style={{ color: "var(--foreground)", fill: "var(--foreground)" }} /> Yüksek verimli konu</li>
                   </ul>
                 </div>
               </aside>
@@ -516,7 +514,7 @@ function QuizSection({ map, onFocusNode }: { map: PharmaMap; onFocusNode: (nodeI
               Puan: <span style={{ color: "var(--primary)", fontWeight: 600 }}>{score}</span> / {idx}
             </span>
             {answered && (
-              <button onClick={next} className="px-4 py-2 rounded-lg text-sm font-medium text-white hover:opacity-90" style={{ background: "var(--primary)" }}>
+              <button onClick={next} className="px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
                 {idx + 1 < quiz.length ? "Sonraki →" : "Sonucu Gör →"}
               </button>
             )}
@@ -528,7 +526,7 @@ function QuizSection({ map, onFocusNode }: { map: PharmaMap; onFocusNode: (nodeI
             {Math.round((score / quiz.length) * 100)}%
           </div>
           <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>{score} / {quiz.length} doğru</p>
-          <button onClick={restart} className="px-4 py-2 rounded-lg text-sm font-medium text-white hover:opacity-90" style={{ background: "var(--primary)" }}>
+          <button onClick={restart} className="px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
             Tekrar Başla
           </button>
         </div>

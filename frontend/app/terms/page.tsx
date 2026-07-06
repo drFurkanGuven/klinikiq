@@ -46,20 +46,20 @@ const TOC: { href: string; label: string }[] = [
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-300 overflow-y-auto">
-      <nav className="glass border-b border-slate-800 sticky top-0 z-50">
+    <div className="min-h-screen flex flex-col bg-background text-foreground overflow-y-auto">
+      <nav className="glass border-b border-border sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center gap-4">
           <Link
             href="/"
-            className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-surface-hover rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 text-slate-400" />
+            <ArrowLeft className="w-5 h-5 text-muted" />
           </Link>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-              <Stethoscope className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+              <Stethoscope className="w-4 h-4 text-accent-foreground" />
             </div>
-            <span className="font-bold text-white">KlinikIQ</span>
+            <span className="font-bold text-foreground">KlinikIQ</span>
           </div>
         </div>
       </nav>
@@ -67,48 +67,48 @@ export default function TermsOfService() {
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-12">
         {/* Başlık */}
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-            <FileText className="w-6 h-6 text-blue-400" />
+          <div className="w-12 h-12 rounded-2xl bg-surface-muted flex items-center justify-center">
+            <FileText className="w-6 h-6 text-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white">
+            <h1 className="text-2xl sm:text-3xl font-black text-foreground">
               Kullanım Şartları
             </h1>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <p className="text-sm text-muted mt-0.5">
               KlinikIQ — Dr. Furkan Güven tarafından geliştirilmiştir
             </p>
           </div>
         </div>
-        <p className="text-xs text-slate-500 mb-8">
-          Son güncelleme: <span className="text-slate-300 font-bold">{LAST_UPDATED}</span>
+        <p className="text-xs text-muted mb-8">
+          Son güncelleme: <span className="text-foreground font-bold">{LAST_UPDATED}</span>
         </p>
 
         {/* Tıbbi Disclaimer */}
-        <div className="bg-amber-500/10 border-2 border-amber-500/40 rounded-2xl p-6 mb-6">
+        <div className="bg-surface-muted border-2 border-border-strong rounded-2xl p-6 mb-6">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-7 h-7 text-amber-400 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-7 h-7 text-warning shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-black text-amber-300 mb-2 uppercase tracking-wider">
+              <p className="text-sm font-black text-warning mb-2 uppercase tracking-wider">
                 Tıbbi Tavsiye Değildir — Critical Disclaimer
               </p>
-              <p className="text-sm text-amber-100/90 leading-relaxed mb-2">
+              <p className="text-sm text-warning leading-relaxed mb-2">
                 KlinikIQ ("Platform"), <span className="font-bold">tıp eğitimi ve klinik karar verme pratiği</span>{' '}
                 amacıyla tasarlanmış kurgusal bir simülasyon ortamıdır. Platformda
                 yer alan vakalar, semptomlar, laboratuvar değerleri, görüntüleme
                 sonuçları, tedavi önerileri ve yapay zeka tarafından üretilen
                 yanıtların tamamı <span className="font-bold">eğitim amaçlı kurgudur</span>.
               </p>
-              <ul className="text-xs text-amber-200/80 space-y-1.5 mt-3 pl-3">
+              <ul className="text-xs text-warning space-y-1.5 mt-3 pl-3">
                 <li className="flex items-start gap-2">
-                  <span className="text-amber-300 mt-0.5">•</span>
+                  <span className="text-warning mt-0.5">•</span>
                   Platform içeriği <span className="font-bold">teşhis, tedavi veya profesyonel tıbbi tavsiye</span> yerine geçemez.
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-amber-300 mt-0.5">•</span>
+                  <span className="text-warning mt-0.5">•</span>
                   Gerçek hastalar üzerinde uygulamak, klinik karar mekanizmasında kullanmak yasaktır.
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-amber-300 mt-0.5">•</span>
+                  <span className="text-warning mt-0.5">•</span>
                   Sağlık sorunlarınız için lütfen yetkili bir hekime başvurun. Acil durumlarda <span className="font-bold">112</span>'yi arayın.
                 </li>
               </ul>
@@ -117,12 +117,12 @@ export default function TermsOfService() {
         </div>
 
         {/* Giriş */}
-        <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 mb-6">
-          <p className="text-sm text-slate-300 leading-relaxed">
+        <div className="bg-surface-muted rounded-2xl border border-border p-6 mb-6">
+          <p className="text-sm text-foreground leading-relaxed">
             Bu Kullanım Şartları ("Şartlar"), KlinikIQ web sitesi, mobil
             uygulamaları ve ilgili tüm hizmetlerinin (toplu olarak "Hizmet")
             kullanımını düzenler. Hizmeti kullanmaya başlayarak bu Şartları,{' '}
-            <Link href="/privacy" className="text-blue-400 hover:underline">
+            <Link href="/privacy" className="text-foreground hover:underline">
               Gizlilik Politikası
             </Link>
             'nı ve yukarıdaki Tıbbi Disclaimer'ı kabul ettiğinizi beyan
@@ -131,17 +131,17 @@ export default function TermsOfService() {
         </div>
 
         {/* İçindekiler */}
-        <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 mb-6">
-          <h2 className="text-sm font-black text-white mb-3 flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-slate-400" />
+        <div className="bg-surface-muted rounded-2xl border border-border p-6 mb-6">
+          <h2 className="text-sm font-black text-foreground mb-3 flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-muted" />
             İçindekiler
           </h2>
-          <ol className="text-sm text-slate-400 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 list-decimal pl-5">
+          <ol className="text-sm text-muted grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 list-decimal pl-5">
             {TOC.map((item) => (
               <li key={item.href}>
                 <a
                   href={item.href}
-                  className="hover:text-white transition-colors hover:underline"
+                  className="hover:text-foreground transition-colors hover:underline"
                 >
                   {item.label}
                 </a>
@@ -154,29 +154,29 @@ export default function TermsOfService() {
         <Section
           id="tanimlar"
           icon={BookOpen}
-          color="text-slate-300"
-          bg="bg-slate-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="1. Tanımlar"
         >
-          <ul className="text-sm text-slate-300 space-y-2">
+          <ul className="text-sm text-foreground space-y-2">
             <Bullet>
-              <span className="font-bold text-white">Platform / Hizmet:</span>{' '}
+              <span className="font-bold text-foreground">Platform / Hizmet:</span>{' '}
               KlinikIQ adı altında sunulan web sitesi, iOS ve Android uygulamaları, ilgili API'ler ve içerikler.
             </Bullet>
             <Bullet>
-              <span className="font-bold text-white">Geliştirici / Sağlayıcı:</span>{' '}
+              <span className="font-bold text-foreground">Geliştirici / Sağlayıcı:</span>{' '}
               {PROVIDER}.
             </Bullet>
             <Bullet>
-              <span className="font-bold text-white">Kullanıcı:</span>{' '}
+              <span className="font-bold text-foreground">Kullanıcı:</span>{' '}
               Hizmete kayıt olan ya da Hizmeti herhangi bir şekilde kullanan gerçek kişi.
             </Bullet>
             <Bullet>
-              <span className="font-bold text-white">İçerik:</span>{' '}
+              <span className="font-bold text-foreground">İçerik:</span>{' '}
               Vakalar, sorular, flashcardlar, histoloji görselleri, raporlar, yapay zeka çıktıları dahil tüm metin / görsel öğeler.
             </Bullet>
             <Bullet>
-              <span className="font-bold text-white">Yapay Zeka Çıktısı:</span>{' '}
+              <span className="font-bold text-foreground">Yapay Zeka Çıktısı:</span>{' '}
               Üçüncü taraf büyük dil modelleri tarafından üretilen ve Platform tarafından sunulan otomatik yanıtlar.
             </Bullet>
           </ul>
@@ -186,13 +186,13 @@ export default function TermsOfService() {
         <Section
           id="kapsam"
           icon={StethoIcon}
-          color="text-blue-400"
-          bg="bg-blue-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="2. Hizmetin Kapsamı"
         >
           <p>
             KlinikIQ; tıp fakültesi öğrencileri ve hekim adayları için
-            hazırlanmış oyunlaştırılmış bir <span className="font-bold text-white">klinik karar verme simülatörüdür</span>.
+            hazırlanmış oyunlaştırılmış bir <span className="font-bold text-foreground">klinik karar verme simülatörüdür</span>.
             Platform; sanal hasta simülasyonu, acil vaka senaryoları, TUS hazırlık
             flashcardları, histoloji öğrenme atlası ve performans takibi gibi
             modüller sunar. İçerik kurgu olup gerçek hastaları temsil etmez.
@@ -203,12 +203,12 @@ export default function TermsOfService() {
         <Section
           id="uygunluk"
           icon={User}
-          color="text-emerald-400"
-          bg="bg-emerald-500/10"
+          color="text-success"
+          bg="bg-surface-muted"
           title="3. Uygunluk ve Hesap"
         >
-          <ul className="text-sm text-slate-300 space-y-2">
-            <Bullet>Hizmeti kullanabilmek için en az <span className="font-bold text-white">16 yaşında</span> olmalısınız.</Bullet>
+          <ul className="text-sm text-foreground space-y-2">
+            <Bullet>Hizmeti kullanabilmek için en az <span className="font-bold text-foreground">16 yaşında</span> olmalısınız.</Bullet>
             <Bullet>Kayıt sırasında verdiğiniz bilgilerin doğru, güncel ve eksiksiz olduğunu beyan edersiniz.</Bullet>
             <Bullet>Bir hesap birden fazla kişi tarafından paylaşılamaz; hesabınızdaki tüm aktivitelerden siz sorumlusunuz.</Bullet>
             <Bullet>Şifrenizin gizliliğini korumak ve yetkisiz erişimi derhal bildirmek sizin yükümlülüğünüzdür.</Bullet>
@@ -220,12 +220,12 @@ export default function TermsOfService() {
         <Section
           id="yukumluluk"
           icon={CheckCircle2}
-          color="text-cyan-400"
-          bg="bg-cyan-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="4. Kullanıcı Yükümlülükleri"
         >
           <p className="mb-3">Hizmeti kullanırken:</p>
-          <ul className="text-sm text-slate-300 space-y-2">
+          <ul className="text-sm text-foreground space-y-2">
             <Bullet>Yalnızca eğitim ve kişisel öğrenme amacıyla kullanacağınızı kabul edersiniz.</Bullet>
             <Bullet>Gerçek hasta verisi, kimlik bilgisi veya başka bir kişinin özel verisini Platform'a girmeyeceğinizi taahhüt edersiniz.</Bullet>
             <Bullet>Yürürlükteki tüm mevzuata, mesleki etik kurallarına ve kamu düzenine uygun davranacağınızı kabul edersiniz.</Bullet>
@@ -237,22 +237,22 @@ export default function TermsOfService() {
         <Section
           id="yasaklar"
           icon={XCircle}
-          color="text-red-400"
-          bg="bg-red-500/10"
+          color="text-destructive"
+          bg="bg-surface-muted"
           title="5. Yasaklı Davranışlar"
         >
           <p className="mb-3">Aşağıdaki davranışlar kesinlikle yasaktır:</p>
-          <ul className="text-sm text-slate-300 space-y-2">
+          <ul className="text-sm text-foreground space-y-2">
             <Bullet>Liderlik tablosunu manipüle etmek (puan hilesi, otomatik script ile vaka çözme).</Bullet>
             <Bullet>API'leri yetkisiz şekilde scrape etmek, ters mühendislik yapmak veya rate limit'leri aşmaya çalışmak.</Bullet>
-            <Bullet>Yapay zeka modellerini sistemin amacı dışına çıkarmaya yönelik <span className="font-bold text-white">prompt injection</span> ve jailbreak girişimleri.</Bullet>
+            <Bullet>Yapay zeka modellerini sistemin amacı dışına çıkarmaya yönelik <span className="font-bold text-foreground">prompt injection</span> ve jailbreak girişimleri.</Bullet>
             <Bullet>Platform içeriğini izinsiz toplu indirip ticari amaçla yeniden dağıtmak.</Bullet>
             <Bullet>Diğer kullanıcıları taciz etmek, tehdit etmek veya nefret söylemi paylaşmak.</Bullet>
             <Bullet>Telif hakkı veya fikri mülkiyet haklarını ihlal eden içerik yüklemek.</Bullet>
             <Bullet>Platform'a virüs, kötü amaçlı yazılım veya zararlı kod enjekte etmeye çalışmak.</Bullet>
             <Bullet>Hizmetin altyapısına yetkisiz erişmeye veya başka kullanıcıların hesaplarını ele geçirmeye çalışmak.</Bullet>
           </ul>
-          <p className="mt-3 text-xs text-amber-300/80 italic">
+          <p className="mt-3 text-xs text-warning italic">
             Bu maddelere aykırı davranışlar; uyarı yapılmaksızın hesap askıya alma,
             kalıcı silme ve gerekli hâllerde yasal işlem başlatma ile sonuçlanabilir.
           </p>
@@ -269,12 +269,12 @@ export default function TermsOfService() {
           <p className="mb-3">
             Platformun yazılım kodu, tasarımı, marka, logo ve KlinikIQ tarafından
             özel olarak hazırlanmış içerikler{' '}
-            <span className="font-bold text-white">{PROVIDER}</span>'e aittir ve
+            <span className="font-bold text-foreground">{PROVIDER}</span>'e aittir ve
             yürürlükteki fikri mülkiyet mevzuatı ile korunur.
           </p>
-          <ul className="text-sm text-slate-300 space-y-2">
+          <ul className="text-sm text-foreground space-y-2">
             <Bullet>İçeriği kopyalamak, çoğaltmak, ticari amaçla dağıtmak veya türev eserler oluşturmak yazılı izin gerektirir.</Bullet>
-            <Bullet>Açık kaynak bileşenler ve üçüncü taraf veri setleri (HuggingFace TUS dataset, Wikimedia Commons görselleri vb.) kendi lisanslarına tâbidir; ilgili atıflar uygulama içindeki <span className="font-bold text-white">"Krediler ve Teşekkürler"</span> sayfasında listelenir.</Bullet>
+            <Bullet>Açık kaynak bileşenler ve üçüncü taraf veri setleri (HuggingFace TUS dataset, Wikimedia Commons görselleri vb.) kendi lisanslarına tâbidir; ilgili atıflar uygulama içindeki <span className="font-bold text-foreground">"Krediler ve Teşekkürler"</span> sayfasında listelenir.</Bullet>
             <Bullet>Kullanıcı tarafından platforma girilen serbest metinler (vaka cevapları, notlar) Kullanıcıya aittir; Geliştirici bu içerikleri yalnızca hizmeti sunmak ve istatistik üretmek için işler.</Bullet>
           </ul>
         </Section>
@@ -283,16 +283,16 @@ export default function TermsOfService() {
         <Section
           id="ucuncu-taraf"
           icon={Bot}
-          color="text-indigo-400"
-          bg="bg-indigo-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="7. Üçüncü Taraf İçerikleri ve Yapay Zeka"
         >
           <p className="mb-3">
             Hizmet, üçüncü taraf büyük dil modelleri (OpenAI, Anthropic, Google
             vb.) ve açık kaynak veri kümeleri kullanır. Bu nedenle:
           </p>
-          <ul className="text-sm text-slate-300 space-y-2">
-            <Bullet>Yapay zeka çıktıları <span className="font-bold text-white">kesin doğruluk garantisi taşımaz</span>; tıbbi referans olarak kullanılamaz.</Bullet>
+          <ul className="text-sm text-foreground space-y-2">
+            <Bullet>Yapay zeka çıktıları <span className="font-bold text-foreground">kesin doğruluk garantisi taşımaz</span>; tıbbi referans olarak kullanılamaz.</Bullet>
             <Bullet>Üretilen yanıtlar zaman zaman güncel literatürle çelişebilir, yanlı veya hatalı olabilir.</Bullet>
             <Bullet>Üçüncü taraf bağlantılar veya entegrasyonlar yalnızca kolaylık sağlar; ilgili sayfaların içeriği ve gizlilik uygulamaları KlinikIQ'nun sorumluluğunda değildir.</Bullet>
           </ul>
@@ -302,17 +302,17 @@ export default function TermsOfService() {
         <Section
           id="sorumluluk"
           icon={ShieldAlert}
-          color="text-amber-400"
-          bg="bg-amber-500/10"
+          color="text-warning"
+          bg="bg-surface-muted"
           title="8. Sorumluluk Reddi"
         >
           <p className="mb-3">
             KlinikIQ "olduğu gibi" ve "mevcut olduğu sürece" esasıyla sunulur.
             Yürürlükteki mevzuatın izin verdiği azami ölçüde:
           </p>
-          <ul className="text-sm text-slate-300 space-y-2">
+          <ul className="text-sm text-foreground space-y-2">
             <Bullet>Platform içeriğinin mutlak doğruluğu, güncelliği veya eksiksizliği garanti edilmez.</Bullet>
-            <Bullet>Platform'da yer alan bilgilerin <span className="font-bold text-white">tıbbi karar verme amacıyla kullanılmasından doğan</span> her türlü zarardan Geliştirici sorumlu tutulamaz.</Bullet>
+            <Bullet>Platform'da yer alan bilgilerin <span className="font-bold text-foreground">tıbbi karar verme amacıyla kullanılmasından doğan</span> her türlü zarardan Geliştirici sorumlu tutulamaz.</Bullet>
             <Bullet>Doğrudan veya dolaylı zararlar, kâr kaybı, veri kaybı, itibar kaybı gibi durumlar için Geliştirici'nin toplam sorumluluğu, ilgili kullanıcıdan o zarara yol açan olaydan önceki 12 ayda alınmış toplam ücretle (varsa) sınırlıdır.</Bullet>
           </ul>
         </Section>
@@ -321,8 +321,8 @@ export default function TermsOfService() {
         <Section
           id="garanti"
           icon={AlertCircle}
-          color="text-rose-400"
-          bg="bg-rose-500/10"
+          color="text-destructive"
+          bg="bg-surface-muted"
           title="9. Garanti Sınırlamaları"
         >
           <p>
@@ -338,8 +338,8 @@ export default function TermsOfService() {
         <Section
           id="degisiklik"
           icon={Clock}
-          color="text-slate-300"
-          bg="bg-slate-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="10. Hizmette Değişiklik veya Sonlandırma"
         >
           <p>
@@ -361,7 +361,7 @@ export default function TermsOfService() {
           <p>
             KlinikIQ ileride opsiyonel bağış kanalları sunabilir
             (örn. "Kahve Ismarla", Patreon vb.). Bağışlar tamamen gönüllü
-            tabanlıdır; <span className="font-bold text-white">hiçbir hizmet, garantili kullanım, VIP üyelik veya
+            tabanlıdır; <span className="font-bold text-foreground">hiçbir hizmet, garantili kullanım, VIP üyelik veya
             iade hakkı tanımaz</span>. Bağış yapan kullanıcılar bu Şartların geri
             kalanına aynı şekilde tâbidir.
           </p>
@@ -371,8 +371,8 @@ export default function TermsOfService() {
         <Section
           id="guncelleme"
           icon={Edit2}
-          color="text-cyan-400"
-          bg="bg-cyan-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="12. Şartların Güncellenmesi"
         >
           <p>
@@ -389,26 +389,26 @@ export default function TermsOfService() {
         <Section
           id="hukuk"
           icon={ShieldCheck}
-          color="text-blue-400"
-          bg="bg-blue-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="13. Geçerli Hukuk ve Yetki"
         >
           <p className="mb-3">
-            İşbu Şartlar <span className="font-bold text-white">{GOVERNING_LAW}</span>{' '}
+            İşbu Şartlar <span className="font-bold text-foreground">{GOVERNING_LAW}</span>{' '}
             hukukuna tâbidir.
           </p>
           <p className="mb-3">
-            <span className="font-bold text-white">Tüketici sıfatına sahip kullanıcılar</span>{' '}
+            <span className="font-bold text-foreground">Tüketici sıfatına sahip kullanıcılar</span>{' '}
             bakımından 6502 sayılı Tüketicinin Korunması Hakkında Kanun hükümleri
             saklıdır. Bu kullanıcılar, uyuşmazlıkları kendi yerleşim yerlerindeki{' '}
-            <span className="font-bold text-white">Tüketici Hakem Heyetleri</span> ve{' '}
-            <span className="font-bold text-white">Tüketici Mahkemeleri</span> önünde
+            <span className="font-bold text-foreground">Tüketici Hakem Heyetleri</span> ve{' '}
+            <span className="font-bold text-foreground">Tüketici Mahkemeleri</span> önünde
             çözmek üzere yasal başvuru haklarını koruyacaktır.
           </p>
           <p>
             Tüketici niteliği taşımayan uyuşmazlıklarda (örn. fikri mülkiyet
             ihlalleri, hizmetin suistimali, prompt injection, hesap manipülasyonu
-            veya ticari kullanım) ise <span className="font-bold text-white">Geliştirici'nin yerleşim yerindeki
+            veya ticari kullanım) ise <span className="font-bold text-foreground">Geliştirici'nin yerleşim yerindeki
             Türkiye Cumhuriyeti mahkemeleri ve icra daireleri</span> yetkilidir
             (HMK md. 6 ve 9 uyarınca).
           </p>
@@ -417,26 +417,26 @@ export default function TermsOfService() {
         {/* 14. İletişim */}
         <div
           id="iletisim"
-          className="bg-slate-900 rounded-2xl border border-slate-800 p-6"
+          className="bg-surface-muted rounded-2xl border border-border p-6"
         >
-          <h2 className="text-lg font-black text-white mb-3 flex items-center gap-2">
-            <Mail className="w-5 h-5 text-blue-400" />
+          <h2 className="text-lg font-black text-foreground mb-3 flex items-center gap-2">
+            <Mail className="w-5 h-5 text-foreground" />
             14. İletişim
           </h2>
-          <p className="text-sm text-slate-300 leading-relaxed mb-4">
+          <p className="text-sm text-foreground leading-relaxed mb-4">
             Bu Şartlar, hesabınız veya genel destek talepleri için aşağıdaki
             e-posta adresinden bize ulaşabilirsiniz.
           </p>
           <a
             href={`mailto:${CONTACT_EMAIL}?subject=KlinikIQ%20-%20Kullan%C4%B1m%20%C5%9Eartlar%C4%B1%20Talebi`}
-            className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 font-bold px-4 py-3 rounded-xl text-sm hover:bg-blue-500/20 transition-colors"
+            className="inline-flex items-center gap-2 bg-surface-muted border border-border text-foreground font-bold px-4 py-3 rounded-xl text-sm hover:bg-surface-muted transition-colors"
           >
             <Mail className="w-4 h-4" />
             {CONTACT_EMAIL}
           </a>
-          <p className="text-xs text-slate-500 mt-4">
+          <p className="text-xs text-muted mt-4">
             Sağlayıcı:{' '}
-            <span className="text-slate-300 font-bold">{PROVIDER}</span>
+            <span className="text-foreground font-bold">{PROVIDER}</span>
           </p>
         </div>
       </main>
@@ -466,9 +466,9 @@ function Section({
   return (
     <section
       id={id}
-      className="bg-slate-900 rounded-2xl border border-slate-800 p-6 mb-6 scroll-mt-20"
+      className="bg-surface-muted rounded-2xl border border-border p-6 mb-6 scroll-mt-20"
     >
-      <h2 className="text-lg font-black text-white mb-4 flex items-center gap-2">
+      <h2 className="text-lg font-black text-foreground mb-4 flex items-center gap-2">
         <span
           className={`w-8 h-8 rounded-lg flex items-center justify-center ${bg}`}
         >
@@ -476,7 +476,7 @@ function Section({
         </span>
         {title}
       </h2>
-      <div className="text-sm text-slate-400 leading-relaxed">{children}</div>
+      <div className="text-sm text-muted leading-relaxed">{children}</div>
     </section>
   );
 }
@@ -484,7 +484,7 @@ function Section({
 function Bullet({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-2">
-      <span className="text-slate-500 mt-1">•</span>
+      <span className="text-muted mt-1">•</span>
       <span>{children}</span>
     </li>
   );

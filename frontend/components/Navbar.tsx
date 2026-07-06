@@ -46,7 +46,7 @@ export default function Navbar() {
             className="w-8 h-8 rounded-md flex items-center justify-center transition-opacity group-hover:opacity-90"
             style={{ background: "var(--accent)" }}
           >
-            <Stethoscope className="w-4 h-4 text-white" />
+            <Stethoscope className="w-4 h-4" style={{ color: "var(--accent-foreground)" }} />
           </div>
           <span
             className="text-base font-semibold tracking-tight"

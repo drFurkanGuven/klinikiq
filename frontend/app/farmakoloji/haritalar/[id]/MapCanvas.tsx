@@ -27,16 +27,16 @@ export interface FlowNodeData extends Record<string, unknown> {
 }
 
 const TYPE_ACCENT: Record<PharmaNodeType, string> = {
-  mediator: "#7c3aed",
-  receptor: "var(--primary)",
-  organ: "#d97706",
-  effect: "#059669",
-  drug_class: "var(--text-muted)",
+  mediator: "var(--foreground)",
+  receptor: "var(--muted-strong)",
+  organ: "var(--muted)",
+  effect: "var(--border-strong)",
+  drug_class: "var(--muted)",
 };
 
 function PharmaFlowNodeBase({ data }: NodeProps) {
   const d = data as FlowNodeData;
-  const accent = TYPE_ACCENT[d.ntype] ?? "var(--primary)";
+  const accent = TYPE_ACCENT[d.ntype] ?? "var(--foreground)";
   return (
     <div
       className="rounded-xl border shadow-sm transition-all"
@@ -56,7 +56,7 @@ function PharmaFlowNodeBase({ data }: NodeProps) {
           <span className="text-sm font-bold leading-snug" style={{ color: "var(--text)" }}>
             {d.label}
           </span>
-          {d.highYield && <Star className="w-3 h-3 shrink-0" style={{ color: "#eab308", fill: "#eab308" }} />}
+          {d.highYield && <Star className="w-3 h-3 shrink-0" style={{ color: "var(--foreground)", fill: "var(--foreground)" }} />}
         </div>
       </div>
       <Handle type="source" position={Position.Right} style={{ opacity: 0 }} />

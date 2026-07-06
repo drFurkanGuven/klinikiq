@@ -57,16 +57,16 @@ export default function PharmaMapsListPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <Link
-              href="/farmakoloji"
+              href="/dashboard"
               className="p-2.5 rounded-xl transition-all hover:bg-black/5 shrink-0"
               style={{ color: "var(--text-muted)" }}
-              aria-label="Farmakoloji"
+              aria-label="Ana sayfa"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shrink-0" style={{ background: "var(--primary)" }}>
-                <Waypoints className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--accent)" }}>
+                <Waypoints className="w-5 h-5" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <div className="min-w-0">
                 <span className="font-black text-lg tracking-tight block leading-tight truncate">Mantık Haritaları</span>

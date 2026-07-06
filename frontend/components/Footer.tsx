@@ -29,7 +29,7 @@ export default function Footer() {
                 className="w-6 h-6 rounded-md flex items-center justify-center"
                 style={{ background: "var(--accent)" }}
               >
-                <Stethoscope className="w-3.5 h-3.5 text-white" />
+                <Stethoscope className="w-3.5 h-3.5" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <span
                 className="text-sm font-semibold"

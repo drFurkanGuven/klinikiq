@@ -4,6 +4,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { register } from "@/lib/auth";
 import { Stethoscope, AlertCircle, ChevronDown } from "lucide-react";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 
 const YEARS = [1, 2, 3, 4, 5, 6];
 
@@ -41,141 +44,129 @@ export default function RegisterPage() {
     }
   }
 
-  const update = (field: string, value: string) =>
-    setForm((f) => ({ ...f, [field]: value }));
+  const update = (field: string, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start sm:justify-center px-4 py-8 sm:py-12 relative overflow-y-auto transition-colors" style={{ background: "var(--bg)", color: "var(--text)" }}>
-      {/* Arka plan efektleri */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--primary)_0%,_transparent_60%)] opacity-10 pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--accent)_0%,_transparent_60%)] opacity-10 pointer-events-none" />
-      
-      <div className="relative w-full max-w-md z-10">
-        {/* Logo */}
-        <div className="text-center mb-6 sm:mb-8">
-          <Link href="/" className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl mb-3 sm:mb-4 shadow-lg transition-transform hover:scale-105"
-            style={{ background: "var(--primary)" }}>
-            <Stethoscope className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-          </Link>
-          <h1 className="text-2xl sm:text-3xl font-black gradient-text tracking-tight">KlinikIQ</h1>
-          <p className="text-[10px] sm:text-xs mt-1 opacity-50 font-black uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>Yeni Hesap Oluştur</p>
-        </div>
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+      <main
+        className="flex-1 flex flex-col items-center justify-center px-4 py-12"
+        style={{ paddingTop: "max(3rem, calc(var(--safe-top) + 3rem))" }}
+      >
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-8">
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center w-12 h-12 rounded-lg mb-4 transition-opacity hover:opacity-90"
+              style={{ background: "var(--accent)" }}
+            >
+              <Stethoscope className="w-6 h-6" style={{ color: "var(--accent-foreground)" }} />
+            </Link>
+            <h1 className="text-2xl font-semibold tracking-tight" style={{ color: "var(--foreground)" }}>
+              Hesap oluştur
+            </h1>
+            <p className="text-sm mt-1.5" style={{ color: "var(--muted)" }}>
+              Ücretsiz başla, saniyeler içinde
+            </p>
+          </div>
 
-        <div className="glass-card p-8 transition-all" style={{ background: "var(--surface)" }}>
-          <h2 className="text-2xl font-black mb-6 tracking-tight" style={{ color: "var(--text-navy)" }}>Hesap Oluştur</h2>
+          <div className="card p-6">
+            {error && (
+              <div
+                className="flex items-center gap-2 rounded-md px-3.5 py-3 mb-5 text-sm border"
+                style={{ background: "var(--destructive-muted)", color: "var(--destructive)", borderColor: "transparent" }}
+              >
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {error}
+              </div>
+            )}
 
-          {error && (
-            <div className="flex items-center gap-2 rounded-2xl px-4 py-3 mb-5 text-sm font-bold border animate-fade-in-up" 
-              style={{ background: "var(--error-light)", color: "var(--danger)", borderColor: "var(--error-light)" }}>
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>Ad Soyad</label>
-              <input
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
                 id="reg-name"
+                label="Ad Soyad"
                 required
                 value={form.name}
                 onChange={(e) => update("name", e.target.value)}
                 placeholder="Ahmet Yılmaz"
-                className="input-focus w-full border rounded-2xl px-5 py-3.5 transition-all text-sm font-medium shadow-sm"
-                style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
+                autoComplete="name"
               />
-            </div>
 
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>E-posta</label>
-              <input
+              <Input
                 id="reg-email"
+                label="E-posta"
                 type="email"
                 required
                 value={form.email}
                 onChange={(e) => update("email", e.target.value)}
                 placeholder="ornek@email.com"
-                className="input-focus w-full border rounded-2xl px-5 py-3.5 transition-all text-sm font-medium shadow-sm"
-                style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
+                autoComplete="email"
               />
-            </div>
 
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>
-                Şifre <span className="text-[9px] lowercase opacity-50 font-medium">(min 6 karakter)</span>
-              </label>
-              <input
+              <Input
                 id="reg-password"
+                label="Şifre"
+                hint="En az 6 karakter"
                 type="password"
                 required
                 minLength={6}
                 value={form.password}
                 onChange={(e) => update("password", e.target.value)}
                 placeholder="••••••••"
-                className="input-focus w-full border rounded-2xl px-5 py-3.5 transition-all text-sm font-medium shadow-sm"
-                style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
+                autoComplete="new-password"
               />
-            </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>Üniversite</label>
-                <input
+              <div className="grid grid-cols-2 gap-3">
+                <Input
                   id="reg-school"
+                  label="Üniversite"
                   value={form.school}
                   onChange={(e) => update("school", e.target.value)}
                   placeholder="Hacettepe Tıp"
-                  className="input-focus w-full border rounded-2xl px-5 py-3.5 transition-all text-sm font-medium shadow-sm"
-                  style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
                 />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] mb-2 px-1 opacity-50" style={{ color: "var(--text-muted)" }}>Sınıf</label>
-                <div className="relative">
-                  <select
-                    id="reg-year"
-                    value={form.year}
-                    onChange={(e) => update("year", e.target.value)}
-                    className="input-focus w-full border rounded-2xl px-5 py-3.5 transition-all text-sm appearance-none font-medium shadow-sm cursor-pointer"
-                    style={{ background: "var(--surface-2)", borderColor: "var(--border)", color: "var(--text)" }}
-                  >
-                    <option value="">Seç</option>
-                    {YEARS.map((y) => (
-                      <option key={y} value={y}>{y}. Sınıf</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30 pointer-events-none" style={{ color: "var(--text)" }} />
+                <div>
+                  <label htmlFor="reg-year" className="block text-sm font-medium mb-1.5" style={{ color: "var(--foreground)" }}>
+                    Sınıf
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="reg-year"
+                      value={form.year}
+                      onChange={(e) => update("year", e.target.value)}
+                      className="input-base appearance-none cursor-pointer pr-9"
+                    >
+                      <option value="">Seç</option>
+                      {YEARS.map((y) => (
+                        <option key={y} value={y}>
+                          {y}. Sınıf
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+                      style={{ color: "var(--muted)" }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <button
-              id="reg-submit"
-              type="submit"
-              disabled={loading}
-              className="btn-premium w-full py-4 mt-4"
-            >
-              {loading ? (
-                <>
-                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Kaydediliyor...
-                </>
-              ) : (
-                "Kayıt Ol ve Başla"
-              )}
-            </button>
-          </form>
+              <Button id="reg-submit" type="submit" loading={loading} className="w-full" size="lg">
+                {loading ? "Kaydediliyor..." : "Kayıt ol ve başla"}
+              </Button>
+            </form>
+          </div>
 
-          <p className="text-center text-sm mt-8 font-medium opacity-60">
+          <p className="text-center text-sm mt-6" style={{ color: "var(--muted)" }}>
             Zaten hesabın var mı?{" "}
-            <Link href="/login" className="font-black text-primary hover:underline transition-all underline-offset-4">
-              Giriş Yap
+            <Link href="/login" className="font-medium hover:underline underline-offset-4" style={{ color: "var(--foreground)" }}>
+              Giriş yap
             </Link>
           </p>
         </div>
-      </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }

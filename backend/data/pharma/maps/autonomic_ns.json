@@ -16,6 +16,8 @@
     { "id": "r_m1", "label_tr": "M1 reseptörü", "type": "receptor", "high_yield": false, "description_tr": "Gq bağlı reseptör. SSS, otonom ganglionlar ve mide paryetal hücrelerinde (asit sekresyonu) yer alır." },
     { "id": "r_m2", "label_tr": "M2 reseptörü", "type": "receptor", "high_yield": true, "description_tr": "Gi bağlı reseptör. Kalpte SA düğümü yavaşlatır ve ileti hızını azaltır (vagal etki → bradikardi)." },
     { "id": "r_m3", "label_tr": "M3 reseptörü", "type": "receptor", "high_yield": true, "description_tr": "Gq bağlı reseptör. Düz kas kasılması (bronş, GİS, mesane detrusor, iris sfinkteri) ve ekzokrin bez sekresyonunu artırır." },
+    { "id": "r_m4", "label_tr": "M4 reseptörü", "type": "receptor", "high_yield": false, "description_tr": "Gi bağlı reseptör. Striatum ve diğer SSS bölgelerinde presinaptik yerleşim; dopamin ve asetilkolin salınımını modüle eder. Antipsikotiklerin ekstrapiramidal yan etkileriyle ilişkilidir." },
+    { "id": "r_m5", "label_tr": "M5 reseptörü", "type": "receptor", "high_yield": false, "description_tr": "Gq bağlı reseptör. VTA dopaminerjik nöronlarda ve diğer SSS bölgelerinde yer alır. Santral kolinerjik–dopaminerjik etkileşimlerde rol oynar." },
 
     { "id": "o_vessel", "label_tr": "Damar düz kası", "type": "organ", "high_yield": true, "description_tr": "α1 uyarısı vazokonstriksiyon; β2 uyarısı (iskelet kası) vazodilatasyon yapar. Net kan basıncı etkisi baskın reseptöre bağlıdır." },
     { "id": "o_heart", "label_tr": "Kalp (SA düğüm & miyokard)", "type": "organ", "high_yield": true, "description_tr": "β1 uyarısı hız ve kontraktiliteyi artırır; M2 (vagal) uyarı yavaşlatır. Otonom dengede kronotropi burada belirlenir." },
@@ -23,6 +25,10 @@
     { "id": "o_eye", "label_tr": "Göz (iris kasları)", "type": "organ", "high_yield": false, "description_tr": "α1 → dilatör pupilla kasılır → midriyazis. M3 → sfinkter pupilla kasılır → miyozis." },
     { "id": "o_glands", "label_tr": "Ekzokrin bezler", "type": "organ", "high_yield": false, "description_tr": "M3 uyarısı tükürük, ter ve bronş bezlerinden sekresyonu artırır. Antimuskarinikler ağız kuruluğu yapar." },
     { "id": "o_bladder", "label_tr": "Mesane (detrusor)", "type": "organ", "high_yield": false, "description_tr": "M3 → detrusor kasılması (işeme). β3 → detrusor gevşemesi (depolama). Aşırı aktif mesane tedavisinin hedefi." },
+    { "id": "o_sweat", "label_tr": "Ter bezleri (ekokrin)", "type": "organ", "high_yield": true, "description_tr": "TUS klasiği: sempatik innervasyonlu olmasına rağmen postganglionik lif asetilkolin salgılar → M3 uyarısı ile terleme. Adrenerjik değil, kolinerjik sempatik lif." },
+    { "id": "o_gi", "label_tr": "GİS düz kası", "type": "organ", "high_yield": false, "description_tr": "M3 uyarısı ile peristaltizm ve sfinkter tonusu artar. Antimuskarinikler (atropin) ile ileus riski." },
+    { "id": "o_prostate", "label_tr": "Prostat & mesane boynu", "type": "organ", "high_yield": true, "description_tr": "α1A reseptörleri (prostatik düz kas) mesane çıkım direncini artırır. α1-selektif blokerler (tamsulosin) BPH semptomlarını hafifletir." },
+    { "id": "r_nn", "label_tr": "Nikotinik (Nn) ganglion", "type": "receptor", "high_yield": true, "description_tr": "Otonom ganglionlarda postsinaptik nikotinik reseptör. ACh ile uyarılır → postganglionik sempatik/parasempatik ileti devam eder. Hexamethonium gibi ganglion blokerleri burayı hedefler." },
 
     { "id": "e_bp_up", "label_tr": "Kan basıncı ↑", "type": "effect", "high_yield": true, "description_tr": "α1 aracılı vazokonstriksiyonun sonucu. Fenilefrin gibi α1 agonistleri ve dekonjestanlar bu etkiyi oluşturur." },
     { "id": "e_bp_down", "label_tr": "Kan basıncı ↓", "type": "effect", "high_yield": false, "description_tr": "β2 aracılı vazodilatasyon veya santral α2 uyarısı ile sempatik çıkışın azalması sonucu görülür." },
@@ -44,6 +50,10 @@
     { "source": "med_ach", "target": "r_m1", "relation": "agonist", "effect_tr": "Muskarinik M1 uyarısı" },
     { "source": "med_ach", "target": "r_m2", "relation": "agonist", "effect_tr": "Kalpte M2 uyarısı" },
     { "source": "med_ach", "target": "r_m3", "relation": "agonist", "effect_tr": "Düz kas & bezlerde M3 uyarısı" },
+    { "source": "med_ach", "target": "r_m4", "relation": "agonist", "effect_tr": "Santral M4 uyarısı" },
+    { "source": "med_ach", "target": "r_m5", "relation": "agonist", "effect_tr": "Santral M5 uyarısı" },
+    { "source": "med_ach", "target": "r_nn", "relation": "agonist", "effect_tr": "Ganglion iletimi (oto & para)" },
+    { "source": "med_ach", "target": "o_sweat", "relation": "agonist", "effect_tr": "Sempatik kolinerjik lif → M3 → terleme" },
 
     { "source": "r_alpha2", "target": "med_ne", "relation": "inhibits", "effect_tr": "Negatif geri bildirim: noradrenalin salınımı ↓" },
 
@@ -58,6 +68,9 @@
     { "source": "r_m3", "target": "o_glands", "relation": "activates", "effect_tr": "Bez sekresyonu artar" },
     { "source": "r_m3", "target": "o_eye", "relation": "activates", "effect_tr": "Sfinkter pupilla kasılır" },
     { "source": "r_m3", "target": "o_bladder", "relation": "activates", "effect_tr": "Detrusor kasılır (işeme)" },
+    { "source": "r_m3", "target": "o_gi", "relation": "activates", "effect_tr": "Peristaltizm & tonus ↑" },
+    { "source": "r_m3", "target": "o_sweat", "relation": "activates", "effect_tr": "Ter bezlerinde sekresyon ↑" },
+    { "source": "r_alpha1", "target": "o_prostate", "relation": "activates", "effect_tr": "Prostatik düz kas kasılır → LUTS" },
     { "source": "r_m1", "target": "o_glands", "relation": "activates", "effect_tr": "Mide asit sekresyonu (dolaylı)" },
 
     { "source": "o_vessel", "target": "e_bp_up", "relation": "activates", "effect_tr": "α1 baskın: kan basıncı ↑" },
@@ -155,6 +168,44 @@
         { "nodeId": "e_mydriasis", "effect_tr": "Midriyazis + siklopleji" }
       ],
       "tr_products_atc": ["A03BA01", "S01FA01"]
+    },
+    {
+      "drug_class": "alpha1_blocker",
+      "label_tr": "α1 bloker (prazosin / tamsulosin)",
+      "targets": ["r_alpha1"],
+      "relation": "antagonist",
+      "downstream_effects": [
+        { "nodeId": "o_vessel", "effect_tr": "Vazodilatasyon → periferik direnç ↓" },
+        { "nodeId": "e_bp_down", "effect_tr": "Antihipertansif etki (prazosin)" },
+        { "nodeId": "o_prostate", "effect_tr": "Prostatik düz kas gevşer" },
+        { "nodeId": "o_bladder", "effect_tr": "Mesane boynu tonusu ↓ → idrar akışı ↑ (tamsulosin, BPH)" }
+      ],
+      "tr_products_atc": ["C02CA01", "G04CA02"]
+    },
+    {
+      "drug_class": "muscarinic_agonist",
+      "label_tr": "Muskarinik agonist (pilokarpin)",
+      "targets": ["r_m3"],
+      "relation": "agonist",
+      "downstream_effects": [
+        { "nodeId": "o_eye", "effect_tr": "Sfinkter kasılır" },
+        { "nodeId": "e_miosis", "effect_tr": "Miyozis (açık açılı glokom tedavisi)" },
+        { "nodeId": "o_glands", "effect_tr": "Sekresyon ↑" }
+      ],
+      "tr_products_atc": ["S01EB01"]
+    },
+    {
+      "drug_class": "acetylcholinesterase_inhibitor",
+      "label_tr": "AChE inhibitörü (neostigmin)",
+      "targets": ["med_ach"],
+      "relation": "activates",
+      "downstream_effects": [
+        { "nodeId": "r_m3", "effect_tr": "Sinaptik ACh artışı → M3 uyarısı güçlenir" },
+        { "nodeId": "r_m2", "effect_tr": "M2 uyarısı güçlenir → bradikardi riski" },
+        { "nodeId": "o_gi", "effect_tr": "Peristaltizm ↑ (ileus sonrası)" },
+        { "nodeId": "e_secretion_up", "effect_tr": "Myastenia gravis: nöromüsküler iletim düzelir (Nm hedef)" }
+      ],
+      "tr_products_atc": ["N07AA01"]
     }
   ],
   "quiz": [
@@ -199,6 +250,20 @@
       "answer_idx": 1,
       "explanation_tr": "Kalpteki M2 reseptörü (Gi bağlı) SA düğümünü yavaşlatır ve AV iletiyi baskılar → bradikardi. Vagal etkinin ana aracısıdır.",
       "node_id": "r_m2"
+    },
+    {
+      "q_tr": "Ter bezleri sempatik innervasyona sahiptir ancak postganglionik nörotransmitteri nedir?",
+      "options_tr": ["Noradrenalin", "Asetilkolin", "Adrenalin", "Dopamin"],
+      "answer_idx": 1,
+      "explanation_tr": "Ekokrin ter bezleri sempatik kolinerjik liflerle innerve edilir; postganglionik lif asetilkolin salgılar ve M3 reseptörlerini uyarır. Bu TUS'ta sık sorulan bir istisnadır.",
+      "node_id": "o_sweat"
+    },
+    {
+      "q_tr": "BPH'li bir hastada mesane çıkım direncini azaltmak için hangi reseptörün selektif blokajı tercih edilir?",
+      "options_tr": ["β1", "α1", "M3", "β2"],
+      "answer_idx": 1,
+      "explanation_tr": "Prostat ve mesane boynundaki α1 reseptörlerinin blokajı (tamsulosin gibi α1-selektif ajanlar) düz kas tonusunu azaltır, idrar akışını iyileştirir.",
+      "node_id": "o_prostate"
     }
   ]
 }

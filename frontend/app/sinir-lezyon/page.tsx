@@ -745,8 +745,8 @@ export default function SinirLezyon() {
                   <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{QUIZ.length} klinik senaryo sorusuyla sınavına hazırlan</p>
                 </div>
                 <button onClick={startQuiz}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm text-white transition-all hover:opacity-90"
-                  style={{ background: "var(--primary)" }}>
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all hover:opacity-90"
+                  style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
                   <HelpCircle size={14} /> Quiz Başlat
                 </button>
               </div>
@@ -921,8 +921,8 @@ export default function SinirLezyon() {
                       <span className="text-sm" style={{ color: "var(--text-muted)" }}>Puan: <span style={{ color: "var(--primary)", fontWeight: 600 }}>{score}</span> / {quizIdx}</span>
                       {answered && (
                         <button onClick={nextQuestion}
-                          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white hover:opacity-90 transition-opacity"
-                          style={{ background: "var(--primary)" }}>
+                          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                          style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
                           {quizIdx + 1 < QUIZ.length ? "Sonraki Soru →" : "Sonucu Gör →"}
                         </button>
                       )}
@@ -938,8 +938,8 @@ export default function SinirLezyon() {
                   <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>{score} / {QUIZ.length} doğru</p>
                   <div className="flex gap-3 justify-center flex-wrap">
                     <button onClick={startQuiz}
-                      className="px-4 py-2 rounded-lg text-sm font-medium text-white hover:opacity-90"
-                      style={{ background: "var(--primary)" }}>Tekrar Başla</button>
+                      className="px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90"
+                      style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>Tekrar Başla</button>
                     <button onClick={() => { setView("home"); setActiveNerve(null); }}
                       className="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-[var(--primary-light)] transition-all"
                       style={{ borderColor: "var(--border)", color: "var(--text)" }}>Konulara Dön</button>

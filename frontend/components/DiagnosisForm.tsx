@@ -134,10 +134,9 @@ export default function DiagnosisForm({ initialDiagnoses, onSubmit, onClose }: P
               id="diagnosis-submit"
               type="submit"
               disabled={loading}
-              className="flex-1 text-white font-black py-3.5 rounded-2xl transition-all text-sm shadow-xl active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2 group relative overflow-hidden"
-              style={{ background: "var(--primary)" }}
+              className="flex-1 font-semibold py-3.5 rounded-2xl transition-all text-sm active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
+              style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
             >
-              <div className="absolute inset-0 bg-white/10 w-0 group-hover:w-full transition-all duration-300" />
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />

@@ -496,8 +496,8 @@ export default function AcilSimulasyonMcqPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shrink-0" style={{ background: "var(--primary)" }}>
-                <Zap className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--accent)" }}>
+                <Zap className="w-5 h-5" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <div className="min-w-0">
                 <span className="font-black text-lg tracking-tight block leading-tight truncate flex flex-wrap items-center gap-2">
@@ -576,8 +576,8 @@ export default function AcilSimulasyonMcqPage() {
               onClick={() => setMcqLang("tr")}
               className="px-3 py-2 rounded-lg transition-all"
               style={{
-                background: mcqLang === "tr" ? "var(--primary)" : "transparent",
-                color: mcqLang === "tr" ? "#fff" : "var(--text-muted)",
+                background: mcqLang === "tr" ? "var(--accent)" : "transparent",
+                color: mcqLang === "tr" ? "var(--accent-foreground)" : "var(--text-muted)",
               }}
             >
               TR
@@ -588,8 +588,8 @@ export default function AcilSimulasyonMcqPage() {
               onClick={() => setMcqLang("en")}
               className="px-3 py-2 rounded-lg transition-all"
               style={{
-                background: mcqLang === "en" ? "var(--primary)" : "transparent",
-                color: mcqLang === "en" ? "#fff" : "var(--text-muted)",
+                background: mcqLang === "en" ? "var(--accent)" : "transparent",
+                color: mcqLang === "en" ? "var(--accent-foreground)" : "var(--text-muted)",
               }}
             >
               EN
@@ -607,8 +607,8 @@ export default function AcilSimulasyonMcqPage() {
                 onClick={() => setSessionTarget(t)}
                 className="px-3 py-2 rounded-lg transition-all"
                 style={{
-                  background: sessionTarget === t ? "var(--primary)" : "transparent",
-                  color: sessionTarget === t ? "#fff" : "var(--text-muted)",
+                  background: sessionTarget === t ? "var(--accent)" : "transparent",
+                  color: sessionTarget === t ? "var(--accent-foreground)" : "var(--text-muted)",
                 }}
               >
                 {t === null ? "∞" : `${t}`}

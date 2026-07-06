@@ -1,0 +1,143 @@
+{
+  "id": "calcium_channel_blockers",
+  "title_tr": "Kalsiyum Kanal Blokerleri (L-tip)",
+  "description_tr": "Dihidropiridin (amlodipin) vs non-DHP (verapamil, diltiazem) ayrımı. Vasküler düz kas vs kalp (SA/AV) selectivity; antihipertansif, antianginal ve antiarrhythmik profiller.",
+  "source_attribution": "Kalsiyum kanal bloker farmakolojisi StatPearls (Calcium Channel Blockers, Amlodipine, Verapamil) ve GtoPdb Cav1.x verileri (CC BY-SA 4.0) temel alınarak derlenmiştir.",
+  "nodes": [
+    { "id": "med_ca_influx", "label_tr": "Ca²⁺ influx", "type": "mediator", "high_yield": true, "description_tr": "L-tip voltage-gated Ca²⁺ kanallarından hücre içi Ca²⁺ girişi. Düz kas kasılması ve kardiyak pacemaker/iletim için gerekli." },
+
+    { "id": "r_cav_l_vascular", "label_tr": "L-tip Ca²⁺ kanalı (vasküler)", "type": "receptor", "high_yield": true, "description_tr": "Damar düz kasında depolarizasyon → Ca²⁺ girişi → kasılma. DHP'ler (amlodipin, nifedipin) vasküler selektiftir." },
+    { "id": "r_cav_l_cardiac", "label_tr": "L-tip Ca²⁺ kanalı (kardiyak)", "type": "receptor", "high_yield": true, "description_tr": "SA/AV düğüm (yavaş depolarizasyon) ve miyokard kontraktilitesi. Verapamil/diltiazem kardiyak ve vasküler etki; DHP daha vasküler selektif." },
+
+    { "id": "o_vascular_smooth", "label_tr": "Vasküler düz kas", "type": "organ", "high_yield": true, "description_tr": "Ca²⁺-kalmodulin → MLCK aktivasyonu → kasılma. CCB Ca²⁺ girişini ↓ → vazodilatasyon." },
+    { "id": "o_sa_av", "label_tr": "SA & AV düğüm", "type": "organ", "high_yield": true, "description_tr": "Ca²⁺ inward akım faz 0 (nodal dokuda). Non-DHP CCB bradikardi ve AV blok yapar." },
+    { "id": "o_myocardium", "label_tr": "Miyokard", "type": "organ", "high_yield": true, "description_tr": "Ca²⁺ girişi kontraktilite için. Verapamil inotropiyi baskılar (dHP'den daha belirgin)." },
+    { "id": "o_coronary", "label_tr": "Koroner arter", "type": "organ", "high_yield": true, "description_tr": "Vazodilatasyon → koroner perfüzyon ↑. Antianginal etkinin temel bileşeni." },
+
+    { "id": "e_vasodilation", "label_tr": "Vazodilatasyon & KB ↓", "type": "effect", "high_yield": true, "description_tr": "Periferik direnç ↓ → antihipertansif. Refleks taşikardi DHP'lerde (nifedipin) görülebilir." },
+    { "id": "e_antianginal", "label_tr": "Antianginal etki", "type": "effect", "high_yield": true, "description_tr": "Preload/afterload ↓ + koroner vazodilatasyon → O2 tüketimi ↓." },
+    { "id": "e_bradycardia", "label_tr": "Bradikardi & AV blok", "type": "effect", "high_yield": true, "description_tr": "Non-DHP (verapamil, diltiazem) SA/AV baskılanması. β-bloker ile kombinede dikkat." },
+    { "id": "e_reflex_tach", "label_tr": "Refleks taşikardi", "type": "effect", "high_yield": true, "description_tr": "DHP vazodilatasyonu → baroreseptor refleks taşikardi. Nifedipin kısa etkili formlarda belirgin." },
+    { "id": "e_edema", "label_tr": "Periferik ödem", "type": "effect", "high_yield": true, "description_tr": "DHP'lerde precapiller vazodilatasyon → hidrostatik ödem (doz bağımlı, diüretikle tam çözülmez)." },
+    { "id": "e_constipation", "label_tr": "Konstipasyon (verapamil)", "type": "effect", "high_yield": true, "description_tr": "Verapamil GI düz kas Ca²⁺ bloğu → konstipasyon sık yan etki." }
+  ],
+  "edges": [
+    { "source": "med_ca_influx", "target": "r_cav_l_vascular", "relation": "activates", "effect_tr": "Vasküler Ca²⁺ girişi" },
+    { "source": "med_ca_influx", "target": "r_cav_l_cardiac", "relation": "activates", "effect_tr": "Kardiyak Ca²⁺ girişi" },
+    { "source": "r_cav_l_vascular", "target": "o_vascular_smooth", "relation": "activates", "effect_tr": "Düz kas kasılması" },
+    { "source": "r_cav_l_cardiac", "target": "o_sa_av", "relation": "activates", "effect_tr": "Pacemaker/AV ileti" },
+    { "source": "r_cav_l_cardiac", "target": "o_myocardium", "relation": "activates", "effect_tr": "Kontraktilite" },
+    { "source": "r_cav_l_vascular", "target": "o_coronary", "relation": "activates", "effect_tr": "Koroner tonus" },
+
+    { "source": "o_vascular_smooth", "target": "e_vasodilation", "relation": "inhibits", "effect_tr": "CCB → gevşeme" },
+    { "source": "o_coronary", "target": "e_antianginal", "relation": "activates", "effect_tr": "Koroner akım ↑" },
+    { "source": "o_sa_av", "target": "e_bradycardia", "relation": "activates", "effect_tr": "Non-DHP baskılama" },
+    { "source": "e_vasodilation", "target": "e_reflex_tach", "relation": "activates", "effect_tr": "Baroreseptor refleks" },
+    { "source": "e_vasodilation", "target": "e_edema", "relation": "activates", "effect_tr": "Precapiller vazodilatasyon" }
+  ],
+  "interventions": [
+    {
+      "drug_class": "dhp_amlodipine",
+      "label_tr": "DHP — amlodipin",
+      "targets": ["r_cav_l_vascular"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_vasodilation", "effect_tr": "Antihipertansif (uzun etkili, günde 1)" },
+        { "nodeId": "e_antianginal", "effect_tr": "Kronik stabil angina" },
+        { "nodeId": "e_edema", "effect_tr": "Periferik ödem (yaygın yan etki)" },
+        { "nodeId": "e_bradycardia", "effect_tr": "Minimal kardiyak etki (vasküler selektif)" }
+      ],
+      "tr_products_atc": ["C08CA01"]
+    },
+    {
+      "drug_class": "dhp_nifedipine",
+      "label_tr": "DHP — nifedipin (kısa etkili)",
+      "targets": ["r_cav_l_vascular"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_vasodilation", "effect_tr": "Hızlı KB düşüşü (sublingual eski kullanım)" },
+        { "nodeId": "e_reflex_tach", "effect_tr": "Belirgin refleks taşikardi" }
+      ],
+      "tr_products_atc": ["C08CA05"]
+    },
+    {
+      "drug_class": "non_dhp_verapamil",
+      "label_tr": "Non-DHP — verapamil",
+      "targets": ["r_cav_l_cardiac", "r_cav_l_vascular"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_bradycardia", "effect_tr": "Bradikardi, AV blok (sınıf IV antiarrhythmik)" },
+        { "nodeId": "e_antianginal", "effect_tr": "Angina + AF hız kontrolü" },
+        { "nodeId": "e_constipation", "effect_tr": "Konstipasyon sık" },
+        { "nodeId": "o_myocardium", "effect_tr": "Negatif inotropi (HF'de dikkat)" }
+      ],
+      "tr_products_atc": ["C08DA01"]
+    },
+    {
+      "drug_class": "non_dhp_diltiazem",
+      "label_tr": "Non-DHP — diltiazem",
+      "targets": ["r_cav_l_cardiac", "r_cav_l_vascular"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_bradycardia", "effect_tr": "AV nodal yavaşlama" },
+        { "nodeId": "e_vasodilation", "effect_tr": "Antihipertansif" },
+        { "nodeId": "e_antianginal", "effect_tr": "Angina, SVT hız kontrolü" }
+      ],
+      "tr_products_atc": ["C08DB01"]
+    },
+    {
+      "drug_class": "ccb_beta_blocker_caution",
+      "label_tr": "Verapamil + β-bloker (kombinasyon uyarısı)",
+      "targets": ["o_sa_av"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_bradycardia", "effect_tr": "Ciddi bradikardi/AV blok riski (verapamil+diltiazem+β-bloker)" }
+      ],
+      "tr_products_atc": ["C08DA01"]
+    }
+  ],
+  "quiz": [
+    {
+      "q_tr": "Dihidropiridin (amlodipin) vs verapamil temel fark nedir?",
+      "options_tr": ["Amlodipin kardiyak selektif, verapamil vasküler", "Amlodipin vasküler selektif; verapamil kardiyak/AV etkisi belirgin", "İkisi de eşit AV blok yapar", "Verapamil sadece diüretik etki yapar"],
+      "answer_idx": 1,
+      "explanation_tr": "DHP'ler (amlodipin) damar düz kasına daha selektif; verapamil/diltiazem SA/AV ve miyokarda belirgin etki → bradikardi/AV blok.",
+      "node_id": "r_cav_l_vascular"
+    },
+    {
+      "q_tr": "Amlodipinin en sık görülen yan etkisi nedir?",
+      "options_tr": ["Bronkospazm", "Periferik ödem", "Hiperkalemi", "Öksürük"],
+      "answer_idx": 1,
+      "explanation_tr": "DHP precapiller vazodilatasyonu → arteriollerden kapiller basınç artışı → ayak bileği ödemi.",
+      "node_id": "e_edema"
+    },
+    {
+      "q_tr": "Verapamil hangi antiarrhythmik Vaughan Williams sınıfına girer?",
+      "options_tr": ["Sınıf I", "Sınıf II", "Sınıf III", "Sınıf IV"],
+      "answer_idx": 3,
+      "explanation_tr": "Verapamil ve diltiazem Ca²⁺ kanal bloker → sınıf IV. AVNRT tedavisinde kullanılır.",
+      "node_id": "o_sa_av"
+    },
+    {
+      "q_tr": "Verapamil + β-bloker kombinasyonunda en çok hangi risk artar?",
+      "options_tr": ["Hipertansiyon", "Ciddi bradikardi/AV blok", "Hiperglisemi", "Trombositopeni"],
+      "answer_idx": 1,
+      "explanation_tr": "Her ikisi de SA/AV iletiyi yavaşlatır → sinerjistik bradikardi ve AV blok. Verapamil+diltiazem+β-bloker dikkatli.",
+      "node_id": "e_bradycardia"
+    },
+    {
+      "q_tr": "Kısa etkili nifedipin neden refleks taşikardi yapabilir?",
+      "options_tr": ["Doğrudan β1 uyarısı", "Hızlı vazodilatasyon → baroreseptor refleks", "RAAS inhibisyonu", "Antikolinerjik etki"],
+      "answer_idx": 1,
+      "explanation_tr": "Ani kan basıncı düşüşü baroreseptor refleks taşikardi tetikler. Uzun etkili DHP'lerde daha az belirgin.",
+      "node_id": "e_reflex_tach"
+    },
+    {
+      "q_tr": "Verapamilin GI yan etkisi nedir?",
+      "options_tr": ["İshal", "Konstipasyon", "Ülser", "Reflü artışı"],
+      "answer_idx": 1,
+      "explanation_tr": "Verapamil GI düz kas Ca²⁺ kanallarını bloke eder → intestinal motilite ↓ → konstipasyon.",
+      "node_id": "e_constipation"
+    }
+  ]
+}

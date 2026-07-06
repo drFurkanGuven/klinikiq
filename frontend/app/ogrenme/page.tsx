@@ -143,8 +143,8 @@ export default function OgrenmePage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shadow-lg shrink-0" style={{ background: "var(--primary)" }}>
-                <BookOpen className="w-[1.125rem] h-[1.125rem] sm:w-5 sm:h-5 text-white" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--accent)" }}>
+                <BookOpen className="w-[1.125rem] h-[1.125rem] sm:w-5 sm:h-5" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <div className="min-w-0">
                 <span className="font-black text-base sm:text-lg tracking-tight block leading-tight truncate">Vaka özetleri</span>

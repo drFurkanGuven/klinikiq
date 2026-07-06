@@ -1,0 +1,159 @@
+{
+  "id": "gaba_benzodiazepine",
+  "title_tr": "GABA-A Reseptörü & Benzodiazepinler",
+  "description_tr": "GABA-A klorür kanal kompleksi, benzodiazepin bağlanma sitesi ve pozitif allosterik modülasyon. Anksiyoliz, sedasyon, antikonvülzan etki; flumazenil antagonizması ve tolerans/bağımlılık.",
+  "source_attribution": "GABAergik farmakoloji StatPearls (Benzodiazepines, Flumazenil, Barbiturates) ve GtoPdb GABA-A receptor ligand verileri (CC BY-SA 4.0) temel alınarak derlenmiştir.",
+  "nodes": [
+    { "id": "med_gaba", "label_tr": "GABA (γ-aminobütirik asit)", "type": "mediator", "high_yield": true, "description_tr": "Başlıca inhibitory nörotransmitter. GABA-A reseptöründe Cl⁻ kanalını açarak hiperpolarizasyon ve nöron baskılanması sağlar." },
+    { "id": "med_glu", "label_tr": "Glutamat (zıt)", "type": "mediator", "high_yield": false, "description_tr": "Excitatory nörotransmitter. GABA/glutamat dengesi epilepsi ve anksiyete patofizyolojisinde merkezi." },
+
+    { "id": "r_gaba_a", "label_tr": "GABA-A reseptörü (Cl⁻ kanalı)", "type": "receptor", "high_yield": true, "description_tr": "Pentamerik ligand-gated iyon kanalı (α, β, γ alt birimleri). GABA bağlanınca Cl⁻ geçişi ↑ → inhibisyon." },
+    { "id": "r_bdz_site", "label_tr": "Benzodiazepin bağlanma bölgesi", "type": "receptor", "high_yield": true, "description_tr": "α-γ subunit arayüzünde allosterik site. Benzodiazepinler GABA'ya bağlı olmasa da frekansı artırarak Cl⁻ akımını potansiyalize eder (BZD)." },
+    { "id": "r_barbiturate_site", "label_tr": "Barbitürat bağlanma bölgesi", "type": "receptor", "high_yield": true, "description_tr": "GABA-A üzerinde ayrı site. Barbitüratlar (fenobarbital) kanal açık kalma süresini uzatır; GABA olmadan da aktivite (toksik dozda solunum depresyonu)." },
+    { "id": "r_gaba_b", "label_tr": "GABA-B reseptörü", "type": "receptor", "high_yield": false, "description_tr": "G protein bağlı (Gi). Baclofen hedefi; spastisite tedavisinde." },
+
+    { "id": "o_cns_cortex", "label_tr": "SSS — limbik/korteks", "type": "organ", "high_yield": true, "description_tr": "Anksiyoliz ve sedasyonun ana hedefi. Benzodiazepinler anksiyete ve uyku bozukluklarında kullanılır." },
+    { "id": "o_cns_reticular", "label_tr": "Retiküler aktivasyon sistemi", "type": "organ", "high_yield": true, "description_tr": "Arousal ve uyanıklık. BZD sedasyon ve amnezi yapar." },
+    { "id": "o_spinal", "label_tr": "Spinal kord / motor nöron", "type": "organ", "high_yield": true, "description_tr": "GABAergik inhibisyon. Baclofen (GABA-B) spastisitede; BZD kas gevşetici etki (zayıf)." },
+    { "id": "o_brainstem_resp", "label_tr": "Beyin sapı (solunum)", "type": "organ", "high_yield": true, "description_tr": "Yüksek doz BZD/barbitürat solunum depresyonu. Flumazenil BZD overdozunda spesifik antidot." },
+
+    { "id": "e_anxiolysis", "label_tr": "Anksiyoliz", "type": "effect", "high_yield": true, "description_tr": "Limbik sistemde GABAergic ton artışı → anksiyete azalması." },
+    { "id": "e_sedation", "label_tr": "Sedasyon & hipnotik etki", "type": "effect", "high_yield": true, "description_tr": "Doz bağımlı sedasyon. Kısa etkili (midazolam) vs uzun etkili (diazepam) seçim klinik." },
+    { "id": "e_anticonvulsant", "label_tr": "Antikonvülzan etki", "type": "effect", "high_yield": true, "description_tr": "GABA ↑ → nöron excitability ↓. Status epileptikus'ta diazepam/midazolam IV." },
+    { "id": "e_amnesia", "label_tr": "Anterograd amnezi", "type": "effect", "high_yield": true, "description_tr": "Midazolam gibi ajanlar prosedürel sedasyon için kullanılır (amnezi istenen)." },
+    { "id": "e_muscle_relax", "label_tr": "Kas gevşetici (zayıf)", "type": "effect", "high_yield": false, "description_tr": "Spinal interneuron inhibisyonu. Diazepam kas spazmında; ana endikasyon değil." },
+    { "id": "e_dependence", "label_tr": "Tolerans & bağımlılık", "type": "effect", "high_yield": true, "description_tr": "Kronik kullanımda reseptör downregülasyonu → tolerans. Ani kesilince rebound anksiyete, insomnia, withdrawal (deliryum tremens benzeri)." },
+    { "id": "e_resp_depression", "label_tr": "Solunum depresyonu", "type": "effect", "high_yield": true, "description_tr": "BZD + opioid/alcohol sinerjisi → fatal solunum depresyonu. Flumazenil antidot." }
+  ],
+  "edges": [
+    { "source": "med_gaba", "target": "r_gaba_a", "relation": "agonist", "effect_tr": "Cl⁻ kanal açılımı" },
+    { "source": "r_bdz_site", "target": "r_gaba_a", "relation": "activates", "effect_tr": "Pozitif allosterik modülasyon" },
+    { "source": "r_barbiturate_site", "target": "r_gaba_a", "relation": "activates", "effect_tr": "Kanal açık kalma süresi ↑" },
+    { "source": "r_gaba_a", "target": "o_cns_cortex", "relation": "inhibits", "effect_tr": "Nöron baskılanması" },
+    { "source": "r_gaba_a", "target": "o_cns_reticular", "relation": "inhibits", "effect_tr": "Sedasyon" },
+    { "source": "r_gaba_a", "target": "o_spinal", "relation": "inhibits", "effect_tr": "Spinal inhibisyon" },
+    { "source": "r_gaba_a", "target": "o_brainstem_resp", "relation": "inhibits", "effect_tr": "Yüksek doz solunum baskılanması" },
+
+    { "source": "o_cns_cortex", "target": "e_anxiolysis", "relation": "activates", "effect_tr": "Anksiyoliz" },
+    { "source": "o_cns_reticular", "target": "e_sedation", "relation": "activates", "effect_tr": "Hipno-sedasyon" },
+    { "source": "o_cns_cortex", "target": "e_anticonvulsant", "relation": "activates", "effect_tr": "Seizure threshold ↑" },
+    { "source": "o_cns_reticular", "target": "e_amnesia", "relation": "activates", "effect_tr": "Anterograd amnezi" },
+    { "source": "o_brainstem_resp", "target": "e_resp_depression", "relation": "activates", "effect_tr": "Overdoz riski" }
+  ],
+  "interventions": [
+    {
+      "drug_class": "benzodiazepine_long",
+      "label_tr": "Uzun etkili BZD (diazepam)",
+      "targets": ["r_bdz_site"],
+      "relation": "agonist",
+      "downstream_effects": [
+        { "nodeId": "e_anxiolysis", "effect_tr": "Anksiyete bozukluğu" },
+        { "nodeId": "e_muscle_relax", "effect_tr": "Kas spazmı, status epileptikus" },
+        { "nodeId": "e_dependence", "effect_tr": "Aktif metabolitler → uzun etki, birikim" }
+      ],
+      "tr_products_atc": ["N05BA01"]
+    },
+    {
+      "drug_class": "benzodiazepine_short",
+      "label_tr": "Kısa etkili BZD (midazolam / lorazepam)",
+      "targets": ["r_bdz_site"],
+      "relation": "agonist",
+      "downstream_effects": [
+        { "nodeId": "e_sedation", "effect_tr": "Prosedürel sedasyon, premedikasyon" },
+        { "nodeId": "e_amnesia", "effect_tr": "Midazolam amnezi" },
+        { "nodeId": "e_anticonvulsant", "effect_tr": "Status epileptikus (lorazepam IV)" }
+      ],
+      "tr_products_atc": ["N05CD08", "N05BA06"]
+    },
+    {
+      "drug_class": "flumazenil",
+      "label_tr": "Flumazenil (BZD antagonist)",
+      "targets": ["r_bdz_site"],
+      "relation": "antagonist",
+      "downstream_effects": [
+        { "nodeId": "e_sedation", "effect_tr": "Sedasyon geri döner" },
+        { "nodeId": "e_resp_depression", "effect_tr": "Solunum iyileşir (kısa yarı ömür)" },
+        { "nodeId": "e_dependence", "effect_tr": "Kronik BZD kullanıcısında withdrawal/seizure riski" }
+      ],
+      "tr_products_atc": ["V03AB25"]
+    },
+    {
+      "drug_class": "barbiturate",
+      "label_tr": "Barbitürat (fenobarbital)",
+      "targets": ["r_barbiturate_site"],
+      "relation": "agonist",
+      "downstream_effects": [
+        { "nodeId": "e_anticonvulsant", "effect_tr": "Epilepsi (özellikle pediatrik)" },
+        { "nodeId": "e_sedation", "effect_tr": "Sedasyon" },
+        { "nodeId": "e_resp_depression", "effect_tr": "Doz bağımlı solunum depresyonu (BZD'den daha tehlikeli)" }
+      ],
+      "tr_products_atc": ["N03AA02"]
+    },
+    {
+      "drug_class": "z_drug",
+      "label_tr": "Z-hapları (zolpidem)",
+      "targets": ["r_bdz_site"],
+      "relation": "agonist",
+      "downstream_effects": [
+        { "nodeId": "e_sedation", "effect_tr": "Hipnotik (α1 subunit selektif)" },
+        { "nodeId": "e_anxiolysis", "effect_tr": "Daha az anksiyolitik etki" }
+      ],
+      "tr_products_atc": ["N05CF02"]
+    },
+    {
+      "drug_class": "baclofen",
+      "label_tr": "Baklofen (GABA-B agonist)",
+      "targets": ["r_gaba_b"],
+      "relation": "agonist",
+      "downstream_effects": [
+        { "nodeId": "o_spinal", "effect_tr": "Spinal motor nöron inhibisyonu" },
+        { "nodeId": "e_muscle_relax", "effect_tr": "Spastisite (MS, SCI)" }
+      ],
+      "tr_products_atc": ["M03BX01"]
+    }
+  ],
+  "quiz": [
+    {
+      "q_tr": "Benzodiazepinler GABA-A reseptöründe nasıl etki eder?",
+      "options_tr": ["Doğrudan Cl⁻ kanalını açarlar", "Pozitif allosterik modülasyon (GABA frekansını artırır)", "GABA yıkımını inhibe eder", "Glutamat reseptörünü bloke eder"],
+      "answer_idx": 1,
+      "explanation_tr": "BZD allosterik siteye bağlanır; endojen GABA'nın Cl⁻ kanalını açma frekansını artırır. GABA olmadan minimal etki.",
+      "node_id": "r_bdz_site"
+    },
+    {
+      "q_tr": "Barbitüratlar benzodiazepinlerden farklı olarak ne yapabilir?",
+      "options_tr": ["Sadece GABA varken etkilidirler", "GABA olmadan da kanalı aktive edebilir (yüksek doz)", "Flumazenil ile antagonize edilir", "Anksiyoliz yapmazlar"],
+      "answer_idx": 1,
+      "explanation_tr": "Barbitüratlar kanal açık kalma süresini uzatır; yüksek dozda GABA'dan bağımsız aktivasyon → ciddi solunum depresyonu.",
+      "node_id": "r_barbiturate_site"
+    },
+    {
+      "q_tr": "Status epileptikus acil tedavisinde IV tercih edilen benzodiazepin hangisidir?",
+      "options_tr": ["Diazepam veya lorazepam", "Flumazenil", "Baklofen", "Zolpidem"],
+      "answer_idx": 0,
+      "explanation_tr": "Lorazepam/diazepam hızlı GABAergic ton artışı ile nöbeti sonlandırır. Flumazenil antagonisttir.",
+      "node_id": "e_anticonvulsant"
+    },
+    {
+      "q_tr": "Flumazenil kullanımında en önemli risk nedir?",
+      "options_tr": ["Kalıcı sedasyon", "Kronik BZD kullanıcısında withdrawal/nöbet", "Hipertansiyon", "Bronkospazm"],
+      "answer_idx": 1,
+      "explanation_tr": "Flumazenil BZD antagonistidir; kronik kullanıcıda ani withdrawal ve convulsiyon tetikleyebilir. Kısa yarı ömür → re-sedasyon.",
+      "node_id": "r_bdz_site"
+    },
+    {
+      "q_tr": "BZD + opioid kombinasyonu neden tehlikelidir?",
+      "options_tr": ["Hipertansiyon", "Sinerjistik solunum depresyonu", "Hiperkalemi", "Trombositopeni"],
+      "answer_idx": 1,
+      "explanation_tr": "Her ikisi de solunum merkezini baskılar; kombine kullanım fatal solunum depresyonu riskini belirgin artırır (FDA black box).",
+      "node_id": "e_resp_depression"
+    },
+    {
+      "q_tr": "Baklofen hangi reseptörü hedefler?",
+      "options_tr": ["GABA-A", "GABA-B", "NMDA", "Glycin"],
+      "answer_idx": 1,
+      "explanation_tr": "Baklofen GABA-B (Gi) agonistidir; spinal düzeyde spastisite tedavisinde kullanılır.",
+      "node_id": "r_gaba_b"
+    }
+  ]
+}

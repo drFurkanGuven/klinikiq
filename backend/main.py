@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, drugs, antibiotics, emergency_mcq, learning, pharma
+from app.api import auth, cases, sessions, reports, users, admin, flashcards, questions, microscope, emergency_mcq, learning, pharma
 from app.api.practice_mcq import router as practice_mcq_router
 
 
@@ -78,8 +78,6 @@ app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(flashcards.router, prefix="/api/flashcards", tags=["Flashcards"])
 app.include_router(questions.router, prefix="/api/questions", tags=["Questions"])
 app.include_router(microscope.router, prefix="/api/microscope", tags=["Microscope"])
-app.include_router(drugs.router, prefix="/api/drugs", tags=["Drugs"])
-app.include_router(antibiotics.router, prefix="/api/antibiotics", tags=["Antibiotics"])
 app.include_router(emergency_mcq.router, prefix="/api/emergency-mcq", tags=["Emergency MCQ"])
 app.include_router(practice_mcq_router, prefix="/api/practice-mcq", tags=["practice-mcq"])
 app.include_router(learning.router, prefix="/api/learning", tags=["Learning"])

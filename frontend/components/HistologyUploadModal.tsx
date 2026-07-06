@@ -232,7 +232,7 @@ export default function HistologyUploadModal({ isOpen, onClose, onSuccess }: Pro
         {/* Header */}
         <div className="px-8 py-6 flex items-center justify-between border-b border-black/5 dark:border-white/5">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-primary text-white">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-accent text-accent-foreground">
               <Microscope className="w-6 h-6" />
             </div>
             <div>
@@ -315,7 +315,7 @@ export default function HistologyUploadModal({ isOpen, onClose, onSuccess }: Pro
                           onChange={(e) => setFile(e.target.files?.[0] || null)}
                           required={tab === "tiff"}
                           disabled={isUploading}
-                          className="w-full text-xs file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-primary file:text-white hover:file:opacity-90 transition-all font-bold p-1 rounded-2xl border-2 border-dashed border-border hover:border-primary cursor-pointer disabled:opacity-50"
+                          className="w-full text-xs file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-accent file:text-accent-foreground hover:file:opacity-90 transition-all font-bold p-1 rounded-2xl border-2 border-dashed border-border hover:border-foreground cursor-pointer disabled:opacity-50"
                         />
                       </div>
                       <p className="text-[10px] font-medium opacity-50 px-1 leading-relaxed">
@@ -347,7 +347,7 @@ export default function HistologyUploadModal({ isOpen, onClose, onSuccess }: Pro
                           });
                         }}
                         disabled={isUploading}
-                        className="w-full text-xs file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-primary file:text-white hover:file:opacity-90 transition-all font-bold p-1 rounded-2xl border-2 border-dashed border-border hover:border-primary cursor-pointer disabled:opacity-50"
+                        className="w-full text-xs file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-accent file:text-accent-foreground hover:file:opacity-90 transition-all font-bold p-1 rounded-2xl border-2 border-dashed border-border hover:border-foreground cursor-pointer disabled:opacity-50"
                       />
                       {folderStats && (
                         <div className="rounded-2xl border border-border bg-black/[0.03] dark:bg-white/[0.04] px-4 py-3 text-xs font-semibold space-y-1">
@@ -568,7 +568,7 @@ export default function HistologyUploadModal({ isOpen, onClose, onSuccess }: Pro
                 <button
                   type="submit"
                   disabled={isUploading}
-                  className="py-4 rounded-2xl text-xs font-black uppercase tracking-widest bg-primary text-white shadow-xl hover:shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:scale-100"
+                  className="py-4 rounded-2xl text-xs font-black uppercase tracking-widest bg-accent text-accent-foreground hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:scale-100"
                 >
                   {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                   {tab === "folder" ? "KLASÖRÜ İŞLE" : "ŞİMDİ YAYINLA"}

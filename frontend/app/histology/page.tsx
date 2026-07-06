@@ -111,25 +111,25 @@ function HistologyPageInner() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-violet-950/25 to-slate-950 text-slate-100 transition-colors">
-      <nav className="border-b border-white/10 bg-slate-950/70 backdrop-blur-xl sticky top-0 z-40">
+    <div className="min-h-screen bg-background text-foreground transition-colors">
+      <nav className="border-b border-border bg-surface-muted backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <Link
               href="/dashboard"
-              className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors shrink-0"
+              className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors shrink-0"
             >
               <ArrowLeft size={15} />
               Dashboard
             </Link>
-            <span className="text-slate-600">/</span>
+            <span className="text-muted">/</span>
             <div className="flex items-center gap-2 font-semibold text-sm min-w-0">
-              <Microscope size={17} className="text-violet-400 shrink-0" />
+              <Microscope size={17} className="text-muted shrink-0" />
               <span className="truncate">Histoloji laboratuvarı</span>
             </div>
           </div>
-          <div className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            <Sparkles size={12} className="text-amber-400/90" />
+          <div className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted">
+            <Sparkles size={12} className="text-warning" />
             Dijital patoloji
           </div>
         </div>
@@ -137,30 +137,27 @@ function HistologyPageInner() {
 
       <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 space-y-10">
         {/* Hero */}
-        <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900/90 via-violet-950/30 to-slate-900/90 p-8 md:p-10 shadow-2xl shadow-violet-950/20">
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-500/15 blur-3xl pointer-events-none" />
-          <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
+        <header className="relative overflow-hidden rounded-3xl border border-border bg-surface-muted p-8 md:p-10">
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-surface-hover blur-3xl pointer-events-none hidden" />
+          <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-surface-hover blur-3xl pointer-events-none hidden" />
           <div className="relative max-w-3xl space-y-4">
-            <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-violet-300/90">
+            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-hover px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-muted">
               <Layers size={12} />
               Açık lisanslı preparatlar
             </p>
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">
-              Preparatları{" "}
-              <span className="bg-gradient-to-r from-violet-300 to-cyan-300 bg-clip-text text-transparent">
-                zoom&apos;la incele
-              </span>
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
+              Preparatları zoom&apos;la incele
             </h1>
-            <p className="text-sm md:text-base text-slate-400 leading-relaxed font-medium">
+            <p className="text-sm md:text-base text-muted leading-relaxed font-medium">
               Wikimedia Commons ve benzeri açık kaynaklardan derlenen H&amp;E / özel boyalı kesitleri
               yüksek çözünürlükte inceleyebilirsin. Müfredat, branş, boya ve organ filtreleriyle temel
               bilim ve klinik izleri ayırabilirsin; görüntü üzerinde alan seçerek not tutabilirsin.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <span className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300">
+              <span className="rounded-xl border border-border bg-surface-hover px-4 py-2 text-xs font-bold text-foreground">
                 {loading ? "…" : images.length} preparat
               </span>
-              <span className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300">
+              <span className="rounded-xl border border-border bg-surface-hover px-4 py-2 text-xs font-bold text-foreground">
                 OpenSeadragon derin zoom
               </span>
             </div>
@@ -170,7 +167,7 @@ function HistologyPageInner() {
         {/* Filters */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <label className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Akademik iz</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted">Akademik iz</span>
             <div className="relative">
               <select
                 value={curriculumTrack}
@@ -178,7 +175,7 @@ function HistologyPageInner() {
                   setCurriculumTrack(e.target.value);
                   setScienceUnit("");
                 }}
-                className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50"
+                className="w-full appearance-none rounded-2xl border border-border bg-surface-muted pl-4 pr-10 py-3 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-border-strong"
               >
                 {CURRICULUM_FILTER_OPTIONS.map((o) => (
                   <option key={o.value || "all"} value={o.value}>
@@ -186,18 +183,18 @@ function HistologyPageInner() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
             </div>
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted">
               Konu (temel ünite)
             </span>
             <div className="relative">
               <select
                 value={scienceUnit}
                 onChange={(e) => setScienceUnit(e.target.value)}
-                className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50 disabled:opacity-40"
+                className="w-full appearance-none rounded-2xl border border-border bg-surface-muted pl-4 pr-10 py-3 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-border-strong disabled:opacity-40"
                 disabled={!!curriculumTrack && curriculumTrack === "clinical"}
               >
                 <option value="">Tümü</option>
@@ -207,16 +204,16 @@ function HistologyPageInner() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
             </div>
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Branş</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted">Branş</span>
             <div className="relative">
               <select
                 value={specialty}
                 onChange={(e) => setSpecialty(e.target.value)}
-                className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50"
+                className="w-full appearance-none rounded-2xl border border-border bg-surface-muted pl-4 pr-10 py-3 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-border-strong"
               >
                 <option value="">Tüm branşlar</option>
                 {Object.entries(HISTOLOGY_SPECIALTIES).map(([key, label]) => (
@@ -225,18 +222,18 @@ function HistologyPageInner() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
             </div>
           </label>
         </section>
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <label className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Boya</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted">Boya</span>
             <div className="relative">
               <select
                 value={stain}
                 onChange={(e) => setStain(e.target.value)}
-                className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50"
+                className="w-full appearance-none rounded-2xl border border-border bg-surface-muted pl-4 pr-10 py-3 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-border-strong"
               >
                 {STAIN_OPTIONS.map((s) => (
                   <option key={s || "all"} value={s}>
@@ -244,16 +241,16 @@ function HistologyPageInner() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
             </div>
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Organ / doku</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted">Organ / doku</span>
             <div className="relative">
               <select
                 value={organ}
                 onChange={(e) => setOrgan(e.target.value)}
-                className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50"
+                className="w-full appearance-none rounded-2xl border border-border bg-surface-muted pl-4 pr-10 py-3 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-border-strong"
               >
                 {ORGAN_OPTIONS.map((o) => (
                   <option key={o || "all"} value={o}>
@@ -261,16 +258,16 @@ function HistologyPageInner() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
             </div>
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Kaynak</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted">Kaynak</span>
             <div className="relative">
               <select
                 value={assetSource}
                 onChange={(e) => setAssetSource(e.target.value)}
-                className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/80 pl-4 pr-10 py-3 text-sm font-semibold text-slate-200 outline-none focus:ring-2 focus:ring-violet-500/50"
+                className="w-full appearance-none rounded-2xl border border-border bg-surface-muted pl-4 pr-10 py-3 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-border-strong"
               >
                 {SOURCE_FILTERS.map((s) => (
                   <option key={s.value || "all"} value={s.value}>
@@ -278,7 +275,7 @@ function HistologyPageInner() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
             </div>
           </label>
         </section>
@@ -286,8 +283,8 @@ function HistologyPageInner() {
         {/* Grid + viewer */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
           <div className="xl:col-span-5 space-y-4">
-            <h2 className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-              <Database size={14} className="text-violet-400" />
+            <h2 className="text-xs font-black uppercase tracking-widest text-muted flex items-center gap-2">
+              <Database size={14} className="text-muted" />
               Kütüphane
             </h2>
             {loading ? (
@@ -295,12 +292,12 @@ function HistologyPageInner() {
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
-                    className="h-36 rounded-2xl bg-white/5 border border-white/10 animate-pulse"
+                    className="h-36 rounded-2xl bg-surface-hover border border-border animate-pulse"
                   />
                 ))}
               </div>
             ) : images.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-10 flex flex-col items-center gap-3 text-slate-500">
+              <div className="rounded-2xl border border-dashed border-border bg-surface-hover p-10 flex flex-col items-center gap-3 text-muted">
                 <ImageOff size={36} />
                 <p className="text-sm font-medium">Filtreye uygun preparat yok</p>
               </div>
@@ -315,11 +312,11 @@ function HistologyPageInner() {
                       onClick={() => setSelected(img)}
                       className={`text-left rounded-2xl border transition-all overflow-hidden group ${
                         active
-                          ? "border-violet-400/60 bg-violet-950/40 ring-1 ring-violet-400/30 shadow-lg shadow-violet-950/30"
-                          : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]"
+                          ? "border-foreground bg-surface-hover ring-1 ring-border-strong shadow-lg shadow-none"
+                          : "border-border bg-surface/[0.03] hover:border-border hover:bg-surface-hover/[0.06]"
                       }`}
                     >
-                      <div className="aspect-[4/3] relative bg-slate-900">
+                      <div className="aspect-[4/3] relative bg-surface-muted">
                         {img.thumbnail_url || img.image_url ? (
                           <img
                             src={resolveImageUrl(img.thumbnail_url, img.image_url)}
@@ -330,31 +327,31 @@ function HistologyPageInner() {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Microscope className="text-slate-600" size={28} />
+                            <Microscope className="text-muted" size={28} />
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                       </div>
                       <div className="p-3 space-y-2">
-                        <p className="text-xs font-bold text-white line-clamp-2 leading-snug">{img.title}</p>
+                        <p className="text-xs font-bold text-foreground line-clamp-2 leading-snug">{img.title}</p>
                         <div className="flex flex-wrap gap-1">
                           {img.specialty && (
-                            <span className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-white/10 text-slate-300">
+                            <span className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md bg-surface-hover text-foreground">
                               {HISTOLOGY_SPECIALTIES[img.specialty] ?? img.specialty}
                             </span>
                           )}
                           {img.stain && (
-                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-violet-500/20 text-violet-200">
+                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-surface-hover text-muted">
                               {img.stain}
                             </span>
                           )}
                           {img.organ && (
-                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-cyan-500/15 text-cyan-200">
+                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-surface-hover text-muted">
                               {img.organ}
                             </span>
                           )}
                           {img.science_unit && (
-                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-100">
+                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-surface-hover text-warning">
                               {SCIENCE_UNIT_LABELS[img.science_unit] ?? img.science_unit}
                             </span>
                           )}
@@ -368,12 +365,12 @@ function HistologyPageInner() {
           </div>
 
           <div className="xl:col-span-7 space-y-4 min-w-0">
-            <h2 className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-              <Microscope size={14} className="text-cyan-400" />
+            <h2 className="text-xs font-black uppercase tracking-widest text-muted flex items-center gap-2">
+              <Microscope size={14} className="text-muted" />
               Görüntüleyici
             </h2>
             {selected ? (
-              <div className="rounded-3xl border border-white/10 bg-slate-900/50 p-5 md:p-6 shadow-2xl">
+              <div className="rounded-3xl border border-border bg-surface-muted p-5 md:p-6 shadow-2xl">
                 <HistologyViewer
                   image={selected}
                   title={selected.title}
@@ -384,7 +381,7 @@ function HistologyPageInner() {
                 />
               </div>
             ) : (
-              <div className="rounded-3xl border border-dashed border-white/15 bg-white/[0.02] p-16 flex flex-col items-center justify-center gap-4 text-slate-500">
+              <div className="rounded-3xl border border-dashed border-border bg-surface/[0.02] p-16 flex flex-col items-center justify-center gap-4 text-muted">
                 <Microscope size={48} className="opacity-40" />
                 <p className="text-sm font-medium text-center max-w-xs">
                   Soldan bir preparat seçerek yüksek çözünürlükte incelemeye başla
@@ -395,13 +392,13 @@ function HistologyPageInner() {
         </div>
 
         {/* Öğrenme kaynakları + ipuçları */}
-        <section className="rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-md p-6 md:p-8 space-y-8">
+        <section className="rounded-3xl border border-border bg-surface-muted backdrop-blur-md p-6 md:p-8 space-y-8">
           <div className="space-y-2">
-            <h2 className="text-lg font-black text-white flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 text-cyan-400/90 shrink-0" />
+            <h2 className="text-lg font-black text-foreground flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-muted shrink-0" />
               Öğrenme ve pratik
             </h2>
-            <p className="text-sm text-slate-400 max-w-2xl font-medium leading-relaxed">
+            <p className="text-sm text-muted max-w-2xl font-medium leading-relaxed">
               Histoloji çalışırken sık başvurulan açık kaynaklar. Bunlar harici sitelerdir; KlinikIQ ile bağlantılı
               değildir — müfredatınızı desteklemek için seçilmiştir.
             </p>
@@ -409,8 +406,8 @@ function HistologyPageInner() {
 
           <div className="grid gap-8 lg:grid-cols-2">
             <div className="space-y-4">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
-                <BookOpen size={14} className="text-violet-400" />
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted flex items-center gap-2">
+                <BookOpen size={14} className="text-muted" />
                 Seçilmiş kaynaklar
               </h3>
               <ul className="space-y-3">
@@ -441,16 +438,16 @@ function HistologyPageInner() {
                       href={item.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex gap-3 rounded-2xl border border-white/10 bg-slate-950/50 p-4 transition-colors hover:border-cyan-500/30 hover:bg-slate-950/80"
+                      className="group flex gap-3 rounded-2xl border border-border bg-surface-muted p-4 transition-colors hover:border-border hover:bg-surface-muted"
                     >
-                      <span className="mt-0.5 text-cyan-400/80 group-hover:text-cyan-300">
+                      <span className="mt-0.5 text-muted group-hover:text-foreground">
                         <ExternalLink size={16} />
                       </span>
                       <span className="min-w-0">
-                        <span className="block text-sm font-bold text-white group-hover:text-cyan-100">
+                        <span className="block text-sm font-bold text-foreground group-hover:text-foreground">
                           {item.title}
                         </span>
-                        <span className="mt-0.5 block text-xs text-slate-500 leading-relaxed">
+                        <span className="mt-0.5 block text-xs text-muted leading-relaxed">
                           {item.desc}
                         </span>
                       </span>
@@ -460,9 +457,9 @@ function HistologyPageInner() {
               </ul>
             </div>
 
-            <div className="space-y-4 rounded-2xl border border-white/5 bg-violet-950/15 p-5 md:p-6">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
-                <Lightbulb size={14} className="text-amber-400" />
+            <div className="space-y-4 rounded-2xl border border-border bg-surface-hover p-5 md:p-6">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted flex items-center gap-2">
+                <Lightbulb size={14} className="text-warning" />
                 Bu sayfada neler var?
               </h3>
               <ul className="space-y-3">
@@ -475,7 +472,7 @@ function HistologyPageInner() {
                     k: "Görüntüleyici",
                     t: (
                       <>
-                        <strong className="text-slate-200 font-semibold">Yakın / Uzak / Tümü</strong> ile yakınlaştırın;
+                        <strong className="text-foreground font-semibold">Yakın / Uzak / Tümü</strong> ile yakınlaştırın;
                         sağ alttaki küçük haritadan genel görünümü izleyin.
                       </>
                     ),
@@ -496,12 +493,12 @@ function HistologyPageInner() {
                 ].map((row) => (
                   <li
                     key={row.k}
-                    className="rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-slate-300 leading-relaxed"
+                    className="rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm text-foreground leading-relaxed"
                   >
-                    <span className="block text-[11px] font-black uppercase tracking-wider text-violet-300/90 mb-1">
+                    <span className="block text-[11px] font-black uppercase tracking-wider text-muted mb-1">
                       {row.k}
                     </span>
-                    <span className="text-slate-400">{row.t}</span>
+                    <span className="text-muted">{row.t}</span>
                   </li>
                 ))}
               </ul>
@@ -517,7 +514,7 @@ export default function HistologyPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-violet-950/25 to-slate-950 flex items-center justify-center text-slate-400 text-sm">
+        <div className="min-h-screen bg-background flex items-center justify-center text-muted text-sm">
           Histoloji yükleniyor…
         </div>
       }

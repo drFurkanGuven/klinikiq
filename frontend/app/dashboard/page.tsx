@@ -24,7 +24,7 @@ function timeAgo(dateStr: string | undefined): string {
 import { nativeClient } from "@/lib/native";
 import { biometricsClient } from "@/lib/biometrics";
 import { storage } from "@/lib/storage";
-import { useTheme, type Palette } from "@/components/ThemeProvider";
+import { useTheme } from "@/components/ThemeProvider";
 import PremiumAlert from "@/components/PremiumAlert";
 
 const SPECIALTIES = [
@@ -84,7 +84,7 @@ export default function DashboardPage() {
   /** Navbar: sınıflı menü (mobilde taşmayı önlemek için) */
   const [openNavMenu, setOpenNavMenu] = useState<null | "study" | "account">(null);
 
-  const { theme, toggleTheme, palette, setPalette } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -333,12 +333,12 @@ export default function DashboardPage() {
       {/* Navbar */}
       <nav className="glass border-b sticky top-0 z-[100] transition-all" style={{ borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group cursor-pointer transition-transform hover:scale-105">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"
-              style={{ background: "var(--primary)" }}>
-              <Stethoscope className="w-4 h-4 text-white" />
+          <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">
+            <div className="w-8 h-8 rounded-md flex items-center justify-center transition-opacity group-hover:opacity-90"
+              style={{ background: "var(--accent)" }}>
+              <Stethoscope className="w-4 h-4" style={{ color: "var(--accent-foreground)" }} />
             </div>
-            <span className="font-bold text-lg tracking-tight" style={{ color: "var(--text)" }}>KlinikIQ</span>
+            <span className="font-semibold text-lg tracking-tight" style={{ color: "var(--text)" }}>KlinikIQ</span>
           </Link>
 
           <div className="flex items-center gap-1 sm:gap-1.5">
@@ -481,7 +481,7 @@ export default function DashboardPage() {
                     Simülasyon (acil)
                   </Link>
                   <Link
-                    href="/farmakoloji"
+                    href="/farmakoloji/haritalar"
                     onClick={() => {
                       nativeClient.impact();
                       setOpenNavMenu(null);
@@ -597,7 +597,6 @@ export default function DashboardPage() {
             {/* Vakalar */}
             <div className="glass-card p-3 sm:p-5 border relative overflow-hidden group" 
                  style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 mb-1 sm:mb-2">
                 <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner"
                   style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}>
@@ -613,7 +612,6 @@ export default function DashboardPage() {
             {/* Ort. Skor */}
             <div className="glass-card p-3 sm:p-5 border relative overflow-hidden group border-t-2" 
                  style={{ background: "var(--surface)", borderColor: "var(--border)", borderTopColor: "var(--success)" }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 mb-1 sm:mb-2">
                 <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner"
                   style={{ background: "color-mix(in srgb, var(--success) 15%, transparent)" }}>
@@ -632,7 +630,6 @@ export default function DashboardPage() {
             {/* Tamamlanan */}
             <div className="glass-card p-3 sm:p-5 border relative overflow-hidden group" 
                  style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1.5 sm:gap-3 mb-1 sm:mb-2">
                 <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner"
                   style={{ background: "color-mix(in srgb, var(--accent) 20%, transparent)" }}>
@@ -710,9 +707,9 @@ export default function DashboardPage() {
               }}
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
-                  style={{ background: "var(--primary)" }}>
-                  <Play className="w-4 h-4 text-white" />
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: "var(--accent)" }}>
+                  <Play className="w-4 h-4" style={{ color: "var(--accent-foreground)" }} />
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs font-black uppercase tracking-widest mb-0.5" style={{ color: "var(--primary)" }}>
@@ -728,7 +725,7 @@ export default function DashboardPage() {
               </div>
               <button
                 onClick={() => { nativeClient.impact(); router.push(`/case?id=${activeSession.session_id}`); }}
-                className="btn-premium shrink-0 px-5 py-2.5 text-sm rounded-xl active:scale-95 w-full sm:w-auto"
+                className="btn-primary shrink-0 px-5 py-2.5 text-sm rounded-xl active:scale-95 w-full sm:w-auto"
               >
                 Devam Et →
               </button>
@@ -745,12 +742,10 @@ export default function DashboardPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`relative px-4 sm:px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm ${
-                  activeTab === tab ? "text-white" : ""
-                }`}
+                className="relative px-4 sm:px-5 py-2 rounded-lg text-sm font-semibold transition-all"
                 style={{
-                  background: activeTab === tab ? "var(--primary)" : "transparent",
-                  color: activeTab === tab ? "#fff" : "var(--text-muted)"
+                  background: activeTab === tab ? "var(--accent)" : "transparent",
+                  color: activeTab === tab ? "var(--accent-foreground)" : "var(--text-muted)"
                 }}
               >
                 {tab === "randomizer" ? "Yepyeni Vaka Çöz" : "Geçmişim"}
@@ -768,15 +763,10 @@ export default function DashboardPage() {
         {activeTab === "randomizer" && (
             <div className="grid grid-cols-1 gap-6">
                 <div className="md:col-span-12">
-                    <div className="glass-card p-5 sm:p-10 border shadow-xl relative overflow-hidden" 
-                      style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-                        {/* Decorative Background */}
-                        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full blur-3xl pointer-events-none transition-all" 
-                          style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)" }} />
-                        
+                    <div className="card p-5 sm:p-10 relative overflow-hidden">
                         <div className="mb-6 sm:mb-10 relative">
-                            <h2 className="text-xl sm:text-3xl font-black flex items-center gap-3 mb-2" style={{ color: "var(--text-navy)" }}>
-                                <Dna className="w-5 h-5 sm:w-7 sm:h-7" style={{ color: "var(--primary)" }} />
+                            <h2 className="text-xl sm:text-3xl font-semibold flex items-center gap-3 mb-2" style={{ color: "var(--text-navy)" }}>
+                                <Dna className="w-5 h-5 sm:w-7 sm:h-7" style={{ color: "var(--foreground)" }} />
                                 Vaka Oluşturucu
                             </h2>
                             <p className="text-xs sm:text-base opacity-60 font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
@@ -795,9 +785,9 @@ export default function DashboardPage() {
                                             : "hover:border-slate-400"
                                     }`}
                                     style={{ 
-                                      background: selectedSpecs.length === 0 ? "var(--primary)" : "var(--surface-2)", 
-                                      borderColor: selectedSpecs.length === 0 ? "var(--primary)" : "var(--border)",
-                                      color: selectedSpecs.length === 0 ? "#fff" : "var(--text-muted)"
+                                      background: selectedSpecs.length === 0 ? "var(--accent)" : "var(--surface-2)", 
+                                      borderColor: selectedSpecs.length === 0 ? "var(--accent)" : "var(--border)",
+                                      color: selectedSpecs.length === 0 ? "var(--accent-foreground)" : "var(--text-muted)"
                                     }}
                                 >
                                     Karışık
@@ -812,9 +802,9 @@ export default function DashboardPage() {
                                                 : "hover:border-slate-400"
                                         }`}
                                         style={{ 
-                                          background: selectedSpecs.includes(s.value) ? "var(--primary)" : "var(--surface-2)", 
-                                          borderColor: selectedSpecs.includes(s.value) ? "var(--primary)" : "var(--border)",
-                                          color: selectedSpecs.includes(s.value) ? "#fff" : "var(--text-muted)"
+                                          background: selectedSpecs.includes(s.value) ? "var(--accent)" : "var(--surface-2)", 
+                                          borderColor: selectedSpecs.includes(s.value) ? "var(--accent)" : "var(--border)",
+                                          color: selectedSpecs.includes(s.value) ? "var(--accent-foreground)" : "var(--text-muted)"
                                         }}
                                     >
                                         {s.label}
@@ -880,8 +870,8 @@ export default function DashboardPage() {
                           <button
                             onClick={handleStartRandomCase}
                             disabled={isStarting || isRecommending || isLimitReached}
-                            className={`btn-premium flex-1 py-4 text-base rounded-2xl active:scale-95 ${
-                              isStarting || isLimitReached ? "opacity-50 grayscale cursor-not-allowed" : ""
+                            className={`btn-primary flex-1 py-4 text-base rounded-2xl active:scale-95 ${
+                              isStarting || isLimitReached ? "opacity-50 cursor-not-allowed" : ""
                             }`}
                           >
                             {isStarting ? "Hazırlanıyor..." : isLimitReached ? "Limit Doldu" : "Vaka Başlat"}
@@ -890,10 +880,9 @@ export default function DashboardPage() {
                           <button
                             onClick={handleRecommendedCase}
                             disabled={isStarting || isRecommending || isLimitReached}
-                            className={`btn-premium px-6 py-4 text-base rounded-2xl active:scale-95 flex items-center justify-center gap-2 ${
-                              isRecommending || isLimitReached ? "opacity-50 grayscale cursor-not-allowed" : ""
+                            className={`btn-secondary px-6 py-4 text-base rounded-2xl active:scale-95 flex items-center justify-center gap-2 ${
+                              isRecommending || isLimitReached ? "opacity-50 cursor-not-allowed" : ""
                             }`}
-                            style={{ background: "transparent", border: "2px solid var(--primary)", color: "var(--primary)" }}
                           >
                             <Sparkles className="w-4 h-4" />
                             <span>Önerilen</span>
@@ -975,8 +964,7 @@ export default function DashboardPage() {
                     {item.status === "completed" && (
                       <button
                         onClick={() => router.push(`/report?id=${item.session_id}`)}
-                        className="btn-premium px-5 py-2.5 text-xs active:scale-95"
-                        style={{ background: "transparent", border: "2px solid var(--primary)", color: "var(--primary)" }}
+                        className="btn-secondary px-5 py-2.5 text-xs active:scale-95"
                       >
                         Rapor
                       </button>
@@ -984,7 +972,7 @@ export default function DashboardPage() {
                     {item.status === "active" && (
                       <button
                         onClick={() => router.push(`/case?id=${item.session_id}`)}
-                        className="btn-premium px-5 py-2.5 text-xs active:scale-95"
+                        className="btn-primary px-5 py-2.5 text-xs active:scale-95"
                       >
                         Devam Et
                       </button>
@@ -1048,8 +1036,8 @@ export default function DashboardPage() {
                                         <button
                                             onClick={saveProfile}
                                             disabled={profileSaving}
-                                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl transition-all text-white"
-                                            style={{ background: "var(--primary)" }}
+                                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl transition-all"
+                                            style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
                                         >
                                             {profileSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
                                             Kaydet
@@ -1178,8 +1166,8 @@ export default function DashboardPage() {
                                 <button
                                     onClick={changePassword}
                                     disabled={passwordSaving}
-                                    className="w-full flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-wider px-3 py-2.5 rounded-xl transition-all text-white"
-                                    style={{ background: "var(--primary)" }}
+                                    className="w-full flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-wider px-3 py-2.5 rounded-xl transition-all"
+                                    style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
                                 >
                                     {passwordSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <KeyRound className="w-3.5 h-3.5" />}
                                     Şifreyi Güncelle
@@ -1197,38 +1185,25 @@ export default function DashboardPage() {
                             </div>
                         </div>
 
-                        {/* Palette Selector */}
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 opacity-40">Renk Paleti</p>
-                            <div className="flex justify-between gap-2">
-                                {(["emerald", "midnight", "violet", "rose"] as Palette[]).map((p) => (
-                                    <button
-                                        key={p}
-                                        onClick={() => { nativeClient.impact(); setPalette(p); }}
-                                        className={`w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-lg border-2 ${palette === p ? "border-primary scale-110" : "border-transparent opacity-60"}`}
-                                        style={{ background: p === "emerald" ? "#4a7c59" : p === "midnight" ? "#334155" : p === "violet" ? "#7c3aed" : "#be123c" }}
-                                    >
-                                        {palette === p && <Check className="w-5 h-5 text-white" />}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
                         {/* Biometric Toggle */}
                         {biometricsAvailable && (
-                            <div className="flex items-center justify-between p-4 rounded-2xl border bg-surface-2" style={{ borderColor: "var(--border)" }}>
+                            <div className="flex items-center justify-between p-4 rounded-2xl border" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
                                 <div className="flex items-center gap-3">
-                                    <Fingerprint className="w-5 h-5 text-primary" />
+                                    <Fingerprint className="w-5 h-5" style={{ color: "var(--foreground)" }} />
                                     <div>
-                                        <p className="text-xs font-black">Parmak İzi</p>
+                                        <p className="text-xs font-semibold">Parmak İzi</p>
                                         <p className="text-[10px] opacity-50">Hızlı Giriş</p>
                                     </div>
                                 </div>
                                 <button
                                     onClick={toggleBiometrics}
-                                    className={`w-12 h-6 rounded-full transition-all relative ${isBiometricsEnabled ? "bg-primary" : "bg-slate-300"}`}
+                                    className="w-12 h-6 rounded-full transition-all relative"
+                                    style={{ background: isBiometricsEnabled ? "var(--accent)" : "var(--border-strong)" }}
                                 >
-                                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isBiometricsEnabled ? "left-7" : "left-1"}`} />
+                                    <div
+                                      className={`absolute top-1 w-4 h-4 rounded-full transition-all ${isBiometricsEnabled ? "left-7" : "left-1"}`}
+                                      style={{ background: isBiometricsEnabled ? "var(--accent-foreground)" : "var(--surface)" }}
+                                    />
                                 </button>
                             </div>
                         )}
@@ -1236,19 +1211,19 @@ export default function DashboardPage() {
                         {/* Theme Toggle Button */}
                         <button
                             onClick={() => { nativeClient.impact(); toggleTheme(); }}
-                            className="w-full flex items-center justify-between p-4 rounded-2xl border bg-surface-2"
-                            style={{ borderColor: "var(--border)" }}
+                            className="w-full flex items-center justify-between p-4 rounded-2xl border"
+                            style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
                         >
                             <div className="flex items-center gap-3">
-                                {theme === "dark" ? <Sun className="w-5 h-5 text-warning" /> : <Moon className="w-5 h-5 text-primary" />}
-                                <p className="text-xs font-black">{theme === "dark" ? "Gündüz Modu" : "Gece Modu"}</p>
+                                {theme === "dark" ? <Sun className="w-5 h-5" style={{ color: "var(--foreground)" }} /> : <Moon className="w-5 h-5" style={{ color: "var(--foreground)" }} />}
+                                <p className="text-xs font-semibold">{theme === "dark" ? "Gündüz Modu" : "Gece Modu"}</p>
                             </div>
                             <span className="text-[10px] font-bold opacity-40 uppercase">Değiştir</span>
                         </button>
                     </div>
 
                     <div className="mt-10 pt-6 border-t" style={{ borderColor: "var(--border)" }}>
-                        <button onClick={logout} className="w-full py-4 text-xs font-black uppercase tracking-widest text-danger flex items-center justify-center gap-2">
+                        <button onClick={logout} className="w-full py-4 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2" style={{ color: "var(--destructive)" }}>
                             <LogOut className="w-4 h-4" /> Oturumu Kapat
                         </button>
                     </div>

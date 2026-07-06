@@ -52,9 +52,9 @@ export default function StudyNotesPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"
-                style={{ background: "var(--primary)" }}>
-                <BookOpen className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ background: "var(--accent)" }}>
+                <BookOpen className="w-5 h-5" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <div className="hidden sm:block">
                 <span className="font-black text-lg tracking-tight block leading-tight">Hata Defterim</span>

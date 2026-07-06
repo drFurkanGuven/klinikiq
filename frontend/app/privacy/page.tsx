@@ -43,20 +43,20 @@ const TOC: { href: string; label: string }[] = [
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-300 overflow-y-auto">
-      <nav className="glass border-b border-slate-800 sticky top-0 z-50">
+    <div className="min-h-screen flex flex-col bg-background text-foreground overflow-y-auto">
+      <nav className="glass border-b border-border sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center gap-4">
           <Link
             href="/"
-            className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-surface-hover rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 text-slate-400" />
+            <ArrowLeft className="w-5 h-5 text-muted" />
           </Link>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-              <Stethoscope className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+              <Stethoscope className="w-4 h-4 text-accent-foreground" />
             </div>
-            <span className="font-bold text-white">KlinikIQ</span>
+            <span className="font-bold text-foreground">KlinikIQ</span>
           </div>
         </div>
       </nav>
@@ -64,67 +64,67 @@ export default function PrivacyPolicy() {
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-12">
         {/* Başlık */}
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-            <ShieldCheck className="w-6 h-6 text-blue-400" />
+          <div className="w-12 h-12 rounded-2xl bg-surface-muted flex items-center justify-center">
+            <ShieldCheck className="w-6 h-6 text-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white">
+            <h1 className="text-2xl sm:text-3xl font-black text-foreground">
               Gizlilik Politikası
             </h1>
-            <p className="text-sm text-slate-400 mt-0.5">
+            <p className="text-sm text-muted mt-0.5">
               KlinikIQ — Dr. Furkan Güven tarafından geliştirilmiştir
             </p>
           </div>
         </div>
-        <p className="text-xs text-slate-500 mb-8 ml-15 sm:ml-15">
-          Son güncelleme: <span className="text-slate-300 font-bold">{LAST_UPDATED}</span>
+        <p className="text-xs text-muted mb-8 ml-15 sm:ml-15">
+          Son güncelleme: <span className="text-foreground font-bold">{LAST_UPDATED}</span>
         </p>
 
         {/* Özet Kart */}
         <div
           id="ozet"
-          className="bg-blue-500/5 rounded-2xl border border-blue-500/20 p-6 mb-6"
+          className="bg-surface-muted rounded-2xl border border-border p-6 mb-6"
         >
-          <h2 className="text-lg font-black text-white mb-3 flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-blue-400" />
+          <h2 className="text-lg font-black text-foreground mb-3 flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-foreground" />
             Tek Bakışta Özet
           </h2>
-          <ul className="text-sm text-slate-300 space-y-2 leading-relaxed">
+          <ul className="text-sm text-foreground space-y-2 leading-relaxed">
             <li className="flex items-start gap-2">
-              <span className="text-blue-400 mt-1">•</span>
-              KlinikIQ <span className="font-bold text-white">eğitim amaçlı</span> bir tıp simülasyon platformudur; <span className="font-bold text-white">gerçek hasta verisi toplamaz</span>.
+              <span className="text-foreground mt-1">•</span>
+              KlinikIQ <span className="font-bold text-foreground">eğitim amaçlı</span> bir tıp simülasyon platformudur; <span className="font-bold text-foreground">gerçek hasta verisi toplamaz</span>.
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-400 mt-1">•</span>
+              <span className="text-foreground mt-1">•</span>
               Sadece kayıt için zorunlu temel bilgileri (ad, e-posta, sınıf vb.) ve uygulama içi performans verilerinizi tutarız.
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-400 mt-1">•</span>
-              Vaka diyaloglarınız <span className="font-bold text-white">üçüncü taraf yapay zeka servisleri</span> (OpenAI, Anthropic, Google) ile <span className="font-bold text-white">geçici olarak</span> işlenir; gerçek hasta bilgisi yazmamalısınız.
+              <span className="text-foreground mt-1">•</span>
+              Vaka diyaloglarınız <span className="font-bold text-foreground">üçüncü taraf yapay zeka servisleri</span> (OpenAI, Anthropic, Google) ile <span className="font-bold text-foreground">geçici olarak</span> işlenir; gerçek hasta bilgisi yazmamalısınız.
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-400 mt-1">•</span>
-              Verileriniz reklam, profilleme veya satış amacıyla <span className="font-bold text-white">üçüncü taraflarla paylaşılmaz</span>.
+              <span className="text-foreground mt-1">•</span>
+              Verileriniz reklam, profilleme veya satış amacıyla <span className="font-bold text-foreground">üçüncü taraflarla paylaşılmaz</span>.
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-400 mt-1">•</span>
+              <span className="text-foreground mt-1">•</span>
               Hesabınızı istediğiniz zaman silebilir, verilerinize ilişkin haklarınızı kullanabilirsiniz.
             </li>
           </ul>
         </div>
 
         {/* İçindekiler */}
-        <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 mb-6">
-          <h2 className="text-sm font-black text-white mb-3 flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-slate-400" />
+        <div className="bg-surface-muted rounded-2xl border border-border p-6 mb-6">
+          <h2 className="text-sm font-black text-foreground mb-3 flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-muted" />
             İçindekiler
           </h2>
-          <ol className="text-sm text-slate-400 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 list-decimal pl-5">
+          <ol className="text-sm text-muted grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 list-decimal pl-5">
             {TOC.map((item) => (
               <li key={item.href}>
                 <a
                   href={item.href}
-                  className="hover:text-white transition-colors hover:underline"
+                  className="hover:text-foreground transition-colors hover:underline"
                 >
                   {item.label}
                 </a>
@@ -137,13 +137,13 @@ export default function PrivacyPolicy() {
         <Section
           id="veri-sorumlusu"
           icon={User}
-          color="text-cyan-400"
-          bg="bg-cyan-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="1. Veri Sorumlusu"
         >
           <p>
             KVKK madde 3/1-(ı) ve GDPR Madde 4(7) anlamında bu platformun veri
-            sorumlusu (controller) <span className="text-white font-bold">{CONTROLLER}</span>'dir.
+            sorumlusu (controller) <span className="text-foreground font-bold">{CONTROLLER}</span>'dir.
             Talep ve sorularınız için iletişim adresi bu politikanın 13. bölümündedir.
           </p>
         </Section>
@@ -152,8 +152,8 @@ export default function PrivacyPolicy() {
         <Section
           id="hangi-veriler"
           icon={Database}
-          color="text-emerald-400"
-          bg="bg-emerald-500/10"
+          color="text-success"
+          bg="bg-surface-muted"
           title="2. Toplanan Veriler"
         >
           <p className="mb-3">
@@ -207,7 +207,7 @@ export default function PrivacyPolicy() {
             Toplanan veriler yalnızca aşağıdaki açık ve meşru amaçlar için
             işlenir (KVKK md. 4 ve GDPR md. 5 ilkeleri uyarınca):
           </p>
-          <ul className="text-sm text-slate-300 space-y-2">
+          <ul className="text-sm text-foreground space-y-2">
             <Bullet>Kullanıcı hesabınızı oluşturmak ve oturumunuzu yönetmek</Bullet>
             <Bullet>Eğitim simülasyonlarını sağlamak ve performansınızı izlemek</Bullet>
             <Bullet>Liderlik tablosunda anonimleştirilmiş şekilde sıralama göstermek</Bullet>
@@ -215,8 +215,8 @@ export default function PrivacyPolicy() {
             <Bullet>Yasal yükümlülüklerimizi (örn. mahkeme talebine cevap) yerine getirmek</Bullet>
             <Bullet>Hizmeti iyileştirmek için anonimleştirilmiş istatistik üretmek</Bullet>
           </ul>
-          <p className="mt-3 text-xs text-slate-500 italic">
-            Verileriniz <span className="text-white not-italic font-bold">reklam, profilleme veya satış</span> amacıyla
+          <p className="mt-3 text-xs text-muted italic">
+            Verileriniz <span className="text-foreground not-italic font-bold">reklam, profilleme veya satış</span> amacıyla
             kullanılmaz.
           </p>
         </Section>
@@ -225,8 +225,8 @@ export default function PrivacyPolicy() {
         <Section
           id="ucuncu-taraf"
           icon={Bot}
-          color="text-indigo-400"
-          bg="bg-indigo-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="4. Yapay Zeka ve Üçüncü Taraf İşleyiciler"
         >
           <p className="mb-3">
@@ -234,28 +234,28 @@ export default function PrivacyPolicy() {
             için diyaloglarınız aşağıdaki üçüncü taraf yapay zeka sağlayıcılarına
             iletilebilir:
           </p>
-          <ul className="text-sm text-slate-300 space-y-1.5">
+          <ul className="text-sm text-foreground space-y-1.5">
             <Bullet>OpenAI (ABD)</Bullet>
             <Bullet>Anthropic (ABD)</Bullet>
             <Bullet>Google AI / Vertex AI (ABD / AB)</Bullet>
           </ul>
           <p className="mt-3">
-            Bu sağlayıcılar diyalogları yalnızca <span className="text-white font-bold">hasta-doktor simülasyonu yanıtı üretmek</span> için
+            Bu sağlayıcılar diyalogları yalnızca <span className="text-foreground font-bold">hasta-doktor simülasyonu yanıtı üretmek</span> için
             anlık olarak işler ve kendi gizlilik politikalarına tâbidir. KlinikIQ,
             bu servislere yapılan API isteklerinde mümkün olduğunca model
             eğitiminden çıkarma (no-train) bayraklarını aktif tutar.
           </p>
-          <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 mt-4">
-            <p className="text-sm text-amber-200/90 font-bold mb-1">
+          <div className="bg-surface-muted border border-border-strong rounded-xl p-4 mt-4">
+            <p className="text-sm text-warning font-bold mb-1">
               Önemli Uyarı
             </p>
-            <p className="text-xs text-amber-200/70 leading-relaxed">
+            <p className="text-xs text-warning leading-relaxed">
               Vaka simülasyonu giriş kutularına <span className="font-bold">gerçek hasta verisi, kişisel sağlık
               bilgisi veya başka bir kişiye ait özel veri girmemelisiniz</span>. KlinikIQ
               kurgusal eğitim senaryoları üzerinde çalışmak için tasarlanmıştır.
             </p>
           </div>
-          <p className="mt-3 text-xs text-slate-500">
+          <p className="mt-3 text-xs text-muted">
             Ayrıca altyapı için aşağıdaki teknik servis sağlayıcılar kullanılabilir:
             barındırma (VDS sağlayıcısı), e-posta gönderimi (transactional e-posta servisi),
             hata izleme (Sentry vb.). Bu servisler yalnızca hizmetin teknik
@@ -267,25 +267,25 @@ export default function PrivacyPolicy() {
         <Section
           id="saklama"
           icon={Clock}
-          color="text-amber-400"
-          bg="bg-amber-500/10"
+          color="text-warning"
+          bg="bg-surface-muted"
           title="5. Veri Saklama Süreleri"
         >
-          <ul className="text-sm text-slate-300 space-y-2">
+          <ul className="text-sm text-foreground space-y-2">
             <Bullet>
-              <span className="font-bold text-white">Hesap verileri:</span> hesap aktif olduğu sürece saklanır.
+              <span className="font-bold text-foreground">Hesap verileri:</span> hesap aktif olduğu sürece saklanır.
             </Bullet>
             <Bullet>
-              <span className="font-bold text-white">Vaka ve performans geçmişi:</span> hesap aktif olduğu sürece; hesap silindiğinde tüm kayıtlar kalıcı olarak silinir.
+              <span className="font-bold text-foreground">Vaka ve performans geçmişi:</span> hesap aktif olduğu sürece; hesap silindiğinde tüm kayıtlar kalıcı olarak silinir.
             </Bullet>
             <Bullet>
-              <span className="font-bold text-white">Yapay zeka istek logları:</span> kalite kontrol ve suistimal incelemesi amacıyla en fazla <span className="font-bold text-white">30 gün</span>, ardından otomatik olarak silinir.
+              <span className="font-bold text-foreground">Yapay zeka istek logları:</span> kalite kontrol ve suistimal incelemesi amacıyla en fazla <span className="font-bold text-foreground">30 gün</span>, ardından otomatik olarak silinir.
             </Bullet>
             <Bullet>
-              <span className="font-bold text-white">Anonim istatistik / analitik:</span> kişisel bağlantı kurulamayacak şekilde anonim halde süresiz saklanabilir.
+              <span className="font-bold text-foreground">Anonim istatistik / analitik:</span> kişisel bağlantı kurulamayacak şekilde anonim halde süresiz saklanabilir.
             </Bullet>
             <Bullet>
-              <span className="font-bold text-white">Yasal yükümlülük:</span> belirli verilerin saklanması yasal olarak zorunlu olduğunda mevzuatın gerektirdiği süre boyunca tutulur.
+              <span className="font-bold text-foreground">Yasal yükümlülük:</span> belirli verilerin saklanması yasal olarak zorunlu olduğunda mevzuatın gerektirdiği süre boyunca tutulur.
             </Bullet>
           </ul>
         </Section>
@@ -294,21 +294,21 @@ export default function PrivacyPolicy() {
         <Section
           id="guvenlik"
           icon={Lock}
-          color="text-rose-400"
-          bg="bg-rose-500/10"
+          color="text-destructive"
+          bg="bg-surface-muted"
           title="6. Veri Güvenliği"
         >
           <p className="mb-3">
             Verilerinizi korumak için sektör standardı tedbirler uygulanır:
           </p>
-          <ul className="text-sm text-slate-300 space-y-2">
+          <ul className="text-sm text-foreground space-y-2">
             <Bullet>Tüm trafik için zorunlu HTTPS / TLS şifrelemesi.</Bullet>
             <Bullet>Şifrelerin tek yönlü güçlü hash algoritmaları (bcrypt vb.) ile saklanması.</Bullet>
             <Bullet>JWT tabanlı oturum yönetimi ve oturum sürelerinin sınırlandırılması.</Bullet>
             <Bullet>Sunucu tarafında erişim logu ve anomali izleme.</Bullet>
             <Bullet>Düzenli yedekleme ve sürüm takibi.</Bullet>
           </ul>
-          <p className="mt-3 text-xs text-slate-500 italic">
+          <p className="mt-3 text-xs text-muted italic">
             Hiçbir internet servisi %100 güvenli değildir. Şifrenizi kimseyle
             paylaşmamak ve farklı servislerde tekrar kullanmamak sizin
             sorumluluğunuzdadır.
@@ -329,9 +329,9 @@ export default function PrivacyPolicy() {
             mekanizmalarını kullanır. Reklam veya üçüncü taraf izleme çerezi
             kullanılmaz.
           </p>
-          <ul className="text-sm text-slate-300 space-y-2">
-            <Bullet><span className="font-bold text-white">Zorunlu çerezler:</span> oturum açma ve güvenlik (silinmesi durumunda hizmet çalışmaz).</Bullet>
-            <Bullet><span className="font-bold text-white">Tercih çerezleri:</span> tema (açık/koyu) ve dil seçimi gibi.</Bullet>
+          <ul className="text-sm text-foreground space-y-2">
+            <Bullet><span className="font-bold text-foreground">Zorunlu çerezler:</span> oturum açma ve güvenlik (silinmesi durumunda hizmet çalışmaz).</Bullet>
+            <Bullet><span className="font-bold text-foreground">Tercih çerezleri:</span> tema (açık/koyu) ve dil seçimi gibi.</Bullet>
             <Bullet>Mobil uygulamada hassas bilgiler iOS Keychain / Android Keystore üzerinde güvenli depolanır.</Bullet>
           </ul>
         </Section>
@@ -346,10 +346,10 @@ export default function PrivacyPolicy() {
         >
           <p>
             KlinikIQ, içeriği ve hedef kitlesi itibarıyla{' '}
-            <span className="font-bold text-white">tıp öğrencileri ve hekim adaylarına</span> yöneliktir.
+            <span className="font-bold text-foreground">tıp öğrencileri ve hekim adaylarına</span> yöneliktir.
             Platform 13 yaş altı çocuklar için tasarlanmamıştır ve bilerek
             13 yaş altı kullanıcılardan veri toplamaz. App Store yaş
-            derecelendirmemiz <span className="font-bold text-white">16+</span> olarak ayarlanmıştır. 13
+            derecelendirmemiz <span className="font-bold text-foreground">16+</span> olarak ayarlanmıştır. 13
             yaşından küçük bir çocuğun verilerini topladığımızı öğrenmemiz halinde,
             bu veriler derhal silinir.
           </p>
@@ -359,8 +359,8 @@ export default function PrivacyPolicy() {
         <Section
           id="haklar"
           icon={Award}
-          color="text-blue-400"
-          bg="bg-blue-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="9. KVKK ve GDPR Kapsamındaki Haklarınız"
         >
           <p className="mb-3">
@@ -368,7 +368,7 @@ export default function PrivacyPolicy() {
             Avrupa Birliği Genel Veri Koruma Tüzüğü (GDPR) madde 15-22 kapsamında
             aşağıdaki haklara sahipsiniz:
           </p>
-          <ul className="text-sm text-slate-300 space-y-1.5">
+          <ul className="text-sm text-foreground space-y-1.5">
             <Bullet>Kişisel verilerinizin işlenip işlenmediğini öğrenme.</Bullet>
             <Bullet>İşlenen veriler hakkında bilgi talep etme (erişim hakkı).</Bullet>
             <Bullet>Verilerin işlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme.</Bullet>
@@ -381,7 +381,7 @@ export default function PrivacyPolicy() {
           </ul>
           <p className="mt-3">
             Bu haklarınızı kullanmak için 13. bölümdeki iletişim adresinden bize
-            yazın. Talepleriniz <span className="font-bold text-white">en geç 30 gün</span> içinde ücretsiz olarak
+            yazın. Talepleriniz <span className="font-bold text-foreground">en geç 30 gün</span> içinde ücretsiz olarak
             karşılanır (KVKK md. 13/2).
           </p>
         </Section>
@@ -396,7 +396,7 @@ export default function PrivacyPolicy() {
         >
           <p>
             KlinikIQ, performans skorlarınızı liderlik tablosunda{' '}
-            <span className="font-bold text-white">isim maskelenmiş</span> şekilde gösterir
+            <span className="font-bold text-foreground">isim maskelenmiş</span> şekilde gösterir
             (örn: "Furkan G."). Tam soyad, e-posta veya iletişim bilgileri başka
             kullanıcılarla paylaşılmaz. Tablodan çıkarılma talebinde bulunabilir
             ya da hesabınızı silerek görünürlüğü tamamen kaldırabilirsiniz.
@@ -407,8 +407,8 @@ export default function PrivacyPolicy() {
         <Section
           id="degisiklikler"
           icon={Edit2}
-          color="text-slate-300"
-          bg="bg-slate-500/10"
+          color="text-foreground"
+          bg="bg-surface-muted"
           title="11. Politikadaki Değişiklikler"
         >
           <p>
@@ -424,27 +424,27 @@ export default function PrivacyPolicy() {
         {/* 12. İletişim */}
         <div
           id="iletisim"
-          className="bg-slate-900 rounded-2xl border border-slate-800 p-6"
+          className="bg-surface-muted rounded-2xl border border-border p-6"
         >
-          <h2 className="text-lg font-black text-white mb-3 flex items-center gap-2">
-            <Mail className="w-5 h-5 text-blue-400" />
+          <h2 className="text-lg font-black text-foreground mb-3 flex items-center gap-2">
+            <Mail className="w-5 h-5 text-foreground" />
             12. İletişim ve Talepler
           </h2>
-          <p className="text-sm text-slate-300 leading-relaxed mb-4">
+          <p className="text-sm text-foreground leading-relaxed mb-4">
             Gizlilik politikası, kişisel verileriniz ve haklarınızla ilgili tüm
             soru ve talepleriniz için aşağıdaki e-posta adresinden bize
             ulaşabilirsiniz. Talebinizi en geç 30 gün içinde yanıtlıyoruz.
           </p>
           <a
             href={`mailto:${CONTACT_EMAIL}?subject=KlinikIQ%20-%20Gizlilik%20Talebi`}
-            className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 font-bold px-4 py-3 rounded-xl text-sm hover:bg-blue-500/20 transition-colors"
+            className="inline-flex items-center gap-2 bg-surface-muted border border-border text-foreground font-bold px-4 py-3 rounded-xl text-sm hover:bg-surface-muted transition-colors"
           >
             <Mail className="w-4 h-4" />
             {CONTACT_EMAIL}
           </a>
-          <p className="text-xs text-slate-500 mt-4">
+          <p className="text-xs text-muted mt-4">
             Veri Sorumlusu:{' '}
-            <span className="text-slate-300 font-bold">{CONTROLLER}</span>
+            <span className="text-foreground font-bold">{CONTROLLER}</span>
           </p>
         </div>
       </main>
@@ -474,9 +474,9 @@ function Section({
   return (
     <section
       id={id}
-      className="bg-slate-900 rounded-2xl border border-slate-800 p-6 mb-6 scroll-mt-20"
+      className="bg-surface-muted rounded-2xl border border-border p-6 mb-6 scroll-mt-20"
     >
-      <h2 className="text-lg font-black text-white mb-4 flex items-center gap-2">
+      <h2 className="text-lg font-black text-foreground mb-4 flex items-center gap-2">
         <span
           className={`w-8 h-8 rounded-lg flex items-center justify-center ${bg}`}
         >
@@ -484,7 +484,7 @@ function Section({
         </span>
         {title}
       </h2>
-      <div className="text-sm text-slate-400 leading-relaxed">{children}</div>
+      <div className="text-sm text-muted leading-relaxed">{children}</div>
     </section>
   );
 }
@@ -492,13 +492,13 @@ function Section({
 function SubList({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="mt-3">
-      <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+      <p className="text-xs font-bold uppercase tracking-wider text-muted mb-1.5">
         {title}
       </p>
-      <ul className="text-sm text-slate-300 space-y-1.5 pl-3">
+      <ul className="text-sm text-foreground space-y-1.5 pl-3">
         {items.map((it) => (
           <li key={it} className="flex items-start gap-2">
-            <span className="text-slate-500 mt-1">•</span>
+            <span className="text-muted mt-1">•</span>
             {it}
           </li>
         ))}
@@ -510,7 +510,7 @@ function SubList({ title, items }: { title: string; items: string[] }) {
 function Bullet({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-2">
-      <span className="text-slate-500 mt-1">•</span>
+      <span className="text-muted mt-1">•</span>
       <span>{children}</span>
     </li>
   );

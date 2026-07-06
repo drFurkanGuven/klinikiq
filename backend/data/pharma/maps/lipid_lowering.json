@@ -1,0 +1,163 @@
+{
+  "id": "lipid_lowering",
+  "title_tr": "Lipid Düşürücüler — Kolesterol Metabolizması",
+  "description_tr": "HMG-CoA redüktaz (statin), NPC1L1 (ezetimib), PPAR-α (fibrat), PCSK9 yolakları. LDL düşürme, HDL artırma, miyopati ve hepatotoksisite profilleri.",
+  "source_attribution": "Lipid farmakolojisi StatPearls (Statins, Ezetimibe, Fibrates, PCSK9 inhibitors) ve GtoPdb (CC BY-SA 4.0) temel alınarak derlenmiştir.",
+  "nodes": [
+    { "id": "med_ldl", "label_tr": "LDL-kolesterol", "type": "mediator", "high_yield": true, "description_tr": "Aterojenik lipoprotein. LDL reseptörü aracılı hepatosit uptake ile plazma düzeyi düzenlenir. Hedef: ASCVD risk azaltımı." },
+    { "id": "med_hdl", "label_tr": "HDL-kolesterol", "type": "mediator", "high_yield": true, "description_tr": "Reverse kolesterol transport. Düşük HDL kardiyovasküler risk faktörü. Niasin ve fibratlar artırabilir." },
+    { "id": "med_tg", "label_tr": "Trigliserid (TG)", "type": "mediator", "high_yield": true, "description_tr": "VLDL/kilomikron bileşeni. Yüksek TG pankreatit riski (aşırı yüksek). Fibratlar ve omega-3 en etkili." },
+    { "id": "med_bile_acid", "label_tr": "Safra asitleri", "type": "mediator", "high_yield": false, "description_tr": "Kolesterol yıkım ürünü. Resinler (kolestiramin) safra asitlerini bağlayarak hepatik kolesterol tüketimini artırır." },
+
+    { "id": "r_ldl_receptor", "label_tr": "LDL reseptörü", "type": "receptor", "high_yield": true, "description_tr": "Hepatosit yüzeyinde LDL uptake. Statinler intraselüler kolesterol ↓ → reseptör upregülasyonu → plazma LDL ↓." },
+    { "id": "r_npc1l1", "label_tr": "NPC1L1 (intestinal)", "type": "receptor", "high_yield": true, "description_tr": "İnce bağırsakta kolesterol emilim taşıyıcısı. Ezetimib hedefi." },
+    { "id": "r_ppar_alpha", "label_tr": "PPAR-α", "type": "receptor", "high_yield": true, "description_tr": "Nükleer reseptör. Lipoprotein lipaz ekspresyonu ↑ → VLDL/TG klirensi. Fenofibrat/gemfibrozil hedefi." },
+    { "id": "r_pcsk9", "label_tr": "PCSK9", "type": "receptor", "high_yield": true, "description_tr": "LDL reseptör degradasyonunu artıran protein. İnhibitörler (evolocumab) LDL reseptör ömrünü uzatır." },
+
+    { "id": "o_hmgcoa", "label_tr": "HMG-CoA redüktaz", "type": "organ", "high_yield": true, "description_tr": "Kolesterol sentezinin hız kısıtlayıcı enzimi (karaciğer). Statinlerin doğrudan hedefi. Gece sentezi aktif → akşam dozu önerisi." },
+    { "id": "o_hepatocyte", "label_tr": "Hepatosit", "type": "organ", "high_yield": true, "description_tr": "Kolesterol sentezi, LDL reseptör ekspresyonu ve VLDL salınımı. Statin hepatotoksisitesi burada izlenir (ALT)." },
+    { "id": "o_intestine", "label_tr": "İnce bağırsak", "type": "organ", "high_yield": true, "description_tr": "Diyet ve safra kolesterol emilimi. Ezetimib ve bile asit sequestrantları burada/enterohepatik dolaşımda etkili." },
+    { "id": "o_muscle", "label_tr": "İskelet kası", "type": "organ", "high_yield": true, "description_tr": "Statinler kas hücrelerinde CoQ10/ mitokondriyal etki ile miyopati/rabdomiyoliz yapabilir (nadir, doz ve ilaç etkileşimi)." },
+    { "id": "o_vascular", "label_tr": "Vasküler endotel / plak", "type": "organ", "high_yield": true, "description_tr": "LDL ↓ ile aterosklerotik plak stabilizasyonu ve ACS risk azalması (statin kanıtı en güçlü)." },
+
+    { "id": "e_ldl_down", "label_tr": "LDL ↓ & ASCVD risk ↓", "type": "effect", "high_yield": true, "description_tr": "Statinler birinci basamak. Her 1 mmol/L LDL ↓ ile majör vasküler olay riski ~%20 azalır." },
+    { "id": "e_tg_down", "label_tr": "Trigliserid ↓", "type": "effect", "high_yield": true, "description_tr": "Fibratlar, omega-3 (yüksek doz), niasin. Aşırı hipertrigliseridemide pankreatit önleme." },
+    { "id": "e_hdl_up", "label_tr": "HDL ↑", "type": "effect", "high_yield": false, "description_tr": "Fibrat ve niasin HDL artırır; HDL hedefleyen tedavinin CV faydası statin kadar kanıtlı değil." },
+    { "id": "e_myopathy", "label_tr": "Miyopati / rabdomiyoliz", "type": "effect", "high_yield": true, "description_tr": "Statin (+ gemfibrozil/CYP3A4 etkileşimi) ile kas ağrısı, CK ↑. Rabdomiyoliz nadirdir ama ciddi." },
+    { "id": "e_hepatotox", "label_tr": "Hepatotoksisite (ALT ↑)", "type": "effect", "high_yield": false, "description_tr": "Statinlerde genelde hafif, asymptomatik transaminaz ↑. Ciddi hepatit nadirdir." },
+    { "id": "e_gallstones", "label_tr": "Safra taşı riski", "type": "effect", "high_yield": false, "description_tr": "Fibratlar safra kolesterol saturasyonunu artırarak taş riskini yükseltebilir." }
+  ],
+  "edges": [
+    { "source": "o_hmgcoa", "target": "o_hepatocyte", "relation": "activates", "effect_tr": "Kolesterol de novo sentezi" },
+    { "source": "o_hepatocyte", "target": "med_ldl", "relation": "activates", "effect_tr": "VLDL salınımı → LDL" },
+    { "source": "r_ldl_receptor", "target": "o_hepatocyte", "relation": "inhibits", "effect_tr": "LDL plazma klirensi" },
+    { "source": "r_ldl_receptor", "target": "med_ldl", "relation": "inhibits", "effect_tr": "Plazma LDL ↓" },
+    { "source": "r_npc1l1", "target": "o_intestine", "relation": "activates", "effect_tr": "Kolesterol emilimi" },
+    { "source": "o_intestine", "target": "med_ldl", "relation": "activates", "effect_tr": "Emilen kolesterol → hepatik pool" },
+    { "source": "r_ppar_alpha", "target": "med_tg", "relation": "inhibits", "effect_tr": "LPL aktivitesi ↑ → TG ↓" },
+    { "source": "r_ppar_alpha", "target": "med_hdl", "relation": "activates", "effect_tr": "HDL ↑ (modest)" },
+    { "source": "r_pcsk9", "target": "r_ldl_receptor", "relation": "inhibits", "effect_tr": "LDL reseptör degradasyonu ↑" },
+    { "source": "med_ldl", "target": "o_vascular", "relation": "activates", "effect_tr": "Aterojenik LDL → plak" },
+    { "source": "o_vascular", "target": "e_ldl_down", "relation": "inhibits", "effect_tr": "LDL ↓ → plak progresyonu ↓" },
+    { "source": "o_muscle", "target": "e_myopathy", "relation": "activates", "effect_tr": "Statin kas toksisitesi" }
+  ],
+  "interventions": [
+    {
+      "drug_class": "statin",
+      "label_tr": "Statin (atorvastatin / rosuvastatin)",
+      "targets": ["o_hmgcoa"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "r_ldl_receptor", "effect_tr": "Hücre içi kolesterol ↓ → LDL reseptör ↑" },
+        { "nodeId": "e_ldl_down", "effect_tr": "Plazma LDL ↓ %30–50; birinci basamak" },
+        { "nodeId": "o_vascular", "effect_tr": "Plak stabilizasyonu, ACS risk ↓" },
+        { "nodeId": "e_myopathy", "effect_tr": "Miyopati riski (gemfibrozil ile ↑)" },
+        { "nodeId": "e_hepatotox", "effect_tr": "ALT izlem" }
+      ],
+      "tr_products_atc": ["C10AA05", "C10AA07"]
+    },
+    {
+      "drug_class": "ezetimibe",
+      "label_tr": "Ezetimib",
+      "targets": ["r_npc1l1"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "o_intestine", "effect_tr": "Bağırsak kolesterol emilimi ↓" },
+        { "nodeId": "e_ldl_down", "effect_tr": "LDL ↓ %15–20; statin ile sinerjik" }
+      ],
+      "tr_products_atc": ["C10AX09"]
+    },
+    {
+      "drug_class": "fibrate",
+      "label_tr": "Fibrat (fenofibrat / gemfibrozil)",
+      "targets": ["r_ppar_alpha"],
+      "relation": "agonist",
+      "downstream_effects": [
+        { "nodeId": "e_tg_down", "effect_tr": "TG ↓ belirgin" },
+        { "nodeId": "e_hdl_up", "effect_tr": "HDL ↑" },
+        { "nodeId": "e_gallstones", "effect_tr": "Safra taşı riski" },
+        { "nodeId": "e_myopathy", "effect_tr": "Statin + gemfibrozil → rabdomiyoliz riski" }
+      ],
+      "tr_products_atc": ["C10AB05", "C10AB04"]
+    },
+    {
+      "drug_class": "pcsk9_inhibitor",
+      "label_tr": "PCSK9 inhibitörü (evolocumab)",
+      "targets": ["r_pcsk9"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "r_ldl_receptor", "effect_tr": "LDL reseptör geri dönüşümü ↓ → daha fazla reseptör" },
+        { "nodeId": "e_ldl_down", "effect_tr": "LDL ↓ %50–60 (statin intoleransı/familial hiperkolesterolemia)" }
+      ],
+      "tr_products_atc": ["C10AX13"]
+    },
+    {
+      "drug_class": "bile_acid_sequestrant",
+      "label_tr": "Safra asit bağlayıcı (kolestiramin)",
+      "targets": ["med_bile_acid"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "o_hepatocyte", "effect_tr": "Hepatik kolesterol → safra asidi dönüşümü ↑" },
+        { "nodeId": "r_ldl_receptor", "effect_tr": "LDL reseptör upregülasyonu" },
+        { "nodeId": "e_ldl_down", "effect_tr": "LDL ↓ (modest); GI yan etkiler" }
+      ],
+      "tr_products_atc": ["C10AC01"]
+    },
+    {
+      "drug_class": "niacin",
+      "label_tr": "Niasin (nikotinik asit)",
+      "targets": ["o_hepatocyte"],
+      "relation": "inhibits",
+      "downstream_effects": [
+        { "nodeId": "e_tg_down", "effect_tr": "VLDL sentezi ↓ → TG ↓" },
+        { "nodeId": "e_hdl_up", "effect_tr": "HDL ↑ belirgin" },
+        { "nodeId": "e_ldl_down", "effect_tr": "LDL ↓ (modest)" }
+      ],
+      "tr_products_atc": ["C10AD02"]
+    }
+  ],
+  "quiz": [
+    {
+      "q_tr": "Statinlerin LDL düşürücü etkisinin temel mekanizması nedir?",
+      "options_tr": ["Safra asit emilimini bloke etmek", "HMG-CoA redüktaz inhibisyonu → LDL reseptör upregülasyonu", "PCSK9 aktivasyonu", "PPAR-α agonizması"],
+      "answer_idx": 1,
+      "explanation_tr": "Statinler hepatik kolesterol sentezini inhibe eder → hücre LDL reseptörlerini artırır → plazma LDL klirensi ↑.",
+      "node_id": "o_hmgcoa"
+    },
+    {
+      "q_tr": "Ezetimib hangi basamakta etki eder?",
+      "options_tr": ["HMG-CoA redüktaz", "NPC1L1 ile intestinal kolesterol emilimi", "Lipoprotein lipaz", "Kolesterol ester transfer proteini"],
+      "answer_idx": 1,
+      "explanation_tr": "Ezetimib ince bağırsak NPC1L1 taşıyıcısını inhibe eder; statin ile kombine LDL düşüşü sinerjiktir.",
+      "node_id": "r_npc1l1"
+    },
+    {
+      "q_tr": "Statin + gemfibrozil kombinasyonunda en ciddi risk nedir?",
+      "options_tr": ["Hepatotoksisite", "Rabdomiyoliz", "Hiperkalemi", "Pancreatit"],
+      "answer_idx": 1,
+      "explanation_tr": "Gemfibrozil statin plazma düzeyini CYP2C8/OATP1B1 inhibisyonu ile artırır → miyopati/rabdomiyoliz riski belirgin yükselir.",
+      "node_id": "e_myopathy"
+    },
+    {
+      "q_tr": "PCSK9 inhibitörleri LDL'yi nasıl düşürür?",
+      "options_tr": ["Kolesterol sentezini doğrudan bloke ederek", "LDL reseptör degradasyonunu azaltarak", "Intestinal emilimi inhibe ederek", "Safra asitlerini bağlayarak"],
+      "answer_idx": 1,
+      "explanation_tr": "PCSK9 LDL reseptörünü lizozomal degradasyona yönlendirir. Antikor inhibitörler reseptör ömrünü uzatır → LDL klirensi ↑.",
+      "node_id": "r_pcsk9"
+    },
+    {
+      "q_tr": "Hipertrigliseridemi (TG >500 mg/dL) tedavisinde birinci tercih hangi sınıftır?",
+      "options_tr": ["Statin", "Fibrat", "Ezetimib", "Kolestiramin"],
+      "answer_idx": 1,
+      "explanation_tr": "Aşırı TG pankreatit riski taşır. Fibratlar (ve omega-3 yüksek doz) TG klirensini en etkili artırır.",
+      "node_id": "e_tg_down"
+    },
+    {
+      "q_tr": "Statinlerin akşam alınması önerilmesinin nedeni nedir?",
+      "options_tr": ["HMG-CoA redüktaz gece daha aktif", "PPAR-α gece aktif", "Safra asitleri gece salınır", "PCSK9 gece yüksektir"],
+      "answer_idx": 0,
+      "explanation_tr": "Kolesterol sentezi gece (özellikle gece yarısı) pik yapar; kısa etkili statinler akşam dozunda daha etkilidir (uzun etkili rosuvastatin/atorvastatin esnek).",
+      "node_id": "o_hmgcoa"
+    }
+  ]
+}

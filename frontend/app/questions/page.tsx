@@ -466,9 +466,9 @@ export default function QuestionsPage() {
             <div className="flex items-center gap-2 min-w-0">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: "var(--primary)" }}
+                style={{ background: "var(--accent)" }}
               >
-                <Stethoscope className="w-4 h-4 text-white" />
+                <Stethoscope className="w-4 h-4" style={{ color: "var(--accent-foreground)" }} />
               </div>
               <span
                 className="font-bold text-lg truncate"
