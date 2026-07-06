@@ -70,7 +70,7 @@ export default function LeaderboardPage() {
       <nav className="glass border-b sticky top-0 z-50 transition-all font-sans" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="p-2.5 rounded-xl transition-all hover:bg-black/5 hover:scale-105 active:scale-90" style={{ color: "var(--text-muted)" }}>
+            <Link href="/calis?tab=ogren" className="p-2.5 rounded-xl transition-all hover:bg-black/5 hover:scale-105 active:scale-90" style={{ color: "var(--text-muted)" }}>
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3">
@@ -127,7 +127,7 @@ export default function LeaderboardPage() {
               <Trophy className="w-12 h-12 opacity-10" />
             </div>
             <p className="text-xl font-black opacity-30">Henüz kimse vaka çözmedi.</p>
-            <Link href="/dashboard" className="inline-block mt-6 text-sm font-black uppercase tracking-widest style={{ color: 'var(--primary)' }}">Henüz ilk sırayı sen al!</Link>
+            <Link href="/calis?tab=ogren" className="inline-block mt-6 text-sm font-black uppercase tracking-widest style={{ color: 'var(--primary)' }}">Henüz ilk sırayı sen al!</Link>
           </div>
         ) : (
           <div className="space-y-4 relative">

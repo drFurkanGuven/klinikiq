@@ -135,7 +135,7 @@ export default function OgrenmePage() {
         <div className="max-w-4xl mx-auto px-3 sm:px-6 min-h-[3.5rem] sm:h-16 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
             <Link
-              href="/dashboard"
+              href="/calis?tab=ogren"
               className="p-3 sm:p-2.5 rounded-xl transition-all hover:bg-black/5 shrink-0 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
               style={{ color: "var(--text-muted)" }}
               aria-label="Panele dön"

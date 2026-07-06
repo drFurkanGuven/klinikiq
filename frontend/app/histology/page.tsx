@@ -116,7 +116,7 @@ function HistologyPageInner() {
         <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <Link
-              href="/dashboard"
+              href="/calis?tab=ogren"
               className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors shrink-0"
             >
               <ArrowLeft size={15} />

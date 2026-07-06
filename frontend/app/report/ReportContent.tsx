@@ -69,7 +69,7 @@ export default function ReportPageContent() {
               <Share2 className="w-4 h-4 relative z-10" />
               <span className="hidden sm:inline relative z-10">Raporu Paylaş</span>
             </button>
-            <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 text-sm font-bold transition-all hover:scale-105 px-4 py-2 rounded-2xl" style={{ color: "var(--text-muted)" }}>
+            <button onClick={() => router.push("/vaka")} className="flex items-center gap-2 text-sm font-bold transition-all hover:scale-105 px-4 py-2 rounded-2xl" style={{ color: "var(--text-muted)" }}>
               <Home className="w-4 h-4" />
               <span className="hidden sm:inline">Dashboard</span>
             </button>

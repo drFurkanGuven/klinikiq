@@ -651,7 +651,7 @@ export default function SinirLezyon() {
       <header className="sticky top-0 z-50 border-b" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 h-12 sm:h-14 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <Link href="/dashboard" className="flex items-center gap-1 text-sm hover:opacity-70 transition-opacity shrink-0" style={{ color: "var(--text-muted)" }}>
+            <Link href="/calis?tab=ogren" className="flex items-center gap-1 text-sm hover:opacity-70 transition-opacity shrink-0" style={{ color: "var(--text-muted)" }}>
               <ArrowLeft size={15} />
               <span className="hidden sm:inline">Dashboard</span>
             </Link>

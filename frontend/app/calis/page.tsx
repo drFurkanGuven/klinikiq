@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Flame,
@@ -15,15 +15,29 @@ import {
 } from "lucide-react";
 import { StudyNav } from "@/components/study/StudyNav";
 import { TopicRing } from "@/components/study/TopicRing";
+import { CalisIlerlemeTab } from "@/components/calis/CalisIlerlemeTab";
+import { CalisOgrenTab } from "@/components/calis/CalisOgrenTab";
 import { studyApi, type StudyDashboard, type StudyTopicMastery } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import { nativeClient } from "@/lib/native";
 
 const GOALS = [5, 10, 20] as const;
+const TABS = [
+  { id: "bugun", label: "Bugün" },
+  { id: "ilerleme", label: "İlerleme" },
+  { id: "ogren", label: "Öğren" },
+] as const;
 
-export default function CalisPage() {
+type TabId = (typeof TABS)[number]["id"];
+
+function CalisPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const activeTab: TabId =
+    tabParam === "ilerleme" || tabParam === "ogren" ? tabParam : "bugun";
+
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dash, setDash] = useState<StudyDashboard | null>(null);
@@ -38,6 +52,10 @@ export default function CalisPage() {
       router.replace("/login?next=/calis");
       return;
     }
+    if (activeTab !== "bugun") {
+      setLoading(false);
+      return;
+    }
     Promise.all([studyApi.dashboard(), studyApi.topics()])
       .then(([d, t]) => {
         setDash(d.data);
@@ -46,7 +64,13 @@ export default function CalisPage() {
       })
       .catch(() => setError("Çalışma verileri yüklenemedi."))
       .finally(() => setLoading(false));
-  }, [router]);
+  }, [router, activeTab]);
+
+  const setTab = (tab: TabId) => {
+    nativeClient.impact();
+    const qs = tab === "bugun" ? "" : `?tab=${tab}`;
+    router.push(`/calis${qs}`);
+  };
 
   const saveGoal = async (g: 5 | 10 | 20) => {
     setGoal(g);
@@ -73,24 +97,48 @@ export default function CalisPage() {
       <StudyNav />
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-10 space-y-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Bugün çalış</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>Türkçe acil MCQ + akıllı tekrar</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Çalış</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+            {activeTab === "bugun" && "Türkçe acil MCQ + akıllı tekrar"}
+            {activeTab === "ilerleme" && "Vaka istatistikleri ve hesap ayarları"}
+            {activeTab === "ogren" && "Histoloji, farmako, atlas ve daha fazlası"}
+          </p>
         </div>
 
-        {loading && (
+        <div className="flex gap-1 p-1 rounded-lg border w-full" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+          {TABS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setTab(id)}
+              className="flex-1 py-2.5 rounded-md text-sm font-medium transition-colors"
+              style={{
+                background: activeTab === id ? "var(--accent)" : "transparent",
+                color: activeTab === id ? "var(--accent-foreground)" : "var(--text-muted)",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === "ilerleme" && <CalisIlerlemeTab />}
+        {activeTab === "ogren" && <CalisOgrenTab />}
+
+        {activeTab === "bugun" && loading && (
           <div className="flex justify-center py-16">
             <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--foreground)" }} />
           </div>
         )}
 
-        {error && (
+        {activeTab === "bugun" && error && (
           <div className="flex items-center gap-2 text-sm p-4 rounded-lg border" style={{ borderColor: "var(--destructive)", color: "var(--destructive)", background: "var(--destructive-muted)" }}>
             <AlertCircle className="w-4 h-4" />
             {error}
           </div>
         )}
 
-        {dash && !loading && (
+        {activeTab === "bugun" && dash && !loading && (
           <>
             <div className="grid grid-cols-3 gap-3">
               <div className="rounded-lg border p-4 text-center" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
@@ -203,5 +251,13 @@ export default function CalisPage() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function CalisPage() {
+  return (
+    <Suspense fallback={null}>
+      <CalisPageContent />
+    </Suspense>
   );
 }

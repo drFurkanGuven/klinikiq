@@ -1,1 +1,5 @@
-export { default } from "@/app/dashboard/page";
+import { redirect } from "next/navigation";
+
+export default function SimulasyonVakaRedirect() {
+  redirect("/vaka");
+}

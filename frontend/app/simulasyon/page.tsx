@@ -155,7 +155,7 @@ export default function SimulasyonHubPage() {
 
         <div className="flex flex-col gap-3">
           <HubCard
-            href="/simulasyon/vaka"
+            href="/vaka"
             icon={<LayoutDashboard className="w-5 h-5" style={{ color: "var(--foreground)" }} />}
             title="Vaka simülasyonu"
             description="AI destekli hasta öyküsü, tetkik ve tanı — klasik KlinikIQ deneyimi."

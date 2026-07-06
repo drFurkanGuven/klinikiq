@@ -713,7 +713,7 @@ export default function CasePageContent() {
       <nav className="border-b flex-shrink-0" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2 text-xs font-medium transition-colors hover:opacity-70" style={{ color: "var(--text-muted)" }}>
+            <button onClick={() => router.push("/vaka")} className="flex items-center gap-2 text-xs font-medium transition-colors hover:opacity-70" style={{ color: "var(--text-muted)" }}>
               <ArrowLeft className="w-4 h-4" /> <span className="hidden sm:inline">Geri</span>
             </button>
             <div className="w-px h-4 bg-current opacity-10 hidden sm:block mx-1" />

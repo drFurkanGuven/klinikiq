@@ -90,14 +90,14 @@ export default function AdminDashboardPage() {
       try {
         const res = await authApi.me();
         if (!res.data.is_admin) {
-          router.replace("/dashboard");
+          router.replace("/calis");
           return;
         }
         setIsAdmin(true);
         fetchUsers();
       } catch (err) {
         console.error("Admin check failed:", err);
-        router.replace("/dashboard");
+        router.replace("/calis");
       }
     };
 
@@ -264,7 +264,7 @@ export default function AdminDashboardPage() {
       <nav className="glass border-b sticky top-0 z-50 transition-all font-sans" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="p-2.5 rounded-xl transition-all hover:bg-black/5 hover:scale-105 active:scale-90" style={{ color: "var(--text-muted)" }}>
+            <Link href="/calis" className="p-2.5 rounded-xl transition-all hover:bg-black/5 hover:scale-105 active:scale-90" style={{ color: "var(--text-muted)" }}>
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3">

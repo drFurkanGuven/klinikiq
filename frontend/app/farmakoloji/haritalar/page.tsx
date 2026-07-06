@@ -91,7 +91,7 @@ export default function PharmaMapsListPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <Link
-              href="/dashboard"
+              href="/calis"
               className="p-2.5 rounded-xl transition-all hover:bg-black/5 shrink-0"
               style={{ color: "var(--text-muted)" }}
               aria-label="Ana sayfa"
