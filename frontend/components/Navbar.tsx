@@ -6,6 +6,9 @@ import { Stethoscope, Menu, X } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { isAuthenticated } from "@/lib/auth";
 
+const navLinkClass =
+  "text-sm font-medium text-muted hover:text-foreground transition-colors";
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,121 +16,167 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
-    const handleScroll = () => setIsScrolled(window.scrollY > 16);
+    const handleScroll = () => setIsScrolled(window.scrollY > 8);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isMobileMenuOpen]);
+
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      className={`fixed top-0 left-0 right-0 z-50 transition-[background,border-color] duration-200 ${
+        isScrolled ? "glass" : "border-b border-transparent"
+      }`}
       style={{
-        background: isScrolled ? "rgba(var(--bg-rgb, 245, 240, 232), 0.85)" : "transparent",
-        backdropFilter: isScrolled ? "blur(14px)" : "none",
-        borderBottom: isScrolled ? "1px solid var(--border)" : "none",
-        backgroundColor: isScrolled ? "var(--bg)" : "transparent",
-        opacity: isScrolled ? 0.97 : 1,
-        paddingTop: `calc(${isScrolled ? "10px" : "18px"} + var(--safe-top, 0px))`,
-        paddingBottom: isScrolled ? "10px" : "18px",
+        paddingTop: `calc(0.75rem + var(--safe-top, 0px))`,
+        paddingBottom: "0.75rem",
       }}
     >
-      <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
-        {/* Logo */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-all group-hover:scale-110 group-active:scale-95"
-            style={{ background: "linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)" }}>
-            <Stethoscope className="w-5 h-5 text-white" />
+          <div
+            className="w-8 h-8 rounded-md flex items-center justify-center transition-opacity group-hover:opacity-90"
+            style={{ background: "var(--accent)" }}
+          >
+            <Stethoscope className="w-4 h-4 text-white" />
           </div>
-          <span className="text-xl font-black tracking-tight" style={{ color: "var(--text-navy)" }}>
+          <span
+            className="text-base font-semibold tracking-tight"
+            style={{ color: "var(--foreground)" }}
+          >
             KlinikIQ
           </span>
         </Link>
- 
-        {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-6">
-          <Link href="#features"
-            className="text-sm font-bold opacity-60 hover:opacity-100 transition-all hover:text-primary"
-            style={{ color: "var(--text-muted)" }}>
+
+        <div className="hidden md:flex items-center gap-5">
+          <Link href="#features" className={navLinkClass}>
             Özellikler
           </Link>
-          <Link href="/leaderboard"
-            className="text-sm font-bold opacity-60 hover:opacity-100 transition-all hover:text-primary"
-            style={{ color: "var(--text-muted)" }}>
+          <Link href="/leaderboard" className={navLinkClass}>
             Liderlik
           </Link>
-          <Link href="/topluluk"
-            className="text-sm font-bold opacity-60 hover:opacity-100 transition-all hover:text-primary"
-            style={{ color: "var(--text-muted)" }}>
-            Notlar
-          </Link>
-          <Link href="/histology"
-            className="text-sm font-bold opacity-60 hover:opacity-100 transition-all hover:text-primary"
-            style={{ color: "var(--text-muted)" }}>
+          <Link href="/histology" className={navLinkClass}>
             Histoloji
           </Link>
-          <Link href="/sinir-lezyon"
-            className="text-sm font-bold opacity-60 hover:opacity-100 transition-all hover:text-primary"
-            style={{ color: "var(--text-muted)" }}>
+          <Link href="/sinir-lezyon" className={navLinkClass}>
             Nöroloji
           </Link>
- 
-          <div className="w-px h-4 opacity-10" style={{ background: "var(--text-navy)" }} />
- 
+
+          <div
+            className="w-px h-4"
+            style={{ background: "var(--border)" }}
+            aria-hidden
+          />
+
           <ThemeToggle />
- 
+
           {isLoggedIn ? (
-            <Link href="/dashboard"
-              className="btn-premium px-6 py-2.5 text-xs">
-              DASHBOARD
+            <Link href="/dashboard" className="btn-primary text-sm px-4 py-2">
+              Dashboard
             </Link>
           ) : (
             <>
-              <Link href="/login"
-                className="text-sm font-black transition-all hover:text-primary"
-                style={{ color: "var(--text-navy)" }}>
+              <Link href="/login" className={navLinkClass}>
                 Giriş
               </Link>
-              <Link href="/register"
-                className="btn-premium px-6 py-2.5 text-xs">
-                HEMEN BAŞLA
+              <Link href="/register" className="btn-primary text-sm px-4 py-2">
+                Başla
               </Link>
             </>
           )}
         </div>
- 
-        {/* Mobile */}
-        <div className="flex items-center gap-3 md:hidden">
+
+        <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
           <button
+            type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-xl bg-surface-2 border border-border shadow-sm active:scale-90 transition-transform" style={{ color: "var(--text-muted)" }}>
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            className="p-2 rounded-md border transition-colors hover:bg-surface-muted"
+            style={{
+              color: "var(--muted)",
+              borderColor: "var(--border)",
+              background: "var(--surface)",
+            }}
+            aria-expanded={isMobileMenuOpen}
+            aria-label={isMobileMenuOpen ? "Menüyü kapat" : "Menüyü aç"}
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </button>
         </div>
       </div>
- 
-      {/* Mobile overlay */}
+
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 border-b p-6 flex flex-col gap-4 shadow-2xl animate-fade-in-up"
-          style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-          <Link href="#features" className="text-sm font-bold opacity-70" style={{ color: "var(--text-muted)" }}>Özellikler</Link>
-          <Link href="/leaderboard" className="text-sm font-bold opacity-70" style={{ color: "var(--text-muted)" }}>Liderlik</Link>
-          <Link href="/topluluk" className="text-sm font-bold opacity-70" style={{ color: "var(--text-muted)" }}>Notlar</Link>
-          <Link href="/histology" className="text-sm font-bold opacity-70" style={{ color: "var(--text-muted)" }}>Histoloji</Link>
-          <Link href="/sinir-lezyon" className="text-sm font-bold opacity-70" style={{ color: "var(--text-muted)" }}>Nöroloji</Link>
-          <hr className="opacity-10" />
+        <div
+          className="md:hidden border-b px-4 sm:px-6 py-4 flex flex-col gap-3"
+          style={{
+            background: "var(--surface)",
+            borderColor: "var(--border)",
+          }}
+        >
+          <Link
+            href="#features"
+            className={navLinkClass}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Özellikler
+          </Link>
+          <Link
+            href="/leaderboard"
+            className={navLinkClass}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Liderlik
+          </Link>
+          <Link
+            href="/histology"
+            className={navLinkClass}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Histoloji
+          </Link>
+          <Link
+            href="/sinir-lezyon"
+            className={navLinkClass}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Nöroloji
+          </Link>
+          <hr style={{ borderColor: "var(--border)" }} />
           {isLoggedIn ? (
-            <Link href="/dashboard" className="btn-premium py-3.5 text-xs">
-              DASHBOARD
+            <Link
+              href="/dashboard"
+              className="btn-primary text-sm py-2.5 text-center"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Dashboard
             </Link>
           ) : (
-            <div className="flex flex-col gap-3">
-              <Link href="/login" className="btn-premium bg-transparent text-primary border-primary py-3.5 text-xs shadow-none"
-                style={{ background: "transparent", color: "var(--primary)", borderColor: "var(--primary)" }}>
-                GİRİŞ YAP
+            <div className="flex flex-col gap-2">
+              <Link
+                href="/login"
+                className="btn-secondary text-sm py-2.5 text-center"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Giriş yap
               </Link>
-              <Link href="/register" className="btn-premium py-3.5 text-xs">
-                ÜCRETSİZ BAŞLA
+              <Link
+                href="/register"
+                className="btn-primary text-sm py-2.5 text-center"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Ücretsiz başla
               </Link>
             </div>
           )}

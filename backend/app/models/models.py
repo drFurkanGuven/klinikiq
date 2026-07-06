@@ -70,10 +70,6 @@ class User(Base):
 
     sessions = relationship("SimulationSession", back_populates="user")
     emergency_mcq_reports = relationship("EmergencyMcqReport", back_populates="user")
-    community_notes = relationship("CommunityNote", back_populates="user")
-    community_note_attachments = relationship(
-        "CommunityNoteAttachment", back_populates="user"
-    )
 
 
 class Case(Base):
@@ -302,87 +298,6 @@ class HistologyImage(Base):
     # Örn. epithelium, muscle_tissue, respiratory — filtre etiketi
     science_unit = Column(String, nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), default=now_utc)
-
-
-class CommunityNote(Base):
-    """Topluluk not akışı — TUS sınıflandırması (temel/klinik + dal + konu)."""
-
-    __tablename__ = "community_notes"
-
-    id = Column(String, primary_key=True, default=gen_uuid)
-    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    tus_group = Column(String, nullable=False, index=True)  # temel | klinik
-    branch_id = Column(String(80), nullable=False, index=True)
-    topic_id = Column(String(80), nullable=False, index=True)
-    title = Column(String(200), nullable=False)
-    body = Column(Text, nullable=False)
-    # pending → yönetici onayı bekliyor | published → akışta | rejected → reddedildi (yazar görür)
-    moderation_status = Column(
-        String(20),
-        nullable=False,
-        default="published",
-        server_default="published",
-        index=True,
-    )
-    created_at = Column(DateTime(timezone=True), default=now_utc, index=True)
-
-    user = relationship("User", back_populates="community_notes")
-    attachments = relationship(
-        "CommunityNoteAttachment",
-        back_populates="note",
-        cascade="all, delete-orphan",
-    )
-
-
-class CommunityNoteAttachment(Base):
-    """Not eki — PDF veya görsel; diskte kullanıcı/not klasöründe saklanır."""
-
-    __tablename__ = "community_note_attachments"
-
-    id = Column(String, primary_key=True, default=gen_uuid)
-    note_id = Column(
-        String,
-        ForeignKey("community_notes.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
-    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    kind = Column(String(16), nullable=False)  # image | pdf
-    original_filename = Column(String(255), nullable=False)
-    content_type = Column(String(120), nullable=True)
-    size_bytes = Column(Integer, nullable=False, default=0)
-    # Örn. /uploads/community-notes/{user_id}/{note_id}/{id}.pdf
-    public_path = Column(String(512), nullable=False)
-    created_at = Column(DateTime(timezone=True), default=now_utc, index=True)
-
-    note = relationship("CommunityNote", back_populates="attachments")
-    user = relationship("User", back_populates="community_note_attachments")
-
-    __table_args__ = (Index("ix_cna_note_created", "note_id", "created_at"),)
-
-
-class CommunityNoteLike(Base):
-    """Not beğenileri — her kullanıcı bir notu en fazla bir kez beğenir (toggle)."""
-
-    __tablename__ = "community_note_likes"
-
-    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
-    note_id = Column(String, ForeignKey("community_notes.id", ondelete="CASCADE"), primary_key=True)
-    created_at = Column(DateTime(timezone=True), default=now_utc)
-
-    __table_args__ = (Index("ix_cn_like_note", "note_id"),)
-
-
-class CommunityNoteSave(Base):
-    """Kişisel kayıtlar — kullanıcı notu kaydeder; başkaları görmez."""
-
-    __tablename__ = "community_note_saves"
-
-    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
-    note_id = Column(String, ForeignKey("community_notes.id", ondelete="CASCADE"), primary_key=True)
-    created_at = Column(DateTime(timezone=True), default=now_utc)
-
-    __table_args__ = (Index("ix_cn_save_user", "user_id"), Index("ix_cn_save_note", "note_id"))
 
 
 class Annotation(Base):

@@ -262,115 +262,6 @@ export interface StudyNoteItem {
   created_at: string;
 }
 
-export interface CommunityNoteAttachment {
-  id: string;
-  kind: "image" | "pdf" | string;
-  filename: string;
-  url: string;
-  size_bytes: number;
-}
-
-export interface CommunityNoteItem {
-  id: string;
-  group: "temel" | "klinik";
-  branch_id: string;
-  topic_id: string;
-  title: string;
-  excerpt: string;
-  author_display: string;
-  likes: number;
-  liked_by_me: boolean;
-  saved_by_me: boolean;
-  is_mine: boolean;
-  /** pending: onay bekliyor | published: akışta | rejected: reddedildi */
-  moderation_status: "pending" | "published" | "rejected";
-  created_at: string;
-  /** Sunucu: metin 280 karakterden uzunsa true */
-  body_truncated?: boolean;
-  attachments?: CommunityNoteAttachment[];
-}
-
-/** GET /community/notes/:id — tam metin dahil */
-export interface CommunityNoteDetail extends CommunityNoteItem {
-  body: string;
-}
-
-export interface ToggleLikeResponse {
-  liked: boolean;
-  likes: number;
-}
-
-export interface ToggleSaveResponse {
-  saved: boolean;
-}
-
-/** Sunucu taksonomisi — `tus-taxonomy.ts` ile senkron tutulmalı. */
-export type TusTaxonomyPayload = {
-  version: number;
-  groups: {
-    temel: Record<string, string[]>;
-    klinik: Record<string, string[]>;
-  };
-};
-
-export const communityApi = {
-  getTaxonomy: () => api.get<TusTaxonomyPayload>("/community/taksonomi"),
-  listNotes: (params?: {
-    group?: string;
-    branch_id?: string;
-    topic_id?: string;
-    q?: string;
-    limit?: number;
-    offset?: number;
-  }) => api.get<CommunityNoteItem[]>("/community/notes", { params }),
-  listSavedNotes: (params?: {
-    group?: string;
-    branch_id?: string;
-    topic_id?: string;
-    q?: string;
-    limit?: number;
-    offset?: number;
-  }) => api.get<CommunityNoteItem[]>("/community/me/kaydedilenler", { params }),
-  createNote: (data: {
-    group: "temel" | "klinik";
-    branch_id: string;
-    topic_id: string;
-    title: string;
-    body: string;
-  }) => api.post<CommunityNoteItem>("/community/notes", data),
-  getNote: (noteId: string) =>
-    api.get<CommunityNoteDetail>(`/community/notes/${noteId}`),
-  updateNote: (
-    noteId: string,
-    data: Partial<{
-      group: "temel" | "klinik";
-      branch_id: string;
-      topic_id: string;
-      title: string;
-      body: string;
-    }>
-  ) => api.patch<CommunityNoteDetail>(`/community/notes/${noteId}`, data),
-  deleteNote: (noteId: string) =>
-    api.delete<void>(`/community/notes/${noteId}`),
-  toggleLike: (noteId: string) =>
-    api.post<ToggleLikeResponse>(`/community/notes/${noteId}/like`),
-  toggleSave: (noteId: string) =>
-    api.post<ToggleSaveResponse>(`/community/notes/${noteId}/kaydet`),
-  uploadNoteAttachment: (noteId: string, file: File, onProgress?: (pct: number) => void) => {
-    const form = new FormData();
-    form.append("file", file);
-    return api.post<CommunityNoteAttachment>(`/community/notes/${noteId}/attachments`, form, {
-      headers: { "Content-Type": undefined },
-      timeout: 120_000,
-      onUploadProgress: (e) => {
-        if (onProgress && e.total) onProgress(Math.round((e.loaded / e.total) * 100));
-      },
-    });
-  },
-  deleteNoteAttachment: (noteId: string, attachmentId: string) =>
-    api.delete<void>(`/community/notes/${noteId}/attachments/${attachmentId}`),
-};
-
 // ── DrugBank ──────────────────────────────────────────────────────────────
 
 export interface DrugSummary {
@@ -662,19 +553,6 @@ export interface OrphanDziFile {
   has_thumb: boolean;
 }
 
-export interface PendingCommunityNote {
-  id: string;
-  title: string;
-  excerpt: string;
-  body_preview: string;
-  group: string;
-  branch_id: string;
-  topic_id: string;
-  author_name: string;
-  author_email: string;
-  created_at: string;
-}
-
 export const adminApi = {
   getUsers: () => api.get<AdminUser[]>("/admin/users"),
   updateLimit: (userId: string, limit: number) =>
@@ -706,13 +584,6 @@ export const adminApi = {
     api.post<HistologyImage>("/admin/hf/import-tiff", body, {
       timeout: 600_000,
     }),
-  /** Topluluk notları — onay kuyruğu */
-  pendingCommunityNotesCount: () => api.get<{ count: number }>("/admin/community-notes/pending-count"),
-  listPendingCommunityNotes: () => api.get<PendingCommunityNote[]>("/admin/community-notes/pending"),
-  approveCommunityNote: (noteId: string) =>
-    api.post<{ ok: boolean; id: string }>(`/admin/community-notes/${noteId}/approve`),
-  rejectCommunityNote: (noteId: string) =>
-    api.post<{ ok: boolean; id: string }>(`/admin/community-notes/${noteId}/reject`),
 };
 
 export interface HuggingFaceDatasetSpotlight {

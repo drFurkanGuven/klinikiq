@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import Constants from "expo-constants";
 import { router } from "expo-router";
-import { ChevronRight, Settings, Users } from "lucide-react-native";
+import { ChevronRight, Settings } from "lucide-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
@@ -250,22 +250,6 @@ export default function ProfilScreen() {
             <Text style={[styles.navRowLabel, { color: theme.text }]}>
               Hesap ve ayarlar
             </Text>
-            <ChevronRight size={20} color={theme.textMuted} />
-          </Pressable>
-          <View style={[styles.navDivider, { backgroundColor: theme.border }]} />
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => {
-              void Haptics.selectionAsync();
-              router.push("/topluluk");
-            }}
-            style={({ pressed }) => [
-              styles.navRow,
-              pressed && { opacity: 0.85 },
-            ]}
-          >
-            <Users size={20} color={theme.accent} />
-            <Text style={[styles.navRowLabel, { color: theme.text }]}>Topluluk</Text>
             <ChevronRight size={20} color={theme.textMuted} />
           </Pressable>
         </Card>

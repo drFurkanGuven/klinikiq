@@ -185,7 +185,7 @@ export default function OgrenmePage() {
             style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--primary)" }}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            Topluluk havuzu
+            Öğrenme havuzu
           </div>
           <h1 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight" style={{ color: "var(--text)" }}>
             Tamamlanan vakalardan özetler

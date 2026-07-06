@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { X, Check, AlertCircle } from "lucide-react";
+import { Check, AlertCircle } from "lucide-react";
 import { nativeClient } from "@/lib/native";
 
 interface PremiumAlertProps {
@@ -22,59 +21,88 @@ export default function PremiumAlert({
   message,
   confirmText = "Tamam",
   cancelText = "Vazgeç",
-  type = "info"
+  type = "info",
 }: PremiumAlertProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-0 sm:p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/70 backdrop-blur-md animate-fade-in"
-        onClick={() => { nativeClient.impact(); onClose(); }}
+    <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/50"
+        onClick={() => {
+          nativeClient.impact();
+          onClose();
+        }}
+        aria-hidden
       />
-      
-      {/* Bottom Sheet Container */}
-      <div className="relative w-full max-w-lg glass-card border-metallic animate-fade-in-up 
-                   rounded-t-[3.5rem] sm:rounded-[3.5rem] overflow-hidden shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
-           style={{ background: "var(--surface)" }}>
-        
-        {/* Handle for Mobile Visual */}
-        <div className="w-12 h-1.5 bg-white/10 rounded-full mx-auto mt-4 mb-2 sm:hidden" />
 
-        <div className="p-8 sm:p-10">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center border border-metallic glass"
-                 style={{ 
-                    background: type === "warning" ? "var(--error-light)" : "var(--primary-light)",
-                    color: type === "warning" ? "var(--danger)" : "var(--primary)" 
-                 }}>
-              {type === "warning" ? <AlertCircle className="w-6 h-6" /> : <Check className="w-6 h-6" />}
+      <div
+        className="relative w-full max-w-md card overflow-hidden animate-fade-in-up rounded-t-lg sm:rounded-lg"
+        style={{ background: "var(--surface)" }}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="w-10 h-1 rounded-full mx-auto mt-3 mb-1 sm:hidden bg-border" />
+
+        <div className="p-6">
+          <div className="flex items-start gap-3 mb-4">
+            <div
+              className="w-9 h-9 rounded-md flex items-center justify-center border shrink-0"
+              style={{
+                background:
+                  type === "warning"
+                    ? "var(--destructive-muted)"
+                    : "var(--accent-muted)",
+                color:
+                  type === "warning" ? "var(--destructive)" : "var(--accent)",
+                borderColor: "var(--border)",
+              }}
+            >
+              {type === "warning" ? (
+                <AlertCircle className="w-4 h-4" />
+              ) : (
+                <Check className="w-4 h-4" />
+              )}
             </div>
-            <h3 className="text-2xl font-black tracking-tight" style={{ color: "var(--text)" }}>{title}</h3>
+            <h3
+              className="text-lg font-semibold pt-1"
+              style={{ color: "var(--foreground)" }}
+            >
+              {title}
+            </h3>
           </div>
 
-          <p className="text-base font-medium opacity-70 leading-relaxed mb-10" style={{ color: "var(--text)" }}>
+          <p
+            className="text-sm leading-relaxed mb-6"
+            style={{ color: "var(--muted)" }}
+          >
             {message}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            {onConfirm && (
-                <button
-                    onClick={() => { nativeClient.impact(); onConfirm(); onClose(); }}
-                    className="btn-premium flex-1 py-4.5 text-base order-1 sm:order-2"
-                >
-                    {confirmText}
-                </button>
-            )}
+          <div className="flex flex-col-reverse sm:flex-row gap-2">
             <button
-                onClick={() => { nativeClient.impact(); onClose(); }}
-                className="flex-1 py-4.5 rounded-2xl font-black text-sm transition-all border-metallic glass 
-                         hover:bg-white/5 order-2 sm:order-1"
-                style={{ color: "var(--text)" }}
+              type="button"
+              onClick={() => {
+                nativeClient.impact();
+                onClose();
+              }}
+              className="btn-secondary flex-1 py-2.5 text-sm"
             >
-                {cancelText}
+              {cancelText}
             </button>
+            {onConfirm && (
+              <button
+                type="button"
+                onClick={() => {
+                  nativeClient.impact();
+                  onConfirm();
+                  onClose();
+                }}
+                className="btn-primary flex-1 py-2.5 text-sm"
+              >
+                {confirmText}
+              </button>
+            )}
           </div>
         </div>
       </div>

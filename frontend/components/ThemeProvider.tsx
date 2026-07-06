@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 
+/** @deprecated Palette selection removed in design v2; kept for type compatibility. */
 export type Palette = "emerald" | "midnight" | "violet" | "rose";
 type Theme = "dark" | "light";
 
@@ -10,11 +11,11 @@ const ThemeContext = createContext<{
   palette: Palette;
   toggleTheme: () => void;
   setPalette: (p: Palette) => void;
-}>({ 
-  theme: "dark", 
-  palette: "emerald", 
-  toggleTheme: () => {}, 
-  setPalette: () => {} 
+}>({
+  theme: "light",
+  palette: "emerald",
+  toggleTheme: () => {},
+  setPalette: () => {},
 });
 
 export function useTheme() {
@@ -22,21 +23,14 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
-  const [palette, setPaletteState] = useState<Palette>("emerald");
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    // Theme loading
     const savedTheme = localStorage.getItem("klinikiq-theme") as Theme | null;
-    const initialTheme = savedTheme || "dark";
+    const initialTheme = savedTheme || "light";
     setTheme(initialTheme);
     document.documentElement.classList.toggle("dark", initialTheme === "dark");
-
-    // Palette loading
-    const savedPalette = localStorage.getItem("klinikiq-palette") as Palette | null;
-    const initialPalette = savedPalette || "emerald";
-    setPaletteState(initialPalette);
-    document.documentElement.setAttribute("data-palette", initialPalette);
+    document.documentElement.removeAttribute("data-palette");
   }, []);
 
   const toggleTheme = () => {
@@ -48,14 +42,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const setPalette = (p: Palette) => {
-    setPaletteState(p);
-    localStorage.setItem("klinikiq-palette", p);
-    document.documentElement.setAttribute("data-palette", p);
-  };
+  /** No-op — single teal accent in CSS; UI may still call this until removed. */
+  const setPalette = (_p: Palette) => {};
 
   return (
-    <ThemeContext.Provider value={{ theme, palette, toggleTheme, setPalette }}>
+    <ThemeContext.Provider
+      value={{ theme, palette: "emerald", toggleTheme, setPalette }}
+    >
       {children}
     </ThemeContext.Provider>
   );

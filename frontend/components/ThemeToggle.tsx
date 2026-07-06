@@ -13,20 +13,29 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return <div className="w-9 h-9 rounded-xl animate-pulse" style={{ background: "var(--surface-2)" }} />;
+    return (
+      <div
+        className="w-8 h-8 rounded-md animate-pulse"
+        style={{ background: "var(--surface-muted)" }}
+      />
+    );
   }
 
   return (
     <button
+      type="button"
       onClick={toggleTheme}
-      className="relative w-9 h-9 flex items-center justify-center rounded-xl transition-all duration-200"
-      style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
-      aria-label="Temayı Değiştir"
+      className="w-8 h-8 flex items-center justify-center rounded-md transition-colors hover:bg-surface-muted"
+      style={{
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+      }}
+      aria-label="Temayı değiştir"
     >
       {theme === "dark" ? (
-        <Sun className="h-4 w-4" style={{ color: "var(--warning)" }} />
+        <Sun className="h-4 w-4" style={{ color: "var(--muted)" }} />
       ) : (
-        <Moon className="h-4 w-4" style={{ color: "var(--primary)" }} />
+        <Moon className="h-4 w-4" style={{ color: "var(--muted)" }} />
       )}
     </button>
   );

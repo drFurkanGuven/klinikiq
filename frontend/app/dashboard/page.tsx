@@ -6,7 +6,7 @@ import { casesApi, usersApi, authApi, sessionsApi, questionsApi, type HistoryIte
 import { isAuthenticated, logout } from "@/lib/auth";
 import Footer from "@/components/Footer";
 import {
-  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound, RefreshCw, Filter, Users, PenLine, Bookmark, ChevronDown, Pill, Zap
+  Stethoscope, LogOut, BookOpen, Trophy, BarChart3, Clock, Bot, ShieldAlert, Dna, Play, CheckCircle2, AlertCircle, Sparkles, GraduationCap, Microscope, Brain, Settings, X, Check, Fingerprint, Sun, Moon, User, Edit2, Save, Loader2, KeyRound, RefreshCw, Filter, PenLine, ChevronDown, Pill, Zap
 } from "lucide-react";
 
 function timeAgo(dateStr: string | undefined): string {
@@ -82,7 +82,7 @@ export default function DashboardPage() {
   const [passwordMsg, setPasswordMsg] = useState<"ok" | string | null>(null);
 
   /** Navbar: sınıflı menü (mobilde taşmayı önlemek için) */
-  const [openNavMenu, setOpenNavMenu] = useState<null | "study" | "community" | "account">(null);
+  const [openNavMenu, setOpenNavMenu] = useState<null | "study" | "account">(null);
 
   const { theme, toggleTheme, palette, setPalette } = useTheme();
 
@@ -366,26 +366,6 @@ export default function DashboardPage() {
               type="button"
               onClick={() => {
                 nativeClient.impact();
-                setOpenNavMenu((m) => (m === "community" ? null : "community"));
-              }}
-              className="flex items-center gap-0.5 sm:gap-1 transition-all text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-2 rounded-xl border shadow-sm"
-              style={{
-                background: openNavMenu === "community" ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--surface-2)",
-                borderColor: openNavMenu === "community" ? "var(--primary)" : "var(--border)",
-                color: "var(--text)",
-              }}
-              aria-expanded={openNavMenu === "community"}
-              aria-haspopup="true"
-              title="Topluluk — not akışı ve paylaşım"
-            >
-              <Users className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--primary)" }} />
-              <span className="max-[360px]:hidden">Topluluk</span>
-              <ChevronDown className={`w-3 h-3 shrink-0 opacity-70 transition-transform ${openNavMenu === "community" ? "rotate-180" : ""}`} />
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                nativeClient.impact();
                 setOpenNavMenu((m) => (m === "account" ? null : "account"));
               }}
               className="flex items-center gap-0.5 sm:gap-1 transition-all text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-2 rounded-xl border shadow-sm"
@@ -419,9 +399,7 @@ export default function DashboardPage() {
             aria-label={
               openNavMenu === "study"
                 ? "Öğren menüsü"
-                : openNavMenu === "community"
-                  ? "Topluluk menüsü"
-                  : "Hesap menüsü"
+                : "Hesap menüsü"
             }
             className="fixed left-3 right-3 top-[4.25rem] z-[110] sm:left-auto sm:right-6 sm:w-[min(100vw-3rem,22rem)] rounded-2xl border shadow-2xl max-h-[min(72vh,440px)] overflow-y-auto"
             style={{ background: "var(--surface)", borderColor: "var(--border)" }}
@@ -525,50 +503,6 @@ export default function DashboardPage() {
                   >
                     <Trophy className="w-4 h-4 shrink-0" style={{ color: "var(--warning)" }} />
                     Sıralama
-                  </Link>
-                </>
-              )}
-              {openNavMenu === "community" && (
-                <>
-                  <p className="px-3 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest opacity-40">Topluluk notları</p>
-                  <Link
-                    href="/topluluk"
-                    onClick={() => {
-                      nativeClient.impact();
-                      setOpenNavMenu(null);
-                    }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
-                    style={{ color: "var(--text)" }}
-                  >
-                    <Users className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
-                    Not akışı
-                  </Link>
-                  <Link
-                    href="/topluluk/kaydedilenler"
-                    onClick={() => {
-                      nativeClient.impact();
-                      setOpenNavMenu(null);
-                    }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
-                    style={{ color: "var(--text)" }}
-                  >
-                    <Bookmark className="w-4 h-4 shrink-0" style={{ color: "var(--primary)" }} />
-                    Kaydedilenler
-                  </Link>
-                  <Link
-                    href="/topluluk/paylas"
-                    onClick={() => {
-                      nativeClient.impact();
-                      setOpenNavMenu(null);
-                    }}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold transition-colors"
-                    style={{
-                      background: "color-mix(in srgb, var(--primary) 10%, transparent)",
-                      color: "var(--primary)",
-                    }}
-                  >
-                    <PenLine className="w-4 h-4 shrink-0" />
-                    Not paylaş
                   </Link>
                 </>
               )}
@@ -710,48 +644,6 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Not akışı kısayolu */}
-        <div
-          className="mb-5 sm:mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-2xl px-5 py-4 border shadow-md"
-          style={{ background: "var(--surface)", borderColor: "var(--border)" }}
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
-              style={{ background: "color-mix(in srgb, var(--primary) 18%, transparent)" }}
-            >
-              <Users className="w-5 h-5" style={{ color: "var(--primary)" }} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-black tracking-tight" style={{ color: "var(--text)" }}>
-                TUS not akışı
-              </p>
-              <p className="text-[11px] font-medium opacity-60 leading-snug" style={{ color: "var(--text-muted)" }}>
-                Notları keşfet, beğen; kayıtların sadece sende.
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2 sm:shrink-0">
-            <Link
-              href="/topluluk"
-              className="text-center px-5 py-2.5 rounded-xl text-xs font-black border transition-all"
-              style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
-            >
-              Akış
-            </Link>
-            <Link
-              href="/topluluk/kaydedilenler"
-              className="text-center px-5 py-2.5 rounded-xl text-xs font-black border transition-all"
-              style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
-            >
-              Kaydedilenler
-            </Link>
-            <Link href="/topluluk/paylas" className="btn-premium text-center px-5 py-2.5 text-xs">
-              Not paylaş
-            </Link>
           </div>
         </div>
 

@@ -34,15 +34,29 @@ export function getApiErrorMessage(
   return fallback;
 }
 
+function createTimeoutSignal(ms: number): { signal: AbortSignal; cancel: () => void } {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), ms);
+  return {
+    signal: controller.signal,
+    cancel: () => clearTimeout(timeoutId),
+  };
+}
+
+/** Sunucuya ulaşılabildi mi? (ağ yok / DNS / SSL hatası → false) */
 export async function checkApiReachable(baseUrl: string): Promise<boolean> {
-  const origin = baseUrl.replace(/\/api\/?$/, "");
+  const apiRoot = baseUrl.replace(/\/$/, "");
+  const { signal, cancel } = createTimeoutSignal(8000);
   try {
-    const res = await fetch(`${origin}/health`, {
+    const res = await fetch(`${apiRoot}/auth/login`, {
       method: "GET",
-      signal: AbortSignal.timeout(8000),
+      signal,
     });
-    return res.ok;
+    // 405 Method Not Allowed vb. — API yanıt veriyor demektir
+    return res.status > 0;
   } catch {
     return false;
+  } finally {
+    cancel();
   }
 }
