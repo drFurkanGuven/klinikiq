@@ -353,3 +353,59 @@ class AnnotationOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# ── Farmakoloji Mantık Haritaları (curated statik JSON) ────────────────────────
+
+class PharmaNode(BaseModel):
+    id: str
+    label_tr: str
+    type: Literal["receptor", "mediator", "organ", "effect", "drug_class"]
+    description_tr: str = ""
+    high_yield: bool = False
+
+
+class PharmaEdge(BaseModel):
+    source: str
+    target: str
+    relation: Literal["activates", "inhibits", "agonist", "antagonist"]
+    effect_tr: str = ""
+
+
+class PharmaDownstreamEffect(BaseModel):
+    nodeId: str
+    effect_tr: str = ""
+
+
+class PharmaIntervention(BaseModel):
+    drug_class: str
+    label_tr: str
+    targets: List[str] = []
+    relation: Literal["agonist", "antagonist", "activates", "inhibits"]
+    downstream_effects: List[PharmaDownstreamEffect] = []
+    tr_products_atc: List[str] = []
+
+
+class PharmaQuizItem(BaseModel):
+    q_tr: str
+    options_tr: List[str]
+    answer_idx: int
+    explanation_tr: str = ""
+    node_id: Optional[str] = None
+
+
+class PharmaMapSummary(BaseModel):
+    id: str
+    title_tr: str
+    description_tr: str = ""
+
+
+class PharmaMapOut(BaseModel):
+    id: str
+    title_tr: str
+    description_tr: str = ""
+    source_attribution: str = ""
+    nodes: List[PharmaNode] = []
+    edges: List[PharmaEdge] = []
+    interventions: List[PharmaIntervention] = []
+    quiz: List[PharmaQuizItem] = []

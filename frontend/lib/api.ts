@@ -490,6 +490,70 @@ export const learningApi = {
   specialties: () => api.get<string[]>("/learning/specialties"),
 };
 
+// ── Farmakoloji Mantık Haritaları ─────────────────────────────────────────────
+
+export type PharmaNodeType = "receptor" | "mediator" | "organ" | "effect" | "drug_class";
+export type PharmaRelation = "activates" | "inhibits" | "agonist" | "antagonist";
+
+export interface PharmaNode {
+  id: string;
+  label_tr: string;
+  type: PharmaNodeType;
+  description_tr: string;
+  high_yield: boolean;
+}
+
+export interface PharmaEdge {
+  source: string;
+  target: string;
+  relation: PharmaRelation;
+  effect_tr: string;
+}
+
+export interface PharmaDownstreamEffect {
+  nodeId: string;
+  effect_tr: string;
+}
+
+export interface PharmaIntervention {
+  drug_class: string;
+  label_tr: string;
+  targets: string[];
+  relation: PharmaRelation;
+  downstream_effects: PharmaDownstreamEffect[];
+  tr_products_atc: string[];
+}
+
+export interface PharmaQuizItem {
+  q_tr: string;
+  options_tr: string[];
+  answer_idx: number;
+  explanation_tr: string;
+  node_id?: string | null;
+}
+
+export interface PharmaMapSummary {
+  id: string;
+  title_tr: string;
+  description_tr: string;
+}
+
+export interface PharmaMap {
+  id: string;
+  title_tr: string;
+  description_tr: string;
+  source_attribution: string;
+  nodes: PharmaNode[];
+  edges: PharmaEdge[];
+  interventions: PharmaIntervention[];
+  quiz: PharmaQuizItem[];
+}
+
+export const pharmaApi = {
+  listMaps: () => api.get<PharmaMapSummary[]>("/pharma/maps"),
+  getMap: (mapId: string) => api.get<PharmaMap>(`/pharma/maps/${mapId}`),
+};
+
 export const usersApi = {
   history: () => api.get<HistoryItem[]>("/users/me/history"),
   getLeaderboard: () => api.get<LeaderboardItem[]>("/users/leaderboard"),

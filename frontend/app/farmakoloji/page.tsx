@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Layers,
   GitCompare,
+  Waypoints,
 } from "lucide-react";
 
 const UNITS = [
@@ -184,6 +185,26 @@ export default function FarmakolojiPage() {
           Araçlar
         </h2>
         <ul className="grid gap-4 sm:grid-cols-2 mb-10">
+          <li>
+            <Link
+              href="/farmakoloji/haritalar"
+              className="flex items-start gap-3 rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg h-full group"
+              style={{ background: "var(--surface)", borderColor: "var(--primary)" }}
+            >
+              <Waypoints className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--primary)" }} />
+              <div className="space-y-2 min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-black text-base leading-snug" style={{ color: "var(--text)" }}>
+                    Mantık Haritaları
+                  </h3>
+                  <ChevronRight className="w-5 h-5 shrink-0 opacity-40 group-hover:opacity-100" style={{ color: "var(--primary)" }} />
+                </div>
+                <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                  İnteraktif reseptör → organ → etki haritaları. İlaç sınıfı seç, mantığı gör. (Yeni)
+                </p>
+              </div>
+            </Link>
+          </li>
           <li>
             <Link
               href="/farmakoloji/ilaclar"
