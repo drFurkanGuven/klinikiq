@@ -65,11 +65,11 @@ function TreeNodeView({
       )}
       {node.children.length > 0 && (
         <div className="mt-3 flex flex-col items-center">
-          <div className="w-px h-3" style={{ background: "var(--border)" }} />
+          <div className="w-[2px] h-3 rounded-full" style={{ background: "var(--border-strong)" }} />
           <div className="flex items-start gap-2 sm:gap-4">
             {node.children.map((child) => (
               <div key={child.id} className="flex flex-col items-center">
-                <div className="w-px h-3" style={{ background: "var(--border)" }} />
+                <div className="w-[2px] h-3 rounded-full" style={{ background: "var(--border-strong)" }} />
                 <TreeNodeView
                   node={child}
                   revealed={revealed}

@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, desc
+from sqlalchemy import select, func, desc, case
 from typing import List
 
 from app.core.database import get_db
 from app.core.security import get_current_user_id
-from app.models.models import EmergencyMcqReport, User, SimulationSession, Report, Case, SessionStatus
+from app.models.models import EmergencyMcqReport, User, SimulationSession, Report, Case, SessionStatus, PharmaMapProgress
 from app.schemas.schemas import LeaderboardItem, StudyNoteItem, UpdateProfile, UserOut
 
 router = APIRouter()
@@ -75,6 +75,22 @@ async def get_leaderboard(db: AsyncSession = Depends(get_db)):
         .subquery()
     )
 
+    # Farmakoloji: quiz tamamlanan harita +5, yalnızca yolak +2 (çift sayım yok)
+    pharma_subq = (
+        select(
+            PharmaMapProgress.user_id,
+            func.sum(
+                case(
+                    (PharmaMapProgress.quiz_completed.is_(True), 5),
+                    (PharmaMapProgress.path_tree_completed.is_(True), 2),
+                    else_=0,
+                )
+            ).label("pharma_points"),
+        )
+        .group_by(PharmaMapProgress.user_id)
+        .subquery()
+    )
+
     # Bulduğumuz bu eşsiz vaka rekorlarını toplayarak skor tablosu oluştururuz.
     # emcq_subq tekrarlayan satırlarda çoğalmaması için max(coalesce(...)) kullanılır.
     stmt = (
@@ -87,9 +103,11 @@ async def get_leaderboard(db: AsyncSession = Depends(get_db)):
             func.avg(subq.c.max_score).label("avg_score"),
             func.sum(subq.c.max_score).label("total_score"),
             func.max(func.coalesce(emcq_subq.c.emergency_correct, 0)).label("emergency_correct"),
+            func.max(func.coalesce(pharma_subq.c.pharma_points, 0)).label("pharma_points"),
         )
         .join(subq, subq.c.user_id == User.id)
         .outerjoin(emcq_subq, emcq_subq.c.user_id == User.id)
+        .outerjoin(pharma_subq, pharma_subq.c.user_id == User.id)
         .group_by(User.id)
         .order_by(desc("total_score"))
         .limit(50)
@@ -108,6 +126,7 @@ async def get_leaderboard(db: AsyncSession = Depends(get_db)):
             average_score=float(row.avg_score) if row.avg_score else 0.0,
             total_score=float(row.total_score) if row.total_score else 0.0,
             emergency_correct=int(row.emergency_correct or 0),
+            pharma_points=int(row.pharma_points or 0),
         ))
         
     return leaderboard

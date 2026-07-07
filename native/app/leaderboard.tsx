@@ -38,11 +38,12 @@ function fontReg() {
 
 const COL_W = {
   rank: 44,
-  name: 140,
-  school: 120,
-  cases: 72,
-  avg: 64,
-  em: 56,
+  name: 120,
+  school: 100,
+  cases: 56,
+  avg: 52,
+  em: 48,
+  ph: 48,
 };
 
 const TABLE_MIN_W =
@@ -52,6 +53,7 @@ const TABLE_MIN_W =
   COL_W.cases +
   COL_W.avg +
   COL_W.em +
+  COL_W.ph +
   48;
 
 function SkeletonRow({ theme }: { theme: ReturnType<typeof useTheme> }) {
@@ -88,6 +90,14 @@ function SkeletonRow({ theme }: { theme: ReturnType<typeof useTheme> }) {
   );
 }
 
+function effectiveScore(item: LeaderboardItem) {
+  return (
+    item.total_score +
+    (item.emergency_correct ?? 0) * 3 +
+    (item.pharma_points ?? 0)
+  );
+}
+
 function medalForRank(rank: number) {
   if (rank === 1) return "🥇 ";
   if (rank === 2) return "🥈 ";
@@ -110,7 +120,8 @@ export default function LeaderboardScreen() {
   const meName = user?.name?.trim() ?? "";
 
   const table = useMemo(() => {
-    return rows.map((item, i) => ({
+    const sorted = [...rows].sort((a, b) => effectiveScore(b) - effectiveScore(a));
+    return sorted.map((item, i) => ({
       rank: i + 1,
       item,
       isMe: meName.length > 0 && item.name.trim() === meName,
@@ -138,6 +149,13 @@ export default function LeaderboardScreen() {
           <Text style={[styles.navTitle, { color: theme.text }]}>Sıralama</Text>
         </View>
         <View style={{ width: 40 }} />
+      </View>
+
+      <View style={[styles.infoBox, { backgroundColor: theme.surfaceMuted, borderColor: theme.border }]}>
+        <Text style={[styles.infoText, { color: theme.textMuted }]}>
+          Sıralama: vaka en yüksek skorları toplamı + acil MCQ (doğru başına +3) +
+          farmakoloji (quiz +5, yolak +2). Günlük MCQ ve soru bankası dahil değil.
+        </Text>
       </View>
 
       {isLoading ? (
@@ -195,6 +213,9 @@ export default function LeaderboardScreen() {
                 </Text>
                 <Text style={[styles.hCell, styles.colEm, { color: theme.textMuted }]}>
                   Acil
+                </Text>
+                <Text style={[styles.hCell, styles.colPh, { color: theme.textMuted }]}>
+                  Farma
                 </Text>
               </View>
 
@@ -264,6 +285,9 @@ function LeaderboardDataRow({
       <Text style={[styles.cell, styles.colEm, { color: theme.text }]}>
         {item.emergency_correct}
       </Text>
+      <Text style={[styles.cell, styles.colPh, { color: theme.text }]}>
+        {item.pharma_points ?? 0}
+      </Text>
     </View>
   );
 }
@@ -296,6 +320,19 @@ const styles = StyleSheet.create({
   navTitle: {
     fontFamily: fontBold(),
     fontSize: 18,
+  },
+  infoBox: {
+    marginHorizontal: 16,
+    marginBottom: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  infoText: {
+    fontFamily: fontReg(),
+    fontSize: 12,
+    lineHeight: 17,
   },
   hScroll: {
     flex: 1,
@@ -348,6 +385,10 @@ const styles = StyleSheet.create({
   },
   colEm: {
     width: COL_W.em,
+    textAlign: "right",
+  },
+  colPh: {
+    width: COL_W.ph,
     textAlign: "right",
   },
   skelWrap: {

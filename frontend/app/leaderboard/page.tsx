@@ -9,7 +9,7 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 function effectiveScore(user: LeaderboardItem) {
-  return user.total_score + (user.emergency_correct ?? 0) * 3;
+  return user.total_score + (user.emergency_correct ?? 0) * 3 + (user.pharma_points ?? 0);
 }
 
 export default function LeaderboardPage() {
@@ -110,8 +110,8 @@ export default function LeaderboardPage() {
           </div>
           <h1 className="text-5xl sm:text-6xl font-black tracking-tight" style={{ color: "var(--text)" }}>Klinik <span style={{ color: "var(--primary)" }}>Üstadları</span></h1>
           <p className="text-sm sm:text-base font-medium max-w-xl mx-auto leading-relaxed opacity-60" style={{ color: "var(--text-muted)" }}>
-            Sıralama, vaka raporlarından gelen toplam puana acil MCQ doğrularının katkısı (her doğru +3) eklenerek hesaplanır. Zirveye giden yol klinik
-            doğruluktan geçer.
+            Sıralama: vaka en yüksek skorları toplamı + acil MCQ (doğru başına +3) + farmakoloji
+            (quiz tamamlanan harita +5, yolak +2). Günlük MCQ ve soru bankası dahil değil.
           </p>
         </div>
 
@@ -191,6 +191,11 @@ export default function LeaderboardPage() {
                       {(user.emergency_correct ?? 0) > 0 && (
                         <div className="text-[10px] font-bold mt-1" style={{ color: "var(--text-muted)" }}>
                           + {user.emergency_correct} acil doğru
+                        </div>
+                      )}
+                      {(user.pharma_points ?? 0) > 0 && (
+                        <div className="text-[10px] font-bold mt-0.5" style={{ color: "var(--text-muted)" }}>
+                          + {user.pharma_points} farma
                         </div>
                       )}
                     </div>

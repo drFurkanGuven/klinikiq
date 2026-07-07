@@ -39,6 +39,15 @@ export default function OgrenTab() {
 
   const links: LinkItem[] = [
     {
+      label: "Farmakoloji",
+      desc: "İlaç haritaları, yolak egzersizi ve quiz",
+      icon: <Pill size={16} color={theme.foreground} />,
+      onPress: () => {
+        void Haptics.selectionAsync();
+        router.push("/farmakoloji");
+      },
+    },
+    {
       label: "Vaka özetleri",
       desc: "Havuzdaki vaka özetleri",
       icon: <Sparkles size={16} color={theme.foreground} />,
@@ -61,15 +70,6 @@ export default function OgrenTab() {
       desc: "Lezyon haritaları",
       icon: <Brain size={16} color={theme.foreground} />,
       onPress: () => openWeb("/sinir-lezyon"),
-    },
-    {
-      label: "Farmakoloji",
-      desc: "İlaç haritaları, yolak egzersizi ve quiz",
-      icon: <Pill size={16} color={theme.foreground} />,
-      onPress: () => {
-        void Haptics.selectionAsync();
-        router.push("/farmakoloji");
-      },
     },
     {
       label: "Sıralama",

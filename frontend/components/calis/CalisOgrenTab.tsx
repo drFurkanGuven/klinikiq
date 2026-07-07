@@ -15,11 +15,11 @@ import {
 import { nativeClient } from "@/lib/native";
 
 const LINKS = [
+  { href: "/farmakoloji/haritalar", label: "Farmakoloji", desc: "İlaç haritaları, yolak egzersizi ve quiz", icon: Pill },
   { href: "/ogrenme", label: "Vaka özetleri (havuz)", desc: "Havuzdaki vaka özetleri", icon: Sparkles },
   { href: "/study-notes", label: "Kişisel özetler", desc: "Kendi notların", icon: PenLine },
   { href: "/histology", label: "Histoloji", desc: "Mikroskop slaytları", icon: Microscope },
   { href: "/sinir-lezyon", label: "Nöro lezyon atlası", desc: "Lezyon haritaları", icon: Brain },
-  { href: "/farmakoloji/haritalar", label: "Farmakoloji", desc: "İlaç haritaları, yolak egzersizi ve quiz", icon: Pill },
   { href: "/leaderboard", label: "Sıralama", desc: "Liderlik tablosu", icon: Trophy },
   { href: "/calis/oturum?mode=usmle", label: "USMLE (gelişmiş)", desc: "İngilizce soru havuzu", icon: GraduationCap },
   { href: "/simulasyon", label: "Simülasyon (acil)", desc: "Zaman baskılı acil modu", icon: Zap },

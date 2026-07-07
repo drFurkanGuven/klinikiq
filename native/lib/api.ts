@@ -120,6 +120,8 @@ export interface LeaderboardItem {
   average_score: number;
   total_score: number;
   emergency_correct: number;
+  /** Farmakoloji: quiz tamamlanan harita +5, yalnızca yolak +2 */
+  pharma_points: number;
 }
 
 export interface EmergencyMcqStats {

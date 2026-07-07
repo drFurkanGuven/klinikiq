@@ -43,6 +43,8 @@ function TreeNodeView({
   const isCurrent = currentId === node.id;
   const hasWalker = walkerId === node.id;
 
+  const connectorColor = theme.borderStrong;
+
   return (
     <View style={styles.treeNode}>
       <View
@@ -82,11 +84,11 @@ function TreeNodeView({
       ) : null}
       {node.children.length > 0 ? (
         <View style={styles.treeChildren}>
-          <View style={[styles.treeConnector, { backgroundColor: theme.border }]} />
+          <View style={[styles.treeConnector, { backgroundColor: connectorColor }]} />
           <View style={styles.treeRow}>
             {node.children.map((child) => (
               <View key={child.id} style={styles.treeChildCol}>
-                <View style={[styles.treeConnectorShort, { backgroundColor: theme.border }]} />
+                <View style={[styles.treeConnectorShort, { backgroundColor: connectorColor }]} />
                 <TreeNodeView
                   node={child}
                   revealed={revealed}
@@ -359,10 +361,10 @@ const styles = StyleSheet.create({
   },
   edgeLabel: { fontSize: 9, marginTop: 4, textAlign: "center", maxWidth: 100 },
   treeChildren: { alignItems: "center", marginTop: 10 },
-  treeConnector: { width: 1, height: 12 },
+  treeConnector: { width: 2, height: 14, borderRadius: 1 },
   treeRow: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
   treeChildCol: { alignItems: "center" },
-  treeConnectorShort: { width: 1, height: 10 },
+  treeConnectorShort: { width: 2, height: 12, borderRadius: 1 },
   actions: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
   actionBtn: { flexGrow: 1, minWidth: "45%" },
   watchRow: { flexDirection: "row", alignItems: "center", gap: 8 },

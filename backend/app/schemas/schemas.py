@@ -178,6 +178,7 @@ class LeaderboardItem(BaseModel):
     average_score: float
     total_score: float
     emergency_correct: int = 0  # acil MCQ'dan toplam doğru cevap sayısı
+    pharma_points: int = 0  # farmakoloji ilerlemesi (quiz +5, yolak +2)
 
     class Config:
         from_attributes = True
