@@ -261,7 +261,7 @@ function MapCardInner({
             <Star className="w-3.5 h-3.5" /> {m.high_yield_count} high-yield
           </span>
           <span>{m.quiz_count} quiz</span>
-          {m.vignette_count > 0 && <span>{m.vignette_count} vaka</span>}
+          {progress.pathTreeCompleted && <span>Yolak ✓</span>}
           {progress.quizScorePct != null && (
             <span>Quiz: %{progress.quizScorePct}</span>
           )}

@@ -9,8 +9,8 @@ export interface PharmaMapProgress {
   quizCompleted: boolean;
   /** Son quiz skoru (0–100) */
   quizScorePct: number | null;
-  /** Vignette'lerin tamamlanan id listesi */
-  vignettesDone: string[];
+  /** Yolak yürüyüşü egzersizi tamamlandı */
+  pathTreeCompleted: boolean;
   completedAt: string | null;
 }
 
@@ -37,7 +37,7 @@ function defaultProgress(): PharmaMapProgress {
     visited: false,
     quizCompleted: false,
     quizScorePct: null,
-    vignettesDone: [],
+    pathTreeCompleted: false,
     completedAt: null,
   };
 }
@@ -68,14 +68,16 @@ export function markQuizCompleted(mapId: string, scorePct: number) {
   writeStore(store);
 }
 
-export function markVignetteDone(mapId: string, vignetteId: string) {
+export function markPathTreeCompleted(mapId: string) {
   const store = readStore();
   const cur = store[mapId] ?? defaultProgress();
-  const done = cur.vignettesDone.includes(vignetteId)
-    ? cur.vignettesDone
-    : [...cur.vignettesDone, vignetteId];
-  store[mapId] = { ...cur, visited: true, vignettesDone: done };
+  store[mapId] = { ...cur, visited: true, pathTreeCompleted: true };
   writeStore(store);
+}
+
+/** @deprecated Vignette kaldırıldı — geriye dönük localStorage uyumu */
+export function markVignetteDone(_mapId: string, _vignetteId: string) {
+  /* no-op */
 }
 
 /** Ön koşul haritalar tamamlandı mı? */

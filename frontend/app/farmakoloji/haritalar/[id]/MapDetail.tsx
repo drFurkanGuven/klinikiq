@@ -13,9 +13,9 @@ import {
   type PharmaIntervention,
   type PharmaNodeType,
   type PharmaNode,
-  type PharmaVignette,
 } from "@/lib/api";
-import { markMapVisited, markQuizCompleted, markVignetteDone } from "@/lib/pharmaProgress";
+import { markMapVisited, markQuizCompleted } from "@/lib/pharmaProgress";
+import { PathwayTreeExercise } from "@/components/pharma/PathwayTreeExercise";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Footer from "@/components/Footer";
 import {
@@ -29,7 +29,6 @@ import {
   HelpCircle,
   Info,
   Lightbulb,
-  Stethoscope,
   Zap,
 } from "lucide-react";
 import type { FlowNodeData } from "./MapCanvas";
@@ -374,8 +373,7 @@ export default function MapDetail({ id }: { id: string }) {
               </aside>
             </div>
 
-            {/* Klinik vignette */}
-            <VignetteSection mapId={id} vignettes={map.vignettes ?? []} onFocusNode={focusOnMap} />
+            <PathwayTreeExercise mapId={id} map={map} onFocusNode={focusOnMap} />
 
             {/* Quiz */}
             <QuizSection mapId={id} map={map} onFocusNode={focusOnMap} />
@@ -512,117 +510,6 @@ function NodeDetailPanel({
   );
 }
 
-// ── Klinik vignette ─────────────────────────────────────────────────
-function VignetteSection({
-  mapId,
-  vignettes,
-  onFocusNode,
-}: {
-  mapId: string;
-  vignettes: PharmaVignette[];
-  onFocusNode: (nodeId: string) => void;
-}) {
-  const [idx, setIdx] = useState(0);
-  const [answered, setAnswered] = useState(false);
-  const [selected, setSelected] = useState<number | null>(null);
-  const letters = ["A", "B", "C", "D", "E"];
-
-  if (!vignettes.length) return null;
-
-  const v = vignettes[idx];
-
-  const select = (i: number) => {
-    if (answered) return;
-    setAnswered(true);
-    setSelected(i);
-    markVignetteDone(mapId, v.id);
-  };
-
-  const next = () => {
-    if (idx + 1 >= vignettes.length) {
-      setIdx(0);
-      setAnswered(false);
-      setSelected(null);
-      return;
-    }
-    setIdx((i) => i + 1);
-    setAnswered(false);
-    setSelected(null);
-  };
-
-  return (
-    <section className="mt-10 max-w-2xl">
-      <h2 className="text-lg font-semibold tracking-tight mb-1 flex items-center gap-2">
-        <Stethoscope className="w-5 h-5" /> Klinik vignette
-      </h2>
-      <p className="text-sm mb-5" style={{ color: "var(--text-muted)" }}>
-        Kısa vaka senaryolarıyla mekanizmayı klinik bağlama oturtun.
-      </p>
-
-      <div className="rounded-xl border p-5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-        <p className="text-xs font-medium mb-2" style={{ color: "var(--muted)" }}>
-          Vaka {idx + 1} / {vignettes.length} · {v.title_tr}
-        </p>
-        <p className="text-sm leading-relaxed mb-4 p-3 rounded-lg border" style={{ borderColor: "var(--border)", background: "var(--surface-muted)", color: "var(--text)" }}>
-          {v.scenario_tr}
-        </p>
-        <p className="font-medium mb-3">{v.q_tr}</p>
-        <div className="space-y-2 mb-4">
-          {v.options_tr.map((opt, i) => {
-            let style: React.CSSProperties = { background: "var(--surface-muted)", borderColor: "var(--border)" };
-            if (answered) {
-              if (i === v.answer_idx) style = { background: "var(--success-muted)", borderColor: "var(--success)", color: "var(--success)" };
-              else if (i === selected) style = { background: "var(--destructive-muted)", borderColor: "var(--destructive)", color: "var(--destructive)" };
-              else style = { ...style, opacity: 0.5 };
-            }
-            return (
-              <button
-                key={i}
-                type="button"
-                className="w-full text-left px-4 py-3 rounded-lg border text-sm transition-all flex items-start gap-3 disabled:cursor-default"
-                style={style}
-                onClick={() => select(i)}
-                disabled={answered}
-              >
-                <span className="w-5 h-5 rounded-full border flex items-center justify-center text-xs font-medium shrink-0" style={{ borderColor: "currentColor" }}>
-                  {letters[i]}
-                </span>
-                {opt}
-              </button>
-            );
-          })}
-        </div>
-        {answered && (
-          <div className="p-4 rounded-lg text-sm mb-4 border-l-2" style={{ background: "var(--surface-hover)", borderColor: "var(--foreground)" }}>
-            <p className="font-medium mb-1">Açıklama</p>
-            <p style={{ color: "var(--text-muted)" }}>{v.explanation_tr}</p>
-            {v.node_id && (
-              <button
-                type="button"
-                onClick={() => onFocusNode(v.node_id as string)}
-                className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
-                style={{ borderColor: "var(--border-strong)", color: "var(--foreground)" }}
-              >
-                <Waypoints className="w-3.5 h-3.5" /> Haritada göster
-              </button>
-            )}
-          </div>
-        )}
-        {answered && (
-          <button
-            type="button"
-            onClick={next}
-            className="px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90"
-            style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
-          >
-            {idx + 1 < vignettes.length ? "Sonraki vaka →" : "Başa dön"}
-          </button>
-        )}
-      </div>
-    </section>
-  );
-}
-
 // ── Quiz ──────────────────────────────────────────────────────────────
 function QuizSection({
   mapId,
@@ -679,7 +566,7 @@ function QuizSection({
         <HelpCircle className="w-5 h-5" style={{ color: "var(--primary)" }} /> Mini quiz
       </h2>
       <p className="text-sm mb-5" style={{ color: "var(--text-muted)" }}>
-        Haritadaki mantığı klinik senaryolarla pekiştir.
+        Haritadaki mantığı ölç — klinik ve mekanizma soruları.
       </p>
 
       {!done ? (

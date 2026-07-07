@@ -245,7 +245,7 @@ export function CalisIlerlemeTab() {
                         <span className="truncate">{m.title_tr}</span>
                       </span>
                       <span className="shrink-0 tabular-nums" style={{ color: p.quizCompleted ? "var(--success)" : "var(--text-muted)" }}>
-                        {p.quizCompleted ? `✓ %${p.quizScorePct}` : p.visited ? "Başlandı" : "—"}
+                        {p.quizCompleted ? `✓ %${p.quizScorePct}` : p.pathTreeCompleted ? "Yolak ✓" : p.visited ? "Başlandı" : "—"}
                       </span>
                     </Link>
                   );
