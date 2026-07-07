@@ -757,7 +757,7 @@
         },
         {
           "nodeId": "e_secretion_up",
-          "effect_tr": "Myastenia gravis: nöromüsküler iletim düzelir (Nm hedef)"
+          "effect_tr": "M3 aracılı salivasyon/GI kramp artışı (aşırı kolinerjik etki). Not: Myastenia gravis tedavisindeki asıl fayda iskelet kası nöromüsküler kavşağındaki nikotinik (Nm) reseptör üzerinden olur — bu harita otonom (M/α/β) reseptörleri kapsar, Nm bu haritanın dışındadır."
         }
       ],
       "tr_products_atc": [

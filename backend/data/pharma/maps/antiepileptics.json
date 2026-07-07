@@ -37,7 +37,7 @@
       "label_tr": "GABA-A reseptörü",
       "type": "receptor",
       "high_yield": true,
-      "description_tr": "Valproat GABA sentezini artırır/GABA-T inhibisyonu; barbitürat/benzodiazepin allosterik modülasyon."
+      "description_tr": "Barbitürat/benzodiazepin allosterik modülasyonu ile Cl⁻ kanal açılma frekansı/süresi artar → inhibisyon. (Valproatın GABA'yı artırıcı etkisi GABA-A üzerinden değil, ayrı bir basamak olan GABA-transaminaz inhibisyonu üzerinden gerçekleşir.)"
     },
     {
       "id": "r_gaba_transaminase",
@@ -231,7 +231,7 @@
         },
         {
           "nodeId": "e_seizure_suppress",
-          "effect_tr": "Sıfır dereceli kinetik (enzim indüksiyonu)"
+          "effect_tr": "Sıfır dereceli kinetik (hepatik enzim satürasyonu — dar terapötik aralık, serum düzeyi takibi gerekir)"
         }
       ],
       "tr_products_atc": [
@@ -286,7 +286,7 @@
         },
         {
           "nodeId": "e_sedation",
-          "effect_tr": "Trombositopeni, hepatotoksisite"
+          "effect_tr": "Tremor, sedasyon; ayrıca hepatotoksisite ve trombositopeni açısından LFT/CBC izlemi gerekir"
         }
       ],
       "tr_products_atc": [

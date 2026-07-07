@@ -341,7 +341,7 @@
         "r_mu",
         "r_kappa"
       ],
-      "relation": "antagonist",
+      "relation": "agonist",
       "downstream_effects": [
         {
           "nodeId": "r_mu",

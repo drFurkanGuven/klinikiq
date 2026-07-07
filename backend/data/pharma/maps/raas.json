@@ -442,12 +442,8 @@
           "effect_tr": "Natriürez, diüretik etki"
         },
         {
-          "nodeId": "e_k_loss",
-          "effect_tr": "K⁺ tutulumu → hiperkalemi"
-        },
-        {
           "nodeId": "e_hyperkalemia",
-          "effect_tr": "Potasyum koruyucu diüretik"
+          "effect_tr": "Potasyum koruyucu diüretik; hiperkalemi riski"
         },
         {
           "nodeId": "e_remodel",
@@ -482,7 +478,7 @@
         },
         {
           "nodeId": "e_hyperkalemia",
-          "effect_tr": "Hiperkalemi riski; ACEİ ile kombine EDİLMEZ"
+          "effect_tr": "Anjiyoödem riski (bradikinin birikimi — ACEİ + neprilizin inhibisyonu üst üste biner) → ACEİ ile kombine EDİLMEZ, geçişte ≥36 saat washout gerekir; ayrıca hiperkalemi riski de mevcuttur"
         }
       ],
       "tr_products_atc": [

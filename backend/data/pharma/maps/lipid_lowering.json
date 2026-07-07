@@ -354,7 +354,7 @@
       "downstream_effects": [
         {
           "nodeId": "e_tg_down",
-          "effect_tr": "VLDL sentezi ↓ → TG ↓"
+          "effect_tr": "Adipoz dokuda GPR109A aracılı lipoliz ↓ → hepatik serbest yağ asidi akışı ↓; hepatositte DGAT2 inhibisyonu ile VLDL sentezi ↓ → TG ↓"
         },
         {
           "nodeId": "e_hdl_up",

@@ -30,7 +30,7 @@
       "label_tr": "L-tip Ca²⁺ kanalı (Cav1.2)",
       "type": "receptor",
       "high_yield": true,
-      "description_tr": "SA/AV düğümde yavaş inward Ca²⁺ akımı (faz 0). Sınıf IV (verapamil, diltiazem) ve dihidropiridinler hedefi."
+      "description_tr": "SA/AV düğümde yavaş inward Ca²⁺ akımı (faz 0). Sınıf IV (verapamil, diltiazem) hedefi; dihidropiridinler nodal dokuya görece selektif olmadığı için klinik olarak anlamlı antiaritmik etki göstermez."
     },
     {
       "id": "r_beta1",
@@ -382,7 +382,7 @@
       "targets": [
         "o_av_node"
       ],
-      "relation": "activates",
+      "relation": "inhibits",
       "downstream_effects": [
         {
           "nodeId": "e_arrhythmia_suppress",

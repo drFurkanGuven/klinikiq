@@ -125,10 +125,10 @@
     },
     {
       "id": "e_ohtn",
-      "label_tr": "Otonom hipertansiyon (tiazid)",
+      "label_tr": "Kronik vazodilatasyon (tiazid)",
       "type": "effect",
       "high_yield": false,
-      "description_tr": "Tiazidler damar düz kasında Ca²⁺'yi artırarak antihipertansif etki gösterir (uzun dönem)."
+      "description_tr": "Tiazidler damar düz kasında hücre içi Ca²⁺'yi azaltarak (KCa kanal aracılı hiperpolarizasyon) antihipertansif etki gösterir (uzun dönem)."
     }
   ],
   "edges": [
