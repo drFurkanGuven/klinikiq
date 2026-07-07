@@ -444,55 +444,64 @@
       "source": "o_vessel",
       "target": "e_bp_up",
       "relation": "activates",
-      "effect_tr": "α1 baskın: kan basıncı ↑"
+      "effect_tr": "α1 baskın: kan basıncı ↑",
+      "mediated_by": "r_alpha1"
     },
     {
       "source": "o_vessel",
       "target": "e_bp_down",
       "relation": "activates",
-      "effect_tr": "β2 baskın: kan basıncı ↓"
+      "effect_tr": "β2 baskın: kan basıncı ↓",
+      "mediated_by": "r_beta2"
     },
     {
       "source": "o_heart",
       "target": "e_hr_up",
       "relation": "activates",
-      "effect_tr": "β1 aracılı hız & kontraktilite ↑"
+      "effect_tr": "β1 aracılı hız & kontraktilite ↑",
+      "mediated_by": "r_beta1"
     },
     {
       "source": "o_heart",
       "target": "e_hr_down",
       "relation": "activates",
-      "effect_tr": "M2 aracılı bradikardi"
+      "effect_tr": "M2 aracılı bradikardi",
+      "mediated_by": "r_m2"
     },
     {
       "source": "o_bronchi",
       "target": "e_bronchodil",
       "relation": "activates",
-      "effect_tr": "β2 aracılı bronkodilatasyon"
+      "effect_tr": "β2 aracılı bronkodilatasyon",
+      "mediated_by": "r_beta2"
     },
     {
       "source": "o_bronchi",
       "target": "e_bronchocon",
       "relation": "activates",
-      "effect_tr": "M3 aracılı bronkokonstriksiyon"
+      "effect_tr": "M3 aracılı bronkokonstriksiyon",
+      "mediated_by": "r_m3"
     },
     {
       "source": "o_eye",
       "target": "e_mydriasis",
       "relation": "activates",
-      "effect_tr": "α1 aracılı midriyazis"
+      "effect_tr": "α1 aracılı midriyazis",
+      "mediated_by": "r_alpha1"
     },
     {
       "source": "o_eye",
       "target": "e_miosis",
       "relation": "activates",
-      "effect_tr": "M3 aracılı miyozis"
+      "effect_tr": "M3 aracılı miyozis",
+      "mediated_by": "r_m3"
     },
     {
       "source": "o_glands",
       "target": "e_secretion_up",
       "relation": "activates",
-      "effect_tr": "M3 aracılı sekresyon ↑"
+      "effect_tr": "M3 aracılı sekresyon ↑",
+      "mediated_by": "r_m3"
     }
   ],
   "interventions": [

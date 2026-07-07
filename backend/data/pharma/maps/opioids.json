@@ -196,31 +196,36 @@
       "source": "o_spinal_dh",
       "target": "e_analgesia",
       "relation": "activates",
-      "effect_tr": "Ağrı iletimi ↓"
+      "effect_tr": "Ağrı iletimi ↓",
+      "mediated_by": ["r_mu", "r_kappa"]
     },
     {
       "source": "o_brainstem",
       "target": "e_resp_depression",
       "relation": "activates",
-      "effect_tr": "Solunum sayısı & derinlik ↓"
+      "effect_tr": "Solunum sayısı & derinlik ↓",
+      "mediated_by": "r_mu"
     },
     {
       "source": "o_eye",
       "target": "e_miosis",
       "relation": "activates",
-      "effect_tr": "Pin-point pupil"
+      "effect_tr": "Pin-point pupil",
+      "mediated_by": "r_mu"
     },
     {
       "source": "o_gi",
       "target": "e_constipation",
       "relation": "activates",
-      "effect_tr": "Kronik konstipasyon"
+      "effect_tr": "Kronik konstipasyon",
+      "mediated_by": "r_mu"
     },
     {
       "source": "o_locus",
       "target": "e_euphoria",
       "relation": "activates",
-      "effect_tr": "Bağımlılık potansiyeli"
+      "effect_tr": "Bağımlılık potansiyeli",
+      "mediated_by": "r_mu"
     }
   ],
   "interventions": [

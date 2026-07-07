@@ -1,4 +1,4 @@
-import type { PharmaMap, PharmaNode } from "@/lib/api";
+import type { PharmaMap, PharmaNode, PharmaEdge } from "@/lib/api";
 
 export interface PathTreeNode {
   id: string;
@@ -6,6 +6,8 @@ export interface PathTreeNode {
   edgeLabel?: string;
   children: PathTreeNode[];
 }
+
+type OutEdge = { target: string; effect_tr: string; mediated_by?: string | string[] };
 
 const MAX_DEPTH = 5;
 const MAX_CHILDREN = 3;
@@ -18,6 +20,12 @@ function nodeScore(n: PharmaNode): number {
   if (n.type === "receptor") s += 2;
   if (n.type === "effect") s += 1;
   return s;
+}
+
+function edgeAllowed(edge: OutEdge, pathIds: Set<string>): boolean {
+  if (!edge.mediated_by) return true;
+  const ids = Array.isArray(edge.mediated_by) ? edge.mediated_by : [edge.mediated_by];
+  return ids.some((id) => pathIds.has(id));
 }
 
 function pickRoot(nodes: PharmaNode[], inDegree: Map<string, number>): string | null {
@@ -33,20 +41,23 @@ function pickRoot(nodes: PharmaNode[], inDegree: Map<string, number>): string | 
 }
 
 function buildSubtree(
-  map: PharmaMap,
   nodeId: string,
+  ancestors: Set<string>,
   depth: number,
   visited: Set<string>,
   fillCount: { n: number },
-  outEdges: Map<string, { target: string; effect_tr: string }[]>,
+  outEdges: Map<string, OutEdge[]>,
   nodeById: Map<string, PharmaNode>,
 ): PathTreeNode | null {
   if (depth > MAX_DEPTH || fillCount.n >= MAX_FILL_NODES) return null;
   const node = nodeById.get(nodeId);
   if (!node) return null;
 
+  const pathIds = new Set(ancestors);
+  pathIds.add(nodeId);
+
   const children: PathTreeNode[] = [];
-  const edges = outEdges.get(nodeId) ?? [];
+  const edges = (outEdges.get(nodeId) ?? []).filter((e) => edgeAllowed(e, pathIds));
   const sorted = [...edges].sort((a, b) => {
     const ta = nodeById.get(a.target);
     const tb = nodeById.get(b.target);
@@ -58,7 +69,8 @@ function buildSubtree(
     if (fillCount.n >= MAX_FILL_NODES) break;
     visited.add(e.target);
     fillCount.n += 1;
-    const child = buildSubtree(map, e.target, depth + 1, visited, fillCount, outEdges, nodeById);
+    const nextAncestors = new Set(pathIds);
+    const child = buildSubtree(e.target, nextAncestors, depth + 1, visited, fillCount, outEdges, nodeById);
     if (child) {
       children.push({ ...child, edgeLabel: e.effect_tr });
     } else {
@@ -81,20 +93,31 @@ function buildSubtree(
   };
 }
 
+function indexEdges(edges: PharmaEdge[]): Map<string, OutEdge[]> {
+  const outEdges = new Map<string, OutEdge[]>();
+  for (const e of edges) {
+    const list = outEdges.get(e.source) ?? [];
+    list.push({
+      target: e.target,
+      effect_tr: e.effect_tr,
+      mediated_by: e.mediated_by,
+    });
+    outEdges.set(e.source, list);
+  }
+  return outEdges;
+}
+
 /** Harita kenarlarından hafıza yürüyüşü ağacı üretir. */
 export function buildPathTree(map: PharmaMap): PathTreeNode | null {
   if (!map.nodes.length || !map.edges.length) return null;
 
   const nodeById = new Map(map.nodes.map((n) => [n.id, n]));
   const inDegree = new Map<string, number>();
-  const outEdges = new Map<string, { target: string; effect_tr: string }[]>();
+  const outEdges = indexEdges(map.edges);
 
   for (const n of map.nodes) inDegree.set(n.id, 0);
   for (const e of map.edges) {
     inDegree.set(e.target, (inDegree.get(e.target) ?? 0) + 1);
-    const list = outEdges.get(e.source) ?? [];
-    list.push({ target: e.target, effect_tr: e.effect_tr });
-    outEdges.set(e.source, list);
   }
 
   const rootId = pickRoot(map.nodes, inDegree);
@@ -102,7 +125,7 @@ export function buildPathTree(map: PharmaMap): PathTreeNode | null {
 
   const visited = new Set<string>([rootId]);
   const fillCount = { n: 0 };
-  const tree = buildSubtree(map, rootId, 0, visited, fillCount, outEdges, nodeById);
+  const tree = buildSubtree(rootId, new Set(), 0, visited, fillCount, outEdges, nodeById);
   if (!tree || countNodes(tree) < 3) return null;
   return tree;
 }

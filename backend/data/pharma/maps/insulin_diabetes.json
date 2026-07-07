@@ -218,7 +218,8 @@
       "source": "o_liver",
       "target": "e_hyperglycemia",
       "relation": "activates",
-      "effect_tr": "Kan glukozu ↑"
+      "effect_tr": "Kan glukozu ↑",
+      "mediated_by": "med_glucagon"
     },
     {
       "source": "r_sglt2",
@@ -242,13 +243,15 @@
       "source": "med_insulin",
       "target": "e_hypoglycemia",
       "relation": "activates",
-      "effect_tr": "Aşırı doz / yemek atlama"
+      "effect_tr": "Aşırı doz / yemek atlama",
+      "mediated_by": ["med_insulin", "r_insulin_receptor"]
     },
     {
       "source": "med_insulin",
       "target": "e_dka",
       "relation": "inhibits",
-      "effect_tr": "Yeterli insülin DKA'yı önler"
+      "effect_tr": "Yeterli insülin DKA'yı önler",
+      "mediated_by": "med_insulin"
     }
   ],
   "interventions": [

@@ -203,13 +203,15 @@
       "source": "r_gaba_a",
       "target": "e_seizure_suppress",
       "relation": "activates",
-      "effect_tr": "GABAergic baskılama"
+      "effect_tr": "GABAergic baskılama",
+      "mediated_by": "r_gaba_a"
     },
     {
       "source": "r_nav",
       "target": "e_seizure_suppress",
       "relation": "inhibits",
-      "effect_tr": "Na⁺ kanal stabilizasyonu"
+      "effect_tr": "Na⁺ kanal stabilizasyonu",
+      "mediated_by": "r_nav"
     }
   ],
   "interventions": [

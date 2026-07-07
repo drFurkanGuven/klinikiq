@@ -171,31 +171,36 @@
       "source": "o_cns_cortex",
       "target": "e_anxiolysis",
       "relation": "activates",
-      "effect_tr": "Anksiyoliz"
+      "effect_tr": "Anksiyoliz",
+      "mediated_by": "r_gaba_a"
     },
     {
       "source": "o_cns_reticular",
       "target": "e_sedation",
       "relation": "activates",
-      "effect_tr": "Hipno-sedasyon"
+      "effect_tr": "Hipno-sedasyon",
+      "mediated_by": "r_gaba_a"
     },
     {
       "source": "o_cns_cortex",
       "target": "e_anticonvulsant",
       "relation": "activates",
-      "effect_tr": "Seizure threshold ↑"
+      "effect_tr": "Seizure threshold ↑",
+      "mediated_by": "r_gaba_a"
     },
     {
       "source": "o_cns_reticular",
       "target": "e_amnesia",
       "relation": "activates",
-      "effect_tr": "Anterograd amnezi"
+      "effect_tr": "Anterograd amnezi",
+      "mediated_by": "r_gaba_a"
     },
     {
       "source": "o_brainstem_resp",
       "target": "e_resp_depression",
       "relation": "activates",
-      "effect_tr": "Overdoz riski"
+      "effect_tr": "Overdoz riski",
+      "mediated_by": "r_gaba_a"
     }
   ],
   "interventions": [

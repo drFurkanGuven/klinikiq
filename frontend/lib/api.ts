@@ -470,6 +470,8 @@ export interface PharmaEdge {
   target: string;
   relation: PharmaRelation;
   effect_tr: string;
+  /** Yolak ağacında yalnızca bu düğüm yol üzerindeyken takip edilir */
+  mediated_by?: string | string[];
 }
 
 export interface PharmaDownstreamEffect {

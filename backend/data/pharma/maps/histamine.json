@@ -203,25 +203,29 @@
       "source": "o_vessel",
       "target": "e_urticaria",
       "relation": "activates",
-      "effect_tr": "Ürtiker plakları"
+      "effect_tr": "Ürtiker plakları",
+      "mediated_by": "r_h1"
     },
     {
       "source": "o_bronchi",
       "target": "e_bronchospasm",
       "relation": "activates",
-      "effect_tr": "H1 aracılı bronş spazmı"
+      "effect_tr": "H1 aracılı bronş spazmı",
+      "mediated_by": "r_h1"
     },
     {
       "source": "o_parietal",
       "target": "e_acid_down",
       "relation": "activates",
-      "effect_tr": "Asit sekresyonu (H2/PPI ile ↓)"
+      "effect_tr": "Asit sekresyonu (H2/PPI ile ↓)",
+      "mediated_by": ["r_h2", "med_ach_gi"]
     },
     {
       "source": "o_chemoreceptor",
       "target": "e_antiemetic",
       "relation": "activates",
-      "effect_tr": "5-HT3 antagonist hedefi"
+      "effect_tr": "5-HT3 antagonist hedefi",
+      "mediated_by": "r_5ht3"
     }
   ],
   "interventions": [

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field, model_validator
-from typing import Optional, List, Any, Dict, Literal
+from typing import Optional, List, Any, Dict, Literal, Union
 from datetime import datetime
 from enum import Enum
 
@@ -378,6 +378,8 @@ class PharmaEdge(BaseModel):
     target: str
     relation: Literal["activates", "inhibits", "agonist", "antagonist"]
     effect_tr: str = ""
+    # Yolak ağacı: bu kenar yalnızca belirtilen reseptör/mediator yolundayken gösterilir
+    mediated_by: Optional[Union[str, List[str]]] = None
 
 
 class PharmaDownstreamEffect(BaseModel):

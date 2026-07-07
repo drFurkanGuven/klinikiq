@@ -137,31 +137,36 @@
       "source": "o_vascular_smooth",
       "target": "e_vasodilation",
       "relation": "inhibits",
-      "effect_tr": "CCB → gevşeme"
+      "effect_tr": "CCB → gevşeme",
+      "mediated_by": "r_cav_l_vascular"
     },
     {
       "source": "o_coronary",
       "target": "e_antianginal",
       "relation": "activates",
-      "effect_tr": "Koroner akım ↑"
+      "effect_tr": "Koroner akım ↑",
+      "mediated_by": "r_cav_l_vascular"
     },
     {
       "source": "o_sa_av",
       "target": "e_bradycardia",
       "relation": "activates",
-      "effect_tr": "Non-DHP baskılama"
+      "effect_tr": "Non-DHP baskılama",
+      "mediated_by": "r_cav_l_cardiac"
     },
     {
       "source": "e_vasodilation",
       "target": "e_reflex_tach",
       "relation": "activates",
-      "effect_tr": "Baroreseptor refleks"
+      "effect_tr": "Baroreseptor refleks",
+      "mediated_by": "r_cav_l_vascular"
     },
     {
       "source": "e_vasodilation",
       "target": "e_edema",
       "relation": "activates",
-      "effect_tr": "Precapiller vazodilatasyon"
+      "effect_tr": "Precapiller vazodilatasyon",
+      "mediated_by": "r_cav_l_vascular"
     }
   ],
   "interventions": [

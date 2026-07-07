@@ -170,31 +170,36 @@
       "source": "o_sa_node",
       "target": "e_hr_down",
       "relation": "activates",
-      "effect_tr": "Bradikardi (β/Ca blok)"
+      "effect_tr": "Bradikardi (β/Ca blok)",
+      "mediated_by": ["r_beta1", "r_cav12"]
     },
     {
       "source": "o_av_node",
       "target": "e_pr_prolong",
       "relation": "activates",
-      "effect_tr": "PR uzaması"
+      "effect_tr": "PR uzaması",
+      "mediated_by": ["r_cav12", "r_beta1", "med_ach"]
     },
     {
       "source": "o_ventricle",
       "target": "e_qrs_wide",
       "relation": "activates",
-      "effect_tr": "Na⁺ kanal bloğu"
+      "effect_tr": "Na⁺ kanal bloğu",
+      "mediated_by": "r_nav15"
     },
     {
       "source": "o_repol",
       "target": "e_qt_prolong",
       "relation": "activates",
-      "effect_tr": "K⁺ kanal bloğu"
+      "effect_tr": "K⁺ kanal bloğu",
+      "mediated_by": "r_herg"
     },
     {
       "source": "r_na_k_atpase",
       "target": "e_inotropy_up",
       "relation": "activates",
-      "effect_tr": "Digoksin inotropi"
+      "effect_tr": "Digoksin inotropi",
+      "mediated_by": "r_na_k_atpase"
     }
   ],
   "interventions": [

@@ -190,19 +190,22 @@
       "source": "e_diuresis",
       "target": "e_hypokalemia",
       "relation": "activates",
-      "effect_tr": "Distal Na⁺ delivery → K⁺ kaybı"
+      "effect_tr": "Distal Na⁺ delivery → K⁺ kaybı",
+      "mediated_by": ["t_nkcc2", "t_ncc"]
     },
     {
       "source": "e_diuresis",
       "target": "e_metabolic_alkalosis",
       "relation": "activates",
-      "effect_tr": "Cl⁻ kaybı + hacim ↓"
+      "effect_tr": "Cl⁻ kaybı + hacim ↓",
+      "mediated_by": ["t_nkcc2", "t_ncc"]
     },
     {
       "source": "r_mr",
       "target": "e_hypokalemia",
       "relation": "activates",
-      "effect_tr": "Aldosteron K⁺ sekresyonu ↑"
+      "effect_tr": "Aldosteron K⁺ sekresyonu ↑",
+      "mediated_by": "r_mr"
     }
   ],
   "interventions": [
