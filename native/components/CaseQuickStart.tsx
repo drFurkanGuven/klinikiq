@@ -317,7 +317,7 @@ export function CaseQuickStart({ title = "Çözülmemiş vaka" }: Props) {
               <Text
                 style={[
                   styles.diffChipTxt,
-                  { color: on ? "#fff" : theme.text },
+                  { color: on ? theme.accentForeground : theme.text },
                 ]}
               >
                 {d.label}
@@ -333,15 +333,21 @@ export function CaseQuickStart({ title = "Çözülmemiş vaka" }: Props) {
           disabled={randomLoading}
           style={[
             styles.btnPrimary,
-            { backgroundColor: theme.accent, opacity: randomLoading ? 0.7 : 1 },
+            {
+              backgroundColor: theme.accent,
+              opacity: randomLoading ? 0.7 : 1,
+              borderRadius: theme.radiusLg,
+            },
           ]}
         >
           {randomLoading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={theme.accentForeground} />
           ) : (
             <>
-              <Dices size={18} color="#fff" />
-              <Text style={styles.btnPrimaryTxt}>Rastgele başlat</Text>
+              <Dices size={18} color={theme.accentForeground} />
+              <Text style={[styles.btnPrimaryTxt, { color: theme.accentForeground }]}>
+                Rastgele başlat
+              </Text>
             </>
           )}
         </Pressable>
@@ -351,17 +357,18 @@ export function CaseQuickStart({ title = "Çözülmemiş vaka" }: Props) {
           style={[
             styles.btnSecondary,
             {
-              borderColor: theme.accent,
+              borderColor: theme.border,
               opacity: recLoading ? 0.7 : 1,
+              borderRadius: theme.radiusLg,
             },
           ]}
         >
           {recLoading ? (
-            <ActivityIndicator color={theme.accent} />
+            <ActivityIndicator color={theme.foreground} />
           ) : (
             <>
-              <Sparkles size={18} color={theme.accent} />
-              <Text style={[styles.btnSecondaryTxt, { color: theme.accent }]}>
+              <Sparkles size={18} color={theme.foreground} />
+              <Text style={[styles.btnSecondaryTxt, { color: theme.text }]}>
                 Sana özel öner
               </Text>
             </>
@@ -449,7 +456,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   btnPrimaryTxt: {
-    color: "#fff",
     fontFamily: fontBold(),
     fontSize: 15,
   },
@@ -460,7 +466,7 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 12,
     borderRadius: 12,
-    borderWidth: 2,
+    borderWidth: 1,
   },
   btnSecondaryTxt: {
     fontFamily: fontBold(),

@@ -3,7 +3,6 @@ import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Linking,
@@ -12,15 +11,22 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
+import { Input } from "../components/ui/Input";
 import { authApi, usersApi } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useTheme } from "../lib/theme";
+import {
+  DELETE_ACCOUNT_URL,
+  PRIVACY_URL,
+  SUPPORT_URL,
+  TERMS_URL,
+  WEB_ORIGIN,
+} from "../lib/urls";
 
 function fontBold() {
   return Platform.select({
@@ -34,13 +40,6 @@ function fontReg() {
     ios: "Inter_400Regular",
     android: "Inter_400Regular",
     default: "Inter_400Regular",
-  });
-}
-function fontSemi() {
-  return Platform.select({
-    ios: "Inter_600SemiBold",
-    android: "Inter_600SemiBold",
-    default: "Inter_600SemiBold",
   });
 }
 
@@ -116,6 +115,16 @@ export default function AyarlarScreen() {
     }
   }, [curPw, newPw, newPw2]);
 
+  const legalLink = (label: string, url: string) => (
+    <Pressable
+      key={label}
+      onPress={() => void Linking.openURL(url)}
+      style={styles.legalHit}
+    >
+      <Text style={[styles.legalText, { color: theme.textMuted }]}>{label}</Text>
+    </Pressable>
+  );
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.bg }]} edges={["top"]}>
       <KeyboardAvoidingView
@@ -127,7 +136,7 @@ export default function AyarlarScreen() {
             onPress={() => router.back()}
             style={({ pressed }) => [styles.backBtn, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <ArrowLeft size={22} color={theme.text} />
+            <ArrowLeft size={22} color={theme.foreground} />
           </Pressable>
           <Text style={[styles.title, { color: theme.text }]}>Hesap Ayarları</Text>
           <View style={{ width: 40 }} />
@@ -141,56 +150,16 @@ export default function AyarlarScreen() {
             Profil bilgilerin liderlik tablosu ve raporlarda görünür.
           </Text>
 
-          <Card style={[styles.card, { borderColor: theme.border }]}>
+          <Card style={styles.card}>
             <Text style={[styles.cardTitle, { color: theme.text }]}>Profil</Text>
-            <Text style={[styles.label, { color: theme.textMuted }]}>Ad Soyad</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  color: theme.text,
-                  borderColor: theme.border,
-                  backgroundColor: theme.surface,
-                  fontFamily: fontReg(),
-                },
-              ]}
-              value={name}
-              onChangeText={setName}
-              placeholder="Adınız"
-              placeholderTextColor={theme.textMuted}
-            />
-            <Text style={[styles.label, { color: theme.textMuted }]}>Okul</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  color: theme.text,
-                  borderColor: theme.border,
-                  backgroundColor: theme.surface,
-                  fontFamily: fontReg(),
-                },
-              ]}
-              value={school}
-              onChangeText={setSchool}
-              placeholder="Üniversite"
-              placeholderTextColor={theme.textMuted}
-            />
-            <Text style={[styles.label, { color: theme.textMuted }]}>Sınıf (yıl)</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  color: theme.text,
-                  borderColor: theme.border,
-                  backgroundColor: theme.surface,
-                  fontFamily: fontReg(),
-                },
-              ]}
+            <Input label="Ad Soyad" value={name} onChangeText={setName} placeholder="Adınız" />
+            <Input label="Okul" value={school} onChangeText={setSchool} placeholder="Üniversite" />
+            <Input
+              label="Sınıf (yıl)"
               value={year}
               onChangeText={setYear}
-              placeholder="örn. 6"
               keyboardType="number-pad"
-              placeholderTextColor={theme.textMuted}
+              placeholder="örn. 6"
             />
             <Text style={[styles.email, { color: theme.textMuted }]}>
               E-posta: {user?.email ?? "—"} (değiştirilemez)
@@ -198,83 +167,64 @@ export default function AyarlarScreen() {
             <Button
               label={saving ? "Kaydediliyor…" : "Profili Kaydet"}
               onPress={() => void saveProfile()}
-              disabled={saving}
+              loading={saving}
             />
           </Card>
 
-          <Card style={[styles.card, { borderColor: theme.border }]}>
+          <Card style={styles.card}>
             <Text style={[styles.cardTitle, { color: theme.text }]}>Şifre</Text>
-            <Text style={[styles.label, { color: theme.textMuted }]}>Mevcut şifre</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  color: theme.text,
-                  borderColor: theme.border,
-                  backgroundColor: theme.surface,
-                  fontFamily: fontReg(),
-                },
-              ]}
+            <Input
+              label="Mevcut şifre"
               value={curPw}
               onChangeText={setCurPw}
               secureTextEntry
               placeholder="••••••"
-              placeholderTextColor={theme.textMuted}
             />
-            <Text style={[styles.label, { color: theme.textMuted }]}>Yeni şifre</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  color: theme.text,
-                  borderColor: theme.border,
-                  backgroundColor: theme.surface,
-                  fontFamily: fontReg(),
-                },
-              ]}
+            <Input
+              label="Yeni şifre"
               value={newPw}
               onChangeText={setNewPw}
               secureTextEntry
               placeholder="En az 6 karakter"
-              placeholderTextColor={theme.textMuted}
             />
-            <Text style={[styles.label, { color: theme.textMuted }]}>Yeni şifre tekrar</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  color: theme.text,
-                  borderColor: theme.border,
-                  backgroundColor: theme.surface,
-                  fontFamily: fontReg(),
-                },
-              ]}
+            <Input
+              label="Yeni şifre tekrar"
               value={newPw2}
               onChangeText={setNewPw2}
               secureTextEntry
               placeholder="Tekrar"
-              placeholderTextColor={theme.textMuted}
             />
-            {pwSaving ? (
-              <ActivityIndicator color={theme.accent} style={{ marginTop: 8 }} />
-            ) : (
-              <Button
-                variant="outline"
-                label="Şifreyi Güncelle"
-                onPress={() => void changePassword()}
-              />
-            )}
+            <Button
+              variant="outline"
+              label="Şifreyi Güncelle"
+              onPress={() => void changePassword()}
+              loading={pwSaving}
+            />
           </Card>
 
-          <Pressable
-            accessibilityRole="link"
-            onPress={() => void Linking.openURL("https://klinikiq.furkanguven.space/privacy")}
-            style={styles.privacyHit}
-          >
-            <Text style={[styles.privacyText, { color: theme.accent }]}>
-              Gizlilik Politikası
-            </Text>
-          </Pressable>
+          {user?.is_admin ? (
+            <Card style={styles.card}>
+              <Text style={[styles.cardTitle, { color: theme.text }]}>Yönetim</Text>
+              <Button
+                variant="outline"
+                label="Admin paneli"
+                onPress={() =>
+                  router.push({ pathname: "/web", params: { path: "/admin" } })
+                }
+              />
+            </Card>
+          ) : null}
+
+          <View style={styles.legalRow}>
+            {legalLink("Gizlilik", PRIVACY_URL)}
+            {legalLink("Koşullar", TERMS_URL)}
+            {legalLink("Destek", SUPPORT_URL)}
+            {legalLink("Hesap sil", DELETE_ACCOUNT_URL)}
+          </View>
+
+          <Text style={[styles.webHint, { color: theme.textMuted }]}>
+            Web: {WEB_ORIGIN}
+          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -296,30 +246,30 @@ const styles = StyleSheet.create({
   title: { fontSize: 17, fontFamily: fontBold() },
   scroll: { padding: 16, paddingBottom: 40 },
   hint: { fontSize: 13, fontFamily: fontReg(), marginBottom: 16 },
-  card: { padding: 16, marginBottom: 16, borderWidth: 1, borderRadius: 16 },
+  card: { marginBottom: 16 },
   cardTitle: {
     fontSize: 17,
     fontFamily: fontBold(),
-    marginBottom: 12,
+    marginBottom: 4,
   },
-  label: { fontSize: 12, fontFamily: fontSemi(), marginBottom: 6, marginTop: 8 },
-  input: {
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-  },
-  email: { fontSize: 13, fontFamily: fontReg(), marginTop: 12, marginBottom: 12 },
-  privacyHit: {
-    alignSelf: "center",
-    minHeight: 44,
+  email: { fontSize: 13, fontFamily: fontReg(), marginBottom: 12 },
+  legalRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "center",
+    gap: 12,
     marginTop: 8,
   },
-  privacyText: {
-    fontSize: 14,
-    fontFamily: fontSemi(),
+  legalHit: { minHeight: 36, justifyContent: "center" },
+  legalText: {
+    fontSize: 12,
     textDecorationLine: "underline",
+    fontFamily: fontReg(),
+  },
+  webHint: {
+    textAlign: "center",
+    fontSize: 11,
+    marginTop: 16,
+    fontFamily: fontReg(),
   },
 });

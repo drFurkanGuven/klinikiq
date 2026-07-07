@@ -1,10 +1,5 @@
 import { Tabs } from "expo-router";
-import {
-  Activity,
-  BookOpen,
-  FlaskConical,
-  User,
-} from "lucide-react-native";
+import { BookOpen, GraduationCap, Stethoscope } from "lucide-react-native";
 import { Platform, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../lib/theme";
@@ -24,7 +19,7 @@ export default function TabsLayout() {
           paddingBottom: Math.max(insets.bottom, 8),
           height: 56 + Math.max(insets.bottom, 8),
         },
-        tabBarActiveTintColor: theme.accent,
+        tabBarActiveTintColor: theme.foreground,
         tabBarInactiveTintColor: theme.textMuted,
         tabBarLabelStyle: styles.tabLabel,
         tabBarIconStyle: { marginBottom: -2 },
@@ -39,31 +34,22 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="simulasyon"
+        name="vaka"
         options={{
-          title: "Simülasyon",
-          tabBarIcon: ({ color }) => <Activity size={22} color={color} />,
+          title: "Vaka",
+          tabBarIcon: ({ color }) => <Stethoscope size={22} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="farmakoloji"
+        name="ogren"
         options={{
-          title: "Farmakoloji",
-          tabBarIcon: ({ color }) => <FlaskConical size={22} color={color} />,
+          title: "Öğren",
+          tabBarIcon: ({ color }) => <GraduationCap size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="acil"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="profil"
-        options={{
-          title: "Profil",
-          tabBarIcon: ({ color }) => <User size={22} color={color} />,
-        }}
+        options={{ href: null }}
       />
     </Tabs>
   );

@@ -74,6 +74,7 @@ class User(Base):
     mcq_review_logs = relationship("McqReviewLog", back_populates="user")
     study_settings = relationship("UserStudySettings", back_populates="user", uselist=False)
     study_streak = relationship("UserStudyStreak", back_populates="user", uselist=False)
+    pharma_map_progress = relationship("PharmaMapProgress", back_populates="user")
 
 
 class Case(Base):
@@ -393,3 +394,24 @@ class Annotation(Base):
     label = Column(String, nullable=True)
     note = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), default=now_utc)
+
+
+class PharmaMapProgress(Base):
+    """Kullanıcı başına farmakoloji harita ilerlemesi (web + native senkron)."""
+    __tablename__ = "pharma_map_progress"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    map_id = Column(String, nullable=False, index=True)
+    visited = Column(Boolean, default=False, nullable=False)
+    quiz_completed = Column(Boolean, default=False, nullable=False)
+    quiz_score_pct = Column(Float, nullable=True)
+    path_tree_completed = Column(Boolean, default=False, nullable=False)
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+    updated_at = Column(DateTime(timezone=True), default=now_utc, onupdate=now_utc)
+
+    user = relationship("User", back_populates="pharma_map_progress")
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "map_id", name="uq_pharma_map_progress"),
+    )

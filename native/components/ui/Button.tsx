@@ -1,5 +1,4 @@
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Text } from "react-native";
 import { useTheme } from "../../lib/theme";
@@ -9,9 +8,9 @@ type Props = {
   onPress: () => void;
   loading?: boolean;
   variant?: "primary" | "outline" | "ghost";
-  /** outline: hata rengi kenarlık ve metin */
   dangerOutline?: boolean;
   disabled?: boolean;
+  size?: "md" | "lg";
 };
 
 export function Button({
@@ -21,9 +20,11 @@ export function Button({
   variant = "primary",
   dangerOutline,
   disabled,
+  size = "md",
 }: Props) {
   const theme = useTheme();
-  const outlineColor = dangerOutline ? theme.error : theme.accent;
+  const outlineColor = dangerOutline ? theme.destructive : theme.foreground;
+  const isLg = size === "lg";
 
   const handlePress = () => {
     if (disabled || loading) return;
@@ -38,23 +39,29 @@ export function Button({
         onPress={handlePress}
         disabled={disabled || loading}
         style={({ pressed }) => [
-          styles.pressBase,
+          styles.primary,
+          isLg && styles.primaryLg,
+          {
+            backgroundColor: theme.accent,
+            borderRadius: theme.radiusLg,
+          },
           pressed && styles.pressed,
           (disabled || loading) && styles.disabled,
         ]}
       >
-        <LinearGradient
-          colors={[theme.gradient[0], theme.gradient[1]]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradient}
-        >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.primaryLabel}>{label}</Text>
-          )}
-        </LinearGradient>
+        {loading ? (
+          <ActivityIndicator color={theme.accentForeground} />
+        ) : (
+          <Text
+            style={[
+              styles.primaryLabel,
+              isLg && styles.primaryLabelLg,
+              { color: theme.accentForeground },
+            ]}
+          >
+            {label}
+          </Text>
+        )}
       </Pressable>
     );
   }
@@ -66,10 +73,11 @@ export function Button({
         onPress={handlePress}
         disabled={disabled || loading}
         style={({ pressed }) => [
-          styles.outlineWrap,
+          styles.outline,
+          isLg && styles.outlineLg,
           {
             borderColor: outlineColor,
-            backgroundColor: "transparent",
+            borderRadius: theme.radiusLg,
           },
           pressed && styles.pressed,
           (disabled || loading) && styles.disabled,
@@ -78,9 +86,7 @@ export function Button({
         {loading ? (
           <ActivityIndicator color={outlineColor} />
         ) : (
-          <Text style={[styles.outlineLabel, { color: outlineColor }]}>
-            {label}
-          </Text>
+          <Text style={[styles.outlineLabel, { color: outlineColor }]}>{label}</Text>
         )}
       </Pressable>
     );
@@ -92,63 +98,66 @@ export function Button({
       onPress={handlePress}
       disabled={disabled || loading}
       style={({ pressed }) => [
-        styles.ghostWrap,
+        styles.ghost,
         pressed && styles.pressed,
         (disabled || loading) && styles.disabled,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={theme.accent} />
+        <ActivityIndicator color={theme.foreground} />
       ) : (
-        <Text style={[styles.ghostLabel, { color: theme.accent }]}>{label}</Text>
+        <Text style={[styles.ghostLabel, { color: theme.foreground }]}>{label}</Text>
       )}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  pressBase: {
+  primary: {
     width: "100%",
     minHeight: 44,
-    borderRadius: 14,
-    overflow: "hidden",
-  },
-  gradient: {
-    minHeight: 44,
-    paddingVertical: 15,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 14,
+  },
+  primaryLg: {
+    minHeight: 52,
+    paddingVertical: 16,
   },
   primaryLabel: {
     fontFamily: Platform.select({
-      ios: "Inter_700Bold",
-      android: "Inter_700Bold",
-      default: "Inter_700Bold",
+      ios: "Inter_600SemiBold",
+      android: "Inter_600SemiBold",
+      default: "Inter_600SemiBold",
     }),
     fontSize: 15,
-    color: "#FFFFFF",
   },
-  outlineWrap: {
+  primaryLabelLg: {
+    fontSize: 16,
+  },
+  outline: {
     width: "100%",
     minHeight: 44,
-    borderRadius: 14,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 15,
+    paddingVertical: 12,
     paddingHorizontal: 16,
+  },
+  outlineLg: {
+    minHeight: 52,
+    paddingVertical: 16,
   },
   outlineLabel: {
     fontFamily: Platform.select({
-      ios: "Inter_700Bold",
-      android: "Inter_700Bold",
-      default: "Inter_700Bold",
+      ios: "Inter_600SemiBold",
+      android: "Inter_600SemiBold",
+      default: "Inter_600SemiBold",
     }),
     fontSize: 15,
   },
-  ghostWrap: {
+  ghost: {
     minHeight: 44,
     paddingVertical: 12,
     paddingHorizontal: 8,
@@ -167,6 +176,6 @@ const styles = StyleSheet.create({
     opacity: 0.88,
   },
   disabled: {
-    opacity: 0.55,
+    opacity: 0.45,
   },
 });

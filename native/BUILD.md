@@ -1,65 +1,70 @@
-# KlinikIQ Native — EAS Build
+# KlinikIQ Native — EAS Build (iOS öncelikli)
 
 ## Ön koşullar
 
 1. [Expo EAS CLI](https://docs.expo.dev/build/setup/): `npm i -g eas-cli`
 2. Expo hesabı: `eas login`
-3. Proje bağlantısı: `cd native && eas init` (app.json içindeki `extra.eas.projectId` güncellenir)
+3. Proje bağlı: `app.json` → `extra.eas.projectId` (mevcut)
 
 ## Ortam değişkenleri
 
 | Değişken | Açıklama |
 |----------|----------|
 | `EXPO_PUBLIC_API_URL` | API base URL (varsayılan: `https://klinikiq.furkanguven.space/api`) |
+| `EXPO_PUBLIC_WEB_URL` | WebView / yasal linkler için frontend origin |
 
-Production build'de farklı API kullanmak için `eas.json` production profilindeki `env` değerini güncelleyin veya EAS Secrets kullanın:
+Production'da farklı ortam için `eas.json` production profilindeki `env` değerlerini güncelleyin veya EAS Secrets kullanın.
 
-```bash
-eas secret:create --name EXPO_PUBLIC_API_URL --value https://klinikiq.furkanguven.space/api --scope project
-```
-
-## Build komutları
+## iOS TestFlight
 
 ```bash
 cd native
 
-# iOS + Android production (store)
-eas build --platform all --profile production
-
-# Sadece iOS
+# Production IPA
 eas build --platform ios --profile production
 
-# Sadece Android
-eas build --platform android --profile production
-
-# Internal test (preview)
-eas build --platform all --profile preview
+# App Store Connect'e gönder (submit credentials doldurulmalı)
+eas submit --platform ios --profile production
 ```
 
-## Lokal native klasör (debug)
+`eas.json` → `submit.production.ios` alanlarını doldurun:
+
+- `appleId` — Apple ID e-postası
+- `ascAppId` — App Store Connect uygulama ID
+- `appleTeamId` — Developer Team ID
+
+## Lokal iOS geliştirme
 
 ```bash
 cd native
-npx expo prebuild --clean
+npm install
+npx expo start --ios
+# veya native modül testi:
+npx expo prebuild --platform ios
 npx expo run:ios
-npx expo run:android
 ```
 
-`android/` ve `ios/` gitignore'da; commit edilmez.
+`ios/` gitignore'da; commit edilmez.
 
 ## Sürüm
 
-- `app.json` → `expo.version` (kullanıcıya görünen, örn. 1.3.2)
-- iOS → `expo.ios.buildNumber`
-- Android → `expo.android.versionCode`
+Her TestFlight yüklemesinde artırın:
 
-Her store gönderiminde bu üç değeri artırın.
+- `app.json` → `expo.version` (örn. 1.3.2)
+- `app.json` → `expo.ios.buildNumber` (örn. 9)
 
-## Store submit
+## Store varlıkları
 
-```bash
-eas submit --platform ios --profile production
-eas submit --platform android --profile production
-```
+Gönderim öncesi kontrol:
 
-Submit profilindeki placeholder alanları (`appleId`, `ascAppId`, vb.) doldurun.
+- [ ] `assets/icon.png` — gerçek KlinikIQ ikonu (placeholder değil)
+- [ ] `assets/splash-icon.png` — splash görseli
+- [ ] `splash.backgroundColor` — `#000000` (monokrom)
+
+## App Review
+
+- Reviewer hesabı: `backend/seed_reviewer.py`
+- Review notları: `APP_STORE_REVIEW.md`
+- Smoke test: `SMOKE_TEST.md`
+
+Android build/submit bu aşamada ertelendi; `eas.json` içinde Android submit profili kaldırıldı.

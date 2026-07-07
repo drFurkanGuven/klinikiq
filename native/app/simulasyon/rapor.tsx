@@ -251,7 +251,7 @@ export default function RaporScreen() {
         {/* Yeni Vaka */}
         <Pressable
           style={[styles.newCaseBtn, { backgroundColor: theme.accent }]}
-          onPress={() => router.replace("/(tabs)/simulasyon")}
+          onPress={() => router.replace("/(tabs)/vaka")}
         >
           <Text style={[styles.newCaseBtnText, { fontFamily: fontBold() }]}>
             Yeni Vaka Başlat

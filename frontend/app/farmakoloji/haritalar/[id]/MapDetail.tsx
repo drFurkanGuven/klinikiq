@@ -14,7 +14,7 @@ import {
   type PharmaNodeType,
   type PharmaNode,
 } from "@/lib/api";
-import { markMapVisited, markQuizCompleted } from "@/lib/pharmaProgress";
+import { markMapVisited, markQuizCompleted, ensurePharmaProgressHydrated } from "@/lib/pharmaProgress";
 import { PathwayTreeExercise } from "@/components/pharma/PathwayTreeExercise";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Footer from "@/components/Footer";
@@ -49,7 +49,6 @@ const COL_X: Record<PharmaNodeType, number> = {
   effect: 750,
   drug_class: 0,
 };
-const COL_ORDER: PharmaNodeType[] = ["mediator", "receptor", "organ", "effect"];
 const ROW_H = 84;
 
 const TYPE_LABEL: Record<PharmaNodeType, string> = {
@@ -94,6 +93,7 @@ export default function MapDetail({ id }: { id: string }) {
     (async () => {
       setLoading(true);
       try {
+        await ensurePharmaProgressHydrated();
         const res = await pharmaApi.getMap(id);
         setMap(res.data);
         markMapVisited(id);

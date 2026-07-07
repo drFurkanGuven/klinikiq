@@ -3,6 +3,7 @@ import { AlertCircle } from "lucide-react-native";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -11,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AuthHeader } from "../../components/auth/AuthHeader";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
@@ -23,6 +25,12 @@ import {
   useResponsiveLayout,
 } from "../../lib/responsive";
 import { useTheme } from "../../lib/theme";
+import {
+  DELETE_ACCOUNT_URL,
+  PRIVACY_URL,
+  SUPPORT_URL,
+  TERMS_URL,
+} from "../../lib/urls";
 
 const YEARS = ["1", "2", "3", "4", "5", "6"];
 
@@ -74,6 +82,16 @@ export default function RegisterScreen() {
     }
   };
 
+  const legalLink = (label: string, url: string) => (
+    <Pressable
+      key={label}
+      onPress={() => void Linking.openURL(url)}
+      style={styles.legalHit}
+    >
+      <Text style={[styles.legalText, { color: theme.textMuted }]}>{label}</Text>
+    </Pressable>
+  );
+
   return (
     <KeyboardAvoidingView
       style={[styles.flex, { backgroundColor: theme.bg }]}
@@ -97,98 +115,115 @@ export default function RegisterScreen() {
             isTablet && { maxWidth: authMaxWidth, alignSelf: "center", width: "100%" },
           ]}
         >
-          <View style={styles.header}>
-            <Text style={[styles.brand, { color: theme.text }]}>KlinikIQ</Text>
-            <Text style={[styles.sub, { color: theme.textMuted }]}>
-              Yeni hesap oluştur
-            </Text>
-          </View>
+          <AuthHeader
+            title="Hesap oluştur"
+            subtitle="Ücretsiz başla — vaka, MCQ ve öğrenme araçları"
+          />
 
           {error ? (
             <Card
               style={[
                 styles.errCard,
                 {
-                  borderColor: theme.error,
-                  backgroundColor: `${theme.error}18`,
+                  borderColor: theme.destructive,
+                  backgroundColor: theme.destructiveMuted,
                 },
               ]}
             >
               <View style={styles.errRow}>
-                <AlertCircle size={20} color={theme.error} />
-                <Text style={[styles.errText, { color: theme.error }]}>{error}</Text>
+                <AlertCircle size={18} color={theme.destructive} />
+                <Text style={[styles.errText, { color: theme.destructive }]}>
+                  {error}
+                </Text>
               </View>
             </Card>
           ) : null}
 
-          <Input
-            label="Ad Soyad"
-            value={name}
-            onChangeText={setName}
-            autoCapitalize="words"
-            editable={!loading}
-          />
-          <Input
-            label="E-posta"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            editable={!loading}
-          />
-          <Input
-            label="Şifre"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            editable={!loading}
-          />
-          <Input
-            label="Okul (isteğe bağlı)"
-            value={school}
-            onChangeText={setSchool}
-            editable={!loading}
-          />
+          <Card>
+            <Input
+              label="Ad Soyad"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+              editable={!loading}
+            />
+            <Input
+              label="E-posta"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              editable={!loading}
+            />
+            <Input
+              label="Şifre"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              editable={!loading}
+              hint="En az 6 karakter"
+            />
+            <Input
+              label="Okul (isteğe bağlı)"
+              value={school}
+              onChangeText={setSchool}
+              editable={!loading}
+            />
 
-          <Text style={[styles.yearLabel, { color: theme.textMuted }]}>Sınıf (isteğe bağlı)</Text>
-          <View style={styles.yearRow}>
-            {YEARS.map((y) => {
-              const selected = year === y;
-              return (
-                <Pressable
-                  key={y}
-                  accessibilityRole="button"
-                  disabled={loading}
-                  onPress={() => setYear(selected ? "" : y)}
-                  style={[
-                    styles.yearChip,
-                    {
-                      borderColor: selected ? theme.accent : theme.border,
-                      backgroundColor: selected ? `${theme.accent}22` : theme.surface,
-                    },
-                  ]}
-                >
-                  <Text
+            <Text style={[styles.yearLabel, { color: theme.textMuted }]}>
+              Sınıf (isteğe bağlı)
+            </Text>
+            <View style={styles.yearRow}>
+              {YEARS.map((y) => {
+                const selected = year === y;
+                return (
+                  <Pressable
+                    key={y}
+                    accessibilityRole="button"
+                    disabled={loading}
+                    onPress={() => setYear(selected ? "" : y)}
                     style={[
-                      styles.yearChipText,
-                      { color: selected ? theme.accent : theme.text },
+                      styles.yearChip,
+                      {
+                        borderColor: selected ? theme.accent : theme.border,
+                        backgroundColor: selected ? theme.accent : theme.surface,
+                      },
                     ]}
                   >
-                    {y}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
+                    <Text
+                      style={[
+                        styles.yearChipText,
+                        {
+                          color: selected ? theme.accentForeground : theme.text,
+                        },
+                      ]}
+                    >
+                      {y}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
 
-          <Button label="Kayıt Ol" onPress={onSubmit} loading={loading} />
+            <Button label="Kayıt Ol" onPress={onSubmit} loading={loading} size="lg" />
+          </Card>
 
           <Text style={[styles.loginLine, { color: theme.textMuted }]}>
             Zaten hesabın var mı?{" "}
-            <Link href="/(auth)/login" style={{ color: theme.accent, fontWeight: "700" }}>
+            <Link
+              href="/(auth)/login"
+              style={{ color: theme.foreground, fontWeight: "600" }}
+            >
               Giriş yap
             </Link>
           </Text>
+
+          <View style={styles.legalRow}>
+            {legalLink("Gizlilik", PRIVACY_URL)}
+            {legalLink("Koşullar", TERMS_URL)}
+            {legalLink("Destek", SUPPORT_URL)}
+            {legalLink("Hesap sil", DELETE_ACCOUNT_URL)}
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -199,53 +234,75 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   scroll: { flexGrow: 1, justifyContent: "center" },
   formWrap: { width: "100%" },
-  header: { alignItems: "center", marginBottom: 24 },
-  brand: {
-    fontFamily: "Inter_900Black",
-    fontSize: 32,
-    letterSpacing: -0.5,
-  },
-  sub: {
-    marginTop: 8,
-    fontFamily: "Inter_400Regular",
-    fontSize: 15,
-  },
   errCard: { marginBottom: 16 },
   errRow: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
   errText: {
     flex: 1,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: Platform.select({
+      ios: "Inter_600SemiBold",
+      android: "Inter_600SemiBold",
+      default: "Inter_600SemiBold",
+    }),
     fontSize: 14,
     lineHeight: 20,
   },
   yearLabel: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 13,
+    fontFamily: Platform.select({
+      ios: "Inter_600SemiBold",
+      android: "Inter_600SemiBold",
+      default: "Inter_600SemiBold",
+    }),
+    fontSize: 14,
     marginBottom: 8,
   },
   yearRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginBottom: 18,
+    marginBottom: 16,
   },
   yearChip: {
     minWidth: 44,
     minHeight: 44,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 12,
   },
   yearChipText: {
-    fontFamily: "Inter_700Bold",
+    fontFamily: Platform.select({
+      ios: "Inter_600SemiBold",
+      android: "Inter_600SemiBold",
+      default: "Inter_600SemiBold",
+    }),
     fontSize: 14,
   },
   loginLine: {
     marginTop: 20,
     textAlign: "center",
-    fontFamily: "Inter_400Regular",
+    fontFamily: Platform.select({
+      ios: "Inter_400Regular",
+      android: "Inter_400Regular",
+      default: "Inter_400Regular",
+    }),
     fontSize: 14,
+  },
+  legalRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 12,
+    marginTop: 20,
+  },
+  legalHit: { minHeight: 36, justifyContent: "center" },
+  legalText: {
+    fontSize: 12,
+    textDecorationLine: "underline",
+    fontFamily: Platform.select({
+      ios: "Inter_400Regular",
+      android: "Inter_400Regular",
+      default: "Inter_400Regular",
+    }),
   },
 });

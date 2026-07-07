@@ -10,6 +10,7 @@ import {
   getOverallProgress,
   prerequisitesMet,
   isMapCompleted,
+  ensurePharmaProgressHydrated,
 } from "@/lib/pharmaProgress";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Footer from "@/components/Footer";
@@ -56,6 +57,7 @@ export default function PharmaMapsListPage() {
     (async () => {
       setLoading(true);
       try {
+        await ensurePharmaProgressHydrated();
         const [mapsRes, pathRes] = await Promise.all([
           pharmaApi.listMaps(),
           pharmaApi.getLearningPath(),

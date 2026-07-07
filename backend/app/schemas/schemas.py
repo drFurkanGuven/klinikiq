@@ -440,6 +440,23 @@ class PharmaMapOut(BaseModel):
     vignettes: List[PharmaVignette] = []
 
 
+class PharmaMapProgressOut(BaseModel):
+    map_id: str
+    visited: bool = False
+    quiz_completed: bool = False
+    quiz_score_pct: Optional[float] = None
+    path_tree_completed: bool = False
+    completed_at: Optional[datetime] = None
+
+
+class PharmaMapProgressPatch(BaseModel):
+    visited: Optional[bool] = None
+    quiz_completed: Optional[bool] = None
+    quiz_score_pct: Optional[float] = None
+    path_tree_completed: Optional[bool] = None
+    completed_at: Optional[datetime] = None
+
+
 class PharmaLearningPathItem(BaseModel):
     map_id: str
     order: int

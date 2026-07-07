@@ -398,7 +398,70 @@ export const studyApi = {
     session_id?: string;
     elapsed_ms?: number;
   }) => api.post<StudyAnswerResult>("/study/session/answer", body),
+  topics: () => api.get<StudyTopicMastery[]>("/study/topics"),
 };
+
+export interface StudyTopicMastery {
+  topic_slug: string;
+  topic_label: string;
+  seen: number;
+  correct: number;
+  mastery_pct: number;
+  map_href: string | null;
+}
+
+export interface PharmaMapSummary {
+  id: string;
+  title_tr: string;
+  description_tr: string;
+  order: number;
+  level: string;
+  estimated_minutes: number;
+  prerequisites: string[];
+  high_yield_count: number;
+  quiz_count: number;
+  vignette_count: number;
+}
+
+export const pharmaApi = {
+  listMaps: () => api.get<PharmaMapSummary[]>("/pharma/maps"),
+};
+
+export interface PharmaMapProgressRow {
+  map_id: string;
+  visited: boolean;
+  quiz_completed: boolean;
+  quiz_score_pct: number | null;
+  path_tree_completed: boolean;
+  completed_at: string | null;
+}
+
+export type PharmaMapProgressPatch = {
+  visited?: boolean;
+  quiz_completed?: boolean;
+  quiz_score_pct?: number | null;
+  path_tree_completed?: boolean;
+  completed_at?: string | null;
+};
+
+export const pharmaProgressApi = {
+  getProgress: () => api.get<PharmaMapProgressRow[]>("/pharma/progress"),
+  patchProgress: (mapId: string, body: PharmaMapProgressPatch) =>
+    api.patch<PharmaMapProgressRow>(
+      `/pharma/progress/${encodeURIComponent(mapId)}`,
+      body
+    ),
+};
+
+export interface StudyNoteItem {
+  session_id: string;
+  case_title: string;
+  specialty: string;
+  missed_diagnoses: string[];
+  pathophysiology_note?: string;
+  tus_reference?: string;
+  created_at: string;
+}
 
 export const leaderboardApi = {
   list: () => api.get<LeaderboardItem[]>("/users/leaderboard"),
@@ -529,6 +592,7 @@ export const microscopyApi = {
 export const usersApi = {
   history: () => api.get<HistoryItem[]>("/users/me/history"),
   getLeaderboard: () => leaderboardApi.list(),
+  getStudyNotes: () => api.get<StudyNoteItem[]>("/users/study-notes"),
   updateProfile: (data: { name?: string; school?: string; year?: number }) =>
     api.patch<UserOut>("/users/me", data),
 };

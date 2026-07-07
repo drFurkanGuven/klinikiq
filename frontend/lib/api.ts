@@ -550,6 +550,26 @@ export const pharmaApi = {
   listMaps: () => api.get<PharmaMapSummary[]>("/pharma/maps"),
   getMap: (mapId: string) => api.get<PharmaMap>(`/pharma/maps/${mapId}`),
   getLearningPath: () => api.get<PharmaLearningPath>("/pharma/learning-path"),
+  getProgress: () => api.get<PharmaMapProgressRow[]>("/pharma/progress"),
+  patchProgress: (mapId: string, body: PharmaMapProgressPatch) =>
+    api.patch<PharmaMapProgressRow>(`/pharma/progress/${encodeURIComponent(mapId)}`, body),
+};
+
+export interface PharmaMapProgressRow {
+  map_id: string;
+  visited: boolean;
+  quiz_completed: boolean;
+  quiz_score_pct: number | null;
+  path_tree_completed: boolean;
+  completed_at: string | null;
+}
+
+export type PharmaMapProgressPatch = {
+  visited?: boolean;
+  quiz_completed?: boolean;
+  quiz_score_pct?: number | null;
+  path_tree_completed?: boolean;
+  completed_at?: string | null;
 };
 
 export const usersApi = {

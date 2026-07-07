@@ -26,39 +26,61 @@ REVIEWER_EMAIL = os.getenv("REVIEWER_EMAIL", "review@klinikiq.app")
 REVIEWER_PASSWORD = os.getenv("REVIEWER_PASSWORD", "KlinikIQ-Review-2026!")
 REVIEWER_NAME = os.getenv("REVIEWER_NAME", "App Review")
 
+# İsteğe bağlı ek hesaplar (virgülle)
+EXTRA_REVIEWER_EMAILS = os.getenv("EXTRA_REVIEWER_EMAILS", "")
+
+
+async def upsert_reviewer(db, email: str, name: str) -> str:
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalar_one_or_none()
+    password_hash = get_password_hash(REVIEWER_PASSWORD)
+
+    if user:
+        user.password_hash = password_hash
+        user.name = name
+        user.school = "KlinikIQ Demo"
+        user.year = 6
+        user.is_admin = False
+        user.daily_limit = 50
+        return "güncellendi"
+
+    user = User(
+        email=email,
+        password_hash=password_hash,
+        name=name,
+        school="KlinikIQ Demo",
+        year=6,
+        is_admin=False,
+        daily_limit=50,
+    )
+    db.add(user)
+    return "oluşturuldu"
+
 
 async def seed_reviewer() -> None:
-    async with AsyncSessionLocal() as db:
-        result = await db.execute(select(User).where(User.email == REVIEWER_EMAIL))
-        user = result.scalar_one_or_none()
-        password_hash = get_password_hash(REVIEWER_PASSWORD)
+    emails = [REVIEWER_EMAIL] + [
+        e.strip() for e in EXTRA_REVIEWER_EMAILS.split(",") if e.strip()
+    ]
+    # Tekrarları kaldır, sırayı koru
+    seen: set[str] = set()
+    unique_emails: list[str] = []
+    for e in emails:
+        if e not in seen:
+            seen.add(e)
+            unique_emails.append(e)
 
-        if user:
-            user.password_hash = password_hash
-            user.name = REVIEWER_NAME
-            user.school = "KlinikIQ Demo"
-            user.year = 6
-            user.is_admin = False
-            user.daily_limit = 50
-            action = "güncellendi"
-        else:
-            user = User(
-                email=REVIEWER_EMAIL,
-                password_hash=password_hash,
-                name=REVIEWER_NAME,
-                school="KlinikIQ Demo",
-                year=6,
-                is_admin=False,
-                daily_limit=50,
-            )
-            db.add(user)
-            action = "oluşturuldu"
+    async with AsyncSessionLocal() as db:
+        for i, email in enumerate(unique_emails):
+            name = REVIEWER_NAME if i == 0 else f"App Review {i + 1}"
+            action = await upsert_reviewer(db, email, name)
+            print(f"Reviewer hesabı {action}:")
+            print(f"  E-posta : {email}")
+            print(f"  Şifre   : {REVIEWER_PASSWORD}")
+            print()
 
         await db.commit()
-        print(f"Reviewer hesabı {action}:")
-        print(f"  E-posta : {REVIEWER_EMAIL}")
-        print(f"  Şifre   : {REVIEWER_PASSWORD}")
-        print("Bu bilgileri App Store Connect Review Notes alanına ekleyin.")
+        print("Bu bilgileri App Store Connect → App Review Information → Notes alanına ekleyin.")
+        print("E-posta ve şifre birebir aynı olmalı; şifre boş bırakılırsa giriş 422 hatası verir.")
 
 
 if __name__ == "__main__":

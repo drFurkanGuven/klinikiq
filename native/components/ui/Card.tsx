@@ -5,9 +5,10 @@ import { useTheme } from "../../lib/theme";
 type Props = {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
+  muted?: boolean;
 };
 
-export function Card({ children, style }: Props) {
+export function Card({ children, style, muted }: Props) {
   const theme = useTheme();
 
   return (
@@ -15,8 +16,9 @@ export function Card({ children, style }: Props) {
       style={[
         styles.card,
         {
-          backgroundColor: theme.card,
+          backgroundColor: muted ? theme.surfaceMuted : theme.surface,
           borderColor: theme.border,
+          borderRadius: theme.radiusLg,
         },
         style,
       ]}
@@ -28,7 +30,6 @@ export function Card({ children, style }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
     borderWidth: 1,
     padding: 16,
   },

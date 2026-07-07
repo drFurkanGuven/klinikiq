@@ -24,6 +24,12 @@ export function getApiErrorMessage(
     if (!error.response) {
       return "İnternet bağlantınızı kontrol edin ve tekrar deneyin.";
     }
+    if (error.response.status === 422) {
+      return "E-posta veya şifre geçersiz. Lütfen her iki alanı da doldurun.";
+    }
+    if (error.response.status === 401) {
+      return "Hatalı e-posta veya şifre.";
+    }
     if (error.response.status >= 500) {
       return "Sunucu hatası. Lütfen daha sonra tekrar deneyin.";
     }

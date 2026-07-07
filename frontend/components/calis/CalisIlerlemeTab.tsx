@@ -28,7 +28,7 @@ import {
   type PharmaMapSummary,
 } from "@/lib/api";
 import { TopicRing } from "@/components/study/TopicRing";
-import { getMapProgress, getOverallProgress } from "@/lib/pharmaProgress";
+import { getMapProgress, getOverallProgress, ensurePharmaProgressHydrated } from "@/lib/pharmaProgress";
 import { nativeClient } from "@/lib/native";
 
 function computeCaseStats(history: HistoryItem[]) {
@@ -87,6 +87,7 @@ export function CalisIlerlemeTab() {
   const [notesCount, setNotesCount] = useState(0);
 
   useEffect(() => {
+    ensurePharmaProgressHydrated().then(() =>
     Promise.all([
       studyApi.dashboard(),
       studyApi.topics(),
@@ -104,7 +105,8 @@ export function CalisIlerlemeTab() {
         setNotesCount(notes.data.length);
       })
       .catch(() => {})
-      .finally(() => setLoading(false));
+      .finally(() => setLoading(false))
+    );
   }, []);
 
   if (loading) {

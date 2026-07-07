@@ -8,32 +8,31 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://klinikiq.furkanguven.space/api"
+        "EXPO_PUBLIC_API_URL": "https://klinikiq.furkanguven.space/api",
+        "EXPO_PUBLIC_WEB_URL": "https://klinikiq.furkanguven.space"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://klinikiq.furkanguven.space/api"
+        "EXPO_PUBLIC_API_URL": "https://klinikiq.furkanguven.space/api",
+        "EXPO_PUBLIC_WEB_URL": "https://klinikiq.furkanguven.space"
       }
     },
     "production": {
       "autoIncrement": false,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://klinikiq.furkanguven.space/api"
+        "EXPO_PUBLIC_API_URL": "https://klinikiq.furkanguven.space/api",
+        "EXPO_PUBLIC_WEB_URL": "https://klinikiq.furkanguven.space"
       }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "appleId": "REPLACE_WITH_APPLE_ID",
-        "ascAppId": "REPLACE_WITH_ASC_APP_ID",
-        "appleTeamId": "REPLACE_WITH_TEAM_ID"
-      },
-      "android": {
-        "serviceAccountKeyPath": "./google-play-service-account.json",
-        "track": "production"
+        "appleId": "drguevenfurkan@icloud.com",
+        "ascAppId": "6763659927",
+        "appleTeamId": "KX2WD572VH"
       }
     }
   }
