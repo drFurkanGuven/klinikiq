@@ -423,8 +423,48 @@ export interface PharmaMapSummary {
   vignette_count: number;
 }
 
+export type PharmaNodeType =
+  | "receptor"
+  | "mediator"
+  | "organ"
+  | "effect"
+  | "drug_class";
+
+export type PharmaRelation = "activates" | "inhibits" | "agonist" | "antagonist";
+
+export interface PharmaNode {
+  id: string;
+  label_tr: string;
+  type: PharmaNodeType;
+  description_tr: string;
+  high_yield: boolean;
+  memory_hook_tr?: string;
+}
+
+export interface PharmaEdge {
+  source: string;
+  target: string;
+  relation: PharmaRelation;
+  effect_tr: string;
+  mediated_by?: string | string[];
+}
+
+export interface PharmaMap {
+  id: string;
+  title_tr: string;
+  description_tr: string;
+  source_attribution: string;
+  path_tree_root?: string | null;
+  nodes: PharmaNode[];
+  edges: PharmaEdge[];
+  interventions: unknown[];
+  quiz: unknown[];
+  vignettes: unknown[];
+}
+
 export const pharmaApi = {
   listMaps: () => api.get<PharmaMapSummary[]>("/pharma/maps"),
+  getMap: (mapId: string) => api.get<PharmaMap>(`/pharma/maps/${mapId}`),
 };
 
 export interface PharmaMapProgressRow {

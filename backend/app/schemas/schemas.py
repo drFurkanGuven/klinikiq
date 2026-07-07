@@ -433,6 +433,7 @@ class PharmaMapOut(BaseModel):
     title_tr: str
     description_tr: str = ""
     source_attribution: str = ""
+    path_tree_root: Optional[str] = None
     nodes: List[PharmaNode] = []
     edges: List[PharmaEdge] = []
     interventions: List[PharmaIntervention] = []

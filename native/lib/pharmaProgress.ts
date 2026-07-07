@@ -156,3 +156,26 @@ export function getOverallProgress(
     pct: total > 0 ? Math.round((completed / total) * 100) : 0,
   };
 }
+
+async function updateMapProgress(
+  mapId: string,
+  patch: Partial<PharmaMapProgress>
+): Promise<void> {
+  const local = await readLocalStore();
+  const cur = local[mapId] ?? defaultProgress();
+  const next: PharmaMapProgress = { ...cur, ...patch };
+  local[mapId] = next;
+  await writeLocalStore(local);
+
+  const token = await storage.getToken();
+  if (!token) return;
+  void pharmaProgressApi.patchProgress(mapId, clientToPatch(next)).catch(() => {});
+}
+
+export async function markMapVisited(mapId: string): Promise<void> {
+  await updateMapProgress(mapId, { visited: true });
+}
+
+export async function markPathTreeCompleted(mapId: string): Promise<void> {
+  await updateMapProgress(mapId, { visited: true, pathTreeCompleted: true });
+}

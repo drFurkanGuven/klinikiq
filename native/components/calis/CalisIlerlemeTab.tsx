@@ -176,6 +176,15 @@ export function CalisIlerlemeTab() {
     router.push({ pathname: "/web", params: { path } });
   };
 
+  const openPharma = (mapId?: string) => {
+    void Haptics.selectionAsync();
+    if (mapId) {
+      router.push(`/farmakoloji/${mapId}`);
+    } else {
+      router.push("/farmakoloji");
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -297,7 +306,7 @@ export function CalisIlerlemeTab() {
           title="Farmakoloji haritaları"
           action={
             <Pressable
-              onPress={() => openWeb("/farmakoloji/haritalar")}
+              onPress={() => openPharma()}
               style={styles.sectionAction}
             >
               <Text style={[styles.sectionActionTxt, { color: theme.textMuted }]}>
@@ -347,7 +356,7 @@ export function CalisIlerlemeTab() {
                 return (
                   <Pressable
                     key={m.id}
-                    onPress={() => openWeb(`/farmakoloji/haritalar/${m.id}`)}
+                    onPress={() => openPharma(m.id)}
                     style={({ pressed }) => [
                       styles.mapRow,
                       pressed && { opacity: 0.88 },

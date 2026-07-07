@@ -3,6 +3,7 @@
   "title_tr": "Otonom Sinir Sistemi — Reseptör Mantık Haritası",
   "description_tr": "Sempatik ve parasempatik reseptörlerin (α, β, muskarinik) hedef organlar ve klinik etkilerle bağlantısını gösteren interaktif harita. Bir ilaç sınıfı seçerek reseptör → organ → etki zincirini takip edin.",
   "source_attribution": "Reseptör–ligand ve sinyal ilişkileri IUPHAR/BPS Guide to PHARMACOLOGY (GtoPdb) temel alınarak derlenmiştir. Lisans: CC BY-SA 4.0 — https://www.guidetopharmacology.org",
+  "path_tree_root": "med_epi",
   "nodes": [
     {
       "id": "med_ne",
@@ -134,7 +135,7 @@
       "label_tr": "Damar düz kası",
       "type": "organ",
       "high_yield": true,
-      "description_tr": "α1 uyarısı vazokonstriksiyon; β2 uyarısı (iskelet kası) vazodilatasyon yapar. Net kan basıncı etkisi baskın reseptöre bağlıdır."
+      "description_tr": "α1 uyarısı vazokonstriksiyon; β2 uyarısı iskelet kası yatağında vazodilatasyon → lokal perfüzyon ↑. Net sistemik KB baskın reseptöre ve doza bağlıdır."
     },
     {
       "id": "o_heart",
@@ -212,7 +213,14 @@
       "label_tr": "Kan basıncı ↓",
       "type": "effect",
       "high_yield": false,
-      "description_tr": "β2 aracılı vazodilatasyon veya santral α2 uyarısı ile sempatik çıkışın azalması sonucu görülür."
+      "description_tr": "β2 aracılı iskelet kası damarlarında vazodilatasyon; santral α2 uyarısı ile sempatik çıkışın azalması veya α1 blokajı sonucu görülür."
+    },
+    {
+      "id": "e_sk_flow_up",
+      "label_tr": "İskelet kası perfüzyonu ↑",
+      "type": "effect",
+      "high_yield": true,
+      "description_tr": "β2 aracılı iskelet kası damarlarında vazodilatasyon → lokal kan akışı ve oksijen sunumu artar. Adrenalinin düşük–orta doz etkisidir; sistemik KB düşüşü ikincil/paradoksaldır."
     },
     {
       "id": "e_hr_up",
@@ -289,6 +297,12 @@
       "target": "r_beta1",
       "relation": "agonist",
       "effect_tr": "Kalpteki β1'i uyarır"
+    },
+    {
+      "source": "med_epi",
+      "target": "r_alpha1",
+      "relation": "agonist",
+      "effect_tr": "Yüksek dozda α1'i güçlü uyarır"
     },
     {
       "source": "med_epi",
@@ -378,7 +392,7 @@
       "source": "r_beta2",
       "target": "o_vessel",
       "relation": "activates",
-      "effect_tr": "İskelet kası damarları genişler"
+      "effect_tr": "İskelet kası yatağında vazodilatasyon"
     },
     {
       "source": "r_beta3",
@@ -449,9 +463,9 @@
     },
     {
       "source": "o_vessel",
-      "target": "e_bp_down",
+      "target": "e_sk_flow_up",
       "relation": "activates",
-      "effect_tr": "β2 baskın: kan basıncı ↓",
+      "effect_tr": "β2: iskelet kası perfüzyonu ↑",
       "mediated_by": "r_beta2"
     },
     {
@@ -588,6 +602,14 @@
         {
           "nodeId": "o_bronchi",
           "effect_tr": "Bronş gevşer"
+        },
+        {
+          "nodeId": "o_vessel",
+          "effect_tr": "İskelet kası damarları genişler"
+        },
+        {
+          "nodeId": "e_sk_flow_up",
+          "effect_tr": "Periferik kan akışı ↑ (β2)"
         },
         {
           "nodeId": "e_bronchodil",

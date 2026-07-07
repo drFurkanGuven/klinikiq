@@ -5,8 +5,12 @@ export const getBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
 
   if (typeof window !== "undefined") {
-    const isAndroid = (window as any).Capacitor?.getPlatform() === "android";
-    const isCapacitorOrigin = window.location.protocol === "capacitor:";
+    const { hostname, origin, protocol } = window.location;
+    if (hostname !== "localhost" && hostname !== "127.0.0.1") {
+      return `${origin}/api`;
+    }
+    const isAndroid = (window as Window & { Capacitor?: { getPlatform: () => string } }).Capacitor?.getPlatform() === "android";
+    const isCapacitorOrigin = protocol === "capacitor:";
     if (isAndroid || isCapacitorOrigin) return "http://10.0.2.2:8000/api";
   }
 
@@ -525,6 +529,7 @@ export interface PharmaMap {
   title_tr: string;
   description_tr: string;
   source_attribution: string;
+  path_tree_root?: string | null;
   nodes: PharmaNode[];
   edges: PharmaEdge[];
   interventions: PharmaIntervention[];

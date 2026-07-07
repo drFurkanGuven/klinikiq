@@ -228,7 +228,7 @@ function MessageContent({
   theme: ReturnType<typeof useTheme>;
 }) {
   const parts = useMemo(() => splitContentForRender(content), [content]);
-  const textColor = alignRight ? "#FFFFFF" : theme.text;
+  const textColor = alignRight ? theme.accentForeground : theme.text;
   return (
     <>
       {parts.map((p, i) => {
@@ -431,7 +431,7 @@ function NativeReportMode({
               onPress={() => void fetchReport()}
               style={[styles.retryBtn, { backgroundColor: theme.accent }]}
             >
-              <Text style={{ color: "#fff", fontFamily: fontSemi() }}>Tekrar Dene</Text>
+              <Text style={{ color: theme.accentForeground, fontFamily: fontSemi() }}>Tekrar Dene</Text>
             </Pressable>
           </View>
         )}
@@ -864,7 +864,7 @@ function NativeSessionView({
             disabled={sending || !input.trim()}
             onPress={() => void sendMessage(input)}
           >
-            <Text style={[styles.sendBtnText, { fontFamily: fontSemi() }]}>
+            <Text style={{ color: theme.accentForeground, fontFamily: fontSemi() }}>
               ➤ Gönder
             </Text>
           </Pressable>
@@ -1012,7 +1012,7 @@ function NativeSessionView({
                       { backgroundColor: theme.accent, opacity: can ? 1 : 0.4 },
                     ]}
                   >
-                    <Text style={{ color: "#fff", fontFamily: fontSemi() }}>
+                    <Text style={{ color: theme.accentForeground, fontFamily: fontSemi() }}>
                       Seç
                     </Text>
                   </Pressable>
@@ -1099,7 +1099,7 @@ function NativeSessionView({
                   }}
                   style={[styles.examApply, { backgroundColor: theme.accent }]}
                 >
-                  <Text style={{ color: "#fff", fontFamily: fontSemi() }}>
+                  <Text style={{ color: theme.accentForeground, fontFamily: fontSemi() }}>
                     Uygula
                   </Text>
                 </Pressable>
@@ -1219,7 +1219,7 @@ function NativeSessionView({
                 },
               ]}
             >
-              <Text style={{ color: "#fff", fontFamily: fontBold() }}>
+              <Text style={{ color: theme.accentForeground, fontFamily: fontBold() }}>
                 Vakayı Tamamla
               </Text>
             </Pressable>
@@ -1397,7 +1397,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   sendBtnText: {
-    color: "#fff",
     fontSize: 14,
   },
   actionRow: {

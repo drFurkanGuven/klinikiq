@@ -1,4 +1,4 @@
-import type { PharmaMap, PharmaNode, PharmaEdge } from "@/lib/api";
+import type { PharmaMap, PharmaNode, PharmaEdge } from "./api";
 
 export interface PathTreeNode {
   id: string;
@@ -47,7 +47,7 @@ function buildSubtree(
   visited: Set<string>,
   fillCount: { n: number },
   outEdges: Map<string, OutEdge[]>,
-  nodeById: Map<string, PharmaNode>,
+  nodeById: Map<string, PharmaNode>
 ): PathTreeNode | null {
   if (depth > MAX_DEPTH || fillCount.n >= MAX_FILL_NODES) return null;
   const node = nodeById.get(nodeId);
@@ -70,7 +70,15 @@ function buildSubtree(
     visited.add(e.target);
     fillCount.n += 1;
     const nextAncestors = new Set(pathIds);
-    const child = buildSubtree(e.target, nextAncestors, depth + 1, visited, fillCount, outEdges, nodeById);
+    const child = buildSubtree(
+      e.target,
+      nextAncestors,
+      depth + 1,
+      visited,
+      fillCount,
+      outEdges,
+      nodeById
+    );
     if (child) {
       children.push({ ...child, edgeLabel: e.effect_tr });
     } else {
@@ -107,7 +115,6 @@ function indexEdges(edges: PharmaEdge[]): Map<string, OutEdge[]> {
   return outEdges;
 }
 
-/** Harita kenarlarından hafıza yürüyüşü ağacı üretir. */
 export function buildPathTree(map: PharmaMap): PathTreeNode | null {
   if (!map.nodes.length || !map.edges.length) return null;
 
@@ -137,7 +144,6 @@ function countNodes(t: PathTreeNode): number {
   return 1 + t.children.reduce((s, c) => s + countNodes(c), 0);
 }
 
-/** DFS: kökten başlayarak doldurulacak düğüm sırası (kök hariç). */
 export function getFillOrder(tree: PathTreeNode): PathTreeNode[] {
   const order: PathTreeNode[] = [];
   function walk(n: PathTreeNode, isRoot: boolean) {
@@ -148,7 +154,6 @@ export function getFillOrder(tree: PathTreeNode): PathTreeNode[] {
   return order;
 }
 
-/** İzleme animasyonu için tüm düğümler (kök dahil) DFS sırası. */
 export function getWalkOrder(tree: PathTreeNode): PathTreeNode[] {
   const order: PathTreeNode[] = [];
   function walk(n: PathTreeNode) {
@@ -160,7 +165,10 @@ export function getWalkOrder(tree: PathTreeNode): PathTreeNode[] {
 }
 
 export function shuffleOptions(correct: string, pool: string[]): string[] {
-  const distractors = pool.filter((l) => l !== correct).sort(() => Math.random() - 0.5).slice(0, 3);
+  const distractors = pool
+    .filter((l) => l !== correct)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3);
   const opts = [correct, ...distractors].sort(() => Math.random() - 0.5);
   return opts.length >= 2 ? opts : [correct, ...pool.filter((l) => l !== correct).slice(0, 1)];
 }

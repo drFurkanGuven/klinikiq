@@ -64,7 +64,11 @@ export function WebAppScreen({ path }: Props) {
         injectedJavaScriptBeforeContentLoaded={injectedJavaScript}
         onLoadStart={() => setLoading(true)}
         onLoadEnd={() => setLoading(false)}
-        originWhitelist={["https://*", "http://*"]}
+        originWhitelist={["https://*"]}
+        onShouldStartLoadWithRequest={(req) => {
+          const url = req.url ?? "";
+          return url.startsWith("https://");
+        }}
         setSupportMultipleWindows={Platform.OS === "android"}
       />
       {loading ? (

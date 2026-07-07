@@ -66,7 +66,10 @@ export default function OgrenTab() {
       label: "Farmakoloji",
       desc: "İlaç haritaları, yolak egzersizi ve quiz",
       icon: <Pill size={16} color={theme.foreground} />,
-      onPress: () => openWeb("/farmakoloji/haritalar"),
+      onPress: () => {
+        void Haptics.selectionAsync();
+        router.push("/farmakoloji");
+      },
     },
     {
       label: "Sıralama",

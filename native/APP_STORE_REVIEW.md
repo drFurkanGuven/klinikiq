@@ -39,4 +39,4 @@ Privacy: https://klinikiq.furkanguven.space/privacy
 - [ ] `seed_reviewer.py` production'da çalıştı
 - [ ] Simülatörde bu hesapla giriş test edildi
 - [ ] Review Notes'ta şifre yazılı
-- [ ] Sürüm 1.3.2, build 9+
+- [ ] Sürüm 1.3.2, build 10+
