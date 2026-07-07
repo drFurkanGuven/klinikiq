@@ -51,7 +51,7 @@ npx expo run:ios
 Her TestFlight yüklemesinde artırın:
 
 - `app.json` → `expo.version` (örn. 1.3.2)
-- `app.json` → `expo.ios.buildNumber` (örn. 10)
+- `app.json` → `expo.ios.buildNumber` (örn. 12)
 
 ## Store varlıkları
 
